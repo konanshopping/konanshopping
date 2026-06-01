@@ -1,0 +1,522 @@
+/* =========================
+   PAGE
+========================= */
+
+.deliveriesPage{
+  min-height:100vh;
+  background:#f4f7ff;
+  padding:30px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.deliveriesHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:30px;
+  gap:20px;
+}
+
+.deliveriesHeader h1{
+  font-size:34px;
+  font-weight:800;
+  color:#111827;
+}
+
+.deliveriesHeader p{
+  color:#6b7280;
+  margin-top:8px;
+  font-size:15px;
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.newDeliveryBtn{
+  border:none;
+  padding:16px 22px;
+  border-radius:18px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #7c3aed
+  );
+
+  color:white;
+
+  font-weight:700;
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  cursor:pointer;
+
+  box-shadow:
+  0 10px 25px
+  rgba(37,99,235,0.25);
+
+  transition:0.3s;
+}
+
+.newDeliveryBtn:hover{
+  transform:translateY(-3px);
+}
+
+/* =========================
+   STATS
+========================= */
+
+.deliveryStats{
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fit,minmax(220px,1fr));
+
+  gap:20px;
+
+  margin-bottom:30px;
+}
+
+.statCard{
+  background:white;
+
+  border-radius:24px;
+
+  padding:24px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:18px;
+
+  box-shadow:
+  0 10px 30px
+  rgba(0,0,0,0.06);
+
+  transition:0.3s;
+}
+
+.statCard:hover{
+  transform:translateY(-5px);
+}
+
+.statCard svg{
+  font-size:28px;
+  color:#2563eb;
+}
+
+.statCard h2{
+  font-size:28px;
+  font-weight:800;
+  color:#111827;
+}
+
+.statCard p{
+  color:#6b7280;
+  margin-top:4px;
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.searchBox{
+  background:white;
+
+  border-radius:18px;
+
+  padding:16px 20px;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  margin-bottom:30px;
+
+  box-shadow:
+  0 10px 30px
+  rgba(0,0,0,0.06);
+}
+
+.searchBox input{
+  border:none;
+  outline:none;
+  width:100%;
+  font-size:15px;
+  background:transparent;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.deliveriesGrid{
+  display:grid;
+
+  grid-template-columns:
+  repeat(auto-fit,minmax(360px,1fr));
+
+  gap:25px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.deliveryCard{
+  background:white;
+
+  border-radius:28px;
+
+  overflow:hidden;
+
+  box-shadow:
+  0 10px 35px
+  rgba(0,0,0,0.06);
+
+  transition:0.3s;
+}
+
+.deliveryCard:hover{
+  transform:translateY(-5px);
+}
+
+/* =========================
+   IMAGE
+========================= */
+
+.deliveryImage{
+  width:100%;
+  height:230px;
+  object-fit:cover;
+}
+
+/* =========================
+   TOP
+========================= */
+
+.deliveryTop{
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:15px;
+
+  padding:22px;
+}
+
+.deliveryTop h2{
+  font-size:22px;
+  font-weight:800;
+  color:#111827;
+}
+
+.deliveryTop p{
+  margin-top:6px;
+  color:#6b7280;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.statusDone{
+  background:#dcfce7;
+  color:#166534;
+
+  padding:10px 16px;
+
+  border-radius:14px;
+
+  font-weight:700;
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.statusPending{
+  background:#fef3c7;
+  color:#92400e;
+
+  padding:10px 16px;
+
+  border-radius:14px;
+
+  font-weight:700;
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* =========================
+   INFOS
+========================= */
+
+.deliveryInfos{
+  padding:0 22px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:14px;
+}
+
+.infoRow{
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  color:#374151;
+
+  font-size:15px;
+}
+
+/* =========================
+   DRIVER
+========================= */
+
+.driverCard{
+  margin:22px;
+
+  padding:18px;
+
+  border-radius:20px;
+
+  background:#f9fafb;
+}
+
+.driverCard h3{
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:16px;
+
+  color:#111827;
+}
+
+.driverBox{
+  display:flex;
+
+  align-items:center;
+
+  gap:14px;
+}
+
+.driverPhoto{
+  width:60px;
+  height:60px;
+
+  border-radius:50%;
+
+  object-fit:cover;
+}
+
+.driverBox h4{
+  font-size:17px;
+  color:#111827;
+}
+
+.driverBox p{
+  color:#6b7280;
+  margin-top:4px;
+}
+
+.noDriver{
+  color:#ef4444;
+  font-weight:600;
+}
+
+/* =========================
+   SELECT
+========================= */
+
+.driverSelect{
+  width:calc(100% - 44px);
+
+  margin:0 22px 22px 22px;
+
+  padding:15px;
+
+  border-radius:16px;
+
+  border:1px solid #e5e7eb;
+
+  background:#f9fafb;
+
+  outline:none;
+
+  font-size:15px;
+}
+
+/* =========================
+   GPS
+========================= */
+
+.gpsBox{
+  margin:0 22px 22px 22px;
+
+  padding:18px;
+
+  border-radius:20px;
+
+  background:#eff6ff;
+}
+
+.gpsBox h4{
+  margin-bottom:10px;
+  color:#1d4ed8;
+}
+
+.gpsBox p{
+  color:#374151;
+  margin-bottom:6px;
+}
+
+/* =========================
+   PRICE
+========================= */
+
+.priceBox{
+  margin:0 22px 22px 22px;
+
+  padding:20px;
+
+  border-radius:20px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #7c3aed
+  );
+
+  color:white;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:12px;
+}
+
+.priceBox h2{
+  font-size:28px;
+  font-weight:800;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.deliveryButtons{
+  display:flex;
+
+  gap:14px;
+
+  padding:0 22px 22px 22px;
+}
+
+.assignBtn,
+.trackBtn{
+  flex:1;
+
+  border:none;
+
+  padding:16px;
+
+  border-radius:16px;
+
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:0.3s;
+}
+
+.assignBtn{
+  background:#111827;
+  color:white;
+}
+
+.trackBtn{
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #7c3aed
+  );
+
+  color:white;
+}
+
+.assignBtn:hover,
+.trackBtn:hover{
+  transform:translateY(-3px);
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.deliveriesLoading{
+  min-height:100vh;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:24px;
+
+  font-weight:700;
+
+  background:#f4f7ff;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+  .deliveriesPage{
+    padding:20px;
+  }
+
+  .deliveriesHeader{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .deliveriesHeader h1{
+    font-size:28px;
+  }
+
+  .deliveryButtons{
+    flex-direction:column;
+  }
+
+}
