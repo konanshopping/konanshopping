@@ -55,7 +55,7 @@ export default function DriverRegister() {
           const upload =
             await axios.post(
 
-              "http://localhost:5000/upload",
+              "https://konanshopping.onrender.com/upload",
 
               data
 
@@ -71,7 +71,7 @@ export default function DriverRegister() {
         // =========================
 
     await axios.post(
-  "http://localhost:5000/driver-register",
+  "https://konanshopping.onrender.com/driver-register",
   {
     ...form,
     photo: photoUrl,

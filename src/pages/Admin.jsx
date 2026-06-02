@@ -61,7 +61,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "http://localhost:5000/orders"
+            "https://konanshopping.onrender.com/orders"
           );
 
         setOrders(res.data);
@@ -81,7 +81,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "http://localhost:5000/products"
+            "https://konanshopping.onrender.com/products"
           );
 
         setProducts(res.data);
@@ -277,7 +277,7 @@ const deleteProduct =
     try {
 
       await axios.delete(
-        `http://localhost:5000/delete-product/${id}`
+        `https://konanshopping.onrender.com/delete-product/${id}`
       );
 
       fetchProducts();
@@ -307,7 +307,7 @@ const saveEdit =
     try {
 
       await axios.put(
-        `http://localhost:5000/update-product/${id}`,
+        `https://konanshopping.onrender.com/update-product/${id}`,
         {
           name: editName,
           price: editPrice,
@@ -341,7 +341,7 @@ const addProduct =
 
       const uploadRes =
         await axios.post(
-          "http://localhost:5000/upload",
+          "https://konanshopping.onrender.com/upload",
           formData
         );
 
@@ -349,7 +349,7 @@ const addProduct =
         uploadRes.data.imageUrl;
 
       await axios.post(
-        "http://localhost:5000/add-product",
+        "https://konanshopping.onrender.com/add-product",
         {
           name,
           price,

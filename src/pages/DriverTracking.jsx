@@ -34,7 +34,7 @@ const [eta, setEta] =
 
         const res =
           await axios.get(
-            "http://localhost:5000/orders"
+            "https://konanshopping.onrender.com/orders"
           );
 
         // NOUVELLE COMMANDE
@@ -205,7 +205,7 @@ if (!driver) {
 
 await axios.put(
 
-  `http://localhost:5000/accept-order/${orderId}`,
+  `https://konanshopping.onrender.com/accept-order/${orderId}`,
 
   {
 
@@ -265,7 +265,7 @@ await axios.put(
 
             await axios.put(
 
-              `http://localhost:5000/order-location/${orderId}`,
+              `https://konanshopping.onrender.com/order-location/${orderId}`,
 
               {
 
@@ -325,7 +325,7 @@ await axios.put(
       try {
 
         await axios.put(
-  `http://localhost:5000/update-order-status/${orderId}`,
+  `https://konanshopping.onrender.com/update-order-status/${orderId}`,
   {
     status: "Livrée",
   }
@@ -358,7 +358,7 @@ const deleteOrder =
     try {
 
       await axios.delete(
-        `http://localhost:5000/delete-order/${id}`
+        `https://konanshopping.onrender.com/delete-order/${id}`
       );
 
       setOrders(
@@ -381,7 +381,7 @@ const deleteOrder =
     try {
 
       await axios.put(
-        `http://localhost:5000/update-order-status/${orderId}`,
+        `https://konanshopping.onrender.com/update-order-status/${orderId}`,
         {
           status: "Annulée",
         }

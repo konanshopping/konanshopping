@@ -12,7 +12,7 @@ function Login() {
     try {
 
       const res = await axios.post(
-        "http://localhost:5000/admin-login",
+        "https://konanshopping.onrender.com/admin-login",
         {
           email: email.trim(),
           password: password.trim(),

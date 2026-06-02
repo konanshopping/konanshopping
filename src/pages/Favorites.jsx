@@ -46,7 +46,7 @@ function Favorites() {
 
       axios
         .get(
-          `http://localhost:5000/favorites/${user._id}`
+          `https://konanshopping.onrender.com/favorites/${user._id}`
         )
 
         .then((res) => {
@@ -306,7 +306,7 @@ useEffect(() => {
 
       await axios.delete(
 
-        `http://localhost:5000/favorites/${user._id}/${productId}`
+        `https://konanshopping.onrender.com/favorites/${user._id}/${productId}`
 
       );
 

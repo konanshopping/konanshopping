@@ -126,7 +126,7 @@ try {
 
 const res =
 await axios.get(
-"http://localhost:5000/products"
+"https://konanshopping.onrender.com/products"
 );
 
 setFeaturedProducts(
@@ -340,7 +340,7 @@ try{
 
 const res =
 await axios.post(
-"http://localhost:5000/ai-chat",
+"https://konanshopping.onrender.com/ai-chat",
 {
 message,
 

@@ -491,7 +491,7 @@ const toggleWishlist =
 
           await axios.delete(
 
-            `http://localhost:5000/favorites/${user._id}/${product._id}`
+            `https://konanshopping.onrender.com/favorites/${user._id}/${product._id}`
 
           );
 
@@ -566,7 +566,7 @@ if (!alreadyAdded) {
       try {
 
         await axios.post(
-          "http://localhost:5000/favorites",
+          "https://konanshopping.onrender.com/favorites",
           {
 
             userId: user._id,
@@ -639,7 +639,7 @@ if (!alreadyAdded) {
   useEffect(() => {
 
     axios
-      .get("http://localhost:5000/products")
+      .get("https://konanshopping.onrender.com/products")
       .then((res) => {
 
         setProducts(res.data);

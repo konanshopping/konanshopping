@@ -40,7 +40,7 @@ function AdminOrders() {
 
         const res =
           await axios.get(
-            "http://localhost:5000/orders"
+            "https://konanshopping.onrender.com/orders"
           );
 
         setOrders(res.data);
@@ -66,7 +66,7 @@ function AdminOrders() {
       try {
 
         await axios.put(
-          `http://localhost:5000/orders/${id}`,
+          `https://konanshopping.onrender.com/orders/${id}`,
           {
             status,
           }

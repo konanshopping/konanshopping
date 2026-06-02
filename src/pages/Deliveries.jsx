@@ -64,7 +64,7 @@ export default function Deliveries() {
   useEffect(() => {
 
     fetch(
-      "http://localhost:5000/api/orders"
+      "https://konanshopping.onrender.com/api/orders"
     )
       .then((res) =>
         res.json()
@@ -95,7 +95,7 @@ export default function Deliveries() {
   useEffect(() => {
 
     fetch(
-      "http://localhost:5000/api/drivers"
+      "https://konanshopping.onrender.com/api/drivers"
     )
       .then((res) =>
         res.json()
@@ -128,7 +128,7 @@ export default function Deliveries() {
         const res =
           await fetch(
 
-            `http://localhost:5000/api/orders/${orderId}/assign-driver`,
+            `https://konanshopping.onrender.com/api/orders/${orderId}/assign-driver`,
 
             {
               method: "PUT",
@@ -619,7 +619,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `http://localhost:5000/api/orders/${order._id}`,
+                        `https://konanshopping.onrender.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -686,7 +686,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `http://localhost:5000/api/orders/${order._id}`,
+                        `https://konanshopping.onrender.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -753,7 +753,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `http://localhost:5000/api/orders/${order._id}`,
+                        `https://konanshopping.onrender.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -803,7 +803,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `http://localhost:5000/api/orders/${order._id}`,
+                        `https://konanshopping.onrender.com/api/orders/${order._id}`,
 
                         {
                           method:

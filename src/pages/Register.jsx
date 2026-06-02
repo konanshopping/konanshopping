@@ -22,7 +22,7 @@ function Register() {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:5000/register",
+        "https://konanshopping.onrender.com/register",
         {
           name,
           email,

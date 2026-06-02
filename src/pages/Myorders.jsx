@@ -57,7 +57,7 @@ function MyOrders() {
     axios
 
       .get(
-        `http://localhost:5000/my-orders/${user._id}`
+        `https://konanshopping.onrender.com/my-orders/${user._id}`
       )
 
       .then((res) => {
@@ -77,7 +77,7 @@ function MyOrders() {
     axios
 
       .get(
-        "http://localhost:5000/products"
+        "https://konanshopping.onrender.com/products"
       )
 
       .then((res) => {

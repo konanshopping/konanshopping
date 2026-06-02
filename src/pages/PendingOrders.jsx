@@ -18,7 +18,7 @@ export default function PendingOrders() {
 
       const res = await axios.get(
 
-        `http://localhost:5000/my-orders/${user._id}`
+        `https://konanshopping.onrender.com/my-orders/${user._id}`
 
       );
 

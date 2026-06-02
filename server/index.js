@@ -300,7 +300,7 @@ app.post(
     res.json({
   imageUrl:
     req.file.secure_url ||
-    "http://localhost:5000/" +
+    "https://konanshopping.onrender.com/" +
     req.file.path,
 });
 

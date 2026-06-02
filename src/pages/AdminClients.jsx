@@ -60,7 +60,7 @@ function AdminClients() {
 
         const res =
           await axios.get(
-            "http://localhost:5000/users"
+            "https://konanshopping.onrender.com/users"
           );
 
         setUsers(res.data);
@@ -84,7 +84,7 @@ function AdminClients() {
 
         const res =
           await axios.get(
-            "http://localhost:5000/visitors"
+            "https://konanshopping.onrender.com/visitors"
           );
 
         setVisitors(res.data);

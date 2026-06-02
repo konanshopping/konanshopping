@@ -68,7 +68,7 @@ function AdminStats() {
 
         const productsRes =
           await axios.get(
-            "http://localhost:5000/products"
+            "https://konanshopping.onrender.com/products"
           );
 
         setProducts(
@@ -79,7 +79,7 @@ function AdminStats() {
 
         const usersRes =
           await axios.get(
-            "http://localhost:5000/users"
+            "https://konanshopping.onrender.com/users"
           );
 
         setUsers(
@@ -90,7 +90,7 @@ function AdminStats() {
 
         const visitorsRes =
           await axios.get(
-            "http://localhost:5000/visitors"
+            "https://konanshopping.onrender.com/visitors"
           );
 
         setVisitors(
@@ -103,7 +103,7 @@ function AdminStats() {
 
           const ordersRes =
             await axios.get(
-              "http://localhost:5000/orders"
+              "https://konanshopping.onrender.com/orders"
             );
 
           setOrders(
