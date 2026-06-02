@@ -31,7 +31,7 @@ import Account from "./pages/Account";
 import ProductDetails from "./pages/ProductDetails";
 
 import MyOrders
-from "./pages/MyOrders";
+from "./pages/Myorders";
 
 import Coupons from "./pages/Coupons";
 
