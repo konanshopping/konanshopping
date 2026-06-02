@@ -3026,6 +3026,30 @@ app.post(
   }
 );
 
+app.get("/fix-images", async (req, res) => {
+  try {
+    const Product = require("./models/product");
+
+    const products = await Product.find({
+      image: { $regex: "http://localhost:5000" },
+    });
+
+    for (const product of products) {
+      product.image = product.image.replace(
+        "http://localhost:5000",
+        "https://konanshopping.onrender.com"
+      );
+
+      await product.save();
+    }
+
+    res.send(`✅ ${products.length} produits corrigés`);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Erreur");
+  }
+});
+
 // =========================
 // START SERVER
 // =========================
