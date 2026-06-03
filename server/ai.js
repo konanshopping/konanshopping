@@ -8,10 +8,13 @@ const {
 
 console.log(process.env.GEMINI_API_KEY);
 
-const genAI =
-  new GoogleGenerativeAI(
-    process.env.GEMINI_API_KEY.trim()
-  );
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+
+if (!GEMINI_API_KEY) {
+  console.error("GEMINI_API_KEY manquante !");
+}
+
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 // =========================
 // KONAN AI ELITE
