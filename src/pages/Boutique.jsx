@@ -2680,7 +2680,7 @@ useEffect(() => {
   window.innerWidth < 768
     ? "repeat(2, 1fr)"
     : "repeat(4, 1fr)",
-            gap: window.innerWidth < 768 ? "13px" : "25px",
+            gap: window.innerWidth < 768 ? "15px" : "25px",
           }}
         >
 
