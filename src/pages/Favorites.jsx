@@ -73,20 +73,27 @@ function Favorites() {
     // CLIENT NON CONNECTÉ
     // ======================
 
-    else {
+   else {
 
-      const savedFavorites =
-        JSON.parse(
-          localStorage.getItem(
-            "favorites"
-          )
-        ) || [];
+  const clientId =
 
-      setFavorites(savedFavorites);
+    localStorage.getItem("guestId");
 
-      setLoading(false);
+  const favoritesKey =
+    `favorites_${clientId}`;
 
-    }
+  const savedFavorites =
+    JSON.parse(
+      localStorage.getItem(
+        favoritesKey
+      )
+    ) || [];
+
+  setFavorites(savedFavorites);
+
+  setLoading(false);
+
+}
 
   }, []);
 
