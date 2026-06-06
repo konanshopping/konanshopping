@@ -1154,14 +1154,11 @@ useEffect(() => {
 <div
   style={{
     width: "100%",
-
     display: "flex",
-
     justifyContent: "center",
-
-    gap: "10px",
-
-    marginTop: "10px",
+    gap: "25px",
+    marginTop: "15px",
+    marginBottom: "25px",
   }}
 >
 
@@ -1192,8 +1189,8 @@ useEffect(() => {
 
           gap:
             window.innerWidth < 768
-              ? "6px"
-              : "10px",
+              ? "20px"
+              : "30px",
         }}
       >
 
