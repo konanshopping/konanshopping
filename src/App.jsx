@@ -1358,18 +1358,17 @@ FCFA
     }
 
     style={{
-      flex: 1,
+  flex: 1,
+  border: "none",
+  outline: "none",
+  fontSize: "13px",
+  padding: "6px 0",
+  background: "transparent",
 
-      border: "none",
-
-      outline: "none",
-
-      fontSize: "13px",
-
-      padding: "6px 0",
-
-      background: "transparent",
-    }}
+  color: "#111827",
+  WebkitTextFillColor: "#111827",
+  caretColor: "#4B2E83",
+}}
   />
 
   <button
