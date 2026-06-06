@@ -798,7 +798,7 @@ useEffect(() => {
 
   }
 
-}, [products]);
+}, [filteredProducts]);
 
   return (
 
@@ -1000,70 +1000,97 @@ useEffect(() => {
 >
  {/* SEARCH */}
 
-      <div
-        style={{
-          position: "relative",
-        }}
-      >
+<div
+  style={{
+    position: "relative",
+  }}
+>
 
-        <FaSearch
-          style={{
-            position: "absolute",
+  <FaSearch
+    style={{
+      position: "absolute",
 
-            top: "11px",
+      top: "50%",
 
-            left: "14px",
+      transform: "translateY(-50%)",
 
-            color: "#9ca3af",
+      left: "14px",
 
-            fontSize: "13px",
-          }}
-        />
+      color: "#9ca3af",
 
-        <input
-          type="text"
+      fontSize: "13px",
 
-          placeholder="Rechercher..."
+      pointerEvents: "none",
+    }}
+  />
 
-          value={search}
+  <input
+    type="text"
 
-          onChange={(e) =>
-            setSearch(
-              e.target.value
-            )
-          }
+    placeholder="Rechercher..."
 
-          style={{
-            padding:
-              "8px 14px 8px 34px",
+    value={search}
 
-            borderRadius: "30px",
+    onChange={(e) =>
+      setSearch(
+        e.target.value
+      )
+    }
 
-            border:
-              "1px solid #e5e7eb",
+    style={{
+      padding:
+        "8px 14px 8px 34px",
 
-            width:
-              window.innerWidth < 768
-                ? "140px"
-                : "220px",
+      borderRadius: "30px",
 
-            outline: "none",
+      border:
+        "1px solid #e5e7eb",
 
-            fontSize: "13px",
+      width:
+        window.innerWidth < 768
+          ? "140px"
+          : "220px",
 
-            fontWeight: "500",
+      outline: "none",
 
-            background:
-              "linear-gradient(135deg,#fff,#f9fafb)",
+      fontSize: "13px",
 
-            boxShadow:
-              "0 3px 10px rgba(0,0,0,0.03)",
+      fontWeight: "500",
 
-            transition: "0.3s",
-          }}
-        />
+      color: "#111827",
 
-      </div>
+      background:
+        "linear-gradient(135deg,#fff,#f9fafb)",
+
+      boxShadow:
+        "0 5px 15px rgba(0,0,0,0.05)",
+
+      transition:
+        "all 0.3s ease",
+    }}
+
+    onFocus={(e) => {
+
+      e.target.style.boxShadow =
+        "0 8px 20px rgba(91,108,255,0.15)";
+
+      e.target.style.border =
+        "1px solid #5b6cff";
+
+    }}
+
+    onBlur={(e) => {
+
+      e.target.style.boxShadow =
+        "0 5px 15px rgba(0,0,0,0.05)";
+
+      e.target.style.border =
+        "1px solid #e5e7eb";
+
+    }}
+  />
+
+</div>
 
       </div>
 
