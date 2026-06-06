@@ -1304,10 +1304,10 @@ useEffect(() => {
   style={{
     height:
       window.innerWidth < 768
-        ? "210px"
-        : "260px",
+        ? "180px"
+        : "240px",
 
-    borderRadius: "34px",
+    borderRadius: "24px",
 
     overflow: "hidden",
 
@@ -1400,7 +1400,7 @@ useEffect(() => {
 
             width: "fit-content",
 
-            padding: "8px 16px",
+            padding: "6px 12px",
 
             borderRadius: "50px",
 
@@ -1415,7 +1415,7 @@ useEffect(() => {
 
             marginBottom: "16px",
 
-            fontSize: "12px",
+            fontSize: "11px",
 
             fontWeight: "800",
 
@@ -1437,8 +1437,8 @@ useEffect(() => {
 
             fontSize:
               window.innerWidth < 768
-                ? "32px"
-                : "52px",
+                ? "24px"
+                : "44px",
 
             fontWeight: "900",
 
@@ -1458,15 +1458,15 @@ useEffect(() => {
 
             fontSize:
               window.innerWidth < 768
-                ? "14px"
-                : "18px",
+                ? "12px"
+                : "16px",
 
             color:
               "rgba(255,255,255,0.92)",
 
             maxWidth: "520px",
 
-            lineHeight: "28px",
+            lineHeight: "22px",
 
             fontWeight: "500",
           }}
