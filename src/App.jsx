@@ -812,7 +812,7 @@ setLoading(false);
 
     </div>
 
-    {/* SEARCH */}
+   {/* SEARCH */}
 
     <div
       style={{
@@ -884,14 +884,18 @@ setSuggestions([]);
 }}
 
           style={{
-            flex: 1,
-            border: "none",
-            outline: "none",
-            padding: "8px 12px",
-            fontSize: "13px",
-            background: "transparent",
-          }}
-        />
+  flex: 1,
+  border: "none",
+  outline: "none",
+  padding: "8px 12px",
+  fontSize: "13px",
+  background: "transparent",
+
+  color: "#111827",
+  WebkitTextFillColor: "#111827",
+  caretColor: "#4B2E83",
+}}
+  />
 
         <button
           style={{
