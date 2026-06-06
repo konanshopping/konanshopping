@@ -798,7 +798,7 @@ useEffect(() => {
 
   }
 
-}, [filteredProducts]);
+}, [products]);
 
   return (
 
