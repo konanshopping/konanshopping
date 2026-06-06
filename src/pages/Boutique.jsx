@@ -1000,70 +1000,105 @@ useEffect(() => {
 >
   {/* SEARCH */}
 
-      <div
-        style={{
-          position: "relative",
-        }}
-      >
+<div
+  style={{
+    position: "relative",
+  }}
+>
 
-        <FaSearch
-          style={{
-            position: "absolute",
+  <FaSearch
+    style={{
+      position: "absolute",
 
-            top: "11px",
+      top: "50%",
 
-            left: "14px",
+      transform: "translateY(-50%)",
 
-            color: "#9ca3af",
+      left: "14px",
 
-            fontSize: "13px",
-          }}
-        />
+      color: "#9ca3af",
 
-        <input
-          type="text"
+      fontSize: "13px",
 
-          placeholder="Rechercher..."
+      pointerEvents: "none",
+    }}
+  />
 
-          value={search}
+  <input
+    type="text"
 
-          onChange={(e) =>
-            setSearch(
-              e.target.value
-            )
-          }
+    placeholder="Rechercher un produit..."
 
-          style={{
-            padding:
-              "8px 14px 8px 34px",
+    value={search}
 
-            borderRadius: "30px",
+    onChange={(e) =>
+      setSearch(e.target.value)
+    }
 
-            border:
-              "1px solid #e5e7eb",
+    onFocus={(e) => {
 
-            width:
-              window.innerWidth < 768
-                ? "140px"
-                : "220px",
+      e.target.style.width =
+        window.innerWidth < 768
+          ? "170px"
+          : "260px";
 
-            outline: "none",
+      e.target.style.boxShadow =
+        "0 10px 25px rgba(91,108,255,0.15)";
 
-            fontSize: "13px",
+      e.target.style.border =
+        "1px solid #5b6cff";
 
-            fontWeight: "500",
+    }}
 
-            background:
-              "linear-gradient(135deg,#fff,#f9fafb)",
+    onBlur={(e) => {
 
-            boxShadow:
-              "0 3px 10px rgba(0,0,0,0.03)",
+      e.target.style.width =
+        window.innerWidth < 768
+          ? "140px"
+          : "220px";
 
-            transition: "0.3s",
-          }}
-        />
+      e.target.style.boxShadow =
+        "0 3px 10px rgba(0,0,0,0.03)";
 
-      </div>
+      e.target.style.border =
+        "1px solid #e5e7eb";
+
+    }}
+
+    style={{
+      padding:
+        "8px 14px 8px 34px",
+
+      borderRadius: "30px",
+
+      border:
+        "1px solid #e5e7eb",
+
+      width:
+        window.innerWidth < 768
+          ? "140px"
+          : "220px",
+
+      outline: "none",
+
+      fontSize: "13px",
+
+      fontWeight: "500",
+
+      color: "#111827",
+
+      background:
+        "linear-gradient(135deg,#fff,#f9fafb)",
+
+      boxShadow:
+        "0 3px 10px rgba(0,0,0,0.03)",
+
+      transition:
+        "all 0.3s ease",
+    }}
+  />
+
+</div>
 
       </div>
 
