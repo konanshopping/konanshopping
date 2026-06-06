@@ -1379,8 +1379,8 @@ useEffect(() => {
 
           bottom:
             window.innerWidth < 768
-              ? "22px"
-              : "34px",
+              ? "14px"
+              : "28px",
 
           color: "white",
 
@@ -1437,8 +1437,8 @@ useEffect(() => {
 
             fontSize:
               window.innerWidth < 768
-                ? "24px"
-                : "44px",
+                ? "20px"
+                : "40px",
 
             fontWeight: "900",
 
