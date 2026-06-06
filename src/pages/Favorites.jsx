@@ -73,19 +73,12 @@ function Favorites() {
     // CLIENT NON CONNECTÉ
     // ======================
 
-   else {
-
-  const clientId =
-
-    localStorage.getItem("guestId");
-
-  const favoritesKey =
-    `favorites_${clientId}`;
+  else {
 
   const savedFavorites =
     JSON.parse(
       localStorage.getItem(
-        favoritesKey
+        "favorites"
       )
     ) || [];
 
