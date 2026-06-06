@@ -838,7 +838,7 @@ useEffect(() => {
 
       padding:
         window.innerWidth < 768
-          ? "8px"
+          ? "10px 12px"
           : "12px 18px",
 
       display: "flex",
@@ -894,13 +894,13 @@ useEffect(() => {
           style={{
             width:
               window.innerWidth < 768
-                ? "32px"
-                : "32px",
+                ? "40px"
+                : "46px",
 
             height:
               window.innerWidth < 768
-                ? "32px"
-                : "32px",
+                ? "40px"
+                : "46px",
 
             borderRadius: "14px",
 
@@ -946,7 +946,7 @@ useEffect(() => {
 
               fontSize:
                 window.innerWidth < 768
-                  ? "15px"
+                  ? "18px"
                   : "22px",
 
               fontWeight: "800",
@@ -993,26 +993,19 @@ useEffect(() => {
     {/* MENU */}
 
     <div
-  style={{
-    display: "flex",
+      style={{
+        display: "flex",
 
-    alignItems: "center",
+        alignItems: "center",
 
-    justifyContent:
-      window.innerWidth < 768
-        ? "center"
-        : "flex-end",
+        gap:
+          window.innerWidth < 768
+            ? "8px"
+            : "14px",
 
-    width: "100%",
-
-    gap:
-      window.innerWidth < 768
-        ? "8px"
-        : "14px",
-
-    flexWrap: "wrap",
-  }}
->
+        flexWrap: "wrap",
+      }}
+    >
 
       {/* NAVIGATION */}
 
@@ -1044,7 +1037,7 @@ useEffect(() => {
             background:
               "#f8fafc",
 
-            padding: "7px 10px",
+            padding: "8px 12px",
 
             borderRadius: "12px",
 
@@ -1052,7 +1045,7 @@ useEffect(() => {
 
             fontWeight: "600",
 
-            fontSize: "12px",
+            fontSize: "13px",
           }}
         >
           <FaHome />
@@ -1173,7 +1166,7 @@ useEffect(() => {
 
             width:
               window.innerWidth < 768
-                ? "130px"
+                ? "170px"
                 : "210px",
 
             outline: "none",
@@ -2126,7 +2119,7 @@ useEffect(() => {
 
       height:
         window.innerWidth < 768
-          ? "180px"
+          ? "220px"
           : "260px",
 
       overflow: "hidden",
@@ -2680,18 +2673,14 @@ useEffect(() => {
         {/* PRODUITS */}
 
         <div
-  style={{
-    flex: 1,
-    display: "grid",
-
-    gridTemplateColumns:
-      window.innerWidth < 768
-        ? "repeat(2, 1fr)"
-        : "repeat(4, 1fr)",
-
-    gap: "15px",
-  }}
->
+          style={{
+            flex: 1,
+            display: "grid",
+         gridTemplateColumns:
+  "repeat(4, 1fr)",
+            gap: "25px",
+          }}
+        >
 
        {randomProducts.map((product) => (
 
@@ -2725,9 +2714,9 @@ useEffect(() => {
      style={{
   background: "white",
 
-  borderRadius: "20px",
+  borderRadius: "28px",
 
-  padding: window.innerWidth < 768 ? "10px" : "16px",
+  padding: "16px",
 
   transition: "0.35s",
 
@@ -2737,15 +2726,17 @@ useEffect(() => {
 
   overflow: "hidden",
 
-  border: "1px solid #eef2ff",
+  border:
+    "1px solid #eef2ff",
 
-  boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
+  boxShadow:
+    "0 10px 25px rgba(0,0,0,0.05)",
 
   display: "flex",
 
   flexDirection: "column",
 
-  minHeight: window.innerWidth < 768 ? "300px" : "390px",
+  minHeight: "390px",
 }}
     >
 
@@ -2796,24 +2787,23 @@ useEffect(() => {
 
       </div>
 
-  <img
+      <img
   src={product.image}
   alt=""
 
   style={{
     width: "100%",
 
-    height:
-      window.innerWidth < 768
-        ? "130px"
-        : "190px",
+    height: "190px",
 
-    objectFit: "contain",
+    objectFit: "cover",
 
-    borderRadius: "14px",
+    borderRadius: "20px",
 
     background:
       "linear-gradient(135deg,#f9fafb,#eef2ff)",
+
+    display: "block",
   }}
 />
 
