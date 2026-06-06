@@ -1158,7 +1158,7 @@ useEffect(() => {
     justifyContent: "center",
     gap: "25px",
     marginTop: "15px",
-    marginBottom: "25px",
+    marginBottom: "40px",
   }}
 >
 
