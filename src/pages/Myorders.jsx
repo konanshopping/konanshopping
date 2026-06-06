@@ -57,7 +57,7 @@ function MyOrders() {
     axios
 
       .get(
-        `https://konanshopping.onrender.com/my-orders/${user._id}`
+        `https://konanshopping-production.up.railway.app/my-orders/${user._id}`
       )
 
       .then((res) => {
@@ -77,7 +77,7 @@ function MyOrders() {
     axios
 
       .get(
-        "https://konanshopping.onrender.com/products"
+        "https://konanshopping-production.up.railway.app/products"
       )
 
       .then((res) => {

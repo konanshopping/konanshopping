@@ -300,7 +300,7 @@ app.post(
     res.json({
   imageUrl:
     req.file.secure_url ||
-    "https://konanshopping.onrender.com/" +
+    "https://konanshopping-production.up.railway.app/" +
     req.file.path,
 });
 
@@ -3037,7 +3037,7 @@ app.get("/fix-images", async (req, res) => {
     for (const product of products) {
       product.image = product.image.replace(
         "http://localhost:5000",
-        "https://konanshopping.onrender.com"
+        "https://konanshopping-production.up.railway.app"
       );
 
       await product.save();

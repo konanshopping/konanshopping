@@ -8,7 +8,7 @@ function Orders() {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping.onrender.com/orders")
+      .get("https://konanshopping-production.up.railway.app/orders")
       .then((res) => {
 
         setOrders(res.data);
@@ -30,7 +30,7 @@ const updateStatus = async (
   try {
 
     await axios.put(
-      `https://konanshopping.onrender.com/orders/${id}`,
+      `https://konanshopping-production.up.railway.app/orders/${id}`,
       {
         status,
       }

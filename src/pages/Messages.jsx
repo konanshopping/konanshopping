@@ -48,7 +48,7 @@ const sendMessage = async () => {
   try {
 
     const res = await axios.post(
-      "https://konanshopping.onrender.com/ai/chat",
+      "https://konanshopping-production.up.railway.app/ai/chat",
       {
 
         message: currentInput,

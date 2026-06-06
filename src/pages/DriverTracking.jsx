@@ -34,7 +34,7 @@ const [eta, setEta] =
 
         const res =
           await axios.get(
-            "https://konanshopping.onrender.com/orders"
+            "https://konanshopping-production.up.railway.app/orders"
           );
 
         // NOUVELLE COMMANDE
@@ -205,7 +205,7 @@ if (!driver) {
 
 await axios.put(
 
-  `https://konanshopping.onrender.com/accept-order/${orderId}`,
+  `https://konanshopping-production.up.railway.app/accept-order/${orderId}`,
 
   {
 
@@ -265,7 +265,7 @@ await axios.put(
 
             await axios.put(
 
-              `https://konanshopping.onrender.com/order-location/${orderId}`,
+              `https://konanshopping-production.up.railway.app/order-location/${orderId}`,
 
               {
 
@@ -325,7 +325,7 @@ await axios.put(
       try {
 
         await axios.put(
-  `https://konanshopping.onrender.com/update-order-status/${orderId}`,
+  `https://konanshopping-production.up.railway.app/update-order-status/${orderId}`,
   {
     status: "Livrée",
   }
@@ -358,7 +358,7 @@ const deleteOrder =
     try {
 
       await axios.delete(
-        `https://konanshopping.onrender.com/delete-order/${id}`
+        `https://konanshopping-production.up.railway.app/delete-order/${id}`
       );
 
       setOrders(
@@ -381,7 +381,7 @@ const deleteOrder =
     try {
 
       await axios.put(
-        `https://konanshopping.onrender.com/update-order-status/${orderId}`,
+        `https://konanshopping-production.up.railway.app/update-order-status/${orderId}`,
         {
           status: "Annulée",
         }

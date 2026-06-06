@@ -68,7 +68,7 @@ function AdminStats() {
 
         const productsRes =
           await axios.get(
-            "https://konanshopping.onrender.com/products"
+            "https://konanshopping-production.up.railway.app/products"
           );
 
         setProducts(
@@ -79,7 +79,7 @@ function AdminStats() {
 
         const usersRes =
           await axios.get(
-            "https://konanshopping.onrender.com/users"
+            "https://konanshopping-production.up.railway.app/users"
           );
 
         setUsers(
@@ -90,7 +90,7 @@ function AdminStats() {
 
         const visitorsRes =
           await axios.get(
-            "https://konanshopping.onrender.com/visitors"
+            "https://konanshopping-production.up.railway.app/visitors"
           );
 
         setVisitors(
@@ -103,7 +103,7 @@ function AdminStats() {
 
           const ordersRes =
             await axios.get(
-              "https://konanshopping.onrender.com/orders"
+              "https://konanshopping-production.up.railway.app/orders"
             );
 
           setOrders(

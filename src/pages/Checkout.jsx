@@ -371,7 +371,7 @@ const shipping =
       const res =
         await axios.post(
 
-          "https://konanshopping.onrender.com/apply-coupon",
+          "https://konanshopping-production.up.railway.app/apply-coupon",
 
           {
 
@@ -460,7 +460,7 @@ const user = JSON.parse(
 
 await axios.post(
 
-  "https://konanshopping.onrender.com/orders",
+  "https://konanshopping-production.up.railway.app/orders",
 
   {
 

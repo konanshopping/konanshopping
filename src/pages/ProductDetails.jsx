@@ -186,14 +186,14 @@ const getProduct = async () => {
   try {
 
     const res = await axios.get(
-      `https://konanshopping.onrender.com/product/${id}`
+      `https://konanshopping-production.up.railway.app/product/${id}`
     );
 
     setProduct(res.data);
 
     const response =
       await axios.get(
-        "https://konanshopping.onrender.com/products"
+        "https://konanshopping-production.up.railway.app/products"
       );
 
     const similar =
@@ -443,7 +443,7 @@ reviewImages.forEach(
 
 await axios.post(
 
-  `https://konanshopping.onrender.com/product/${id}/review`,
+  `https://konanshopping-production.up.railway.app/product/${id}/review`,
 
   formData,
 
@@ -1915,7 +1915,7 @@ try{
 
 await axios.put(
 
-`https://konanshopping.onrender.com/product/${product._id}/review/${review._id}/like`,
+`https://konanshopping-production.up.railway.app/product/${product._id}/review/${review._id}/like`,
 
 {
 
@@ -1982,7 +1982,7 @@ try{
 
 await axios.put(
 
-`https://konanshopping.onrender.com/product/${product._id}/review/${review._id}/dislike`,
+`https://konanshopping-production.up.railway.app/product/${product._id}/review/${review._id}/dislike`,
 
 {
 
@@ -2126,7 +2126,7 @@ try{
 
 await axios.post(
 
-`https://konanshopping.onrender.com/product/${product._id}/review/${review._id}/reply`,
+`https://konanshopping-production.up.railway.app/product/${product._id}/review/${review._id}/reply`,
 
 {
 

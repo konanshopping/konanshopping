@@ -64,7 +64,7 @@ function AdminProducts() {
 
         const res =
           await axios.get(
-            "https://konanshopping.onrender.com/products"
+            "https://konanshopping-production.up.railway.app/products"
           );
 
         setProducts(res.data);
@@ -118,7 +118,7 @@ formData.append("image", image);
 
 await axios.post(
 
-  "https://konanshopping.onrender.com/add-product",
+  "https://konanshopping-production.up.railway.app/add-product",
 
   formData,
 
@@ -181,7 +181,7 @@ await axios.post(
       try {
 
         await axios.delete(
-          `https://konanshopping.onrender.com/delete-product/${id}`
+          `https://konanshopping-production.up.railway.app/delete-product/${id}`
         );
 
         fetchProducts();
@@ -210,7 +210,7 @@ await axios.post(
         setLoading(true);
 
         await axios.put(
-          `https://konanshopping.onrender.com/update-product/${editId}`,
+          `https://konanshopping-production.up.railway.app/update-product/${editId}`,
           {
             name,
             price,
@@ -569,7 +569,7 @@ await axios.post(
   src={
     product.image.startsWith("http")
       ? product.image
-      : `https://konanshopping.onrender.com/${product.image}`
+      : `https://konanshopping-production.up.railway.app/${product.image}`
   }
   alt=""
 />

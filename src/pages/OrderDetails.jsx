@@ -32,7 +32,7 @@ export default function OrderDetails() {
     axios
 
       .get(
-        `https://konanshopping.onrender.com/order/${id}`
+        `https://konanshopping-production.up.railway.app/order/${id}`
       )
 
       .then((res) => {

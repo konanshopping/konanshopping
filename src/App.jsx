@@ -283,7 +283,7 @@ console.log(geo);
 
       await axios.post(
 
-        "https://konanshopping.onrender.com/track-visitor",
+        "https://konanshopping-production.up.railway.app/track-visitor",
 
         {
 
@@ -408,7 +408,7 @@ const startVoice = () => {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping.onrender.com/products")
+      .get("https://konanshopping-production.up.railway.app/products")
 
       .then((res) => {
 
@@ -629,7 +629,7 @@ image
 const res =
 await axios.post(
 
-"https://konanshopping.onrender.com/products/ai-search",
+"https://konanshopping-production.up.railway.app/products/ai-search",
 
 formData
 
@@ -652,7 +652,7 @@ else if(search.trim() !== ""){
 const res =
 await axios.get(
 
-`https://konanshopping.onrender.com/products/search/${search}`
+`https://konanshopping-production.up.railway.app/products/search/${search}`
 
 );
 
@@ -2166,7 +2166,7 @@ la recherche IA.
 
       await axios.delete(
 
-        `https://konanshopping.onrender.com/favorites/${user._id}/${product._id}`
+        `https://konanshopping-production.up.railway.app/favorites/${user._id}/${product._id}`
 
       );
 
@@ -2197,7 +2197,7 @@ la recherche IA.
         try {
 
           await axios.post(
-            "https://konanshopping.onrender.com/favorites",
+            "https://konanshopping-production.up.railway.app/favorites",
             {
 
               userId: user._id,

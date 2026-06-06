@@ -199,7 +199,7 @@ const [location, setLocation] = useState(null)
 
           const res =
             await axios.get(
-              `https://konanshopping.onrender.com/order/${id}`
+              `https://konanshopping-production.up.railway.app/order/${id}`
             );
 
           setOrder(
