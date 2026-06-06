@@ -3063,6 +3063,8 @@ fontSize:
 
     background: "white",
 
+    color: "#111827",
+
     cursor: "pointer",
 
     fontWeight: "700",
