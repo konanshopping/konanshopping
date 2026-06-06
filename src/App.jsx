@@ -826,7 +826,10 @@ setLoading(false);
       <div
 style={{
 width:"100%",
-maxWidth:"430px",
+maxWidth:
+window.innerWidth < 768
+? "100%"
+: "550px",
 background:"white",
 position:"relative",
 borderRadius:"50px",
@@ -1004,13 +1007,15 @@ FCFA
 
 {/* ICONS */}
 
-    <div
-      style={{
-        display: "flex",
-        gap: "14px",
-        alignItems: "center",
-      }}
-    >
+   <div
+  style={{
+    display: "flex",
+    gap: "18px",
+    alignItems: "center",
+    flexShrink: 0,
+    marginLeft: "auto",
+  }}
+>
 
       <div
         style={{
@@ -1029,11 +1034,17 @@ FCFA
 
         >
 
-          <div>
+          <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+  }}
+>
 
             <div
   style={{
-    fontSize: "18px",
+    fontSize: "22px",
     position: "relative",
   }}
 >
@@ -1089,14 +1100,6 @@ FCFA
 
 </div>
 
-            <p
-              style={{
-                margin: 0,
-                fontSize: "10px",
-              }}
-            >
-              Favoris
-            </p>
 
           </div>
 
@@ -1115,15 +1118,17 @@ FCFA
       >
 
         <div
-          style={{
-            textAlign: "center",
-            position: "relative",
-          }}
-        >
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    position: "relative",
+  }}
+>
 
           <div
             style={{
-              fontSize: "18px",
+              fontSize: "22px",
             }}
           >
             <FaShoppingCart />
@@ -1154,14 +1159,6 @@ FCFA
             )}
           </div>
 
-          <p
-            style={{
-              margin: 0,
-              fontSize: "10px",
-            }}
-          >
-            Panier
-          </p>
 
         </div>
 
@@ -1184,19 +1181,12 @@ FCFA
 
           <div
             style={{
-              fontSize: "18px",
+              fontSize: "22px",
             }}
           >
             <FaUserCircle />
           </div>
 
-          <div
-            style={{
-              fontSize: "10px",
-            }}
-          >
-            Compte
-          </div>
 
         </Link>
 
