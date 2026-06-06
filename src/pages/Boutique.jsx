@@ -838,8 +838,8 @@ useEffect(() => {
 
       padding:
         window.innerWidth < 768
-          ? "10px 12px"
-          : "12px 18px",
+          ? "6px 8px"
+          : "10px 16px",
 
       display: "flex",
 
@@ -894,13 +894,13 @@ useEffect(() => {
           style={{
             width:
               window.innerWidth < 768
-                ? "40px"
-                : "46px",
+                ? "32px"
+                : "42px",
 
             height:
               window.innerWidth < 768
-                ? "40px"
-                : "46px",
+                ? "32px"
+                : "42px",
 
             borderRadius: "14px",
 
@@ -946,10 +946,10 @@ useEffect(() => {
 
               fontSize:
                 window.innerWidth < 768
-                  ? "18px"
-                  : "22px",
+                  ? "15px"
+                  : "20px",
 
-              fontWeight: "800",
+              fontWeight: "700",
 
               lineHeight: "1",
 
@@ -974,14 +974,14 @@ useEffect(() => {
 
               color: "#6b7280",
 
-              fontSize: "10px",
+              fontSize: "8px",
 
               fontWeight: "500",
 
               letterSpacing: "0.4px",
             }}
           >
-            Mode • Lifestyle • Premium
+            habilleur des stars
           </p>
 
         </div>
@@ -990,7 +990,182 @@ useEffect(() => {
 
     </Link>
 
-    {/* MENU */}
+    <div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    flex: 1,
+    gap: "10px",
+  }}
+>
+  {/* SEARCH */}
+
+      <div
+        style={{
+          position: "relative",
+        }}
+      >
+
+        <FaSearch
+          style={{
+            position: "absolute",
+
+            top: "11px",
+
+            left: "14px",
+
+            color: "#9ca3af",
+
+            fontSize: "13px",
+          }}
+        />
+
+        <input
+          type="text"
+
+          placeholder="Rechercher..."
+
+          value={search}
+
+          onChange={(e) =>
+            setSearch(
+              e.target.value
+            )
+          }
+
+          style={{
+            padding:
+              "8px 14px 8px 34px",
+
+            borderRadius: "30px",
+
+            border:
+              "1px solid #e5e7eb",
+
+            width:
+              window.innerWidth < 768
+                ? "140px"
+                : "220px",
+
+            outline: "none",
+
+            fontSize: "13px",
+
+            fontWeight: "500",
+
+            background:
+              "linear-gradient(135deg,#fff,#f9fafb)",
+
+            boxShadow:
+              "0 3px 10px rgba(0,0,0,0.03)",
+
+            transition: "0.3s",
+          }}
+        />
+
+      </div>
+
+      </div>
+
+      {/* PANIER */}
+
+      <Link
+        to="/checkout"
+
+        style={{
+          position: "relative",
+
+          textDecoration: "none",
+        }}
+      >
+
+        <div
+          style={{
+            width: "36px",
+
+            height: "36px",
+
+            borderRadius: "14px",
+
+            background:
+              "linear-gradient(135deg,#111827,#374151)",
+
+            display: "flex",
+
+            alignItems: "center",
+
+            justifyContent: "center",
+
+            color: "white",
+
+            fontSize: "15px",
+
+            boxShadow:
+              "0 8px 18px rgba(0,0,0,0.12)",
+          }}
+        >
+          <FaShoppingCart />
+        </div>
+
+        {cart.length > 0 && (
+
+          <div
+            style={{
+              position: "absolute",
+
+              top: "-4px",
+
+              right: "-4px",
+
+              width: "20px",
+
+              height: "20px",
+
+              borderRadius: "50%",
+
+              background:
+                "linear-gradient(135deg,#ef4444,#dc2626)",
+
+              color: "white",
+
+              display: "flex",
+
+              alignItems: "center",
+
+              justifyContent: "center",
+
+              fontSize: "10px",
+
+              fontWeight: "700",
+
+              border:
+                "2px solid white",
+            }}
+          >
+            {cart.length}
+          </div>
+
+        )}
+
+      </Link>
+
+    </div>
+
+<div
+  style={{
+    width: "100%",
+
+    display: "flex",
+
+    justifyContent: "center",
+
+    gap: "10px",
+
+    marginTop: "10px",
+  }}
+>
+
+{/* MENU */}
 
     <div
       style={{
@@ -1120,158 +1295,11 @@ useEffect(() => {
 
       </div>
 
-      {/* SEARCH */}
-
-      <div
-        style={{
-          position: "relative",
-        }}
-      >
-
-        <FaSearch
-          style={{
-            position: "absolute",
-
-            top: "11px",
-
-            left: "14px",
-
-            color: "#9ca3af",
-
-            fontSize: "13px",
-          }}
-        />
-
-        <input
-          type="text"
-
-          placeholder="Rechercher..."
-
-          value={search}
-
-          onChange={(e) =>
-            setSearch(
-              e.target.value
-            )
-          }
-
-          style={{
-            padding:
-              "10px 16px 10px 40px",
-
-            borderRadius: "30px",
-
-            border:
-              "1px solid #e5e7eb",
-
-            width:
-              window.innerWidth < 768
-                ? "170px"
-                : "210px",
-
-            outline: "none",
-
-            fontSize: "13px",
-
-            fontWeight: "500",
-
-            background:
-              "linear-gradient(135deg,#fff,#f9fafb)",
-
-            boxShadow:
-              "0 3px 10px rgba(0,0,0,0.03)",
-
-            transition: "0.3s",
-          }}
-        />
+      </div>
 
       </div>
 
-      {/* PANIER */}
-
-      <Link
-        to="/checkout"
-
-        style={{
-          position: "relative",
-
-          textDecoration: "none",
-        }}
-      >
-
-        <div
-          style={{
-            width: "44px",
-
-            height: "44px",
-
-            borderRadius: "14px",
-
-            background:
-              "linear-gradient(135deg,#111827,#374151)",
-
-            display: "flex",
-
-            alignItems: "center",
-
-            justifyContent: "center",
-
-            color: "white",
-
-            fontSize: "17px",
-
-            boxShadow:
-              "0 8px 18px rgba(0,0,0,0.12)",
-          }}
-        >
-          <FaShoppingCart />
-        </div>
-
-        {cart.length > 0 && (
-
-          <div
-            style={{
-              position: "absolute",
-
-              top: "-4px",
-
-              right: "-4px",
-
-              width: "20px",
-
-              height: "20px",
-
-              borderRadius: "50%",
-
-              background:
-                "linear-gradient(135deg,#ef4444,#dc2626)",
-
-              color: "white",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-
-              fontSize: "10px",
-
-              fontWeight: "700",
-
-              border:
-                "2px solid white",
-            }}
-          >
-            {cart.length}
-          </div>
-
-        )}
-
-      </Link>
-
-    </div>
-
-  </div>
+      
 
 {/* HERO */}
 
