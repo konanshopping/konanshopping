@@ -401,6 +401,11 @@ useEffect(() => {
 
   };
 
+  console.log(
+  "favorites =",
+  favorites
+);
+
   return (
 
     <div
