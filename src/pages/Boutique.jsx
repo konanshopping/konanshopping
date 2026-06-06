@@ -810,6 +810,11 @@ useEffect(() => {
 
 }, [products]);
 
+const displayedProducts =
+  search.trim()
+    ? filteredProducts
+    : randomProducts;
+
   return (
 
     <div
@@ -2749,7 +2754,7 @@ useEffect(() => {
           }}
         >
 
-       {randomProducts.map((product) => (
+       {displayedProducts.map((product) => (
 
   <Link
     key={product._id}
