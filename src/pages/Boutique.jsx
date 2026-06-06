@@ -783,6 +783,16 @@ useEffect(() => {
 
 });
 
+console.log(
+  "Recherche:",
+  search
+);
+
+console.log(
+  "Résultats:",
+  filteredProducts.length
+);
+
 const [randomProducts, setRandomProducts] =
   useState([]);
 
