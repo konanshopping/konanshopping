@@ -2119,7 +2119,7 @@ useEffect(() => {
 
       height:
         window.innerWidth < 768
-          ? "220px"
+          ? "180px"
           : "260px",
 
       overflow: "hidden",
@@ -2673,14 +2673,18 @@ useEffect(() => {
         {/* PRODUITS */}
 
         <div
-          style={{
-            flex: 1,
-            display: "grid",
-         gridTemplateColumns:
-  "repeat(4, 1fr)",
-            gap: "25px",
-          }}
-        >
+  style={{
+    flex: 1,
+    display: "grid",
+
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(2, 1fr)"
+        : "repeat(4, 1fr)",
+
+    gap: "15px",
+  }}
+>
 
        {randomProducts.map((product) => (
 
