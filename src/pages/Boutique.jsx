@@ -998,99 +998,72 @@ useEffect(() => {
     gap: "10px",
   }}
 >
-  {/* SEARCH */}
+ {/* SEARCH */}
 
-<div
-  style={{
-    position: "relative",
-  }}
->
+      <div
+        style={{
+          position: "relative",
+        }}
+      >
 
-  <FaSearch
-    style={{
-      position: "absolute",
+        <FaSearch
+          style={{
+            position: "absolute",
 
-      top: "50%",
+            top: "11px",
 
-      transform: "translateY(-50%)",
+            left: "14px",
 
-      left: "14px",
+            color: "#9ca3af",
 
-      color: "#9ca3af",
+            fontSize: "13px",
+          }}
+        />
 
-      fontSize: "13px",
+        <input
+          type="text"
 
-      pointerEvents: "none",
-    }}
-  />
+          placeholder="Rechercher..."
 
-  <input
-    type="text"
+          value={search}
 
-    placeholder="Rechercher..."
+          onChange={(e) =>
+            setSearch(
+              e.target.value
+            )
+          }
 
-    value={search}
+          style={{
+            padding:
+              "8px 14px 8px 34px",
 
-    onChange={(e) =>
-      setSearch(
-        e.target.value
-      )
-    }
+            borderRadius: "30px",
 
-    style={{
-      padding:
-        "8px 14px 8px 34px",
+            border:
+              "1px solid #e5e7eb",
 
-      borderRadius: "30px",
+            width:
+              window.innerWidth < 768
+                ? "140px"
+                : "220px",
 
-      border:
-        "1px solid #e5e7eb",
+            outline: "none",
 
-      width:
-        window.innerWidth < 768
-          ? "140px"
-          : "220px",
+            fontSize: "13px",
 
-      outline: "none",
+            fontWeight: "500",
 
-      fontSize: "13px",
+            background:
+              "linear-gradient(135deg,#fff,#f9fafb)",
 
-      fontWeight: "500",
+            boxShadow:
+              "0 3px 10px rgba(0,0,0,0.03)",
 
-      color: "#111827",
+            transition: "0.3s",
+          }}
+        />
 
-      background:
-        "linear-gradient(135deg,#fff,#f9fafb)",
-
-      boxShadow:
-        "0 5px 15px rgba(0,0,0,0.05)",
-
-      transition:
-        "all 0.3s ease",
-    }}
-
-    onFocus={(e) => {
-
-      e.target.style.boxShadow =
-        "0 8px 20px rgba(91,108,255,0.15)";
-
-      e.target.style.border =
-        "1px solid #5b6cff";
-
-    }}
-
-    onBlur={(e) => {
-
-      e.target.style.boxShadow =
-        "0 5px 15px rgba(0,0,0,0.05)";
-
-      e.target.style.border =
-        "1px solid #e5e7eb";
-
-    }}
-  />
-
-</div>
+      </div>
 
       </div>
 
