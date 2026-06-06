@@ -141,6 +141,8 @@ useEffect(() => {
 
     };
 
+    updateFavorites();
+
   window.addEventListener(
     "favoritesUpdated",
     updateFavorites
