@@ -751,7 +751,7 @@ setLoading(false);
 
       gap: "12px",
 
-      flexWrap: "wrap",
+      flexWrap: "nowrap",
     }}
   >
 
@@ -772,9 +772,9 @@ setLoading(false);
         alt=""
 
         style={{
-          width: "42px",
+          width: "32px",
 
-          height: "42px",
+          height: "32px",
 
           objectFit: "cover",
 
@@ -787,7 +787,7 @@ setLoading(false);
         <h1
           style={{
             margin: 0,
-            fontSize: "14px",
+            fontSize: "10px",
             color: "#1f1b4b",
             fontWeight: "900",
             lineHeight: "1.1",
@@ -799,7 +799,7 @@ setLoading(false);
         <h2
           style={{
             margin: 0,
-            fontSize: "14px",
+            fontSize: "10px",
             color: "#5b3cc4",
             fontWeight: "900",
             lineHeight: "1.1",
@@ -828,8 +828,8 @@ style={{
 width:"100%",
 maxWidth:
 window.innerWidth < 768
-? "100%"
-: "550px",
+? "180px"
+: "350px",
 background:"white",
 position:"relative",
 borderRadius:"50px",
@@ -887,7 +887,7 @@ setSuggestions([]);
             flex: 1,
             border: "none",
             outline: "none",
-            padding: "10px 14px",
+            padding: "8px 12px",
             fontSize: "13px",
             background: "transparent",
           }}
@@ -895,8 +895,8 @@ setSuggestions([]);
 
         <button
           style={{
-            width: "45px",
-            height: "42px",
+            width: "38px",
+            height: "38px",
             border: "none",
             background: "#4B2E83",
             color: "white",
@@ -1010,10 +1010,10 @@ FCFA
    <div
   style={{
     display: "flex",
-    gap: "18px",
+    gap: "12px",
     alignItems: "center",
     flexShrink: 0,
-    marginLeft: "auto",
+    
   }}
 >
 
@@ -1044,7 +1044,7 @@ FCFA
 
             <div
   style={{
-    fontSize: "22px",
+    fontSize: "18px",
     position: "relative",
   }}
 >
@@ -1128,7 +1128,7 @@ FCFA
 
           <div
             style={{
-              fontSize: "22px",
+              fontSize: "18px",
             }}
           >
             <FaShoppingCart />
@@ -1181,7 +1181,7 @@ FCFA
 
           <div
             style={{
-              fontSize: "22px",
+              fontSize: "18px",
             }}
           >
             <FaUserCircle />
