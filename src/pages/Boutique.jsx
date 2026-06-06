@@ -2718,7 +2718,10 @@ useEffect(() => {
 
   borderRadius: "18px",
 
-  padding: "16px",
+  padding:
+  window.innerWidth < 768
+    ? "10px"
+    : "16px",
 
   transition: "0.35s",
 
@@ -2727,6 +2730,9 @@ useEffect(() => {
   position: "relative",
 
   overflow: "hidden",
+
+  width: "100%",
+boxSizing: "border-box",
 
   border:
     "1px solid #eef2ff",
