@@ -2676,8 +2676,10 @@ useEffect(() => {
           style={{
             flex: 1,
             display: "grid",
-         gridTemplateColumns:
-  "repeat(4, 1fr)",
+        gridTemplateColumns:
+  window.innerWidth < 768
+    ? "repeat(2, 1fr)"
+    : "repeat(4, 1fr)",
             gap: "25px",
           }}
         >
@@ -2714,7 +2716,7 @@ useEffect(() => {
      style={{
   background: "white",
 
-  borderRadius: "28px",
+  borderRadius: "18px",
 
   padding: "16px",
 
@@ -2736,7 +2738,10 @@ useEffect(() => {
 
   flexDirection: "column",
 
-  minHeight: "390px",
+minHeight:
+  window.innerWidth < 768
+    ? "330px"
+    : "390px",
 }}
     >
 
@@ -2787,25 +2792,30 @@ useEffect(() => {
 
       </div>
 
-      <img
-  src={product.image}
-  alt=""
-
+  <div
   style={{
-    width: "100%",
-
-    height: "190px",
-
-    objectFit: "cover",
-
+    background: "#f8f8fb",
+    padding: "12px",
     borderRadius: "20px",
-
-    background:
-      "linear-gradient(135deg,#f9fafb,#eef2ff)",
-
-    display: "block",
   }}
-/>
+>
+  <img
+    src={product.image}
+    alt=""
+    style={{
+      width: "100%",
+
+      height:
+        window.innerWidth < 768
+          ? "140px"
+          : "190px",
+
+      objectFit: "cover",
+
+      borderRadius: "15px",
+    }}
+  />
+</div>
 
               <div
                 style={{
@@ -2993,8 +3003,8 @@ avis )
                 <div
                   style={{
                     display: "flex",
-                    gap: "10px",
-                    marginTop: "20px",
+                    gap: "8px",
+                    marginTop: "&(px",
                   }}
                 >
 
@@ -3040,7 +3050,12 @@ avis )
   style={{
     flex: 1,
 
-    padding: "12px",
+    padding: window.innerWidth < 768 ? "10px" : "12px",
+
+fontSize:
+  window.innerWidth < 768
+    ? "12px"
+    : "13px",
 
     borderRadius: "16px",
 
@@ -3052,7 +3067,6 @@ avis )
 
     fontWeight: "700",
 
-    fontSize: "13px",
 
     display: "flex",
 
@@ -3142,7 +3156,14 @@ localStorage.setItem(
   style={{
     width: "100%",
 
-    padding: "12px",
+    padding: window.innerWidth < 768 ? "10px" : "12px",
+
+fontSize:
+  window.innerWidth < 768
+    ? "12px"
+    : "13px",
+
+    flex: 1,
 
     borderRadius: "16px",
 
@@ -3157,7 +3178,6 @@ localStorage.setItem(
 
     fontWeight: "800",
 
-    fontSize: "13px",
 
     display: "flex",
 
