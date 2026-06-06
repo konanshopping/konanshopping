@@ -1212,15 +1212,15 @@ useEffect(() => {
             background:
               "#f8fafc",
 
-            padding: "8px 12px",
+            padding: "6px 10px",
 
-            borderRadius: "12px",
+            borderRadius: "10px",
 
             color: "#374151",
 
             fontWeight: "600",
 
-            fontSize: "13px",
+            fontSize: "12px",
           }}
         >
           <FaHome />
@@ -1243,15 +1243,15 @@ useEffect(() => {
             background:
               "linear-gradient(135deg,#5b6cff,#7c4dff)",
 
-            padding: "8px 12px",
+            padding: "6px 10px",
 
-            borderRadius: "12px",
+            borderRadius: "10px",
 
             color: "white",
 
             fontWeight: "600",
 
-            fontSize: "13px",
+            fontSize: "12px",
 
             boxShadow:
               "0 8px 18px rgba(91,108,255,0.18)",
@@ -1277,15 +1277,15 @@ useEffect(() => {
             background:
               "#f0fdf4",
 
-            padding: "8px 12px",
+            padding: "6px 10px",
 
-            borderRadius: "12px",
+            borderRadius: "10px",
 
             color: "#16a34a",
 
             fontWeight: "600",
 
-            fontSize: "13px",
+            fontSize: "12px",
           }}
         >
           <FaWhatsapp />
