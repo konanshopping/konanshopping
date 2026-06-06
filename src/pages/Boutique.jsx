@@ -1106,9 +1106,6 @@ const displayedProducts =
   />
 
 </div>
-<p style={{color:"red"}}>
-  {search}
-</p>
 
       </div>
 
