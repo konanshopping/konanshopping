@@ -1027,43 +1027,15 @@ useEffect(() => {
   <input
     type="text"
 
-    placeholder="Rechercher un produit..."
+    placeholder="Rechercher..."
 
     value={search}
 
     onChange={(e) =>
-      setSearch(e.target.value)
+      setSearch(
+        e.target.value
+      )
     }
-
-    onFocus={(e) => {
-
-      e.target.style.width =
-        window.innerWidth < 768
-          ? "170px"
-          : "260px";
-
-      e.target.style.boxShadow =
-        "0 10px 25px rgba(91,108,255,0.15)";
-
-      e.target.style.border =
-        "1px solid #5b6cff";
-
-    }}
-
-    onBlur={(e) => {
-
-      e.target.style.width =
-        window.innerWidth < 768
-          ? "140px"
-          : "220px";
-
-      e.target.style.boxShadow =
-        "0 3px 10px rgba(0,0,0,0.03)";
-
-      e.target.style.border =
-        "1px solid #e5e7eb";
-
-    }}
 
     style={{
       padding:
@@ -1091,10 +1063,30 @@ useEffect(() => {
         "linear-gradient(135deg,#fff,#f9fafb)",
 
       boxShadow:
-        "0 3px 10px rgba(0,0,0,0.03)",
+        "0 5px 15px rgba(0,0,0,0.05)",
 
       transition:
         "all 0.3s ease",
+    }}
+
+    onFocus={(e) => {
+
+      e.target.style.boxShadow =
+        "0 8px 20px rgba(91,108,255,0.15)";
+
+      e.target.style.border =
+        "1px solid #5b6cff";
+
+    }}
+
+    onBlur={(e) => {
+
+      e.target.style.boxShadow =
+        "0 5px 15px rgba(0,0,0,0.05)";
+
+      e.target.style.border =
+        "1px solid #e5e7eb";
+
     }}
   />
 
