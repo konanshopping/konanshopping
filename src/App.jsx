@@ -1020,6 +1020,7 @@ FCFA
     gap: "12px",
     alignItems: "center",
     flexShrink: 0,
+    marginRight: "12px",
     
   }}
 >
