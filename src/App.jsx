@@ -1014,14 +1014,14 @@ FCFA
 
 {/* ICONS */}
 
-   <div
+ <div
   style={{
     display: "flex",
-    gap: "12px",
     alignItems: "center",
+    gap: "6px",
     flexShrink: 0,
-    marginRight: "18px",
-    
+    minWidth: "90px",
+    justifyContent: "flex-end",
   }}
 >
 
