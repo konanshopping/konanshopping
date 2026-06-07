@@ -3031,22 +3031,35 @@ app.get("/fix-images", async (req, res) => {
     const Product = require("./models/product");
 
     const products = await Product.find({
-      image: { $regex: "http://localhost:5000" },
+      $or: [
+        { image: { $regex: "localhost:5000" } },
+        { image: { $regex: "onrender.com" } },
+      ],
     });
 
     for (const product of products) {
-      product.image = product.image.replace(
-        "http://localhost:5000",
-        "https://konanshopping-production.up.railway.app"
-      );
+
+      product.image = product.image
+        .replace(
+          "http://localhost:5000",
+          "https://konanshopping-production.up.railway.app"
+        )
+        .replace(
+          "https://konanshopping.onrender.com",
+          "https://konanshopping-production.up.railway.app"
+        );
 
       await product.save();
     }
 
     res.send(`✅ ${products.length} produits corrigés`);
+
   } catch (err) {
+
     console.log(err);
+
     res.status(500).send("Erreur");
+
   }
 });
 
