@@ -10,6 +10,8 @@ import {
 
 import axios from "axios";
 
+import { toast } from "react-toastify";
+
 import {
   useNavigate,
 } from "react-router-dom";
@@ -319,7 +321,7 @@ const addToCart = () => {
     new Event("cartUpdated")
   );
 
-  alert(
+  toast.success(
     "Produit ajouté 🛒"
   );
 
@@ -396,7 +398,7 @@ async () => {
 
   ) {
 
-    alert(
+    toast.warning(
       "Veuillez remplir tous les champs ⚠️"
     );
 
@@ -460,7 +462,7 @@ await axios.post(
 
 );
 
-    alert(
+    toast.success(
       "Avis ajouté avec succès ⭐"
     );
 
@@ -484,7 +486,7 @@ await axios.post(
 
     console.log(err);
 
-    alert(
+  toast.error(
 
       err.response?.data?.message ||
 
@@ -2116,7 +2118,7 @@ onClick={async()=>{
 
 if(!replyText){
 
-return alert(
+return toast.warning(
 "Écrivez une réponse ⚠️"
 );
 
@@ -2147,11 +2149,19 @@ setReplyText("");
 
 getProduct();
 
+toast.success(
+  "Réponse envoyée ✅"
+);
+
 }
 
 catch(err){
 
-console.log(err);
+  console.log(err);
+
+  toast.error(
+    "Erreur lors de l'envoi"
+  );
 
 }
 
@@ -2761,9 +2771,9 @@ onClick={() => {
     new Event("cartUpdated")
   );
 
-  alert(
-    "Produit ajouté 🛒"
-  );
+  toast.success(
+  "Produit ajouté au panier 🛒"
+);
 
 }}
 

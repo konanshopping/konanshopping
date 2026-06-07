@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 
 
 export default function DriverTracking() {
@@ -199,7 +199,9 @@ if (
 );
 
 if (!driver) {
-  alert("Chauffeur non connecté");
+  toast.error(
+  "Chauffeur non connecté"
+);
   return;
 }
 
@@ -279,9 +281,13 @@ await axios.put(
 
           } catch (err) {
 
-            console.log(err);
+  console.log(err);
 
-          }
+  toast.error(
+    "Une erreur est survenue"
+  );
+
+}
 
         },
 
@@ -303,9 +309,9 @@ await axios.put(
 
       );
 
-      alert(
-        "🚚 Livraison démarrée"
-      );
+      toast.success(
+  "🚚 Livraison démarrée"
+);
 
     } catch (err) {
 
@@ -331,7 +337,9 @@ await axios.put(
   }
 );
 
-alert("✅ Commande livrée");
+toast.success(
+  "✅ Commande livrée"
+);
 
 setOrders(
   orders.map((o) =>
@@ -346,9 +354,13 @@ setOrders(
 
       } catch (err) {
 
-        console.log(err);
+  console.log(err);
 
-      }
+  toast.error(
+    "Une erreur est survenue"
+  );
+
+}
 
     };
 
@@ -387,7 +399,7 @@ const deleteOrder =
         }
       );
 
-      alert(
+      toast.error(
         "❌ Commande annulée"
       );
 
@@ -402,9 +414,13 @@ const deleteOrder =
 
     } catch (err) {
 
-      console.log(err);
+  console.log(err);
 
-    }
+  toast.error(
+    "Une erreur est survenue"
+  );
+
+}
 
   };
 

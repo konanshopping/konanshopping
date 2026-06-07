@@ -9,6 +9,8 @@ import {
   useNavigate
 } from "react-router-dom";
 
+import { toast } from "react-toastify";
+
 import {
   FaHeart,
   FaTrash,
@@ -283,9 +285,9 @@ useEffect(() => {
           new Event("cartUpdated")
         );
 
-        alert(
-          "✅ Produit ajouté au panier"
-        );
+        toast.success(
+  "Produit ajouté au panier 🛒"
+);
 
       }
 

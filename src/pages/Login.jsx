@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { Lock, Mail } from "lucide-react";
+import { toast } from "react-toastify";
 
 function Login() {
 
@@ -29,9 +30,16 @@ function Login() {
         JSON.stringify(res.data.user)
       );
 
-      alert("Connexion réussie 🚀");
+     toast.success(
+  "Connexion réussie 🚀"
+);
 
-      window.location.href = "/admin";
+setTimeout(() => {
+
+  window.location.href =
+    "/admin";
+
+}, 1500);
 
     } catch (err) {
 
@@ -39,11 +47,15 @@ function Login() {
 
       if (err.response) {
 
-        alert(err.response.data.message);
+        toast.error(
+  err.response.data.message
+);
 
       } else {
 
-        alert("Erreur serveur");
+        toast.error(
+  "Erreur serveur"
+);
 
       }
 

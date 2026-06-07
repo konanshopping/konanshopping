@@ -4,6 +4,8 @@ import axios from "axios";
 import { FaArrowLeft }
 from "react-icons/fa";
 
+import { toast } from "react-toastify";
+
 function UserLogin() {
 
   const [email, setEmail] =
@@ -38,7 +40,7 @@ localStorage.setItem(
 
 // SUCCESS
 
-alert(
+toast.success(
   "Bienvenue sur Konan Shopping 🚀"
 );
 
@@ -55,8 +57,12 @@ if (res.data.user.isAdmin) {
 
   );
 
+  setTimeout(() => {
+
   window.location.href =
     "/admin";
+
+}, 1500);
 
 }
 
@@ -73,8 +79,12 @@ else {
 
   );
 
+  setTimeout(() => {
+
   window.location.href =
     "/account";
+
+}, 1500);
 
 }
 
@@ -82,10 +92,10 @@ else {
 
       console.log(err);
 
-      alert(
-        err.response?.data?.message ||
-        "Erreur connexion"
-      );
+      toast.error(
+  err.response?.data?.message ||
+  "Erreur connexion"
+);
 
     } finally {
 

@@ -11,6 +11,8 @@ import Confetti from "react-confetti";
 
 import { useNavigate } from "react-router-dom";
 
+import { toast } from "react-toastify";
+
 import {
   FaShoppingCart,
   FaUser,
@@ -387,7 +389,7 @@ const shipping =
         res.data.discount
       );
 
-      alert(
+      toast.success(
         "Coupon appliqué ✅"
       );
 
@@ -395,7 +397,7 @@ const shipping =
 
     catch (err) {
 
-      alert(
+      toast.error(
 
         err.response?.data
           ?.message ||
@@ -434,7 +436,7 @@ const shipping =
 
     ) {
 
-      alert(
+      toast.warning(
         "Veuillez remplir toutes les informations obligatoires ⚠️"
       );
 
@@ -605,7 +607,7 @@ console.log(localStorage);
 
       console.log(err);
 
-      alert(
+      toast.error(
         "Erreur lors de la commande ❌"
       );
 

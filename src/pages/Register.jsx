@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 function Register() {
 
@@ -58,21 +59,25 @@ function Register() {
         JSON.stringify(userData)
       );
 
-      alert(
-        "Compte créé avec succès 🚀"
-      );
+      toast.success(
+  "Compte créé avec succès 🚀"
+);
 
-     window.location.href =
-  "/account";
+     setTimeout(() => {
+
+  window.location.href =
+    "/account";
+
+}, 1500);
 
     } catch (err) {
 
       console.log(err);
 
-      alert(
-        err.response?.data?.message ||
-        "Erreur serveur"
-      );
+      toast.error(
+  err.response?.data?.message ||
+  "Erreur serveur"
+);
 
     } finally {
 
