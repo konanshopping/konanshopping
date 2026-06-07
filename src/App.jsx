@@ -775,9 +775,9 @@ setLoading(false);
         alt=""
 
         style={{
-          width: "32px",
+          width: "35px",
 
-          height: "32px",
+          height: "35px",
 
           objectFit: "cover",
 
@@ -790,7 +790,7 @@ setLoading(false);
         <h1
           style={{
             margin: 0,
-            fontSize: "10px",
+            fontSize: "11px",
             color: "#1f1b4b",
             fontWeight: "900",
             lineHeight: "1.1",
@@ -802,7 +802,7 @@ setLoading(false);
         <h2
           style={{
             margin: 0,
-            fontSize: "10px",
+            fontSize: "11px",
             color: "#5b3cc4",
             fontWeight: "900",
             lineHeight: "1.1",
