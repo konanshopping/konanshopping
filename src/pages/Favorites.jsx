@@ -301,28 +301,27 @@ useEffect(() => {
   // REMOVE FAVORITE
   // =========================
 
-  const removeFavorite =
-  async (productId) => {
+  const removeFavorite = async (productId) => {
 
-    try {
+  try {
+
+console.log("user =", user);
+
+    if (user?._id) {
 
       await axios.delete(
-
         `https://konanshopping-production.up.railway.app/favorites/${user._id}/${productId}`
-
       );
 
-      const updatedFavorites =
-        favorites.filter(
-          (item) =>
-            item._id !== productId
-        );
+    }
 
-      // UPDATE STATE
-
-      setFavorites(
-        updatedFavorites
+    const updatedFavorites =
+      favorites.filter(
+        (item) =>
+          item._id !== productId
       );
+
+    setFavorites(updatedFavorites);
 
       // =====================
       // CLIENT ID
