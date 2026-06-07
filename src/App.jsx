@@ -766,7 +766,7 @@ setLoading(false);
 
         alignItems: "center",
 
-        gap: "8px",
+        gap: "10px",
       }}
     >
 
@@ -775,41 +775,41 @@ setLoading(false);
         alt=""
 
         style={{
-          width: "32px",
+          width: "42px",
 
-          height: "32px",
+          height: "42px",
 
           objectFit: "cover",
 
-          borderRadius: "10px",
+          borderRadius: "12px",
         }}
       />
 
       <div>
 
         <h1
-          style={{
-            margin: 0,
-            fontSize: "10px",
-            color: "#1f1b4b",
-            fontWeight: "900",
-            lineHeight: "1.1",
-          }}
-        >
-          KONAN
-        </h1>
+  style={{
+    margin: 0,
+    fontSize: "14px",
+    color: "#1f1b4b",
+    fontWeight: "900",
+    lineHeight: "1",
+  }}
+>
+  KONAN
+</h1>
 
-        <h2
-          style={{
-            margin: 0,
-            fontSize: "10px",
-            color: "#5b3cc4",
-            fontWeight: "900",
-            lineHeight: "1.1",
-          }}
-        >
-          SHOPPING
-        </h2>
+<h2
+  style={{
+    margin: 0,
+    fontSize: "14px",
+    color: "#5b3cc4",
+    fontWeight: "900",
+    lineHeight: "1",
+  }}
+>
+  SHOPPING
+</h2>
 
       </div>
 
