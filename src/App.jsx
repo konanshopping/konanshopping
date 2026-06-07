@@ -818,13 +818,15 @@ setLoading(false);
    {/* SEARCH */}
 
     <div
-      style={{
-        flex: 1,
-        display: "flex",
-        justifyContent: "center",
-        minWidth: "220px",
-      }}
-    >
+  style={{
+    flex: 1,
+    display: "flex",
+    justifyContent: "center",
+    minWidth: "0",
+    marginLeft: "8px",
+    marginRight: "8px",
+  }}
+>
 
       <div
 style={{
