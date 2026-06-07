@@ -1017,7 +1017,7 @@ FCFA
    <div
   style={{
     display: "flex",
-    gap: "10px",
+    gap: "8px",
     alignItems: "center",
     flexShrink: 0,
     
