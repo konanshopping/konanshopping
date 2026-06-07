@@ -831,7 +831,7 @@ style={{
 width:"100%",
 maxWidth:
 window.innerWidth < 768
-? "140px"
+? "180px"
 : "350px",
 background:"white",
 position:"relative",
