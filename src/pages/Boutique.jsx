@@ -815,6 +815,8 @@ const displayedProducts =
     ? filteredProducts
     : randomProducts;
 
+console.log(products);
+
   return (
 
     <div
