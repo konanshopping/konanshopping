@@ -2585,9 +2585,10 @@ avis )
 
 onClick={(e) => {
 
-e.preventDefault();
+  e.preventDefault();
+  e.stopPropagation();
 
-addToCart(product);
+  addToCart(product);
 
 setAddedProduct(product._id);
 
