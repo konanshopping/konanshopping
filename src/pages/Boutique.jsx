@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import {
   Link,
@@ -793,28 +793,23 @@ console.log(
   filteredProducts.length
 );
 
-const [randomProducts, setRandomProducts] =
-  useState([]);
-
-useEffect(() => {
-
-  if (filteredProducts.length > 0) {
-
-    setRandomProducts(
-      [...filteredProducts].sort(
-        () => Math.random() - 0.5
-      )
-    );
-
-  }
-
-}, [products]);
+const randomProducts = useMemo(
+  () =>
+    [...filteredProducts].sort(
+      () => Math.random() - 0.5
+    ),
+  [
+    products,
+    selectedCategory,
+    selectedBrand,
+    search
+  ]
+);
 
 const displayedProducts =
   search.trim()
     ? filteredProducts
     : randomProducts;
-
 
   return (
 
