@@ -2590,13 +2590,6 @@ onClick={(e) => {
 
   addToCart(product);
 
-setAddedProduct(product._id);
-
-setTimeout(() => {
-
-setAddedProduct(null);
-
-}, 1500);
 
 }}
 
