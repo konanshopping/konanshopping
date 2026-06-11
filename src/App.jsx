@@ -2042,17 +2042,15 @@ la recherche IA.
 
       .map((product) => (
 
-        <div
+<Link
+  to={`/product/${product._id}`}
   key={product._id}
->
 
-  <Link
-    to={`/product/${product._id}`}
-    style={{
-      textDecoration: "none",
-      color: "black",
-    }}
-  >
+  style={{
+    textDecoration: "none",
+    color: "black",
+  }}
+>
 
           <div
   style={{
@@ -2584,10 +2582,6 @@ avis )
     >
       {product.price} FCFA
     </h2>
-</div>
-</div>
-</Link>
-
 
     <div
       style={{
@@ -2718,13 +2712,12 @@ Ajouter
 
 </div>
 
+</div>
+
+</Link>
 
 ))
 }
-
-
-</div>
-
 
 {/* BOTTOM NAVIGATION */}
 
@@ -2927,10 +2920,10 @@ transition: "0.3s",
 </div>
 
   </div>
-
-  </div>
-    
    
+   </div>
+
+   </div>
  );
 
 }
