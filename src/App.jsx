@@ -431,17 +431,7 @@ const startVoice = () => {
 useState(null);
 
 useEffect(() => {
-
-  console.log(
-    "TYPE:",
-    typeof addedProduct
-  );
-
-  console.log(
-    "VALUE:",
-    addedProduct
-  );
-
+  console.log("addedProduct =", addedProduct);
 }, [addedProduct]);
 
   const addToCart = (product) => {
@@ -2799,7 +2789,7 @@ Ajouter
         }}
       >
 
-        <div
+        <div 
 
   className="bottomNavItem"
           style={{
