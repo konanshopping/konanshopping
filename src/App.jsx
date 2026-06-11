@@ -2600,16 +2600,16 @@ onClick={(e) => {
   e.preventDefault();
   e.stopPropagation();
 
+  console.log("Produit cliqué =", product);
+
   addToCart(product);
 
-requestAnimationFrame(() => {
-  setAddedProduct(String(product._id));
+  setAddedProduct(product._id);
 
   setTimeout(() => {
-  setAddedProduct(null);
-}, 1500);
+    setAddedProduct(null);
+  }, 1500);
 
-});
 }}
 
 style={{
