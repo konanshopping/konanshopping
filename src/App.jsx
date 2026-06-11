@@ -430,6 +430,13 @@ const startVoice = () => {
   const [addedProduct, setAddedProduct] =
 useState(null);
 
+useEffect(() => {
+  console.log(
+    "addedProduct changé :",
+    addedProduct
+  );
+}, [addedProduct]);
+
   const addToCart = (product) => {
 
   const user =
@@ -690,6 +697,11 @@ setLoading(false);
 }
 
 };
+
+console.log("Home render");
+console.log("addedProduct =", addedProduct);
+console.log("randomizedProducts =", randomizedProducts);
+console.log("aiProducts =", aiProducts);
 
   return (
 
@@ -2593,9 +2605,6 @@ onClick={(e) => {
 requestAnimationFrame(() => {
   setAddedProduct(product._id);
 
-  setTimeout(() => {
-    setAddedProduct(null);
-  }, 1500);
 });
 }}
 
