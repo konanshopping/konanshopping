@@ -2603,7 +2603,11 @@ onClick={(e) => {
   addToCart(product);
 
 requestAnimationFrame(() => {
-  setAddedProduct("test");
+  setAddedProduct(String(product._id));
+
+  setTimeout(() => {
+  setAddedProduct(null);
+}, 1500);
 
 });
 }}
