@@ -591,7 +591,11 @@ useEffect(() => {
 const [visibleProducts, setVisibleProducts] =
   useState(8);
 
-const randomizedProducts = products;
+const randomizedProducts = useMemo(() => {
+  return [...products].sort(
+    () => Math.random() - 0.5
+  );
+}, [products]);
 
 useEffect(() => {
   const handleScroll = () => {
@@ -2607,7 +2611,9 @@ onClick={(e) => {
 
   addToCart(product);
 
-  setAddedProduct(product._id);
+  setAddedProduct({
+  id: product._id
+});
 
   setTimeout(() => {
     setAddedProduct(null);
@@ -2622,7 +2628,7 @@ border:"1px solid #e5e7eb",
 
 background:
 
-addedProduct === String(product._id)
+addedProduct?.id === String(product._id)
 
 ? "#10b981"
 
@@ -2630,7 +2636,7 @@ addedProduct === String(product._id)
 
 color:
 
-addedProduct === String(product._id)
+addedProduct?.id === String(product._id)
 
 ? "#ffffff"
 
@@ -2658,7 +2664,7 @@ transition:"all .3s ease",
 
 transform:
 
-addedProduct === String(product._id)
+addedProduct?.id === String(product._id)
 
 ? "scale(1.03)"
 
@@ -2667,7 +2673,7 @@ addedProduct === String(product._id)
 >
 
 {
-addedProduct === String(product._id)
+addedProduct?.id === String(product._id)
 
 ? (
 <>
