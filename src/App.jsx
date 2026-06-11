@@ -431,10 +431,17 @@ const startVoice = () => {
 useState(null);
 
 useEffect(() => {
+
   console.log(
-    "addedProduct changé :",
+    "TYPE:",
+    typeof addedProduct
+  );
+
+  console.log(
+    "VALUE:",
     addedProduct
   );
+
 }, [addedProduct]);
 
   const addToCart = (product) => {
@@ -584,11 +591,7 @@ useEffect(() => {
 const [visibleProducts, setVisibleProducts] =
   useState(8);
 
-const randomizedProducts = useMemo(() => {
-  return [...products].sort(
-    () => Math.random() - 0.5
-  );
-}, [products]);
+const randomizedProducts = products;
 
 useEffect(() => {
   const handleScroll = () => {
