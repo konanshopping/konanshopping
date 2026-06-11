@@ -2603,7 +2603,7 @@ onClick={(e) => {
   addToCart(product);
 
 requestAnimationFrame(() => {
-  setAddedProduct(product._id);
+  setAddedProduct("test");
 
 });
 }}
