@@ -2591,7 +2591,7 @@ avis )
     >
     
 
-     <button
+   <button
 
 onClick={(e) => {
 
@@ -2603,8 +2603,8 @@ onClick={(e) => {
   addToCart(product);
 
   setAddedProduct({
-  id: product._id
-});
+    id: product._id
+  });
 
   setTimeout(() => {
     setAddedProduct(null);
@@ -2613,53 +2613,41 @@ onClick={(e) => {
 }}
 
 style={{
-flex:1,
+  flex:1,
 
-border:"1px solid #e5e7eb",
+  border:"1px solid #e5e7eb",
 
-background:
+  background:"white",
 
-addedProduct?.id === String(product._id)
+  color:"#111827",
 
-? "#10b981"
+  padding:"10px",
 
-: "white",
+  borderRadius:"12px",
 
-color:
+  fontWeight:"700",
 
-addedProduct?.id === String(product._id)
+  fontSize:"12px",
 
-? "#ffffff"
+  cursor:"pointer",
 
-: "#111827",
+  display:"flex",
 
-padding:"10px",
+  alignItems:"center",
 
-borderRadius:"12px",
+  justifyContent:"center",
 
-fontWeight:"700",
+  gap:"6px",
 
-fontSize:"12px",
+  transition:"all .3s ease",
 
-cursor:"pointer",
+  transform:
 
-display:"flex",
+  addedProduct?.id === String(product._id)
 
-alignItems:"center",
+  ? "scale(1.03)"
 
-justifyContent:"center",
-
-gap:"6px",
-
-transition:"all .3s ease",
-
-transform:
-
-addedProduct?.id === String(product._id)
-
-? "scale(1.03)"
-
-: "scale(1)"
+  : "scale(1)"
 }}
 >
 
@@ -2667,17 +2655,23 @@ addedProduct?.id === String(product._id)
 addedProduct?.id === String(product._id)
 
 ? (
-<>
-<FaCheck />
-Ajouté
-</>
+  <span
+    style={{
+      color:"#2563eb",
+      fontSize:"22px",
+      fontWeight:"900",
+      lineHeight:"1"
+    }}
+  >
+    ➜
+  </span>
 )
 
 : (
-<>
-<FaShoppingCart />
-Ajouter
-</>
+  <>
+    <FaShoppingCart />
+    Ajouter
+  </>
 )
 }
 
