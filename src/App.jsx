@@ -2619,7 +2619,7 @@ border:"1px solid #e5e7eb",
 
 background:
 
-addedProduct === product._id
+addedProduct === String(product._id)
 
 ? "#10b981"
 
@@ -2627,7 +2627,7 @@ addedProduct === product._id
 
 color:
 
-addedProduct === product._id
+addedProduct === String(product._id)
 
 ? "#ffffff"
 
@@ -2655,7 +2655,7 @@ transition:"all .3s ease",
 
 transform:
 
-addedProduct === product._id
+addedProduct === String(product._id)
 
 ? "scale(1.03)"
 
@@ -2664,7 +2664,7 @@ addedProduct === product._id
 >
 
 {
-addedProduct === product._id
+addedProduct === String(product._id)
 
 ? (
 <>
