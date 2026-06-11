@@ -355,9 +355,9 @@ const shipping =
     setCart(updated);
 
     localStorage.setItem(
-      "cart",
-      JSON.stringify(updated)
-    );
+  `cart_${clientId}`,
+  JSON.stringify(updated)
+);
 
   };
 
@@ -641,16 +641,22 @@ const cardStyle = {
   backdropFilter: "blur(10px)",
 };
 
+if (!Array.isArray(cart)) {
+  return <h1>Erreur panier</h1>;
+}
+
   // =========================
   // UI
   // =========================
+
+console.log("Cart =", cart);
 
   return (
 
     <>
 
       {showConfetti && (
-
+ 
         <Confetti
           numberOfPieces={500}
           recycle={false}

@@ -2590,12 +2590,13 @@ onClick={(e) => {
 
   addToCart(product);
 
-setAddedProduct(product._id);
+requestAnimationFrame(() => {
+  setAddedProduct(product._id);
 
-setTimeout(() => {
-  setAddedProduct(null);
-}, 1500);
-
+  setTimeout(() => {
+    setAddedProduct(null);
+  }, 1500);
+});
 }}
 
 style={{
