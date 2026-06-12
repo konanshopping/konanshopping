@@ -660,7 +660,7 @@ console.log("Cart length =", cart.length);
 
     <>
 
-      {false && (
+   {showConfetti && (
   <Confetti
     numberOfPieces={500}
     recycle={false}
@@ -1319,9 +1319,77 @@ console.log("Cart length =", cart.length);
   Votre commande
 </h2>
 
+{cart.length === 0 && (
+
+  <div
+    style={{
+      marginTop: "25px",
+      padding: "40px 25px",
+      borderRadius: "24px",
+      background:
+        "linear-gradient(135deg,#ffffff,#f8fafc)",
+      border: "1px solid #e5e7eb",
+      textAlign: "center",
+      boxShadow:
+        "0 10px 25px rgba(0,0,0,0.05)",
+    }}
+  >
+
+    <FaShoppingCart
+      style={{
+        fontSize: "60px",
+        color: "#cbd5e1",
+        marginBottom: "15px",
+      }}
+    />
+
+    <h2
+      style={{
+        margin: 0,
+        color: "#111827",
+        fontSize: "24px",
+        fontWeight: "800",
+      }}
+    >
+      Votre panier est vide
+    </h2>
+
+    <p
+      style={{
+        marginTop: "12px",
+        color: "#6b7280",
+        fontSize: "15px",
+        lineHeight: "1.6",
+      }}
+    >
+      Vous n'avez actuellement aucun produit dans votre panier.
+      Parcourez notre boutique et ajoutez vos articles préférés pour passer commande.
+    </p>
+
+    <button
+      onClick={() => navigate("/")}
+      style={{
+        marginTop: "20px",
+        padding: "14px 25px",
+        border: "none",
+        borderRadius: "14px",
+        background:
+          "linear-gradient(135deg,#5b6cff,#7c4dff)",
+        color: "white",
+        fontWeight: "700",
+        cursor: "pointer",
+      }}
+    >
+      Continuer mes achats
+    </button>
+
+  </div>
+
+)}
+
 {cart.map((item, index) => (
   <div
-    key={`${item._id}-${index}`}
+    key={item._id}
 
     style={{
       display: "flex",
