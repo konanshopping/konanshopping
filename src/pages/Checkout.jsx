@@ -645,18 +645,6 @@ if (!Array.isArray(cart)) {
   return <h1>Erreur panier</h1>;
 }
 
-if (cart.length === 0) {
-  return (
-    <div
-      style={{
-        padding: "50px",
-        textAlign: "center",
-      }}
-    >
-      <h1>Panier vide</h1>
-    </div>
-  );
-}
 
   // =========================
   // UI
