@@ -702,11 +702,6 @@ setLoading(false);
 
 };
 
-console.log("Home render");
-console.log("addedProduct =", addedProduct);
-console.log("randomizedProducts =", randomizedProducts);
-console.log("aiProducts =", aiProducts);
-
   return (
 
     <div
@@ -2614,26 +2609,47 @@ onClick={(e) => {
 
 }}
 style={{
-flex:1,
-border:"1px solid #e5e7eb",
-background:
-addedProduct === product._id
-? "#10b981"
-: "white",
-color:
-addedProduct === product._id
-? "#ffffff"
-: "#111827",
-padding:"10px",
-borderRadius:"12px",
-fontWeight:"700",
-fontSize:"12px",
-cursor:"pointer"
+  flex:1,
+  border:"1px solid #e5e7eb",
+
+  background:
+  addedProduct === product._id
+  ? "#10b981"
+  : "white",
+
+  color:
+  addedProduct === product._id
+  ? "#ffffff"
+  : "#111827",
+
+  padding:"10px",
+
+  borderRadius:"12px",
+
+  fontWeight:"700",
+
+  fontSize:"12px",
+
+  cursor:"pointer",
+
+  transition:"all .25s ease",
+
+  transform:
+  addedProduct === product._id
+  ? "scale(1.03)"
+  : "scale(1)",
+
+  boxShadow:
+  addedProduct === product._id
+  ? "0 6px 15px rgba(16,185,129,.25)"
+  : "none",
 }}
 >
-{addedProduct === product._id
-? "Ajouté"
-: "Ajouter"}
+{
+addedProduct === product._id
+? "✓ Ajouté"
+: "Ajouter"
+}
 </button>
 
       <button
