@@ -2,6 +2,19 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaEye,
+  FaUserPlus,
+  FaSignInAlt,
+  FaShieldAlt,
+  FaEyeSlash,
+  FaCheckCircle,
+
+} from "react-icons/fa";
+
 function Register() {
 
   const [name, setName] =
@@ -15,6 +28,9 @@ function Register() {
 
   const [loading, setLoading] =
     useState(false);
+
+    const [showPassword, setShowPassword] =
+  useState(false);
 
   const register = async () => {
 
@@ -104,558 +120,999 @@ function Register() {
         position: "relative",
 
         background:
-          "linear-gradient(135deg,#0F172A,#1E1B4B,#312E81)",
+"linear-gradient(135deg,#f8fafc,#ffffff,#eef4ff)",
 
         padding: "20px",
       }}
     >
 
-      {/* LIGHT EFFECT */}
-
-      <div
-        style={{
-          position: "absolute",
-
-          width: "500px",
-
-          height: "500px",
-
-          background:
-            "#7C3AED",
-
-          borderRadius: "50%",
-
-          top: "-180px",
-
-          left: "-120px",
-
-          opacity: 0.25,
-
-          filter: "blur(120px)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-
-          width: "450px",
-
-          height: "450px",
-
-          background:
-            "#4F46E5",
-
-          borderRadius: "50%",
-
-          bottom: "-180px",
-
-          right: "-120px",
-
-          opacity: 0.25,
-
-          filter: "blur(120px)",
-        }}
-      />
 
       {/* CARD */}
 
-      <div
+<div
+  style={{
+    width: "100%",
+
+    maxWidth: "900px",
+
+    background: "#ffffff",
+
+    borderRadius: "35px",
+
+    padding:
+      window.innerWidth < 768
+        ? "35px 20px"
+        : "60px 70px",
+
+    boxShadow:
+      "0 20px 60px rgba(15,23,42,0.08)",
+
+    border:
+      "1px solid #e5e7eb",
+
+    position: "relative",
+
+    zIndex: 5,
+
+    overflow: "hidden",
+  }}
+>
+
+    {/* LOGO PREMIUM */}
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    marginBottom: "30px",
+  }}
+>
+
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "140px"
+          : "170px",
+
+      height:
+        window.innerWidth < 768
+          ? "140px"
+          : "170px",
+
+      borderRadius: "50%",
+
+      background:
+        "linear-gradient(135deg,#ffffff,#f8fafc)",
+
+      border:
+        "3px solid #2563eb",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      boxShadow:
+        "0 15px 40px rgba(37,99,235,0.15)",
+
+      position: "relative",
+    }}
+  >
+
+    <img
+      src="/logo.jpg"
+
+      alt="Konan Shopping"
+
+      style={{
+        width: "75%",
+
+        objectFit: "contain",
+      }}
+    />
+
+  </div>
+
+</div>
+
+{/* TITLE */}
+
+<div
+  style={{
+    textAlign: "center",
+    marginBottom: "45px",
+  }}
+>
+
+  <h1
+    style={{
+      margin: 0,
+
+      fontSize:
+        window.innerWidth < 768
+          ? "50px"
+          : "70px",
+
+      fontWeight: "900",
+
+      color: "#07133d",
+
+      lineHeight: "1",
+    }}
+  >
+    Créer un
+  </h1>
+
+  <h1
+    style={{
+      margin: 0,
+
+      fontSize:
+        window.innerWidth < 768
+          ? "50px"
+          : "70px",
+
+      fontWeight: "900",
+
+      color: "#2563eb",
+
+      lineHeight: "1",
+    }}
+  >
+    compte
+  </h1>
+
+  <div
+    style={{
+      width: "90px",
+
+      height: "6px",
+
+      background:
+        "linear-gradient(135deg,#2563eb,#60a5fa)",
+
+      margin: "18px auto",
+
+      borderRadius: "20px",
+    }}
+  />
+
+  <p
+    style={{
+      color: "#64748b",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "16px"
+          : "20px",
+
+      lineHeight: "1.8",
+
+      maxWidth: "600px",
+
+      margin: "0 auto",
+    }}
+  >
+    Rejoignez Konan Shopping et profitez
+    d'une expérience premium de vente en ligne.
+  </p>
+
+</div>
+       {/* NAME */}
+
+<div
+  style={{
+    marginBottom: "20px",
+  }}
+>
+
+  <div
+  style={{
+    display: "flex",
+
+    alignItems: "center",
+
+    background: "#ffffff",
+
+    border:
+      "2px solid #eef2ff",
+
+    borderRadius: "24px",
+
+    padding:
+      window.innerWidth < 768
+        ? "16px"
+        : "20px",
+
+    boxShadow:
+      "0 12px 30px rgba(15,23,42,0.05)",
+
+    transition: "all .3s ease",
+
+    minHeight: "95px",
+  }}
+>
+
+    {/* ICON */}
+
+    <div
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "60px"
+            : "72px",
+
+        height:
+          window.innerWidth < 768
+            ? "60px"
+            : "72px",
+
+        borderRadius: "18px",
+
+        background:
+  "linear-gradient(135deg,#2563eb,#60a5fa)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        marginRight: "18px",
+
+        flexShrink: 0,
+      }}
+    >
+
+      <FaUser
+  style={{
+    color: "#ffffff",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "28px",
+        }}
+      />
+
+    </div>
+
+    {/* INPUT */}
+
+    <div
+      style={{
+        flex: 1,
+      }}
+    >
+
+      <p
+        style={{
+          margin: 0,
+
+          color: "#0f172a",
+
+          fontWeight: "700",
+
+          fontSize: "15px",
+
+          marginBottom: "8px",
+        }}
+      >
+        Nom complet
+      </p>
+
+      <input
+        type="text"
+
+        placeholder="Entrez votre nom"
+
+        value={name}
+
+        onChange={(e) =>
+          setName(
+            e.target.value
+          )
+        }
+
         style={{
           width: "100%",
 
-          maxWidth: "500px",
+          border: "none",
 
-          background:
-            "rgba(255,255,255,0.08)",
+          outline: "none",
 
-          backdropFilter:
-            "blur(25px)",
+          background: "transparent",
 
-          border:
-            "1px solid rgba(255,255,255,0.12)",
+          fontSize: "18px",
 
-          borderRadius: "38px",
+          color: "#64748b",
 
-          padding: "45px 35px",
+          padding: 0,
+        }}
+      />
 
-          boxShadow:
-            "0 20px 60px rgba(0,0,0,0.35)",
+    </div>
 
-          position: "relative",
+  </div>
 
-          zIndex: 5,
+</div>
+
+    {/* EMAIL */}
+
+<div
+  style={{
+    marginBottom: "20px",
+  }}
+>
+
+  <div
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      background: "#ffffff",
+
+      border:
+        "2px solid #eef2ff",
+
+      borderRadius: "24px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "14px",
+
+      boxShadow:
+        "0 12px 30px rgba(15,23,42,0.05)",
+
+      transition: "all .3s ease",
+
+      minHeight: "78px",
+    }}
+  >
+
+    {/* ICON */}
+
+    <div
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
+
+        height:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
+
+        borderRadius: "16px",
+
+        background:
+          "linear-gradient(135deg,#2563eb,#60a5fa)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        marginRight: "12px",
+
+        flexShrink: 0,
+      }}
+    >
+
+      <FaEnvelope
+        style={{
+          color: "#ffffff",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "20px"
+              : "22px",
+        }}
+      />
+
+    </div>
+
+    {/* INPUT */}
+
+    <div
+      style={{
+        flex: 1,
+      }}
+    >
+
+      <p
+        style={{
+          margin: 0,
+
+          color: "#0f172a",
+
+          fontWeight: "700",
+
+          fontSize: "13px",
+
+          marginBottom: "5px",
         }}
       >
+        Adresse e-mail
+      </p>
 
-        {/* LOGO PREMIUM */}
+      <input
+        type="email"
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "28px",
-          }}
-        >
+        placeholder="Entrez votre email"
 
-          <div
+        value={email}
 
-            style={{
+        onChange={(e) =>
+          setEmail(
+            e.target.value
+          )
+        }
 
-              width: "150px",
+        style={{
+          width: "100%",
 
-              height: "150px",
+          border: "none",
 
-              borderRadius: "40px",
+          outline: "none",
 
-              background:
-                "rgba(255,255,255,0.08)",
+          background: "transparent",
 
-              backdropFilter:
-                "blur(20px)",
+          fontSize:
+            window.innerWidth < 768
+              ? "15px"
+              : "16px",
 
-              border:
-                "1px solid rgba(255,255,255,0.15)",
+          color: "#0f172a",
 
-              display: "flex",
+          padding: 0,
+        }}
+      />
 
-              justifyContent: "center",
+    </div>
 
-              alignItems: "center",
+  </div>
 
-              boxShadow:
-                "0 20px 60px rgba(124,58,237,0.45)",
+</div>
 
-              transition: "0.4s",
+{/* PASSWORD */}
 
-              overflow: "hidden",
+<div
+  style={{
+    marginBottom: "15px",
+  }}
+>
 
-              cursor: "pointer",
+  <div
+    style={{
+      display: "flex",
 
-            }}
+      alignItems: "center",
 
-            onMouseEnter={(e) => {
+      background: "#ffffff",
 
-              e.currentTarget.style.transform =
-                "translateY(-8px) scale(1.03)";
+      border:
+        "2px solid #eef2ff",
 
-              e.currentTarget.style.boxShadow =
-                "0 30px 80px rgba(124,58,237,0.7)";
+      borderRadius: "24px",
 
-            }}
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "14px",
 
-            onMouseLeave={(e) => {
+      boxShadow:
+        "0 12px 30px rgba(15,23,42,0.05)",
 
-              e.currentTarget.style.transform =
-                "translateY(0px) scale(1)";
+      transition: "all .3s ease",
 
-              e.currentTarget.style.boxShadow =
-                "0 20px 60px rgba(124,58,237,0.45)";
+      minHeight: "78px",
+    }}
+  >
 
-            }}
-          >
+    {/* ICON */}
 
-            <img
-              src="/logo.jpg"
-              alt="Konan Shopping"
+    <div
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
 
-              style={{
+        height:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
 
-                width: "85%",
+        borderRadius: "16px",
 
-                objectFit: "contain",
+        background:
+          "linear-gradient(135deg,#2563eb,#60a5fa)",
 
-                filter:
-                  "drop-shadow(0 10px 20px rgba(0,0,0,0.25))",
+        display: "flex",
 
-              }}
-            />
+        justifyContent: "center",
 
-          </div>
+        alignItems: "center",
 
-        </div>
+        marginRight: "12px",
 
-        {/* TITLE */}
+        flexShrink: 0,
+      }}
+    >
 
-        <div
-          style={{
-            textAlign: "center",
-            marginBottom: "35px",
-          }}
-        >
+      <FaLock
+        style={{
+          color: "#ffffff",
 
-          <h1
-            style={{
-              color: "white",
+          fontSize:
+            window.innerWidth < 768
+              ? "20px"
+              : "22px",
+        }}
+      />
 
-              fontSize: "42px",
+    </div>
 
-              fontWeight: "900",
+    {/* INPUT */}
 
-              marginBottom: "10px",
+    <div
+      style={{
+        flex: 1,
+      }}
+    >
 
-              letterSpacing: "-1px",
-            }}
-          >
-            Créer un compte
-          </h1>
+      <p
+        style={{
+          margin: 0,
 
-          <p
-            style={{
-              color:
-                "rgba(255,255,255,0.7)",
+          color: "#0f172a",
 
-              fontSize: "15px",
+          fontWeight: "700",
 
-              lineHeight: "26px",
-            }}
-          >
-            Rejoignez Konan Shopping
-            et profitez d'une expérience
-            premium de vente en ligne.
-          </p>
+          fontSize: "13px",
 
-        </div>
+          marginBottom: "5px",
+        }}
+      >
+        Mot de passe
+      </p>
 
-        {/* NAME */}
+      <input
+        type={
+          showPassword
+            ? "text"
+            : "password"
+        }
 
-        <div
-          style={{
-            marginBottom: "22px",
-          }}
-        >
+        placeholder="Entrez votre mot de passe"
 
-          <p
-            style={{
-              color: "white",
+        value={password}
 
-              marginBottom: "10px",
+        onChange={(e) =>
+          setPassword(
+            e.target.value
+          )
+        }
 
-              fontWeight: "700",
+        style={{
+          width: "100%",
 
-              fontSize: "15px",
-            }}
-          >
+          border: "none",
 
-            <i
-              className="fa-solid fa-user"
-              style={{
-                marginRight: "10px",
-                color: "#A78BFA",
-              }}
-            ></i>
+          outline: "none",
 
-            Nom complet
+          background: "transparent",
 
-          </p>
+          fontSize:
+            window.innerWidth < 768
+              ? "15px"
+              : "16px",
 
-          <input
-            type="text"
+          color: "#0f172a",
 
-            placeholder="Entrez votre nom"
+          padding: 0,
+        }}
+      />
 
-            value={name}
+    </div>
 
-            onChange={(e) =>
-              setName(
-                e.target.value
-              )
-            }
+    {/* EYE */}
 
-            style={inputStyle}
-          />
+    <div
+      onClick={() =>
+        setShowPassword(
+          !showPassword
+        )
+      }
 
-        </div>
+      style={{
+        cursor: "pointer",
 
-        {/* EMAIL */}
+        color: "#94a3b8",
 
-        <div
-          style={{
-            marginBottom: "22px",
-          }}
-        >
+        fontSize: "18px",
 
-          <p
-            style={{
-              color: "white",
+        paddingLeft: "10px",
+      }}
+    >
 
-              marginBottom: "10px",
+      {showPassword ? (
+        <FaEyeSlash />
+      ) : (
+        <FaEye />
+      )}
 
-              fontWeight: "700",
+    </div>
 
-              fontSize: "15px",
-            }}
-          >
+  </div>
 
-            <i
-              className="fa-solid fa-envelope"
-              style={{
-                marginRight: "10px",
-                color: "#A78BFA",
-              }}
-            ></i>
+</div>
 
-            Adresse email
 
-          </p>
 
-          <input
-            type="email"
+{/* SECURITY */}
 
-            placeholder="Entrez votre email"
+<div
+  style={{
+    display: "flex",
 
-            value={email}
+    alignItems: "center",
 
-            onChange={(e) =>
-              setEmail(
-                e.target.value
-              )
-            }
+    gap: "10px",
 
-            style={inputStyle}
-          />
+    marginBottom: "30px",
 
-        </div>
+    color: "#16a34a",
 
-        {/* PASSWORD */}
+    fontSize: "15px",
 
-        <div
-          style={{
-            marginBottom: "28px",
-          }}
-        >
+    fontWeight: "700",
 
-          <p
-            style={{
-              color: "white",
+padding: "14px 18px",
+background: "#f0fdf4",
+border: "1px solid #bbf7d0",
+borderRadius: "16px",
 
-              marginBottom: "10px",
+  }}
+>
 
-              fontWeight: "700",
+  <FaShieldAlt />
 
-              fontSize: "15px",
-            }}
-          >
+  Vos données sont protégées et sécurisées
 
-            <i
-              className="fa-solid fa-lock"
-              style={{
-                marginRight: "10px",
-                color: "#A78BFA",
-              }}
-            ></i>
+</div>
 
-            Mot de passe
+{/* BUTTON */}
 
-          </p>
+<button
+  onClick={register}
 
-          <input
-            type="password"
+  disabled={loading}
 
-            placeholder="Entrez votre mot de passe"
+  style={{
 
-            value={password}
+    width: "100%",
 
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
+    height: "72px",
 
-            style={inputStyle}
-          />
+    letterSpacing: "0.3px",
 
-        </div>
+    border: "none",
 
-        {/* BUTTON */}
+    borderRadius: "22px",
 
-        <button
-          onClick={register}
+    background:
+      "linear-gradient(135deg,#2563eb,#3b82f6)",
 
-          disabled={loading}
+    color: "white",
 
-          style={buttonStyle}
+    fontSize: "18px",
 
-          onMouseEnter={(e) => {
+    fontWeight: "800",
 
-            e.target.style.transform =
-              "translateY(-4px)";
+    cursor: "pointer",
 
-            e.target.style.boxShadow =
-              "0 20px 45px rgba(124,58,237,0.6)";
+    display: "flex",
 
-          }}
+    justifyContent: "center",
 
-          onMouseLeave={(e) => {
+    alignItems: "center",
 
-            e.target.style.transform =
-              "translateY(0px)";
+    gap: "12px",
 
-            e.target.style.boxShadow =
-              "0 15px 35px rgba(124,58,237,0.45)";
+    boxShadow:
+  "0 20px 45px rgba(37,99,235,0.30)",
 
-          }}
-        >
+    transition: "0.3s",
+  }}
 
-          {loading ? (
+  onMouseEnter={(e) => {
 
-            <>
-              <i
-                className="fa-solid fa-spinner fa-spin"
-                style={{
-                  marginRight: "10px",
-                }}
-              ></i>
+    e.currentTarget.style.transform =
+      "translateY(-3px)";
 
-              Création...
+  }}
 
-            </>
+  onMouseLeave={(e) => {
 
-          ) : (
+    e.currentTarget.style.transform =
+      "translateY(0px)";
 
-            <>
-              <i
-                className="fa-solid fa-user-plus"
-                style={{
-                  marginRight: "10px",
-                }}
-              ></i>
+  }}
+>
 
-              Créer mon compte
+  {loading ? (
 
-            </>
+    "Création..."
 
-          )}
+  ) : (
 
-        </button>
+    <>
+      <FaUserPlus />
+      Créer mon compte
+    </>
 
-        {/* LOGIN LINK */}
+  )}
 
-        <button
-          onClick={() =>
-            window.location.href =
-              "/login"
-          }
+</button>
 
-          style={{
-            width: "100%",
+       {/* SEPARATOR */}
 
-            padding: "17px",
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "18px",
+    marginTop: "35px",
+    marginBottom: "30px",
+  }}
+>
+  <div
+    style={{
+      flex: 1,
+      height: "1px",
+      background:
+        "linear-gradient(to right,transparent,#dbeafe)",
+    }}
+  />
 
-            marginTop: "18px",
+  <span
+    style={{
+      color: "#94a3b8",
+      fontSize: "12px",
+      fontWeight: "800",
+      letterSpacing: "2px",
+    }}
+  >
+    OU
+  </span>
 
-            borderRadius: "18px",
+  <div
+    style={{
+      flex: 1,
+      height: "1px",
+      background:
+        "linear-gradient(to left,transparent,#dbeafe)",
+    }}
+  />
+</div>
 
-            border:
-              "1px solid rgba(255,255,255,0.15)",
+{/* LOGIN BUTTON */}
 
-            background:
-              "rgba(255,255,255,0.05)",
+<button
+  onClick={() =>
+    window.location.href =
+      "/login"
+  }
+  style={{
+    width: "100%",
+    height: "68px",
+    borderRadius: "24px",
+    border: "2px solid #2563eb",
+    background: "#ffffff",
+    color: "#2563eb",
+    fontSize:
+  window.innerWidth < 768
+    ? "15px"
+    : "16px",
+    fontWeight: "800",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+    transition: "0.3s",
+    boxShadow:
+      "0 12px 30px rgba(37,99,235,0.08)",
+  }}
+>
+  <FaSignInAlt />
 
-            color: "white",
+  Se connecter
+</button>
 
-            fontSize: "15px",
+{/* TRUST BLOCK */}
 
-            fontWeight: "700",
+<div
+  style={{
+    marginTop: "35px",
+    borderRadius: "32px",
+    overflow: "hidden",
+    background:
+      "linear-gradient(135deg,#ffffff,#f8fbff)",
+    border: "1px solid #dbeafe",
+    boxShadow:
+      "0 15px 35px rgba(37,99,235,0.08)",
+  }}
+>
 
-            cursor: "pointer",
+  {/* HEADER */}
 
-            transition: "0.3s",
-          }}
+  <div
+    style={{
+      padding: "22px",
+      borderBottom:
+        "1px solid #eef2ff",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+    }}
+  >
 
-          onMouseEnter={(e) => {
+    <div
+      style={{
+        width: "50px",
+        height: "50px",
+        borderRadius: "14px",
+        background:
+          "linear-gradient(135deg,#2563eb,#3b82f6)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <FaShieldAlt
+        style={{
+          color: "white",
+          fontSize: "20px",
+        }}
+      />
+    </div>
 
-            e.target.style.background =
-              "rgba(255,255,255,0.12)";
+    <div>
 
-          }}
+      <div
+        style={{
+          fontWeight: "800",
+          color: "#0f172a",
+          fontSize: "17px",
+        }}
+      >
+        Protection Konan Shopping
+      </div>
 
-          onMouseLeave={(e) => {
-
-            e.target.style.background =
-              "rgba(255,255,255,0.05)";
-
-          }}
-        >
-
-          <i
-            className="fa-solid fa-right-to-bracket"
-            style={{
-              marginRight: "10px",
-            }}
-          ></i>
-
-          J'ai déjà un compte
-
-        </button>
-
+      <div
+        style={{
+          color: "#64748b",
+          fontSize: "13px",
+          marginTop: "3px",
+        }}
+      >
+        Sécurité avancée de votre compte
       </div>
 
     </div>
 
+  </div>
+
+  {/* ITEMS */}
+
+  <div
+    style={{
+      padding: "22px",
+    }}
+  >
+
+    {[
+      "Mot de passe chiffré",
+      "Protection des données personnelles",
+      "Compte vérifié et sécurisé",
+      "Connexion protégée SSL",
+    ].map((item) => (
+      <div
+        key={item}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
+          marginBottom: "14px",
+        }}
+      >
+
+        <FaCheckCircle
+          style={{
+            color: "#22c55e",
+            flexShrink: 0,
+          }}
+        />
+
+        <span
+          style={{
+            color: "#475569",
+            fontSize: "14px",
+            fontWeight: "500",
+          }}
+        >
+          {item}
+        </span>
+
+      </div>
+    ))}
+
+  </div>
+
+</div>
+
+{/* FOOTER */}
+
+<div
+  style={{
+    marginTop: "30px",
+    display: "flex",
+    justifyContent:
+  window.innerWidth < 768
+    ? "center"
+    : "space-between",
+    flexWrap: "wrap",
+    gap: "15px",
+    textAlign: "center",
+  }}
+>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      color: "#64748b",
+      fontSize: "13px",
+      fontWeight: "600",
+    }}
+  >
+    <FaShieldAlt />
+    Compte sécurisé
+  </div>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      color: "#64748b",
+      fontSize: "13px",
+      fontWeight: "600",
+    }}
+  >
+    <FaCheckCircle />
+    Support premium
+  </div>
+
+</div>
+
+</div>
+
+</div>
   );
 
 }
 
-// =========================
-// INPUT STYLE
-// =========================
 
-const inputStyle = {
-
-  width: "100%",
-
-  padding: "18px",
-
-  borderRadius: "18px",
-
-  border:
-    "1px solid rgba(255,255,255,0.1)",
-
-  background:
-    "rgba(255,255,255,0.08)",
-
-  color: "white",
-
-  fontSize: "15px",
-
-  outline: "none",
-
-  boxSizing:
-    "border-box",
-
-};
-
-// =========================
-// BUTTON STYLE
-// =========================
-
-const buttonStyle = {
-
-  width: "100%",
-
-  padding: "18px",
-
-  border: "none",
-
-  borderRadius: "20px",
-
-  background:
-    "linear-gradient(135deg,#8B5CF6,#4F46E5)",
-
-  color: "white",
-
-  fontSize: "16px",
-
-  fontWeight: "800",
-
-  cursor: "pointer",
-
-  boxShadow:
-    "0 15px 35px rgba(124,58,237,0.45)",
-
-  transition: "0.3s",
-
-};
 
 export default Register;
