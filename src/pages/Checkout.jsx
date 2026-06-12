@@ -214,18 +214,19 @@ useEffect(() => {
   // TOTALS
   // =========================
 
-  const total = cart.reduce(
+  const [total, setTotal] = useState(0);
 
+useEffect(() => {
+  const newTotal = cart.reduce(
     (acc, item) =>
-
       acc +
-
-      (Number(item.price) || 0) *
-
-      (Number(item.quantity) || 1),
-
+      Number(item.price) *
+      Number(item.quantity),
     0
   );
+
+  setTotal(newTotal);
+}, [cart]);
 
 
   // =========================
