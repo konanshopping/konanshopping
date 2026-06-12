@@ -257,6 +257,9 @@ const shipping =
 
   setCart(updated);
 
+  console.log("Après suppression =", updated);
+console.log("Taille =", updated.length);
+
   // =====================
   // CLIENT CONNECTÉ
   // =====================
