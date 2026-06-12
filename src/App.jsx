@@ -6,7 +6,6 @@ import {
 
 import AiMode from "./pages/AiMode";
 
-import { useLocation } from "react-router-dom"
 
 import {
   BrowserRouter,
@@ -2902,8 +2901,6 @@ transition: "0.3s",
 
 function App() {
 
-  const location = useLocation();
-
   useEffect(() => {
 
   const hiddenPages = [
@@ -2943,10 +2940,6 @@ function App() {
   document.body.appendChild(
     script1
   );
-
-  // =========================
-  // LOAD CONFIG APRÈS
-  // =========================
 
   script1.onload = () => {
 
