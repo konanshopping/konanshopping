@@ -1319,7 +1319,7 @@ console.log("Cart length =", cart.length);
   Votre commande
 </h2>
 
-{cart.length === 0 && (
+{cart.length === 0 ? (
 
   <div
     style={{
@@ -1362,8 +1362,8 @@ console.log("Cart length =", cart.length);
         lineHeight: "1.6",
       }}
     >
-      Vous n'avez actuellement aucun produit dans votre panier.
-      Parcourez notre boutique et ajoutez vos articles préférés pour passer commande.
+      Aucun produit n'est actuellement dans votre panier.
+      Découvrez nos meilleures offres et ajoutez vos articles préférés.
     </p>
 
     <button
@@ -1385,7 +1385,9 @@ console.log("Cart length =", cart.length);
 
   </div>
 
-)}
+) : (
+
+  <>
 
 {cart.map((item, index) => (
   <div
@@ -1617,6 +1619,7 @@ console.log("Cart length =", cart.length);
     </button>
 
   </div>
+ 
 
 ))}
 
@@ -2297,6 +2300,8 @@ console.log("Cart length =", cart.length);
   )}
 
 </button>
+</>
+)}
 
           </div>
 
