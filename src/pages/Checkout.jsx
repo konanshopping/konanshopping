@@ -262,7 +262,7 @@ const shipping =
         item._id !== id
     );
 
-  setCart(updated);
+  setCart([...updated]);
 
   console.log("Après suppression =", updated);
 console.log("Taille =", updated.length);
@@ -350,15 +350,12 @@ console.log("Taille =", updated.length);
             ...item,
 
             quantity:
-
-              type === "plus"
-
-                ? item.quantity + 1
-
-                : Math.max(
-                    1,
-                    item.quantity - 1
-                  ),
+  type === "plus"
+    ? Number(item.quantity || 1) + 1
+    : Math.max(
+        1,
+        Number(item.quantity || 1) - 1
+      )
           };
 
         }
@@ -367,7 +364,7 @@ console.log("Taille =", updated.length);
 
       });
 
-    setCart(updated);
+    setCart([...updated]);
 
     localStorage.setItem(
   `cart_${clientId}`,
@@ -674,6 +671,12 @@ if (!Array.isArray(cart)) {
 
 console.log("Cart =", cart);
 console.log("Cart length =", cart.length);
+
+console.log(
+  "Render",
+  total,
+  cart.length
+);
 
   return (
 
