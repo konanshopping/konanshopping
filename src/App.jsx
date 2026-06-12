@@ -2913,6 +2913,10 @@ function App() {
     "/checkout",
     "/success",
     "/admin",
+    "/userlogin",
+    "/register",
+    "/forgotpassword",
+    "/resetpassword",
     "/driver"
   ];
 
