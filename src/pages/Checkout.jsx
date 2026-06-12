@@ -625,12 +625,15 @@ console.log(localStorage);
   };
 
 const cardStyle = {
-
   background: "white",
+
+  width: "100%",
+
+  boxSizing: "border-box",
 
   padding:
     window.innerWidth < 768
-      ? "22px"
+      ? "15px"
       : "28px",
 
   borderRadius: "26px",
@@ -675,9 +678,15 @@ console.log("Cart length =", cart.length);
             "linear-gradient(135deg,#f9fafb,#eef2ff)",
 
           padding:
-            window.innerWidth < 768
-              ? "20px"
-              : "50px",
+  window.innerWidth < 768
+    ? "10px"
+    : "50px",
+
+overflowX: "hidden",
+
+width: "100%",
+
+boxSizing: "border-box",
 
           fontFamily: "Arial",
         }}
@@ -697,9 +706,9 @@ console.log("Cart length =", cart.length);
   <FaShoppingCart
     style={{
       fontSize:
-        window.innerWidth < 768
-          ? "38px"
-          : "58px",
+  window.innerWidth < 768
+    ? "28px"
+    : "58px",
 
       color: "#5b6cff",
     }}
@@ -831,7 +840,10 @@ console.log("Cart length =", cart.length);
 
       background: "#fafafa",
 
-      minWidth: "150px",
+      minWidth:
+  window.innerWidth < 768
+    ? "90px"
+    : "150px",
     }}
   >
 
@@ -1183,7 +1195,13 @@ console.log("Cart length =", cart.length);
 <div
   style={{
     display: "flex",
-    gap: "12px",
+
+flexDirection:
+  window.innerWidth < 768
+    ? "column"
+    : "row",
+
+gap: "12px",
     marginTop: "10px",
   }}
 >
@@ -1258,6 +1276,11 @@ console.log("Cart length =", cart.length);
         "linear-gradient(135deg,#6d28d9,#4f46e5)",
 
       color: "white",
+
+      width:
+  window.innerWidth < 768
+    ? "100%"
+    : "auto",
 
       fontWeight: "800",
 
@@ -1360,6 +1383,11 @@ console.log("Cart length =", cart.length);
         color: "#6b7280",
         fontSize: "15px",
         lineHeight: "1.6",
+        maxWidth: "100%",
+
+wordBreak: "break-word",
+
+overflowWrap: "break-word",
       }}
     >
       Aucun produit n'est actuellement dans votre panier.
@@ -1396,7 +1424,15 @@ console.log("Cart length =", cart.length);
     style={{
       display: "flex",
 
-      alignItems: "center",
+flexDirection:
+  window.innerWidth < 768
+    ? "column"
+    : "row",
+
+alignItems:
+  window.innerWidth < 768
+    ? "flex-start"
+    : "center",
 
       gap: "18px",
 
@@ -1777,10 +1813,19 @@ console.log("Cart length =", cart.length);
     style={{
       display: "flex",
 
-      justifyContent:
-        "space-between",
+flexDirection:
+  window.innerWidth < 768
+    ? "column"
+    : "row",
 
-      alignItems: "center",
+gap: "15px",
+
+justifyContent: "space-between",
+
+alignItems:
+  window.innerWidth < 768
+    ? "flex-start"
+    : "center",
 
       padding: "14px 0",
 
