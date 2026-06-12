@@ -692,6 +692,17 @@ console.log(
   total
 );
 
+console.log("Cart state =", cart);
+
+console.log(
+  "Checkout cart =",
+  JSON.parse(
+    localStorage.getItem(
+      `checkoutCart_${clientId}`
+    )
+  )
+);
+
   return (
 
     <>
