@@ -1318,10 +1318,9 @@ console.log("Cart length =", cart.length);
   Votre commande
 </h2>
 
-{cart.map((item) => (
-
+{cart.map((item, index) => (
   <div
-    key={item._id}
+    key={`${item._id}-${index}`}
 
     style={{
       display: "flex",
