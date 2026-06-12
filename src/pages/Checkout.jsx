@@ -381,6 +381,11 @@ console.log("Taille =", updated.length);
 
     setCart([...updated]);
 
+console.log(
+  "State après update =",
+  updated
+);
+
     localStorage.setItem(
   `cart_${clientId}`,
   JSON.stringify(updated)
@@ -688,9 +693,8 @@ console.log("Cart =", cart);
 console.log("Cart length =", cart.length);
 
 console.log(
-  "Render",
-  total,
-  cart.length
+  "Render total =",
+  total
 );
 
   return (
