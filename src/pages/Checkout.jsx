@@ -953,20 +953,21 @@ lineHeight: "1",
     }
 
     style={{
-      flex: 1,
+  flex: 1,
+  border: "none",
+  outline: "none",
+  height: "50px",
+  padding: "0 20px",
+  fontSize: "15px",
 
-      border: "none",
+  background: "#ffffff",
+  color: "#111827",
 
-      outline: "none",
+  WebkitTextFillColor: "#111827",
 
-      height: "50px",
-
-      padding: "0 20px",
-
-      fontSize: "15px",
-
-      background: "white",
-    }}
+  WebkitAppearance: "none",
+  appearance: "none",
+}}
   />
 
 </div>
