@@ -384,11 +384,18 @@ const SpeechRecognition =
   window.webkitSpeechRecognition;
 
 const recognition =
-  new SpeechRecognition();
+  SpeechRecognition
+    ? new SpeechRecognition()
+    : null;
 
 recognition.lang = "fr-FR";
 
 const startVoice = () => {
+
+  if (!recognition) {
+    alert("Recherche vocale non supportée");
+    return;
+  }
 
   recognition.start();
 
@@ -2592,7 +2599,6 @@ avis )
     
 
   <button
-
 onClick={(e) => {
 
   e.preventDefault();
@@ -2607,76 +2613,27 @@ onClick={(e) => {
   }, 1500);
 
 }}
-
 style={{
 flex:1,
-
 border:"1px solid #e5e7eb",
-
 background:
-
 addedProduct === product._id
-
 ? "#10b981"
-
 : "white",
-
 color:
-
 addedProduct === product._id
-
 ? "#ffffff"
-
 : "#111827",
-
 padding:"10px",
-
 borderRadius:"12px",
-
 fontWeight:"700",
-
 fontSize:"12px",
-
-cursor:"pointer",
-
-display:"flex",
-
-alignItems:"center",
-
-justifyContent:"center",
-
-gap:"6px",
-
-transition:"all .3s ease",
-
-transform:
-
-addedProduct === product._id
-
-? "scale(1.03)"
-
-: "scale(1)"
+cursor:"pointer"
 }}
 >
-
-{
-addedProduct === product._id
-
-? (
-<>
-<FaCheck />
-Ajouté
-</>
-)
-
-: (
-<>
-<FaShoppingCart />
-Ajouter
-</>
-)
-}
-
+{addedProduct === product._id
+? "Ajouté"
+: "Ajouter"}
 </button>
 
       <button
