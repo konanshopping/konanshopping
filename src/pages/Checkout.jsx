@@ -1434,18 +1434,12 @@ overflowWrap: "break-word",
 boxSizing: "border-box",
 overflow: "hidden",
 maxWidth: "100%",
+position: "relative",
 
       display: "flex",
 
-flexDirection:
-  window.innerWidth < 768
-    ? "column"
-    : "row",
-
-alignItems:
-  window.innerWidth < 768
-    ? "flex-start"
-    : "center",
+flexDirection: "row",
+alignItems: "flex-start",
 
       gap: "18px",
 
@@ -1496,6 +1490,7 @@ alignItems:
   style={{
     flex: 1,
     minWidth: 0,
+    paddingRight: "60px",
   }}
 >
 
@@ -1644,31 +1639,32 @@ alignItems:
       }
 
       style={{
-        border: "none",
+  position: "absolute",
 
-        background:
-          "linear-gradient(135deg,#ef4444,#dc2626)",
+  top: "18px",
 
-        color: "white",
+  right: "18px",
 
-        width: "42px",
+  border: "none",
 
-        height: "42px",
+  background:
+    "linear-gradient(135deg,#ef4444,#dc2626)",
 
-        flexShrink: 0,
+  color: "white",
 
-        borderRadius: "14px",
+  width: "38px",
 
-        cursor: "pointer",
+  height: "38px",
 
-        fontWeight: "bold",
+  borderRadius: "12px",
 
-        fontSize: "16px",
+  cursor: "pointer",
 
-        boxShadow:
-          "0 8px 18px rgba(239,68,68,0.25)",
-      }}
-    >
+  fontWeight: "bold",
+
+  fontSize: "16px",
+}}
+>
       ✕
     </button>
 
