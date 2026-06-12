@@ -6,6 +6,8 @@ import {
 
 import AiMode from "./pages/AiMode";
 
+import { useLocation } from "react-router-dom"
+
 import {
   BrowserRouter,
   Routes,
@@ -2900,45 +2902,69 @@ transition: "0.3s",
 
 function App() {
 
+  const location = useLocation();
+
   useEffect(() => {
 
-    // =========================
-    // SCRIPT BOTPRESS
-    // =========================
+  const hiddenPages = [
+    "/checkout",
+    "/success",
+    "/admin",
+    "/driver"
+  ];
 
-    const script1 =
+  if (
+    hiddenPages.includes(
+      window.location.pathname
+    )
+  ) {
+    return;
+  }
+
+  // =========================
+  // SCRIPT BOTPRESS
+  // =========================
+
+  console.log(
+    "Botpress scripts:",
+    document.querySelectorAll(
+      'script[src*="botpress"]'
+    ).length
+  );
+
+  const script1 =
+    document.createElement("script");
+
+  script1.src =
+    "https://cdn.botpress.cloud/webchat/v3.6/inject.js";
+
+  script1.async = true;
+
+  document.body.appendChild(
+    script1
+  );
+
+  // =========================
+  // LOAD CONFIG APRÈS
+  // =========================
+
+  script1.onload = () => {
+
+    const script2 =
       document.createElement("script");
 
-    script1.src =
-      "https://cdn.botpress.cloud/webchat/v3.6/inject.js";
+    script2.src =
+      "https://files.bpcontent.cloud/2025/01/25/16/20250125162805-WU2DYMW9.js";
 
-    script1.async = true;
+    script2.defer = true;
 
     document.body.appendChild(
-      script1
+      script2
     );
 
-    // =========================
-    // LOAD CONFIG APRÈS
-    // =========================
+  };
 
-    script1.onload = () => {
-
-      const script2 =
-        document.createElement("script");
-
-      script2.src =
-        "https://files.bpcontent.cloud/2025/01/25/16/20250125162805-WU2DYMW9.js";
-
-      script2.defer = true;
-
-      document.body.appendChild(
-        script2
-      );
-
-    };
-
-  }, []);
+}, []);
 
   return (
 
