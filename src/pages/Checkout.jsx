@@ -52,6 +52,8 @@ const clientId =
 
 const navigate = useNavigate();
 
+const mobile = window.innerWidth <= 768;
+
 const [location, setLocation] = useState(null);
 
   // =========================
@@ -625,26 +627,21 @@ console.log(localStorage);
   };
 
 const cardStyle = {
-  background: "white",
+  background: "#fff",
 
   width: "100%",
 
   boxSizing: "border-box",
 
-  padding:
-    window.innerWidth < 768
-      ? "15px"
-      : "28px",
+  padding: mobile ? "18px" : "30px",
 
-  borderRadius: "26px",
+  borderRadius: mobile ? "20px" : "26px",
 
   boxShadow:
-    "0 12px 35px rgba(0,0,0,0.05)",
+    "0 10px 30px rgba(0,0,0,0.06)",
 
   border:
-    "1px solid rgba(255,255,255,0.8)",
-
-  backdropFilter: "blur(10px)",
+    "1px solid rgba(0,0,0,0.04)",
 };
 
 if (!Array.isArray(cart)) {
@@ -677,10 +674,9 @@ console.log("Cart length =", cart.length);
           background:
             "linear-gradient(135deg,#f9fafb,#eef2ff)",
 
-          padding:
-  window.innerWidth < 768
-    ? "10px"
-    : "50px",
+         padding: mobile ? "12px" : "50px",
+maxWidth: "1600px",
+margin: "0 auto",
 
 overflowX: "hidden",
 
@@ -697,37 +693,42 @@ boxSizing: "border-box",
         <div
   style={{
     display: "flex",
-    alignItems: "center",
-    gap: "18px",
+alignItems: "center",
+gap: "15px",
+flexWrap: "wrap",
     marginBottom: "35px",
   }}
 >
 
   <FaShoppingCart
     style={{
-      fontSize:
-  window.innerWidth < 768
-    ? "28px"
-    : "58px",
+     fontSize: mobile ? "32px" : "58px",
+lineHeight: "1",
 
       color: "#5b6cff",
     }}
   />
 
   <h1
-    style={{
-      fontSize:
-        window.innerWidth < 768
-          ? "36px"
-          : "58px",
+  style={{
+    fontSize:
+      window.innerWidth < 768
+        ? "28px"
+        : "58px",
 
-      margin: 0,
+    margin: 0,
 
-      color: "#111827",
+    color: "#111827",
 
-      fontWeight: "900",
-    }}
-  >
+    fontWeight: "900",
+
+    lineHeight: "1",
+
+    maxWidth: "100%",
+
+    wordBreak: "break-word",
+  }}
+>
     Validation Commande
   </h1>
 
@@ -839,11 +840,9 @@ boxSizing: "border-box",
         "1px solid #eee",
 
       background: "#fafafa",
+      flexShrink: 0,
 
-      minWidth:
-  window.innerWidth < 768
-    ? "90px"
-    : "150px",
+      minWidth: mobile ? "110px" : "150px"
     }}
   >
 
@@ -1207,11 +1206,16 @@ gap: "12px",
 >
 
   <div
-    style={{
-      position: "relative",
-      flex: 1,
-    }}
-  >
+  style={{
+    position: "relative",
+
+    flex: 1,
+
+    width: "100%",
+
+    boxSizing: "border-box",
+  }}
+>
 
     <FaTag
       style={{
@@ -1422,6 +1426,10 @@ overflowWrap: "break-word",
     key={item._id}
 
     style={{
+
+      width: "100%",
+boxSizing: "border-box",
+
       display: "flex",
 
 flexDirection:
@@ -1883,20 +1891,29 @@ alignItems:
   {/* LIVRAISON */}
 
   <div
-    style={{
-      display: "flex",
+  style={{
+    display: "flex",
 
-      justifyContent:
-        "space-between",
+    flexDirection:
+      window.innerWidth < 768
+        ? "column"
+        : "row",
 
-      alignItems: "center",
+    gap: "15px",
 
-      padding: "14px 0",
+    justifyContent: "space-between",
 
-      borderBottom:
-        "1px solid #dbeafe",
-    }}
-  >
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
+
+    padding: "14px 0",
+
+    borderBottom:
+      "1px solid #dbeafe",
+  }}
+>
 
     <div>
 
@@ -1914,7 +1931,7 @@ alignItems:
         Livraison
       </h3>
 
-      <p
+    <p
         style={{
           margin: 0,
 
@@ -1956,20 +1973,29 @@ alignItems:
   {discount > 0 && (
 
     <div
-      style={{
-        display: "flex",
+  style={{
+    display: "flex",
 
-        justifyContent:
-          "space-between",
+    flexDirection:
+      window.innerWidth < 768
+        ? "column"
+        : "row",
 
-        alignItems: "center",
+    gap: "15px",
 
-        padding: "14px 0",
+    justifyContent: "space-between",
 
-        borderBottom:
-          "1px solid #dbeafe",
-      }}
-    >
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
+
+    padding: "14px 0",
+
+    borderBottom:
+      "1px solid #dbeafe",
+  }}
+>
 
       <div>
 
@@ -2037,10 +2063,19 @@ alignItems:
 
       display: "flex",
 
-      justifyContent:
-        "space-between",
+flexDirection:
+  window.innerWidth < 768
+    ? "column"
+    : "row",
 
-      alignItems: "center",
+gap: "15px",
+
+justifyContent: "space-between",
+
+alignItems:
+  window.innerWidth < 768
+    ? "flex-start"
+    : "center",
 
       boxShadow:
         "0 15px 30px rgba(91,108,255,0.25)",
@@ -2365,7 +2400,6 @@ alignItems:
 // =========================
 
 const inputStyle = {
-
   width: "100%",
 
   padding: "14px 16px",
@@ -2376,25 +2410,20 @@ const inputStyle = {
 
   border: "1px solid #e5e7eb",
 
-  fontSize: "15px",
+  fontSize: window.innerWidth <= 768 ? "16px" : "15px",
 
-  fontWeight: "500",
+  minHeight: "56px",
 
   outline: "none",
 
-  background:
-    "linear-gradient(135deg,#ffffff,#f9fafb)",
+  background: "#fff",
 
   boxSizing: "border-box",
-
-  transition: "0.3s",
 
   color: "#111827",
 
   boxShadow:
-    "0 4px 12px rgba(0,0,0,0.03)",
-
-  height: "56px",
+    "0 2px 8px rgba(0,0,0,0.03)",
 };
 
 export default Checkout;
