@@ -631,6 +631,10 @@ const cardStyle = {
 
   width: "100%",
 
+  maxWidth: "100%",
+
+  overflow: "hidden",
+
   boxSizing: "border-box",
 
   padding: mobile ? "18px" : "30px",
@@ -674,7 +678,7 @@ console.log("Cart length =", cart.length);
           background:
             "linear-gradient(135deg,#f9fafb,#eef2ff)",
 
-         padding: mobile ? "12px" : "50px",
+         padding: mobile ? "16px" : "50px",
 maxWidth: "1600px",
 margin: "0 auto",
 
@@ -735,20 +739,19 @@ lineHeight: "1",
 </div>
 
         <div
-          style={{
-            display: "grid",
+  style={{
+    display: "grid",
 
-            gridTemplateColumns:
+    gridTemplateColumns:
+      mobile
+        ? "1fr"
+        : "minmax(0,1.2fr) minmax(0,0.8fr)",
 
-              window.innerWidth < 768
+    gap: mobile ? "20px" : "30px",
 
-                ? "1fr"
-
-                : "1.2fr 0.8fr",
-
-            gap: "30px",
-          }}
-        >
+    width: "100%",
+  }}
+>
 
           {/* LEFT */}
 
@@ -1429,6 +1432,8 @@ overflowWrap: "break-word",
 
       width: "100%",
 boxSizing: "border-box",
+overflow: "hidden",
+maxWidth: "100%",
 
       display: "flex",
 
@@ -1473,6 +1478,8 @@ alignItems:
 
         height: "90px",
 
+        flexShrink: 0,
+
         objectFit: "cover",
 
         borderRadius: "18px",
@@ -1486,10 +1493,11 @@ alignItems:
     {/* CONTENT */}
 
     <div
-      style={{
-        flex: 1,
-      }}
-    >
+  style={{
+    flex: 1,
+    minWidth: 0,
+  }}
+>
 
       <h3
         style={{
@@ -1646,6 +1654,8 @@ alignItems:
         width: "42px",
 
         height: "42px",
+
+        flexShrink: 0,
 
         borderRadius: "14px",
 
@@ -2401,6 +2411,9 @@ alignItems:
 
 const inputStyle = {
   width: "100%",
+
+  maxWidth: "100%",
+overflow: "hidden",
 
   padding: "14px 16px",
 
