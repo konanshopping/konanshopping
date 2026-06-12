@@ -660,14 +660,12 @@ console.log("Cart length =", cart.length);
 
     <>
 
-      {showConfetti && (
- 
-        <Confetti
-          numberOfPieces={500}
-          recycle={false}
-        />
-
-      )}
+      {false && (
+  <Confetti
+    numberOfPieces={500}
+    recycle={false}
+  />
+)}
 
       <div
         style={{
