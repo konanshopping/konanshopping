@@ -208,6 +208,11 @@ useEffect(() => {
     0
   );
 
+  useEffect(() => {
+  console.log("Cart =", cart);
+  console.log("Total =", total);
+}, [cart, total]);
+
   // =========================
 // LIVRAISON
 // =========================
@@ -297,6 +302,11 @@ console.log("Taille =", updated.length);
 
   );
 
+  localStorage.setItem(
+  `checkoutCart_${clientId}`,
+  JSON.stringify(updated)
+);
+
   // =====================
   // UPDATE COUNT
   // =====================
@@ -361,6 +371,11 @@ console.log("Taille =", updated.length);
 
     localStorage.setItem(
   `cart_${clientId}`,
+  JSON.stringify(updated)
+);
+
+localStorage.setItem(
+  `checkoutCart_${clientId}`,
   JSON.stringify(updated)
 );
 
