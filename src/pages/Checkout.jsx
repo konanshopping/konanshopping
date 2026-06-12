@@ -227,9 +227,6 @@ useEffect(() => {
     0
   );
 
-  useEffect(() => {
-  console.log("TOTAL REACT =", total);
-}, [total]);
 
   // =========================
 // LIVRAISON
@@ -1915,13 +1912,6 @@ alignItems:
       </p>
 
     </div>
-
-    <p style={{
-  color: "red",
-  fontWeight: "bold"
-}}>
-  DEBUG TOTAL = {total}
-</p>
 
     <h3
       style={{
