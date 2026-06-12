@@ -52,7 +52,26 @@ const clientId =
 
 const navigate = useNavigate();
 
-const mobile = window.innerWidth <= 768;
+const [mobile, setMobile] = useState(
+  window.innerWidth <= 768
+);
+
+useEffect(() => {
+  const handleResize = () => {
+    setMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener(
+    "resize",
+    handleResize
+  );
+
+  return () =>
+    window.removeEventListener(
+      "resize",
+      handleResize
+    );
+}, []);
 
 const [location, setLocation] = useState(null);
 
@@ -209,9 +228,8 @@ useEffect(() => {
   );
 
   useEffect(() => {
-  console.log("Cart =", cart);
-  console.log("Total =", total);
-}, [cart, total]);
+  console.log("TOTAL REACT =", total);
+}, [total]);
 
   // =========================
 // LIVRAISON
@@ -1897,6 +1915,13 @@ alignItems:
       </p>
 
     </div>
+
+    <p style={{
+  color: "red",
+  fontWeight: "bold"
+}}>
+  DEBUG TOTAL = {total}
+</p>
 
     <h3
       style={{
