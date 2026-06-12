@@ -12,6 +12,8 @@ require("./routes/products");
 const ordersRoutes =
   require("./routes/orders");
 
+  const crypto = require("crypto");
+
 const Driver =
   require("./models/Driver");
 
@@ -288,6 +290,120 @@ app.get("/admin", (req, res) => {
   }
 
 });
+
+app.post(
+  "/forgot-password",
+  async (req, res) => {
+
+    const { email } = req.body;
+
+    const user =
+      await User.findOne({
+        email,
+      });
+
+    if (!user) {
+
+      return res.status(404).json({
+        message:
+          "Aucun compte trouvé",
+      });
+
+    }
+
+    const token =
+      crypto.randomBytes(32)
+      .toString("hex");
+
+    user.resetToken =
+      token;
+
+    user.resetTokenExpire =
+      Date.now() +
+      1000 * 60 * 30;
+
+    await user.save();
+
+    // envoi email ici
+
+    const resetUrl =
+
+`https://konanshopping-npgy.vercel.app/reset-password/${token}`;
+
+console.log(resetUrl);
+
+res.json({
+  message:
+    "Lien envoyé",
+  resetUrl,
+});
+
+  }
+);
+
+app.post(
+  "/reset-password/:token",
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findOne({
+
+          resetToken:
+            req.params.token,
+
+          resetTokenExpire: {
+            $gt: Date.now(),
+          },
+
+        });
+
+      if (!user) {
+
+        return res.status(400).json({
+          message:
+            "Lien expiré ou invalide",
+        });
+
+      }
+
+      const bcrypt =
+require("bcryptjs");
+
+const hashedPassword =
+await bcrypt.hash(
+  req.body.password,
+  10
+);
+
+user.password =
+  hashedPassword;
+
+      user.resetToken =
+        undefined;
+
+      user.resetTokenExpire =
+        undefined;
+
+      await user.save();
+
+      res.json({
+        message:
+          "Mot de passe modifié ✅",
+      });
+
+    } catch (err) {
+
+      res.status(500).json({
+        message:
+          "Erreur serveur",
+      });
+
+    }
+
+  }
+);
 
 // ==========================
 // SERVER

@@ -29,6 +29,12 @@ import Success from "./pages/Success";
 import Favorites from "./pages/Favorites";
 import Account from "./pages/Account";
 
+import ForgotPassword
+from "./pages/ForgotPassword";
+
+import ResetPassword
+from "./pages/ResetPassword";
+
 import ProductDetails from "./pages/ProductDetails";
 
 import MyOrders
@@ -3138,6 +3144,18 @@ function App() {
 <Route
   path="/deliveries"
   element={<Deliveries />}
+/>
+
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password/:token"
+  element={
+    <ResetPassword />
+  }
 />
 
       </Routes>

@@ -12,6 +12,10 @@ const userSchema =
 
     password: String,
 
+    resetToken: String,
+
+resetTokenExpire: Date,
+
     // ADMIN
 
     isAdmin: {
