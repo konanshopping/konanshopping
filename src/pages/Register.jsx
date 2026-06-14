@@ -113,7 +113,10 @@ function Register() {
 
         justifyContent: "center",
 
-        alignItems: "center",
+        alignItems:
+  window.innerWidth < 768
+    ? "flex-start"
+    : "center",
 
         overflow: "hidden",
 
@@ -122,7 +125,10 @@ function Register() {
         background:
 "linear-gradient(135deg,#f8fafc,#ffffff,#eef4ff)",
 
-        padding: "20px",
+        padding:
+  window.innerWidth < 768
+    ? "0"
+    : "20px",
       }}
     >
 
@@ -133,22 +139,37 @@ function Register() {
   style={{
     width: "100%",
 
-    maxWidth: "900px",
+    maxWidth:
+      window.innerWidth < 768
+        ? "100%"
+        : "900px",
+
+    minHeight:
+      window.innerWidth < 768
+        ? "100vh"
+        : "auto",
 
     background: "#ffffff",
 
-    borderRadius: "35px",
+    borderRadius:
+      window.innerWidth < 768
+        ? "0px"
+        : "35px",
 
     padding:
       window.innerWidth < 768
-        ? "35px 20px"
+        ? "25px"
         : "60px 70px",
 
     boxShadow:
-      "0 20px 60px rgba(15,23,42,0.08)",
+      window.innerWidth < 768
+        ? "none"
+        : "0 20px 60px rgba(15,23,42,0.08)",
 
     border:
-      "1px solid #e5e7eb",
+      window.innerWidth < 768
+        ? "none"
+        : "1px solid #e5e7eb",
 
     position: "relative",
 
