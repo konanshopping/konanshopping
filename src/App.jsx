@@ -2912,12 +2912,12 @@ function App() {
   const hiddenPages = [
     "/checkout",
     "/success",
-    "/admin",
-    "/userlogin",
-    "/register",
-    "/forgotpassword",
-    "/resetpassword",
-    "/driver"
+    "/Admin",
+    "/UserLogin",
+    "/Register",
+    "/ForgotPassword",
+    "/ResetPassword",
+    "/Driver"
   ];
 
   if (
