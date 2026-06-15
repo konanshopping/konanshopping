@@ -974,137 +974,242 @@ borderRadius: "16px",
   }}
 >
 
+{/* TRUST CENTER */}
+
+<div
+  style={{
+   
+
+    background:
+      "linear-gradient(135deg,#ffffff,#f8fbff)",
+
+    border:
+      "1px solid #dbeafe",
+
+    
+
+    overflow: "hidden",
+
+    marginTop: "25px",
+borderRadius: "22px",
+boxShadow:
+  "0 8px 25px rgba(37,99,235,0.05)",
+  }}
+>
+
   {/* HEADER */}
 
   <div
     style={{
-      padding: "22px",
+      padding: "16px",
+
+      background:
+        "linear-gradient(135deg,#eff6ff,#ffffff)",
+
       borderBottom:
-        "1px solid #eef2ff",
+        "1px solid #e2e8f0",
+
       display: "flex",
+
       alignItems: "center",
+
       gap: "12px",
     }}
   >
 
     <div
       style={{
-        width: "50px",
-        height: "50px",
-        borderRadius: "14px",
+        width: "45px",
+
+        height: "45px",
+
+        borderRadius: "12px",
+
         background:
           "linear-gradient(135deg,#2563eb,#3b82f6)",
+
         display: "flex",
+
         justifyContent: "center",
+
         alignItems: "center",
+
+        boxShadow:
+          "0 10px 25px rgba(37,99,235,0.25)",
       }}
     >
+
       <FaShieldAlt
         style={{
           color: "white",
-          fontSize: "20px",
+
+          fontSize: "18px",
         }}
       />
+
     </div>
 
     <div>
 
       <div
         style={{
+          fontSize: "15px",
+
           fontWeight: "800",
+
           color: "#0f172a",
-          fontSize: "17px",
         }}
       >
-        Protection Konan Shopping
+        Sécurité Konan Shopping
       </div>
 
       <div
         style={{
           color: "#64748b",
-          fontSize: "13px",
-          marginTop: "3px",
+
+          fontSize: "12px",
+
+          marginTop: "4px",
         }}
       >
-        Sécurité avancée de votre compte
+        Vos informations sont protégées par nos systèmes de sécurité avancés.
       </div>
 
     </div>
 
   </div>
 
-  {/* ITEMS */}
+  {/* FEATURES */}
 
   <div
     style={{
-      padding: "22px",
+      padding: "16px",
     }}
   >
 
     {[
-      "Mot de passe chiffré",
-      "Protection des données personnelles",
-      "Compte vérifié et sécurisé",
-      "Connexion protégée SSL",
+      {
+        title: "Mot de passe chiffré",
+        desc: "Protection renforcée de vos identifiants",
+      },
+
+      {
+        title: "Données personnelles sécurisées",
+        desc: "Confidentialité garantie",
+      },
+
+      {
+        title: "Compte vérifié",
+        desc: "Authentification fiable",
+      },
+
+      {
+        title: "Connexion SSL sécurisée",
+        desc: "Navigation protégée",
+      },
     ].map((item) => (
+
       <div
-        key={item}
+        key={item.title}
         style={{
           display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          marginBottom: "14px",
+
+          alignItems: "flex-start",
+
+          gap: "10px",
+
+          paddingBottom: "12px",
+
+          marginBottom: "12px",
+
+          borderBottom:
+            "1px solid #f1f5f9",
         }}
       >
 
         <FaCheckCircle
           style={{
             color: "#22c55e",
+
+            marginTop: "4px",
+
+            fontSize: "18px",
+
             flexShrink: 0,
           }}
         />
 
-        <span
-          style={{
-            color: "#475569",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}
-        >
-          {item}
-        </span>
+        <div>
+
+          <div
+            style={{
+              color: "#0f172a",
+
+              fontWeight: "700",
+
+              fontSize: "14px",
+            }}
+          >
+            {item.title}
+          </div>
+
+          <div
+            style={{
+              color: "#64748b",
+
+              fontSize: "12px",
+
+              marginTop: "3px",
+            }}
+          >
+            {item.desc}
+          </div>
+
+        </div>
 
       </div>
+
     ))}
 
   </div>
 
 </div>
 
-{/* FOOTER */}
+{/* FOOTER BADGES */}
 
 <div
   style={{
-    marginTop: "30px",
+    marginTop: "25px",
+
     display: "flex",
-    justifyContent:
-  window.innerWidth < 768
-    ? "center"
-    : "space-between",
+
+    justifyContent: "center",
+
+    gap: "12px",
+
     flexWrap: "wrap",
-    gap: "15px",
-    textAlign: "center",
   }}
 >
 
   <div
     style={{
+      padding: "8px 12px",
+
+      background: "#eff6ff",
+
+      color: "#2563eb",
+
+      borderRadius: "999px",
+
+      fontSize: "12px",
+
+      fontWeight: "700",
+
       display: "flex",
+
       alignItems: "center",
+
       gap: "8px",
-      color: "#64748b",
-      fontSize: "13px",
-      fontWeight: "600",
     }}
   >
     <FaShieldAlt />
@@ -1113,12 +1218,23 @@ borderRadius: "16px",
 
   <div
     style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      color: "#64748b",
+      padding: "10px 16px",
+
+      background: "#f0fdf4",
+
+      color: "#16a34a",
+
+      borderRadius: "999px",
+
       fontSize: "13px",
-      fontWeight: "600",
+
+      fontWeight: "700",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "8px",
     }}
   >
     <FaCheckCircle />
@@ -1126,9 +1242,8 @@ borderRadius: "16px",
   </div>
 
 </div>
-
 </div>
-
+</div>
 </div>
   );
 
