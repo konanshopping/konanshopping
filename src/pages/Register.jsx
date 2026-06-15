@@ -963,81 +963,65 @@ borderRadius: "16px",
 
 <div
   style={{
-    marginTop: "25px",
-
+    marginTop: "20px",
     display: "flex",
-
     justifyContent: "center",
-
     alignItems: "center",
-
-    gap: "8px",
-
-    flexWrap: "nowrap",
-
-    overflowX: "auto",
-
-    paddingBottom: "5px",
+    gap: "6px",
   }}
 >
 
   <div
-    style={{
-      padding: "8px 12px",
-      background: "#eff6ff",
-      color: "#2563eb",
-      borderRadius: "999px",
-      fontSize: "12px",
-      fontWeight: "700",
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-      whiteSpace: "nowrap",
-      flexShrink: 0,
-    }}
-  >
-    <FaShieldAlt />
-    Compte sécurisé
-  </div>
+  style={{
+    padding: "6px 10px",
+    background: "#eff6ff",
+    color: "#2563eb",
+    borderRadius: "999px",
+    fontSize: "10px",
+    fontWeight: "700",
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  }}
+>
+  <FaShieldAlt />
+  Sécurisé
+</div>
 
   <div
-    style={{
-      padding: "8px 12px",
-      background: "#f0fdf4",
-      color: "#16a34a",
-      borderRadius: "999px",
-      fontSize: "12px",
-      fontWeight: "700",
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-      whiteSpace: "nowrap",
-      flexShrink: 0,
-    }}
-  >
-    <FaCheckCircle />
-    Données protégées
-  </div>
+  style={{
+    padding: "6px 10px",
+    background: "#f0fdf4",
+    color: "#16a34a",
+    borderRadius: "999px",
+    fontSize: "10px",
+    fontWeight: "700",
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+  }}
+>
+  <FaCheckCircle />
+  Protégé
+</div>
 
   <div
-    style={{
-      padding: "8px 12px",
-      background: "#f8fafc",
-      color: "#0f172a",
-      borderRadius: "999px",
-      fontSize: "12px",
-      fontWeight: "700",
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-      border: "1px solid #e2e8f0",
-      whiteSpace: "nowrap",
-      flexShrink: 0,
-    }}
-  >
-    <FaUser />
-    Accès premium
-  </div>
+  style={{
+    padding: "6px 10px",
+    background: "#f8fafc",
+    color: "#0f172a",
+    borderRadius: "999px",
+    fontSize: "10px",
+    fontWeight: "700",
+    display: "flex",
+    alignItems: "center",
+    gap: "4px",
+    border: "1px solid #e2e8f0",
+  }}
+>
+  <FaUser />
+  Premium
+</div>
 
 </div>
 
