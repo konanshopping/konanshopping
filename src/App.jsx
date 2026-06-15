@@ -2907,6 +2907,18 @@ transition: "0.3s",
 
 function App() {
 
+  const [chatPosition,
+  setChatPosition] =
+  useState({
+
+    x:
+      window.innerWidth - 90,
+
+    y:
+      window.innerHeight - 160,
+
+  });
+
   useEffect(() => {
 
   const hiddenPages = [
@@ -3026,6 +3038,29 @@ if (
     );
 
   };
+
+  setTimeout(() => {
+
+  const botpress =
+    document.querySelector(
+      "#bp-web-widget-container"
+    );
+
+  if (botpress) {
+
+    botpress.style.display =
+      "none";
+
+    setTimeout(() => {
+
+      botpress.style.display =
+        "block";
+
+    }, 20000);
+
+  }
+
+}, 12000);
 
 }, []);
 
