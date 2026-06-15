@@ -38,7 +38,10 @@ const Coupon =
   require("./models/Visitor");
 
   const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -48,12 +51,12 @@ const Coupon =
 console.log("EMAIL_USER =", process.env.EMAIL_USER);
 console.log("EMAIL_PASS =", process.env.EMAIL_PASS ? "OK" : "UNDEFINED");
 
-transporter.verify((error, success) => {
+transporter.verify(function (error, success) {
   if (error) {
-    console.log("SMTP ERROR");
+    console.log("SMTP VERIFY ERROR");
     console.log(error);
   } else {
-    console.log("SMTP CONNECTED");
+    console.log("SMTP READY");
   }
 });
 
