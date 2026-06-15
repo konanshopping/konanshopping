@@ -497,7 +497,7 @@ const authToken = jwt.sign(
     id: user._id,
     isAdmin: user.isAdmin,
   },
-  process.env.JWT_SECRET,
+  "KONAN_SECRET",
   {
     expiresIn: "30d",
   }
