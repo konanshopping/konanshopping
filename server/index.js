@@ -59,6 +59,18 @@ transporter.verify(function (error, success) {
   }
 });
 
+const SibApiV3Sdk = require("sib-api-v3-sdk");
+
+const defaultClient =
+  SibApiV3Sdk.ApiClient.instance;
+
+defaultClient.authentications[
+  "api-key"
+].apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance =
+  new SibApiV3Sdk.TransactionalEmailsApi();
+
 
 async function sendTelegramMessage(message) {
 
@@ -315,74 +327,110 @@ app.get("/admin", (req, res) => {
 
 });
 
-app.post("/forgot-password", async (req, res) => {
-  try {
-
-    console.log("Route forgot-password appelée");
+app.post(
+  "/forgot-password",
+  async (req, res) => {
 
     const { email } = req.body;
 
-    console.log("Email reçu :", email);
-
-    const user = await User.findOne({ email });
-
-    console.log("Utilisateur trouvé :", !!user);
+    const user =
+      await User.findOne({
+        email,
+      });
 
     if (!user) {
+
       return res.status(404).json({
-        message: "Aucun compte trouvé",
+        message:
+          "Aucun compte trouvé",
       });
+
     }
 
-    const token = crypto
-      .randomBytes(32)
+    const token =
+      crypto.randomBytes(32)
       .toString("hex");
 
-    user.resetToken = token;
+    user.resetToken =
+      token;
 
     user.resetTokenExpire =
-      Date.now() + 1000 * 60 * 30;
+      Date.now() +
+      1000 * 60 * 30;
 
     await user.save();
 
-    console.log("Avant envoi email");
+    // envoi email ici
 
-    const resetUrl =
-      `https://konanshopping-npgy.vercel.app/reset-password/${token}`;
+const resetUrl =
+`https://konanshopping-npgy.vercel.app/reset-password/${token}`;
 
-    const info =
-      await transporter.sendMail({
+await apiInstance.sendTransacEmail({
 
-        from: `"Konan Shopping Cameroun" <${process.env.EMAIL_USER}>`,
+  sender: {
+    name: "Konan Shopping Cameroun",
+    email: "konanshoppingcameroun@gmail.com",
+  },
 
-        to: user.email,
+  to: [
+    {
+      email: user.email,
+    },
+  ],
 
-        subject:
-          "Réinitialisation du mot de passe",
+  subject: "Réinitialisation du mot de passe",
 
-        html: `...`
+  htmlContent: `
 
-      });
+<div style="font-family:Arial,sans-serif;padding:20px">
 
-    console.log("EMAIL ENVOYÉ ✅");
-    console.log(info);
+  <h2 style="color:#2563eb">
+    Konan Shopping
+  </h2>
 
-    res.json({
-      message:
-        "Email de récupération envoyé",
-    });
+  <p>
+    Bonjour ${user.name},
+  </p>
 
-  } catch (err) {
+  <p>
+    Nous avons reçu une demande de réinitialisation de votre mot de passe.
+  </p>
 
-    console.log("ERREUR FORGOT PASSWORD ❌");
-    console.log(err);
+  <p>
+    Cliquez sur le bouton ci-dessous :
+  </p>
 
-    res.status(500).json({
-      message: err.message,
-    });
+  <a
+    href="${resetUrl}"
+    style="
+      background:#2563eb;
+      color:white;
+      padding:14px 24px;
+      border-radius:10px;
+      text-decoration:none;
+      display:inline-block;
+      font-weight:bold;
+    "
+  >
+    Réinitialiser mon mot de passe
+  </a>
+
+  <p style="margin-top:20px">
+    Ce lien expirera dans 30 minutes.
+  </p>
+
+</div>
+
+  `,
+
+});
+
+res.json({
+  message: "Email de récupération envoyé",
+});
 
   }
-});
+);
 
 app.post(
   "/reset-password/:token",
