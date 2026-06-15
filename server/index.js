@@ -492,11 +492,29 @@ app.post(
 
       await user.save();
 
-      res.json({
-        success: true,
-        message:
-          "Mot de passe modifié avec succès ✅",
-      });
+const authToken = jwt.sign(
+  {
+    id: user._id,
+    isAdmin: user.isAdmin,
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn: "30d",
+  }
+);
+
+res.json({
+  success: true,
+  message:
+    "Mot de passe modifié avec succès ✅",
+  token: authToken,
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    isAdmin: user.isAdmin,
+  },
+});
 
     } catch (err) {
 

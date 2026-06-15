@@ -107,247 +107,187 @@ setTimeout(() => {
 
     };
 
-  return (
+return (
+
+  <div
+    style={{
+      minHeight: "100vh",
+      width: "100%",
+      background:
+        "linear-gradient(180deg,#f8fbff 0%,#eef4ff 100%)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
 
     <div
       style={{
+        width: "100%",
         minHeight: "100vh",
-
+        background: "#fff",
+        padding: "40px 25px",
         display: "flex",
-
-        justifyContent:
-          "center",
-
-        alignItems: "center",
-
-        background:
-          "linear-gradient(135deg,#f8fafc,#eff6ff)",
-
-        padding: "20px",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
 
       <div
         style={{
-          width: "100%",
-
-          maxWidth: "450px",
-
-          background: "#fff",
-
-          borderRadius: "28px",
-
-          padding: "35px",
-
-          boxShadow:
-            "0 20px 50px rgba(0,0,0,0.08)",
+          textAlign: "center",
+          marginBottom: "40px",
         }}
       >
 
-        <div
+        <img
+          src="/logo.jpg"
+          alt="Konan Shopping"
           style={{
-            textAlign:
-              "center",
+            width: "120px",
+            height: "120px",
+            borderRadius: "50%",
+            objectFit: "cover",
+            margin: "0 auto",
+            display: "block",
+            boxShadow:
+              "0 15px 35px rgba(37,99,235,0.15)",
+          }}
+        />
 
-            marginBottom:
-              "25px",
+        <h1
+          style={{
+            marginTop: "25px",
+            color: "#2563eb",
+            fontSize: "42px",
+            fontWeight: "800",
+            lineHeight: "1",
           }}
         >
+          Réinitialiser
+          <br />
+          votre mot de passe
+        </h1>
 
-          <img
-            src="/logo.jpg"
-            alt="Konan Shopping"
-            style={{
-              width: "90px",
-
-              height: "90px",
-
-              borderRadius:
-                "50%",
-            }}
-          />
-
-          <h1
-            style={{
-              marginTop:
-                "15px",
-
-              color:
-                "#2563eb",
-            }}
-          >
-            Nouveau mot de passe
-          </h1>
-
-          <p
-            style={{
-              color:
-                "#64748b",
-            }}
-          >
-            Choisissez un mot de passe sécurisé.
-          </p>
-
-        </div>
-
-        <div
+        <p
           style={{
-            position:
-              "relative",
-
-            marginBottom:
-              "15px",
+            color: "#64748b",
+            marginTop: "15px",
+            fontSize: "16px",
           }}
         >
-
-          <FaLock
-            style={{
-              position:
-                "absolute",
-
-              left: "18px",
-
-              top: "18px",
-
-              color:
-                "#94a3b8",
-            }}
-          />
-
-          <input
-            type="password"
-
-            placeholder="Nouveau mot de passe"
-
-            value={password}
-
-            onChange={(e) =>
-              setPassword(
-                e.target.value
-              )
-            }
-
-            style={{
-              width:
-                "100%",
-
-              height:
-                "55px",
-
-              paddingLeft:
-                "50px",
-
-              borderRadius:
-                "14px",
-
-              border:
-                "1px solid #e2e8f0",
-            }}
-          />
-
-        </div>
-
-        <div
-          style={{
-            position:
-              "relative",
-          }}
-        >
-
-          <FaCheckCircle
-            style={{
-              position:
-                "absolute",
-
-              left: "18px",
-
-              top: "18px",
-
-              color:
-                "#94a3b8",
-            }}
-          />
-
-          <input
-            type="password"
-
-            placeholder="Confirmer le mot de passe"
-
-            value={
-              confirmPassword
-            }
-
-            onChange={(e) =>
-              setConfirmPassword(
-                e.target.value
-              )
-            }
-
-            style={{
-              width:
-                "100%",
-
-              height:
-                "55px",
-
-              paddingLeft:
-                "50px",
-
-              borderRadius:
-                "14px",
-
-              border:
-                "1px solid #e2e8f0",
-            }}
-          />
-
-        </div>
-
-        <button
-          onClick={
-            updatePassword
-          }
-
-          disabled={
-            loading
-          }
-
-          style={{
-            width: "100%",
-
-            height: "55px",
-
-            marginTop:
-              "20px",
-
-            border: "none",
-
-            borderRadius:
-              "14px",
-
-            background:
-              "#2563eb",
-
-            color: "#fff",
-
-            fontWeight:
-              "700",
-
-            cursor:
-              "pointer",
-          }}
-        >
-
-          {loading
-            ? "Modification..."
-            : "Modifier le mot de passe"}
-
-        </button>
+          Choisissez un mot de passe sécurisé pour protéger votre compte.
+        </p>
 
       </div>
 
+      <div
+        style={{
+          position: "relative",
+          marginBottom: "18px",
+        }}
+      >
+
+        <FaLock
+          style={{
+            position: "absolute",
+            left: "20px",
+            top: "22px",
+            color: "#94a3b8",
+          }}
+        />
+
+        <input
+          type="password"
+          placeholder="Nouveau mot de passe"
+          value={password}
+          onChange={(e) =>
+            setPassword(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            height: "62px",
+            paddingLeft: "55px",
+            borderRadius: "18px",
+            border:
+              "1px solid #e2e8f0",
+            fontSize: "16px",
+            outline: "none",
+          }}
+        />
+
+      </div>
+
+      <div
+        style={{
+          position: "relative",
+        }}
+      >
+
+        <FaCheckCircle
+          style={{
+            position: "absolute",
+            left: "20px",
+            top: "22px",
+            color: "#94a3b8",
+          }}
+        />
+
+        <input
+          type="password"
+          placeholder="Confirmer le mot de passe"
+          value={confirmPassword}
+          onChange={(e) =>
+            setConfirmPassword(
+              e.target.value
+            )
+          }
+          style={{
+            width: "100%",
+            height: "62px",
+            paddingLeft: "55px",
+            borderRadius: "18px",
+            border:
+              "1px solid #e2e8f0",
+            fontSize: "16px",
+            outline: "none",
+          }}
+        />
+
+      </div>
+
+      <button
+        onClick={updatePassword}
+        disabled={loading}
+        style={{
+          width: "100%",
+          height: "62px",
+          marginTop: "25px",
+          border: "none",
+          borderRadius: "18px",
+          background: "#2563eb",
+          color: "#fff",
+          fontWeight: "800",
+          fontSize: "17px",
+          cursor: "pointer",
+          boxShadow:
+            "0 10px 25px rgba(37,99,235,0.25)",
+        }}
+      >
+
+        {loading
+          ? "Modification..."
+          : "Modifier le mot de passe"}
+
+      </button>
+
     </div>
-  );
+
+  </div>
+
+);
 }
 
 export default ResetPassword;
