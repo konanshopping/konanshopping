@@ -964,16 +964,26 @@ borderRadius: "16px",
 <div
   style={{
     marginTop: "25px",
+
     display: "flex",
+
     justifyContent: "center",
-    gap: "10px",
-    flexWrap: "wrap",
+
+    alignItems: "center",
+
+    gap: "8px",
+
+    flexWrap: "nowrap",
+
+    overflowX: "auto",
+
+    paddingBottom: "5px",
   }}
 >
 
   <div
     style={{
-      padding: "8px 14px",
+      padding: "8px 12px",
       background: "#eff6ff",
       color: "#2563eb",
       borderRadius: "999px",
@@ -982,6 +992,8 @@ borderRadius: "16px",
       display: "flex",
       alignItems: "center",
       gap: "6px",
+      whiteSpace: "nowrap",
+      flexShrink: 0,
     }}
   >
     <FaShieldAlt />
@@ -990,7 +1002,7 @@ borderRadius: "16px",
 
   <div
     style={{
-      padding: "8px 14px",
+      padding: "8px 12px",
       background: "#f0fdf4",
       color: "#16a34a",
       borderRadius: "999px",
@@ -999,6 +1011,8 @@ borderRadius: "16px",
       display: "flex",
       alignItems: "center",
       gap: "6px",
+      whiteSpace: "nowrap",
+      flexShrink: 0,
     }}
   >
     <FaCheckCircle />
@@ -1007,7 +1021,7 @@ borderRadius: "16px",
 
   <div
     style={{
-      padding: "8px 14px",
+      padding: "8px 12px",
       background: "#f8fafc",
       color: "#0f172a",
       borderRadius: "999px",
@@ -1017,6 +1031,8 @@ borderRadius: "16px",
       alignItems: "center",
       gap: "6px",
       border: "1px solid #e2e8f0",
+      whiteSpace: "nowrap",
+      flexShrink: 0,
     }}
   >
     <FaUser />
@@ -1024,8 +1040,10 @@ borderRadius: "16px",
   </div>
 
 </div>
+
 </div>
 </div>
+
   );
 
 }
