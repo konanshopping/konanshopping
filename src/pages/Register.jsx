@@ -105,35 +105,66 @@ function Register() {
 
   return (
 
+  <div
+    style={{
+      minHeight: "100vh",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems:
+        window.innerWidth < 768
+          ? "flex-start"
+          : "center",
+
+      overflow: "hidden",
+
+      position: "relative",
+
+      background:
+        "linear-gradient(180deg,#f8fafc 0%,#ffffff 45%,#eef4ff 100%)",
+
+      padding:
+        window.innerWidth < 768
+          ? "0"
+          : "20px",
+    }}
+  >
+
+    {/* HALO HAUT DROIT */}
+
     <div
       style={{
-        minHeight: "100vh",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems:
-  window.innerWidth < 768
-    ? "flex-start"
-    : "center",
-
-        overflow: "hidden",
-
-        position: "relative",
-
+        position: "absolute",
+        top: "-150px",
+        right: "-150px",
+        width: "300px",
+        height: "300px",
+        borderRadius: "50%",
         background:
-"linear-gradient(135deg,#f8fafc,#ffffff,#eef4ff)",
-
-        padding:
-  window.innerWidth < 768
-    ? "0"
-    : "20px",
+          "rgba(37,99,235,0.10)",
+        filter: "blur(60px)",
       }}
-    >
+    />
 
+    {/* HALO BAS GAUCHE */}
 
-      {/* CARD */}
+    <div
+      style={{
+        position: "absolute",
+        bottom: "-150px",
+        left: "-150px",
+        width: "280px",
+        height: "280px",
+        borderRadius: "50%",
+        background:
+          "rgba(96,165,250,0.08)",
+        filter: "blur(60px)",
+      }}
+    />
+
+     {/* CARD */}
 
 <div
   style={{
@@ -144,26 +175,24 @@ function Register() {
         ? "100%"
         : "900px",
 
-    minHeight:
-      window.innerWidth < 768
-        ? "100vh"
-        : "auto",
+    minHeight: "100vh",
 
-    background: "#ffffff",
+    background:
+      "linear-gradient(180deg,#ffffff,#f8fbff)",
 
     borderRadius:
       window.innerWidth < 768
-        ? "0px"
-        : "35px",
+        ? "0"
+        : "36px",
 
     padding:
       window.innerWidth < 768
-        ? "25px"
+        ? "20px"
         : "60px 70px",
 
     boxShadow:
       window.innerWidth < 768
-        ? "none"
+        ? "inset 0 1px 0 rgba(255,255,255,0.8)"
         : "0 20px 60px rgba(15,23,42,0.08)",
 
     border:
@@ -178,14 +207,30 @@ function Register() {
     overflow: "hidden",
   }}
 >
+  <div
+  style={{
+    position: "absolute",
+    top: "-120px",
+    right: "-120px",
+    width: "240px",
+    height: "240px",
+    borderRadius: "50%",
+    background:
+      "rgba(37,99,235,0.08)",
+    filter: "blur(40px)",
+  }}
+/>
 
-    {/* LOGO PREMIUM */}
+ {/* LOGO PREMIUM */}
 
 <div
   style={{
     display: "flex",
     justifyContent: "center",
-    marginBottom: "30px",
+    marginBottom:
+      window.innerWidth < 768
+        ? "22px"
+        : "35px",
   }}
 >
 
@@ -193,21 +238,19 @@ function Register() {
     style={{
       width:
         window.innerWidth < 768
-          ? "140px"
-          : "170px",
+          ? "90px"
+          : "130px",
 
       height:
         window.innerWidth < 768
-          ? "140px"
-          : "170px",
+          ? "90px"
+          : "130px",
 
       borderRadius: "50%",
 
-      background:
-        "linear-gradient(135deg,#ffffff,#f8fafc)",
+      background: "#ffffff",
 
-      border:
-        "3px solid #2563eb",
+      border: "2px solid #dbeafe",
 
       display: "flex",
 
@@ -216,20 +259,20 @@ function Register() {
       alignItems: "center",
 
       boxShadow:
-        "0 15px 40px rgba(37,99,235,0.15)",
+        "0 10px 30px rgba(37,99,235,0.10)",
 
       position: "relative",
+
+      overflow: "hidden",
     }}
   >
 
     <img
       src="/logo.jpg"
-
       alt="Konan Shopping"
-
       style={{
-        width: "75%",
-
+        width: "100%",
+        height: "100%",
         objectFit: "contain",
       }}
     />
@@ -243,7 +286,10 @@ function Register() {
 <div
   style={{
     textAlign: "center",
-    marginBottom: "45px",
+    marginBottom:
+      window.innerWidth < 768
+        ? "28px"
+        : "40px",
   }}
 >
 
@@ -253,208 +299,145 @@ function Register() {
 
       fontSize:
         window.innerWidth < 768
-          ? "50px"
-          : "70px",
+          ? "30px"
+          : "54px",
 
       fontWeight: "900",
 
-      color: "#07133d",
+      letterSpacing: "-1px",
 
-      lineHeight: "1",
+      color: "#0f172a",
+
+      lineHeight: "1.1",
     }}
   >
-    Créer un
+    Créer votre{" "}
+    <span
+      style={{
+        color: "#2563eb",
+      }}
+    >
+      compte
+    </span>
   </h1>
-
-  <h1
-    style={{
-      margin: 0,
-
-      fontSize:
-        window.innerWidth < 768
-          ? "50px"
-          : "70px",
-
-      fontWeight: "900",
-
-      color: "#2563eb",
-
-      lineHeight: "1",
-    }}
-  >
-    compte
-  </h1>
-
-  <div
-    style={{
-      width: "90px",
-
-      height: "6px",
-
-      background:
-        "linear-gradient(135deg,#2563eb,#60a5fa)",
-
-      margin: "18px auto",
-
-      borderRadius: "20px",
-    }}
-  />
 
   <p
     style={{
+      marginTop: "12px",
+
       color: "#64748b",
 
       fontSize:
         window.innerWidth < 768
-          ? "16px"
-          : "20px",
+          ? "14px"
+          : "18px",
 
-      lineHeight: "1.8",
+      lineHeight: "1.7",
 
-      maxWidth: "600px",
+      maxWidth: "500px",
 
-      margin: "0 auto",
+      marginLeft: "auto",
+
+      marginRight: "auto",
     }}
   >
-    Rejoignez Konan Shopping et profitez
-    d'une expérience premium de vente en ligne.
+    Accédez à une expérience d'achat rapide,
+    sécurisée et personnalisée sur
+    Konan Shopping.
   </p>
 
+  <div
+    style={{
+      width: "50px",
+
+      height: "4px",
+
+      borderRadius: "999px",
+
+      background:
+        "linear-gradient(135deg,#2563eb,#60a5fa)",
+
+      margin: "18px auto 0",
+    }}
+  />
+
 </div>
-       {/* NAME */}
+{/* NOM COMPLET */}
 
 <div
   style={{
-    marginBottom: "20px",
+    marginBottom: "25px",
   }}
 >
+
+  <p
+    style={{
+      color: "#0f172a",
+      fontWeight: "700",
+      fontSize: "15px",
+      marginBottom: "10px",
+    }}
+  >
+    Nom complet
+  </p>
 
   <div
-  style={{
-    display: "flex",
+    style={{
+      height: "68px",
 
-    alignItems: "center",
+      border: "1.5px solid #e2e8f0",
 
-    background: "#ffffff",
+      borderRadius: "18px",
 
-    border:
-      "2px solid #eef2ff",
+      background: "#ffffff",
 
-    borderRadius: "24px",
+      display: "flex",
 
-    padding:
-      window.innerWidth < 768
-        ? "16px"
-        : "20px",
+      alignItems: "center",
 
-    boxShadow:
-      "0 12px 30px rgba(15,23,42,0.05)",
+      padding: "0 18px",
 
-    transition: "all .3s ease",
+      transition: "0.3s",
+    }}
+  >
 
-    minHeight: "95px",
-  }}
->
-
-    {/* ICON */}
-
-    <div
+    <FaUser
       style={{
-        width:
-          window.innerWidth < 768
-            ? "60px"
-            : "72px",
+        color: "#94a3b8",
 
-        height:
-          window.innerWidth < 768
-            ? "60px"
-            : "72px",
+        fontSize: "18px",
 
-        borderRadius: "18px",
-
-        background:
-  "linear-gradient(135deg,#2563eb,#60a5fa)",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        marginRight: "18px",
+        marginRight: "12px",
 
         flexShrink: 0,
       }}
-    >
+    />
 
-      <FaUser
-  style={{
-    color: "#ffffff",
+    <input
+      type="text"
 
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "28px",
-        }}
-      />
+      placeholder="Entrez votre nom"
 
-    </div>
+      value={name}
 
-    {/* INPUT */}
+      onChange={(e) =>
+        setName(e.target.value)
+      }
 
-    <div
       style={{
         flex: 1,
+
+        border: "none",
+
+        outline: "none",
+
+        background: "transparent",
+
+        fontSize: "15px",
+
+        color: "#0f172a",
       }}
-    >
-
-      <p
-        style={{
-          margin: 0,
-
-          color: "#0f172a",
-
-          fontWeight: "700",
-
-          fontSize: "15px",
-
-          marginBottom: "8px",
-        }}
-      >
-        Nom complet
-      </p>
-
-      <input
-        type="text"
-
-        placeholder="Entrez votre nom"
-
-        value={name}
-
-        onChange={(e) =>
-          setName(
-            e.target.value
-          )
-        }
-
-        style={{
-          width: "100%",
-
-          border: "none",
-
-          outline: "none",
-
-          background: "transparent",
-
-          fontSize: "18px",
-
-          color: "#64748b",
-
-          padding: 0,
-        }}
-      />
-
-    </div>
+    />
 
   </div>
 
@@ -464,139 +447,78 @@ function Register() {
 
 <div
   style={{
-    marginBottom: "20px",
+    marginBottom: "25px",
   }}
 >
 
+  <p
+    style={{
+      color: "#0f172a",
+      fontWeight: "700",
+      fontSize: "15px",
+      marginBottom: "10px",
+    }}
+  >
+    Adresse e-mail
+  </p>
+
   <div
     style={{
+      height: "68px",
+
+      border: "1.5px solid #e2e8f0",
+
+      borderRadius: "18px",
+
+      background: "#ffffff",
+
       display: "flex",
 
       alignItems: "center",
 
-      background: "#ffffff",
+      padding: "0 18px",
 
-      border:
-        "2px solid #eef2ff",
-
-      borderRadius: "24px",
-
-      padding:
-        window.innerWidth < 768
-          ? "12px"
-          : "14px",
-
-      boxShadow:
-        "0 12px 30px rgba(15,23,42,0.05)",
-
-      transition: "all .3s ease",
-
-      minHeight: "78px",
+      transition: "0.3s",
     }}
   >
 
-    {/* ICON */}
-
-    <div
+    <FaEnvelope
       style={{
-        width:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
+        color: "#94a3b8",
 
-        height:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
-
-        borderRadius: "16px",
-
-        background:
-          "linear-gradient(135deg,#2563eb,#60a5fa)",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
+        fontSize: "18px",
 
         marginRight: "12px",
 
         flexShrink: 0,
       }}
-    >
+    />
 
-      <FaEnvelope
-        style={{
-          color: "#ffffff",
+    <input
+      type="email"
 
-          fontSize:
-            window.innerWidth < 768
-              ? "20px"
-              : "22px",
-        }}
-      />
+      placeholder="Entrez votre email"
 
-    </div>
+      value={email}
 
-    {/* INPUT */}
+      onChange={(e) =>
+        setEmail(e.target.value)
+      }
 
-    <div
       style={{
         flex: 1,
+
+        border: "none",
+
+        outline: "none",
+
+        background: "transparent",
+
+        fontSize: "15px",
+
+        color: "#0f172a",
       }}
-    >
-
-      <p
-        style={{
-          margin: 0,
-
-          color: "#0f172a",
-
-          fontWeight: "700",
-
-          fontSize: "13px",
-
-          marginBottom: "5px",
-        }}
-      >
-        Adresse e-mail
-      </p>
-
-      <input
-        type="email"
-
-        placeholder="Entrez votre email"
-
-        value={email}
-
-        onChange={(e) =>
-          setEmail(
-            e.target.value
-          )
-        }
-
-        style={{
-          width: "100%",
-
-          border: "none",
-
-          outline: "none",
-
-          background: "transparent",
-
-          fontSize:
-            window.innerWidth < 768
-              ? "15px"
-              : "16px",
-
-          color: "#0f172a",
-
-          padding: 0,
-        }}
-      />
-
-    </div>
+    />
 
   </div>
 
@@ -606,145 +528,84 @@ function Register() {
 
 <div
   style={{
-    marginBottom: "15px",
+    marginBottom: "20px",
   }}
 >
 
+  <p
+    style={{
+      color: "#0f172a",
+      fontWeight: "700",
+      fontSize: "15px",
+      marginBottom: "10px",
+    }}
+  >
+    Mot de passe
+  </p>
+
   <div
     style={{
+      height: "68px",
+
+      border: "1.5px solid #e2e8f0",
+
+      borderRadius: "18px",
+
+      background: "#ffffff",
+
       display: "flex",
 
       alignItems: "center",
 
-      background: "#ffffff",
+      padding: "0 18px",
 
-      border:
-        "2px solid #eef2ff",
-
-      borderRadius: "24px",
-
-      padding:
-        window.innerWidth < 768
-          ? "12px"
-          : "14px",
-
-      boxShadow:
-        "0 12px 30px rgba(15,23,42,0.05)",
-
-      transition: "all .3s ease",
-
-      minHeight: "78px",
+      transition: "0.3s",
     }}
   >
 
-    {/* ICON */}
-
-    <div
+    <FaLock
       style={{
-        width:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
+        color: "#94a3b8",
 
-        height:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
-
-        borderRadius: "16px",
-
-        background:
-          "linear-gradient(135deg,#2563eb,#60a5fa)",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
+        fontSize: "18px",
 
         marginRight: "12px",
 
         flexShrink: 0,
       }}
-    >
+    />
 
-      <FaLock
-        style={{
-          color: "#ffffff",
+    <input
+      type={
+        showPassword
+          ? "text"
+          : "password"
+      }
 
-          fontSize:
-            window.innerWidth < 768
-              ? "20px"
-              : "22px",
-        }}
-      />
+      placeholder="Entrez votre mot de passe"
 
-    </div>
+      value={password}
 
-    {/* INPUT */}
+      onChange={(e) =>
+        setPassword(
+          e.target.value
+        )
+      }
 
-    <div
       style={{
         flex: 1,
+
+        border: "none",
+
+        outline: "none",
+
+        background: "transparent",
+
+        fontSize: "15px",
+
+        color: "#0f172a",
       }}
-    >
-
-      <p
-        style={{
-          margin: 0,
-
-          color: "#0f172a",
-
-          fontWeight: "700",
-
-          fontSize: "13px",
-
-          marginBottom: "5px",
-        }}
-      >
-        Mot de passe
-      </p>
-
-      <input
-        type={
-          showPassword
-            ? "text"
-            : "password"
-        }
-
-        placeholder="Entrez votre mot de passe"
-
-        value={password}
-
-        onChange={(e) =>
-          setPassword(
-            e.target.value
-          )
-        }
-
-        style={{
-          width: "100%",
-
-          border: "none",
-
-          outline: "none",
-
-          background: "transparent",
-
-          fontSize:
-            window.innerWidth < 768
-              ? "15px"
-              : "16px",
-
-          color: "#0f172a",
-
-          padding: 0,
-        }}
-      />
-
-    </div>
-
-    {/* EYE */}
+    />
 
     <div
       onClick={() =>
@@ -760,7 +621,7 @@ function Register() {
 
         fontSize: "18px",
 
-        paddingLeft: "10px",
+        marginLeft: "10px",
       }}
     >
 
@@ -777,37 +638,40 @@ function Register() {
 </div>
 
 
-
 {/* SECURITY */}
 
 <div
   style={{
     display: "flex",
-
     alignItems: "center",
+    justifyContent: "center",
 
-    gap: "10px",
+    gap: "8px",
 
-    marginBottom: "30px",
+    marginBottom: "25px",
+
+    padding: "12px",
+
+    background: "#f8fafc",
+
+    border: "1px solid #e2e8f0",
+
+    borderRadius: "14px",
 
     color: "#16a34a",
 
-    fontSize: "15px",
+    fontSize: "13px",
 
-    fontWeight: "700",
-
-padding: "14px 18px",
-background: "#f0fdf4",
-border: "1px solid #bbf7d0",
-borderRadius: "16px",
-
+    fontWeight: "600",
   }}
 >
+  <FaShieldAlt
+    style={{
+      fontSize: "15px",
+    }}
+  />
 
-  <FaShieldAlt />
-
-  Vos données sont protégées et sécurisées
-
+  Vos données sont sécurisées
 </div>
 
 {/* BUTTON */}
@@ -818,25 +682,24 @@ borderRadius: "16px",
   disabled={loading}
 
   style={{
-
     width: "100%",
 
-    height: "72px",
-
-    letterSpacing: "0.3px",
+    height: "62px",
 
     border: "none",
 
-    borderRadius: "22px",
+    borderRadius: "18px",
 
     background:
       "linear-gradient(135deg,#2563eb,#3b82f6)",
 
-    color: "white",
+    color: "#ffffff",
 
-    fontSize: "18px",
+    fontSize: "16px",
 
-    fontWeight: "800",
+    fontWeight: "700",
+
+    letterSpacing: "0.3px",
 
     cursor: "pointer",
 
@@ -846,25 +709,32 @@ borderRadius: "16px",
 
     alignItems: "center",
 
-    gap: "12px",
+    gap: "10px",
 
     boxShadow:
-  "0 20px 45px rgba(37,99,235,0.30)",
+      "0 10px 25px rgba(37,99,235,0.20)",
 
-    transition: "0.3s",
+    transition:
+      "all 0.25s ease",
   }}
 
   onMouseEnter={(e) => {
 
     e.currentTarget.style.transform =
-      "translateY(-3px)";
+      "translateY(-2px) scale(1.01)";
+
+    e.currentTarget.style.boxShadow =
+      "0 16px 35px rgba(37,99,235,0.30)";
 
   }}
 
   onMouseLeave={(e) => {
 
     e.currentTarget.style.transform =
-      "translateY(0px)";
+      "translateY(0px) scale(1)";
+
+    e.currentTarget.style.boxShadow =
+      "0 10px 25px rgba(37,99,235,0.20)";
 
   }}
 >
@@ -890,26 +760,34 @@ borderRadius: "16px",
   style={{
     display: "flex",
     alignItems: "center",
-    gap: "18px",
-    marginTop: "35px",
-    marginBottom: "30px",
+
+    gap: "12px",
+
+    marginTop: "25px",
+
+    marginBottom: "25px",
   }}
 >
+
   <div
     style={{
       flex: 1,
+
       height: "1px",
-      background:
-        "linear-gradient(to right,transparent,#dbeafe)",
+
+      background: "#e2e8f0",
     }}
   />
 
   <span
     style={{
       color: "#94a3b8",
-      fontSize: "12px",
-      fontWeight: "800",
-      letterSpacing: "2px",
+
+      fontSize: "11px",
+
+      fontWeight: "600",
+
+      letterSpacing: "1px",
     }}
   >
     OU
@@ -918,11 +796,13 @@ borderRadius: "16px",
   <div
     style={{
       flex: 1,
+
       height: "1px",
-      background:
-        "linear-gradient(to left,transparent,#dbeafe)",
+
+      background: "#e2e8f0",
     }}
   />
+
 </div>
 
 {/* LOGIN BUTTON */}
@@ -932,319 +812,141 @@ borderRadius: "16px",
     window.location.href =
       "/login"
   }
+
   style={{
     width: "100%",
-    height: "68px",
-    borderRadius: "24px",
-    border: "2px solid #2563eb",
+
+    height: "62px",
+
+    borderRadius: "18px",
+
+    border: "1.5px solid #2563eb",
+
     background: "#ffffff",
+
     color: "#2563eb",
-    fontSize:
-  window.innerWidth < 768
-    ? "15px"
-    : "16px",
-    fontWeight: "800",
+
+    fontSize: "16px",
+
+    fontWeight: "700",
+
     cursor: "pointer",
+
     display: "flex",
+
     alignItems: "center",
+
     justifyContent: "center",
-    gap: "12px",
-    transition: "0.3s",
+
+    gap: "10px",
+
+    transition: "all 0.25s ease",
+
     boxShadow:
-      "0 12px 30px rgba(37,99,235,0.08)",
+      "0 8px 20px rgba(37,99,235,0.08)",
+  }}
+
+  onMouseEnter={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
+
+    e.currentTarget.style.boxShadow =
+      "0 14px 30px rgba(37,99,235,0.15)";
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(0px)";
+
+    e.currentTarget.style.boxShadow =
+      "0 8px 20px rgba(37,99,235,0.08)";
+
   }}
 >
+
   <FaSignInAlt />
 
   Se connecter
+
 </button>
 
-{/* TRUST BLOCK */}
+{/* TRUST BADGES */}
 
 <div
   style={{
-    marginTop: "35px",
-    borderRadius: "32px",
-    overflow: "hidden",
-    background:
-      "linear-gradient(135deg,#ffffff,#f8fbff)",
-    border: "1px solid #dbeafe",
-    boxShadow:
-      "0 15px 35px rgba(37,99,235,0.08)",
-  }}
->
-
-{/* TRUST CENTER */}
-
-<div
-  style={{
-   
-
-    background:
-      "linear-gradient(135deg,#ffffff,#f8fbff)",
-
-    border:
-      "1px solid #dbeafe",
-
-    
-
-    overflow: "hidden",
-
-    marginTop: "25px",
-borderRadius: "22px",
-boxShadow:
-  "0 8px 25px rgba(37,99,235,0.05)",
-  }}
->
-
-  {/* HEADER */}
-
-  <div
-    style={{
-      padding: "16px",
-
-      background:
-        "linear-gradient(135deg,#eff6ff,#ffffff)",
-
-      borderBottom:
-        "1px solid #e2e8f0",
-
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "12px",
-    }}
-  >
-
-    <div
-      style={{
-        width: "45px",
-
-        height: "45px",
-
-        borderRadius: "12px",
-
-        background:
-          "linear-gradient(135deg,#2563eb,#3b82f6)",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        boxShadow:
-          "0 10px 25px rgba(37,99,235,0.25)",
-      }}
-    >
-
-      <FaShieldAlt
-        style={{
-          color: "white",
-
-          fontSize: "18px",
-        }}
-      />
-
-    </div>
-
-    <div>
-
-      <div
-        style={{
-          fontSize: "15px",
-
-          fontWeight: "800",
-
-          color: "#0f172a",
-        }}
-      >
-        Sécurité Konan Shopping
-      </div>
-
-      <div
-        style={{
-          color: "#64748b",
-
-          fontSize: "12px",
-
-          marginTop: "4px",
-        }}
-      >
-        Vos informations sont protégées par nos systèmes de sécurité avancés.
-      </div>
-
-    </div>
-
-  </div>
-
-  {/* FEATURES */}
-
-  <div
-    style={{
-      padding: "16px",
-    }}
-  >
-
-    {[
-      {
-        title: "Mot de passe chiffré",
-        desc: "Protection renforcée de vos identifiants",
-      },
-
-      {
-        title: "Données personnelles sécurisées",
-        desc: "Confidentialité garantie",
-      },
-
-      {
-        title: "Compte vérifié",
-        desc: "Authentification fiable",
-      },
-
-      {
-        title: "Connexion SSL sécurisée",
-        desc: "Navigation protégée",
-      },
-    ].map((item) => (
-
-      <div
-        key={item.title}
-        style={{
-          display: "flex",
-
-          alignItems: "flex-start",
-
-          gap: "10px",
-
-          paddingBottom: "12px",
-
-          marginBottom: "12px",
-
-          borderBottom:
-            "1px solid #f1f5f9",
-        }}
-      >
-
-        <FaCheckCircle
-          style={{
-            color: "#22c55e",
-
-            marginTop: "4px",
-
-            fontSize: "18px",
-
-            flexShrink: 0,
-          }}
-        />
-
-        <div>
-
-          <div
-            style={{
-              color: "#0f172a",
-
-              fontWeight: "700",
-
-              fontSize: "14px",
-            }}
-          >
-            {item.title}
-          </div>
-
-          <div
-            style={{
-              color: "#64748b",
-
-              fontSize: "12px",
-
-              marginTop: "3px",
-            }}
-          >
-            {item.desc}
-          </div>
-
-        </div>
-
-      </div>
-
-    ))}
-
-  </div>
-
-</div>
-
-{/* FOOTER BADGES */}
-
-<div
-  style={{
-    marginTop: "25px",
-
+    marginTop: "20px",
     display: "flex",
-
     justifyContent: "center",
-
-    gap: "12px",
-
+    alignItems: "center",
+    gap: "8px",
     flexWrap: "wrap",
   }}
 >
 
   <div
     style={{
-      padding: "8px 12px",
-
+      height: "34px",
+      padding: "0 12px",
       background: "#eff6ff",
-
       color: "#2563eb",
-
       borderRadius: "999px",
-
-      fontSize: "12px",
-
+      fontSize: "11px",
       fontWeight: "700",
-
       display: "flex",
-
       alignItems: "center",
-
-      gap: "8px",
+      gap: "6px",
+      border: "1px solid #dbeafe",
     }}
   >
     <FaShieldAlt />
-    Compte sécurisé
+    SSL Sécurisé
   </div>
 
   <div
     style={{
-      padding: "10px 16px",
-
+      height: "34px",
+      padding: "0 12px",
       background: "#f0fdf4",
-
       color: "#16a34a",
-
       borderRadius: "999px",
-
-      fontSize: "13px",
-
+      fontSize: "11px",
       fontWeight: "700",
-
       display: "flex",
-
       alignItems: "center",
-
-      gap: "8px",
+      gap: "6px",
+      border: "1px solid #bbf7d0",
     }}
   >
     <FaCheckCircle />
-    Support premium
+    Données protégées
+  </div>
+
+  <div
+    style={{
+      height: "34px",
+      padding: "0 12px",
+      background: "#ffffff",
+      color: "#0f172a",
+      borderRadius: "999px",
+      fontSize: "11px",
+      fontWeight: "700",
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      border: "1px solid #e2e8f0",
+    }}
+  >
+    <FaUser />
+    Premium
   </div>
 
 </div>
 </div>
 </div>
-</div>
+
   );
 
 }
