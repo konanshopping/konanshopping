@@ -48,22 +48,17 @@ const Coupon =
 console.log("EMAIL_USER =", process.env.EMAIL_USER);
 console.log("EMAIL_PASS =", process.env.EMAIL_PASS ? "OK" : "UNDEFINED");
 
-
-transporter.verify(function (error, success) {
-
+transporter.verify((error, success) => {
   if (error) {
-
+    console.log("SMTP ERROR");
     console.log(error);
-
   } else {
-
-    console.log(
-      "SMTP Gmail connecté ✅"
-    );
-
+    console.log("SMTP CONNECTED");
   }
-
 });
+
+
+
 
 async function sendTelegramMessage(message) {
 
