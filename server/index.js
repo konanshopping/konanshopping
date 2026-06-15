@@ -315,100 +315,103 @@ app.get("/admin", (req, res) => {
 
 });
 
-app.post("/forgot-password", async (req, res) => {
-  try {
+app.post(
+  "/forgot-password",
+  async (req, res) => {
 
     const { email } = req.body;
 
-    const user = await User.findOne({
-      email,
-    });
+    const user =
+      await User.findOne({
+        email,
+      });
 
     if (!user) {
+
       return res.status(404).json({
-        message: "Aucun compte trouvé",
+        message:
+          "Aucun compte trouvé",
       });
+
     }
 
-    const token = crypto
-      .randomBytes(32)
+    const token =
+      crypto.randomBytes(32)
       .toString("hex");
 
-    user.resetToken = token;
+    user.resetToken =
+      token;
 
     user.resetTokenExpire =
-      Date.now() + 1000 * 60 * 30;
+      Date.now() +
+      1000 * 60 * 30;
 
     await user.save();
 
-    const resetUrl =
-      `https://konanshopping-npgy.vercel.app/reset-password/${token}`;
+    // envoi email ici
 
-    console.log(
-      "EMAIL_USER =",
-      process.env.EMAIL_USER
-    );
+   const resetUrl =
+`https://konanshopping-npgy.vercel.app/reset-password/${token}`;
 
-    try {
+await transporter.sendMail({
 
-      await transporter.sendMail({
+  from: `"Konan Shopping cameroun" <${process.env.EMAIL_USER}>`,
 
-        from: `"Konan Shopping Cameroun" <${process.env.EMAIL_USER}>`,
+  to: user.email,
 
-        to: user.email,
+  subject: "Réinitialisation du mot de passe",
 
-        subject:
-          "Réinitialisation du mot de passe",
+  html: `
 
-        html: `
-          <h2>Konan Shopping</h2>
-          <p>Bonjour ${user.name}</p>
+<div style="font-family:Arial,sans-serif;padding:20px">
 
-          <a href="${resetUrl}">
-            Réinitialiser mon mot de passe
-          </a>
+  <h2 style="color:#2563eb">
+    Konan Shopping
+  </h2>
 
-          <p>
-            Ce lien expire dans 30 minutes.
-          </p>
-        `,
-      });
+  <p>
+    Bonjour ${user.name},
+  </p>
 
-      console.log(
-        "EMAIL ENVOYÉ ✅"
-      );
+  <p>
+    Nous avons reçu une demande de réinitialisation de votre mot de passe.
+  </p>
 
-      return res.json({
-        message:
-          "Email de récupération envoyé",
-      });
+  <p>
+    Cliquez sur le bouton ci-dessous :
+  </p>
 
-    } catch (emailError) {
+  <a
+    href="${resetUrl}"
+    style="
+      background:#2563eb;
+      color:white;
+      padding:14px 24px;
+      border-radius:10px;
+      text-decoration:none;
+      display:inline-block;
+      font-weight:bold;
+    "
+  >
+    Réinitialiser mon mot de passe
+  </a>
 
-      console.log(
-        "ERREUR EMAIL ❌"
-      );
+  <p style="margin-top:20px">
+    Ce lien expirera dans 30 minutes.
+  </p>
 
-      console.log(emailError);
+</div>
 
-      return res.status(500).json({
-        message:
-          emailError.message,
-      });
+  `,
 
-    }
+});
 
-  } catch (err) {
-
-    console.log(err);
-
-    return res.status(500).json({
-      message:
-        "Erreur serveur",
-    });
+res.json({
+  message: "Email de récupération envoyé",
+});
 
   }
-});
+);
 
 app.post(
   "/reset-password/:token",
