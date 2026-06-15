@@ -435,19 +435,20 @@ res.json({
 app.post(
   "/reset-password/:token",
   async (req, res) => {
-
     try {
+
+      const { token } =
+        req.params;
+
+      const { password } =
+        req.body;
 
       const user =
         await User.findOne({
-
-          resetToken:
-            req.params.token,
-
+          resetToken: token,
           resetTokenExpire: {
             $gt: Date.now(),
           },
-
         });
 
       if (!user) {
@@ -459,17 +460,29 @@ app.post(
 
       }
 
+      if (
+        !password ||
+        password.length < 6
+      ) {
+
+        return res.status(400).json({
+          message:
+            "Le mot de passe doit contenir au moins 6 caractères",
+        });
+
+      }
+
       const bcrypt =
-require("bcryptjs");
+        require("bcryptjs");
 
-const hashedPassword =
-await bcrypt.hash(
-  req.body.password,
-  10
-);
+      const hashedPassword =
+        await bcrypt.hash(
+          password,
+          10
+        );
 
-user.password =
-  hashedPassword;
+      user.password =
+        hashedPassword;
 
       user.resetToken =
         undefined;
@@ -480,19 +493,25 @@ user.password =
       await user.save();
 
       res.json({
+        success: true,
         message:
-          "Mot de passe modifié ✅",
+          "Mot de passe modifié avec succès ✅",
       });
 
     } catch (err) {
 
+      console.error(
+        "RESET PASSWORD ERROR:",
+        err
+      );
+
       res.status(500).json({
+        success: false,
         message:
           "Erreur serveur",
       });
 
     }
-
   }
 );
 
