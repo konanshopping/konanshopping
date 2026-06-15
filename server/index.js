@@ -46,6 +46,22 @@ const Coupon =
   },
 });
 
+transporter.verify(function (error, success) {
+
+  if (error) {
+
+    console.log(error);
+
+  } else {
+
+    console.log(
+      "SMTP Gmail connecté ✅"
+    );
+
+  }
+
+});
+
 async function sendTelegramMessage(message) {
 
   try {
