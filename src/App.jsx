@@ -2910,23 +2910,83 @@ function App() {
   useEffect(() => {
 
   const hiddenPages = [
-    "/checkout",
-    "/success",
-    "/Admin",
-    "/UserLogin",
-    "/Register",
-    "/ForgotPassword",
-    "/ResetPassword",
-    "/Driver"
-  ];
+  "/checkout",
+  "/success",
+  "/admin",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/driver"
+];
 
-  if (
-    hiddenPages.includes(
-      window.location.pathname
-    )
-  ) {
-    return;
-  }
+  const currentPath =
+  window.location.pathname;
+
+if (
+
+  hiddenPages.includes(
+    currentPath
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/reset-password"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/forgot-password"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/login"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/register"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/admin"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/driver"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/checkout"
+  )
+
+  ||
+
+  currentPath.startsWith(
+    "/success"
+  )
+
+) {
+
+  console.log(
+    "Botpress caché sur :",
+    currentPath
+  );
+
+  return;
+
+}
 
   // =========================
   // SCRIPT BOTPRESS
