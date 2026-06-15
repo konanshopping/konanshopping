@@ -193,12 +193,12 @@ function Register() {
     style={{
       width:
         window.innerWidth < 768
-          ? "110px"
+          ? "140px"
           : "170px",
 
       height:
         window.innerWidth < 768
-          ? "110px"
+          ? "140px"
           : "170px",
 
       borderRadius: "50%",
@@ -253,7 +253,7 @@ function Register() {
 
       fontSize:
         window.innerWidth < 768
-          ? "42px"
+          ? "50px"
           : "70px",
 
       fontWeight: "900",
@@ -959,75 +959,292 @@ borderRadius: "16px",
   Se connecter
 </button>
 
-{/* TRUST BADGES */}
+{/* TRUST BLOCK */}
 
 <div
   style={{
-    marginTop: "20px",
+    marginTop: "35px",
+    borderRadius: "32px",
+    overflow: "hidden",
+    background:
+      "linear-gradient(135deg,#ffffff,#f8fbff)",
+    border: "1px solid #dbeafe",
+    boxShadow:
+      "0 15px 35px rgba(37,99,235,0.08)",
+  }}
+>
+
+{/* TRUST CENTER */}
+
+<div
+  style={{
+   
+
+    background:
+      "linear-gradient(135deg,#ffffff,#f8fbff)",
+
+    border:
+      "1px solid #dbeafe",
+
+    
+
+    overflow: "hidden",
+
+    marginTop: "25px",
+borderRadius: "22px",
+boxShadow:
+  "0 8px 25px rgba(37,99,235,0.05)",
+  }}
+>
+
+  {/* HEADER */}
+
+  <div
+    style={{
+      padding: "16px",
+
+      background:
+        "linear-gradient(135deg,#eff6ff,#ffffff)",
+
+      borderBottom:
+        "1px solid #e2e8f0",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "12px",
+    }}
+  >
+
+    <div
+      style={{
+        width: "45px",
+
+        height: "45px",
+
+        borderRadius: "12px",
+
+        background:
+          "linear-gradient(135deg,#2563eb,#3b82f6)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        boxShadow:
+          "0 10px 25px rgba(37,99,235,0.25)",
+      }}
+    >
+
+      <FaShieldAlt
+        style={{
+          color: "white",
+
+          fontSize: "18px",
+        }}
+      />
+
+    </div>
+
+    <div>
+
+      <div
+        style={{
+          fontSize: "15px",
+
+          fontWeight: "800",
+
+          color: "#0f172a",
+        }}
+      >
+        Sécurité Konan Shopping
+      </div>
+
+      <div
+        style={{
+          color: "#64748b",
+
+          fontSize: "12px",
+
+          marginTop: "4px",
+        }}
+      >
+        Vos informations sont protégées par nos systèmes de sécurité avancés.
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* FEATURES */}
+
+  <div
+    style={{
+      padding: "16px",
+    }}
+  >
+
+    {[
+      {
+        title: "Mot de passe chiffré",
+        desc: "Protection renforcée de vos identifiants",
+      },
+
+      {
+        title: "Données personnelles sécurisées",
+        desc: "Confidentialité garantie",
+      },
+
+      {
+        title: "Compte vérifié",
+        desc: "Authentification fiable",
+      },
+
+      {
+        title: "Connexion SSL sécurisée",
+        desc: "Navigation protégée",
+      },
+    ].map((item) => (
+
+      <div
+        key={item.title}
+        style={{
+          display: "flex",
+
+          alignItems: "flex-start",
+
+          gap: "10px",
+
+          paddingBottom: "12px",
+
+          marginBottom: "12px",
+
+          borderBottom:
+            "1px solid #f1f5f9",
+        }}
+      >
+
+        <FaCheckCircle
+          style={{
+            color: "#22c55e",
+
+            marginTop: "4px",
+
+            fontSize: "18px",
+
+            flexShrink: 0,
+          }}
+        />
+
+        <div>
+
+          <div
+            style={{
+              color: "#0f172a",
+
+              fontWeight: "700",
+
+              fontSize: "14px",
+            }}
+          >
+            {item.title}
+          </div>
+
+          <div
+            style={{
+              color: "#64748b",
+
+              fontSize: "12px",
+
+              marginTop: "3px",
+            }}
+          >
+            {item.desc}
+          </div>
+
+        </div>
+
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
+
+{/* FOOTER BADGES */}
+
+<div
+  style={{
+    marginTop: "25px",
+
     display: "flex",
+
     justifyContent: "center",
-    alignItems: "center",
-    gap: "6px",
+
+    gap: "12px",
+
+    flexWrap: "wrap",
   }}
 >
 
   <div
-  style={{
-    padding: "6px 10px",
-    background: "#eff6ff",
-    color: "#2563eb",
-    borderRadius: "999px",
-    fontSize: "10px",
-    fontWeight: "700",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-  }}
->
-  <FaShieldAlt />
-  Sécurisé
-</div>
+    style={{
+      padding: "8px 12px",
+
+      background: "#eff6ff",
+
+      color: "#2563eb",
+
+      borderRadius: "999px",
+
+      fontSize: "12px",
+
+      fontWeight: "700",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "8px",
+    }}
+  >
+    <FaShieldAlt />
+    Compte sécurisé
+  </div>
 
   <div
-  style={{
-    padding: "6px 10px",
-    background: "#f0fdf4",
-    color: "#16a34a",
-    borderRadius: "999px",
-    fontSize: "10px",
-    fontWeight: "700",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-  }}
->
-  <FaCheckCircle />
-  Protégé
-</div>
+    style={{
+      padding: "10px 16px",
 
-  <div
-  style={{
-    padding: "6px 10px",
-    background: "#f8fafc",
-    color: "#0f172a",
-    borderRadius: "999px",
-    fontSize: "10px",
-    fontWeight: "700",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-    border: "1px solid #e2e8f0",
-  }}
->
-  <FaUser />
-  Premium
-</div>
+      background: "#f0fdf4",
 
-</div>
+      color: "#16a34a",
+
+      borderRadius: "999px",
+
+      fontSize: "13px",
+
+      fontWeight: "700",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "8px",
+    }}
+  >
+    <FaCheckCircle />
+    Support premium
+  </div>
 
 </div>
 </div>
-
+</div>
+</div>
   );
 
 }
