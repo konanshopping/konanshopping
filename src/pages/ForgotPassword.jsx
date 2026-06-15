@@ -53,451 +53,560 @@ function ForgotPassword() {
 
   };
 
-  return (
+ return (
+
+  <div
+    style={{
+      minHeight: "100vh",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems:
+        window.innerWidth < 768
+          ? "flex-start"
+          : "center",
+
+      overflow: "hidden",
+
+      position: "relative",
+
+      background:
+        "linear-gradient(180deg,#f8fafc 0%,#ffffff 45%,#eef4ff 100%)",
+
+      padding:
+        window.innerWidth < 768
+          ? "0"
+          : "20px",
+    }}
+  >
+
+    {/* HALO HAUT DROIT */}
 
     <div
       style={{
-        minHeight: "100vh",
+        position: "absolute",
 
-        display: "flex",
+        top: "-150px",
 
-        justifyContent: "center",
+        right: "-150px",
 
-        alignItems: "center",
+        width: "300px",
 
-        padding: "20px",
+        height: "300px",
 
-        position: "relative",
-
-        overflow: "hidden",
+        borderRadius: "50%",
 
         background:
-          "linear-gradient(135deg,#f8fafc,#eff6ff,#eef2ff)",
+          "rgba(37,99,235,0.10)",
+
+        filter: "blur(60px)",
       }}
-    >
+    />
 
-      {/* LIGHT EFFECT */}
+    {/* HALO BAS GAUCHE */}
 
-      <div
-        style={{
-          position: "absolute",
+    <div
+      style={{
+        position: "absolute",
 
-          width: "350px",
+        bottom: "-150px",
 
-          height: "350px",
+        left: "-150px",
 
-          borderRadius: "50%",
+        width: "280px",
 
-          background:
-            "rgba(37,99,235,0.08)",
+        height: "280px",
 
-          top: "-120px",
+        borderRadius: "50%",
 
-          left: "-120px",
+        background:
+          "rgba(96,165,250,0.08)",
 
-          filter: "blur(80px)",
-        }}
-      />
-
-      <div
-        style={{
-          position: "absolute",
-
-          width: "350px",
-
-          height: "350px",
-
-          borderRadius: "50%",
-
-          background:
-            "rgba(79,70,229,0.08)",
-
-          bottom: "-120px",
-
-          right: "-120px",
-
-          filter: "blur(80px)",
-        }}
-      />
+        filter: "blur(60px)",
+      }}
+    />
 
       {/* CARD */}
 
-      <div
-        style={{
-          width: "100%",
+<div
+  style={{
+    width: "100%",
 
-          maxWidth: "550px",
+    maxWidth:
+      window.innerWidth < 768
+        ? "100%"
+        : "550px",
 
-          background: "#ffffff",
+    minHeight:
+      window.innerWidth < 768
+        ? "100vh"
+        : "auto",
 
-          borderRadius: "40px",
+    background:
+      "linear-gradient(180deg,#ffffff,#f8fbff)",
 
-          padding:
-            window.innerWidth < 768
-              ? "30px 22px"
-              : "50px",
+    borderRadius:
+      window.innerWidth < 768
+        ? "0"
+        : "36px",
 
-          boxShadow:
-            "0 25px 70px rgba(0,0,0,0.08)",
+    padding:
+      window.innerWidth < 768
+        ? "20px"
+        : "50px",
 
-          border:
-            "1px solid rgba(37,99,235,0.08)",
+    boxShadow:
+      window.innerWidth < 768
+        ? "none"
+        : "0 25px 70px rgba(0,0,0,0.08)",
 
-          position: "relative",
+    border:
+      window.innerWidth < 768
+        ? "none"
+        : "1px solid rgba(37,99,235,0.08)",
 
-          zIndex: 5,
-        }}
-      >
+    position: "relative",
+
+    zIndex: 5,
+
+    overflow: "hidden",
+  }}
+>
 
         {/* LOGO */}
 
-        <div
-          style={{
-            display: "flex",
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    marginBottom:
+      window.innerWidth < 768
+        ? "20px"
+        : "30px",
+  }}
+>
 
-            justifyContent: "center",
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "95px"
+          : "140px",
 
-            marginBottom: "25px",
-          }}
-        >
+      height:
+        window.innerWidth < 768
+          ? "95px"
+          : "140px",
 
-          <div
-            style={{
-              width: "140px",
+      borderRadius: "50%",
 
-              height: "140px",
+      background:
+        "linear-gradient(135deg,#ffffff,#f8fafc)",
 
-              borderRadius: "50%",
+      border: "3px solid #2563eb",
 
-              background:
-                "linear-gradient(135deg,#ffffff,#f8fafc)",
+      display: "flex",
 
-              display: "flex",
+      justifyContent: "center",
 
-              justifyContent: "center",
+      alignItems: "center",
 
-              alignItems: "center",
+      boxShadow:
+        "0 15px 40px rgba(37,99,235,0.15)",
 
-              boxShadow:
-                "0 20px 50px rgba(37,99,235,0.15)",
+      position: "relative",
+    }}
+  >
 
-              border:
-                "3px solid rgba(37,99,235,0.15)",
-            }}
-          >
+    <img
+      src="/logo.jpg"
 
-            <img
-              src="/logo.jpg"
+      alt="Konan Shopping"
 
-              alt="Konan Shopping"
+      style={{
+        width: "80%",
 
-              style={{
-                width: "95px",
+        height: "80%",
 
-                height: "95px",
+        objectFit: "contain",
+      }}
+    />
 
-                objectFit: "cover",
+  </div>
 
-                borderRadius: "50%",
-              }}
-            />
+</div>
 
-          </div>
+{/* TITLE */}
 
-        </div>
+<div
+  style={{
+    textAlign: "center",
 
-        {/* TITLE */}
+    marginBottom:
+      window.innerWidth < 768
+        ? "28px"
+        : "40px",
+  }}
+>
 
-        <div
-          style={{
-            textAlign: "center",
+  <h1
+    style={{
+      margin: 0,
 
-            marginBottom: "35px",
-          }}
-        >
+      fontSize:
+        window.innerWidth < 768
+          ? "21px"
+          : "48px",
 
-          <h1
-            style={{
-              margin: 0,
+      fontWeight: "900",
 
-              fontSize:
-                window.innerWidth < 768
-                  ? "38px"
-                  : "48px",
+      lineHeight: "1.1",
 
-              fontWeight: "900",
+      display: "flex",
 
-              color: "#0f172a",
+      justifyContent: "center",
 
-              lineHeight: "1.1",
-            }}
-          >
-            Récupération
-          </h1>
+      alignItems: "center",
 
-          <h1
-            style={{
-              margin: 0,
+      gap:
+        window.innerWidth < 768
+          ? "5px"
+          : "10px",
 
-              fontSize:
-                window.innerWidth < 768
-                  ? "38px"
-                  : "48px",
+      whiteSpace: "nowrap",
+    }}
+  >
+    <span style={{ color: "#0f172a" }}>
+      Récupération
+    </span>
 
-              fontWeight: "900",
+    <span
+      style={{
+        color: "#2563eb",
+      }}
+    >
+      de compte
+    </span>
+  </h1>
 
-              color: "#2563eb",
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "55px"
+          : "80px",
 
-              lineHeight: "1.1",
-            }}
-          >
-            de compte
-          </h1>
+      height:
+        window.innerWidth < 768
+          ? "3px"
+          : "4px",
 
-          <div
-            style={{
-              width: "70px",
+      background:
+        "linear-gradient(135deg,#2563eb,#60a5fa)",
 
-              height: "4px",
+      borderRadius: "999px",
 
-              background:
-                "linear-gradient(135deg,#2563eb,#4f46e5)",
+      margin: "14px auto",
+    }}
+  />
 
-              borderRadius: "20px",
+  <p
+    style={{
+      color: "#64748b",
 
-              margin:
-                "15px auto 20px",
-            }}
-          />
+      fontSize:
+        window.innerWidth < 768
+          ? "13px"
+          : "17px",
 
-          <p
-            style={{
-              color: "#64748b",
+      lineHeight: "1.7",
 
-              lineHeight: "28px",
+      maxWidth: "450px",
 
-              fontSize: "16px",
+      margin: "0 auto",
+    }}
+  >
+    Entrez votre adresse e-mail pour recevoir
+    un lien sécurisé permettant de récupérer
+    votre compte Konan Shopping.
+  </p>
 
-              margin: 0,
-            }}
-          >
-            Entrez votre adresse e-mail.
-            Nous vous enverrons un lien
-            sécurisé pour récupérer
-            votre compte Konan Shopping.
-          </p>
+</div>
 
-        </div>
+{/* EMAIL */}
 
-        {/* EMAIL */}
+<div
+  style={{
+    marginBottom: "25px",
+  }}
+>
 
-        <div
-          style={{
-            position: "relative",
-          }}
-        >
+  <p
+    style={{
+      marginBottom: "12px",
 
-          <FaEnvelope
-            style={{
-              position: "absolute",
+      color: "#0f172a",
 
-              left: "18px",
+      fontWeight: "800",
 
-              top: "23px",
+      fontSize: "15px",
+    }}
+  >
+    Adresse e-mail
+  </p>
 
-              color: "#94a3b8",
-            }}
-          />
+  <div
+    style={{
+      position: "relative",
+    }}
+  >
 
-          <input
-            type="email"
+    <FaEnvelope
+      style={{
+        position: "absolute",
 
-            placeholder="Votre email"
+        left: "18px",
 
-            value={email}
+        top: "50%",
 
-            onChange={(e) =>
-              setEmail(
-                e.target.value
-              )
-            }
+        transform: "translateY(-50%)",
 
-            style={{
-              width: "100%",
+        color: "#94a3b8",
 
-              height: "65px",
+        fontSize: "20px",
+      }}
+    />
 
-              borderRadius: "18px",
+    <input
+      type="email"
 
-              border:
-                "2px solid #e2e8f0",
+      placeholder="Entrez votre email"
 
-              paddingLeft: "50px",
+      value={email}
 
-              paddingRight: "20px",
+      onChange={(e) =>
+        setEmail(e.target.value)
+      }
 
-              fontSize: "16px",
+      style={{
+        width: "100%",
 
-              background: "#fff",
+        height:
+          window.innerWidth < 768
+            ? "72px"
+            : "75px",
 
-              color: "#0f172a",
+        borderRadius: "24px",
 
-              outline: "none",
+        border: "1.5px solid #e2e8f0",
 
-              boxSizing:
-                "border-box",
-            }}
-          />
+        paddingLeft: "55px",
 
-        </div>
+        paddingRight: "20px",
 
-        {/* BUTTON */}
+        fontSize: "16px",
 
-        <button
-          onClick={sendResetLink}
+        background: "#ffffff",
 
-          disabled={loading}
+        color: "#0f172a",
 
-          style={{
-            width: "100%",
+        outline: "none",
 
-            height: "65px",
+        boxSizing: "border-box",
 
-            marginTop: "20px",
+        boxShadow:
+          "0 2px 10px rgba(15,23,42,0.03)",
+      }}
+    />
 
-            border: "none",
+  </div>
 
-            borderRadius: "20px",
+</div>
 
-            background:
-              "linear-gradient(135deg,#2563eb,#4f46e5)",
+{/* BUTTON */}
 
-            color: "white",
+<button
+  onClick={sendResetLink}
 
-            fontWeight: "800",
+  disabled={loading}
 
-            fontSize: "17px",
+  style={{
+    width: "100%",
 
-            cursor: "pointer",
+    height:
+      window.innerWidth < 768
+        ? "58px"
+        : "64px",
 
-            boxShadow:
-              "0 20px 40px rgba(37,99,235,0.30)",
-          }}
-        >
+    marginTop: "18px",
 
-          {loading
-            ? "Envoi..."
-            : "📩 Envoyer le lien sécurisé"}
+    border: "none",
 
-        </button>
+    borderRadius: "18px",
 
-        {/* RETOUR */}
+    background:
+      "linear-gradient(135deg,#2563eb,#3b82f6)",
 
-        <button
+    color: "#ffffff",
 
-          onClick={() =>
-            window.location.href =
-              "/login"
-          }
+    fontWeight: "800",
 
-          style={{
-            width: "100%",
+    fontSize:
+      window.innerWidth < 768
+        ? "15px"
+        : "17px",
 
-            height: "60px",
+    cursor: "pointer",
 
-            marginTop: "15px",
+    display: "flex",
 
-            border:
-              "2px solid #2563eb",
+    alignItems: "center",
 
-            borderRadius: "18px",
+    justifyContent: "center",
 
-            background: "white",
+    gap: "10px",
 
-            color: "#2563eb",
+    boxShadow:
+      "0 12px 30px rgba(37,99,235,0.25)",
 
-            fontWeight: "700",
+    transition: "all .3s ease",
+  }}
 
-            cursor: "pointer",
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
+  }}
 
-            display: "flex",
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(0px)";
+  }}
+>
+  {loading ? (
+    <>
+      <FaPaperPlane />
+      Envoi...
+    </>
+  ) : (
+    <>
+      <FaPaperPlane />
+      Envoyer le lien
+    </>
+  )}
+</button>
 
-            justifyContent: "center",
+       {/* RETOUR */}
 
-            alignItems: "center",
+<button
+  onClick={() =>
+    window.location.href =
+      "/login"
+  }
 
-            gap: "10px",
-          }}
-        >
+  style={{
+    width: "100%",
 
-          <FaArrowLeft />
+    height:
+      window.innerWidth < 768
+        ? "58px"
+        : "64px",
 
-          Retour connexion
+    marginTop: "14px",
 
-        </button>
+    border:
+      "2px solid #2563eb",
 
-        {/* SECURITY */}
+    borderRadius: "18px",
 
-        <div
-          style={{
-            marginTop: "30px",
+    background: "#ffffff",
 
-            padding: "18px",
+    color: "#2563eb",
 
-            borderRadius: "18px",
+    fontWeight: "800",
 
-            background: "#f8fafc",
+    fontSize:
+      window.innerWidth < 768
+        ? "15px"
+        : "16px",
 
-            border:
-              "1px solid #e2e8f0",
-          }}
-        >
+    cursor: "pointer",
 
-          <p
-            style={{
-              margin: 0,
+    display: "flex",
 
-              color: "#0f172a",
+    justifyContent: "center",
 
-              fontWeight: "700",
+    alignItems: "center",
 
-              display: "flex",
+    gap: "10px",
 
-              alignItems: "center",
+    boxShadow:
+      "0 10px 25px rgba(37,99,235,0.08)",
 
-              gap: "10px",
-            }}
-          >
+    transition: "all .3s ease",
+  }}
 
-            <FaShieldAlt />
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
+  }}
 
-            Sécurité Konan Shopping
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform =
+      "translateY(0px)";
+  }}
+>
 
-          </p>
+  <FaArrowLeft />
 
-          <p
-            style={{
-              marginTop: "10px",
+  Retour connexion
 
-              color: "#64748b",
+</button>
 
-              fontSize: "14px",
+       {/* SECURITY */}
 
-              lineHeight: "24px",
-            }}
-          >
-            Chaque lien est unique,
-            personnel et expire
-            automatiquement après
-            30 minutes pour protéger
-            votre compte.
-          </p>
+<div
+  style={{
+    marginTop: "22px",
 
-        </div>
+    display: "flex",
 
-      </div>
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    gap: "8px",
+
+    color: "#64748b",
+
+    fontSize:
+      window.innerWidth < 768
+        ? "12px"
+        : "13px",
+
+    fontWeight: "600",
+  }}
+>
+
+  <FaShieldAlt
+    style={{
+      color: "#2563eb",
+
+      fontSize: "14px",
+    }}
+  />
+
+  <span>
+    Lien sécurisé • Expiration après 30 min
+  </span>
+
+</div>
+
+</div>
 
     </div>
+    
 
   );
 

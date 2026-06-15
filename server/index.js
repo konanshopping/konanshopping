@@ -4,6 +4,7 @@ const Order = require("./models/Order");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
+const nodemailer = require("nodemailer");
 
 const path = require("path");
 const productRoutes =
@@ -35,6 +36,15 @@ const Coupon =
 
   const Visitor =
   require("./models/Visitor");
+
+  const transporter = nodemailer.createTransport({
+  service: "gmail",
+
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 async function sendTelegramMessage(message) {
 
@@ -326,16 +336,64 @@ app.post(
 
     // envoi email ici
 
-    const resetUrl =
-
+   const resetUrl =
 `https://konanshopping-npgy.vercel.app/reset-password/${token}`;
 
-console.log(resetUrl);
+await transporter.sendMail({
+
+  from: `"Konan Shopping cameroun" <${process.env.EMAIL_USER}>`,
+
+  to: user.email,
+
+  subject: "Réinitialisation du mot de passe",
+
+  html: `
+
+<div style="font-family:Arial,sans-serif;padding:20px">
+
+  <h2 style="color:#2563eb">
+    Konan Shopping
+  </h2>
+
+  <p>
+    Bonjour ${user.name},
+  </p>
+
+  <p>
+    Nous avons reçu une demande de réinitialisation de votre mot de passe.
+  </p>
+
+  <p>
+    Cliquez sur le bouton ci-dessous :
+  </p>
+
+  <a
+    href="${resetUrl}"
+    style="
+      background:#2563eb;
+      color:white;
+      padding:14px 24px;
+      border-radius:10px;
+      text-decoration:none;
+      display:inline-block;
+      font-weight:bold;
+    "
+  >
+    Réinitialiser mon mot de passe
+  </a>
+
+  <p style="margin-top:20px">
+    Ce lien expirera dans 30 minutes.
+  </p>
+
+</div>
+
+  `,
+
+});
 
 res.json({
-  message:
-    "Lien envoyé",
-  resetUrl,
+  message: "Email de récupération envoyé",
 });
 
   }
