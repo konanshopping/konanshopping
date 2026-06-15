@@ -45,6 +45,10 @@ const Coupon =
   },
 });
 
+console.log("EMAIL_USER =", process.env.EMAIL_USER);
+console.log("EMAIL_PASS =", process.env.EMAIL_PASS ? "OK" : "UNDEFINED");
+
+
 transporter.verify(function (error, success) {
 
   if (error) {
