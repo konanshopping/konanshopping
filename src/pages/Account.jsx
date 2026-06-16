@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useState,
+  useRef
+} from "react";
 
 import {
   Link,
@@ -18,6 +21,18 @@ import {
   FaCreditCard,
   FaRobot,
   FaBullseye,
+  FaUserCircle
+} from "react-icons/fa";
+
+import {
+  FaCamera,
+  FaTrash,
+  FaTimes,
+} from "react-icons/fa";
+
+import {
+  FaSignOutAlt,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 
 function Account() {
@@ -63,6 +78,17 @@ const [profileImage, setProfileImage] =
       "profileImage"
     ) || ""
   );
+
+  const [showPhotoModal,
+  setShowPhotoModal] =
+  useState(false);
+
+  const fileInputRef =
+  useRef(null);
+
+const [showLogoutModal,
+  setShowLogoutModal] =
+  useState(false);
 
   const quickActions = [
   {
@@ -142,128 +168,213 @@ const features = [
   },
 ];
 
-  return (
+return (
+
+  <div
+    style={{
+      minHeight: "100vh",
+
+      background:
+        "linear-gradient(to bottom,#eef2ff,#f8fafc)",
+
+      paddingBottom: "110px",
+
+      overflowX: "hidden",
+    }}
+  >
+
+    {/* HEADER */}
 
     <div
       style={{
-        minHeight: "100vh",
+        background:
+          "linear-gradient(135deg,#4f46e5,#7c3aed)",
 
-        background: "#f5f7ff",
+        padding: "14px 16px 22px",
 
-        paddingBottom: "110px",
+        borderBottomLeftRadius: "28px",
+
+        borderBottomRightRadius: "28px",
+
+        color: "white",
+
+        boxShadow:
+          "0 12px 30px rgba(79,70,229,0.25)",
+
+        position: "relative",
+
+        overflow: "hidden",
       }}
     >
 
-      {/* HEADER */}
+      {/* Décoration */}
 
       <div
         style={{
+          position: "absolute",
+
+          top: "-40px",
+
+          right: "-30px",
+
+          width: "110px",
+
+          height: "110px",
+
+          borderRadius: "50%",
+
           background:
-            "linear-gradient(135deg,#4f46e5,#7c3aed)",
+            "rgba(255,255,255,0.08)",
+        }}
+      />
 
-          padding: "22px 16px",
+      <div
+        style={{
+          position: "absolute",
 
-          borderBottomLeftRadius: "24px",
+          bottom: "-35px",
 
-          borderBottomRightRadius: "24px",
+          left: "-25px",
 
-          color: "white",
+          width: "85px",
 
-          boxShadow:
-            "0 10px 30px rgba(79,70,229,0.25)",
+          height: "85px",
+
+          borderRadius: "50%",
+
+          background:
+            "rgba(255,255,255,0.05)",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+
+          justifyContent:
+            "space-between",
+
+          alignItems: "center",
+
+          position: "relative",
+
+          zIndex: 2,
         }}
       >
 
         <div
-          style={{
-            display: "flex",
-
-            justifyContent:
-              "space-between",
-
-            alignItems: "center",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-
-              alignItems: "center",
-
-              gap: "14px",
-            }}
-          >
-
-          <label
   style={{
-    cursor: "pointer",
+    display: "flex",
+
+    alignItems: "center",
+
+    gap: "10px",
+
+    flex: 1,
+
+    minWidth: 0,
   }}
 >
 
-  <input
-    type="file"
+<label
+  onClick={(e) => {
 
-    accept="image/*"
+    if (profileImage) {
 
-    style={{
-      display: "none",
-    }}
+      e.preventDefault();
 
-    onChange={(e) => {
+      e.stopPropagation();
 
-      const file =
-        e.target.files[0];
+      setShowPhotoModal(
+        true
+      );
 
-      if (!file) return;
+      return;
+    }
 
-      const reader =
-        new FileReader();
+  }}
 
-      reader.onloadend = () => {
+  style={{
+    cursor: "pointer",
+    position: "relative",
+    flexShrink: 0,
+  }}
+>
 
-        setProfileImage(
-          reader.result
-        );
+ <input
+  ref={fileInputRef}
 
-        localStorage.setItem(
-          "profileImage",
-          reader.result
-        );
+  id="profileInput"
 
-      };
+  type="file"
 
-      reader.readAsDataURL(file);
+  accept="image/*"
 
-    }}
-  />
+  style={{
+    display: "none",
+  }}
+
+  onChange={(e) => {
+
+    const file =
+      e.target.files[0];
+
+    if (!file) return;
+
+    const reader =
+      new FileReader();
+
+    reader.onloadend = () => {
+
+      setProfileImage(
+        reader.result
+      );
+
+      localStorage.setItem(
+        "profileImage",
+        reader.result
+      );
+
+    };
+
+    reader.readAsDataURL(file);
+
+  }}
+/>
 
   <div
-    style={{
-      width: "58px",
+  style={{
+    width: "58px",
 
-      height: "58px",
+    height: "58px",
 
-      borderRadius: "50%",
+    borderRadius: "50%",
 
-      overflow: "hidden",
+    overflow: "hidden",
 
-      background:
-        "rgba(255,255,255,0.2)",
+    background:
+      "rgba(255,255,255,0.15)",
 
-      display: "flex",
+    display: "flex",
 
-      justifyContent:
-        "center",
+    justifyContent:
+      "center",
 
-      alignItems: "center",
+    alignItems:
+      "center",
 
-      fontSize: "26px",
+    fontSize: "24px",
 
-      border:
-        "2px solid rgba(255,255,255,0.4)",
-    }}
-  >
+    border:
+      "3px solid rgba(255,255,255,0.35)",
+
+    boxShadow:
+      "0 12px 30px rgba(0,0,0,0.18)",
+
+    backdropFilter:
+      "blur(10px)",
+  }}
+>
 
     {profileImage ? (
 
@@ -282,94 +393,110 @@ const features = [
       />
 
     ) : (
-      "👤"
-    )}
+
+  <FaUserCircle
+    style={{
+      fontSize: "32px",
+
+      color:
+        "rgba(255,255,255,0.9)",
+    }}
+  />
+
+)}
 
   </div>
 
 </label>
 
-            <div>
-
-              <h2
-                style={{
-                  margin: 0,
-
-                  fontSize: "20px",
-
-                  fontWeight: "800",
-                }}
-              >
-                {user.name}
-              </h2>
-
-              <p
-                style={{
-                  marginTop: "4px",
-
-                  opacity: 0.9,
-
-                  fontSize: "13px",
-                }}
-              >
-                {user.email}
-              </p>
-
-            </div>
-
-          </div>
-
-     <button
-  onClick={() => {
-
-    const confirmLogout =
-      window.confirm(
-        "Voulez-vous vous déconnecter ?"
-      );
-
-    // SI OUI
-    if (confirmLogout) {
-
-      // SUPPRIME UNIQUEMENT USER
-
-      localStorage.removeItem(
-        "user"
-      );
-
-      localStorage.removeItem(
-        "token"
-      );
-
-      // REDIRECTION
-
-      navigate("/");
-
-    }
-
-    // SI NON
-    else {
-
-      return;
-
-    }
-
+           <div
+  style={{
+    flex: 1,
+    minWidth: 0,
   }}
+>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      marginBottom: "4px",
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+        fontSize: "17px",
+        fontWeight: "800",
+        color: "#fff",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        letterSpacing: "-0.3px",
+      }}
+    >
+      {user.name}
+    </h2>
+
+    <FaCheckCircle
+      style={{
+        color: "#22c55e",
+        fontSize: "15px",
+        flexShrink: 0,
+        filter:
+          "drop-shadow(0 2px 6px rgba(34,197,94,0.35))",
+      }}
+    />
+
+  </div>
+
+  <p
+    style={{
+      margin: 0,
+      fontSize: "12px",
+      color: "rgba(255,255,255,0.85)",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      fontWeight: "500",
+    }}
+  >
+    {user.email}
+  </p>
+
+</div>
+</div>
+
+    <button
+  onClick={() =>
+    setShowLogoutModal(
+      true
+    )
+  }
 
   style={{
-    border: "none",
+    border: "1px solid rgba(255,255,255,0.15)",
 
     background:
-      "linear-gradient(135deg,#EF4444,#DC2626)",
+      "rgba(255,255,255,0.12)",
 
-    width: "42px",
+    backdropFilter:
+      "blur(12px)",
 
-    height: "42px",
+    WebkitBackdropFilter:
+      "blur(12px)",
 
-    borderRadius: "14px",
+    width: "38px",
 
-    color: "white",
+    height: "38px",
 
-    fontSize: "18px",
+    borderRadius: "12px",
+
+    color: "#fff",
+
+    fontSize: "15px",
 
     cursor: "pointer",
 
@@ -380,33 +507,39 @@ const features = [
     alignItems: "center",
 
     boxShadow:
-      "0 8px 20px rgba(239,68,68,0.35)",
+      "0 6px 18px rgba(0,0,0,0.12)",
 
-    transition: "0.3s",
+    flexShrink: 0,
+
+    transition:
+      "all 0.25s ease",
   }}
 
   onMouseEnter={(e) => {
 
-    e.target.style.transform =
-      "scale(1.08)";
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
 
   }}
 
   onMouseLeave={(e) => {
 
-    e.target.style.transform =
-      "scale(1)";
+    e.currentTarget.style.transform =
+      "translateY(0)";
 
   }}
 >
 
-  <i className="fa-solid fa-right-from-bracket"></i>
+  <i
+    className="fa-solid fa-right-from-bracket"
+    style={{
+      fontSize: "15px",
+    }}
+  />
 
 </button>
-
-        </div>
-
-      </div>
+</div>
+</div>
 
       {/* QUICK ACTIONS */}
 
@@ -798,6 +931,509 @@ const features = [
         </div>
 
       </div>
+
+     {showPhotoModal && (
+
+  <div
+    onClick={() =>
+      setShowPhotoModal(false)
+    }
+
+    style={{
+      position: "fixed",
+      inset: 0,
+
+      background:
+        "rgba(0,0,0,0.35)",
+
+      backdropFilter:
+        "blur(10px)",
+
+      WebkitBackdropFilter:
+        "blur(10px)",
+
+      display: "flex",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      zIndex: 9999,
+
+      padding: "20px",
+    }}
+  >
+
+    <div
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+
+      style={{
+        width: "82%",
+
+        maxWidth: "260px",
+
+        background:
+          "rgba(255,255,255,0.95)",
+
+        backdropFilter:
+          "blur(20px)",
+
+        WebkitBackdropFilter:
+          "blur(20px)",
+
+        border:
+          "1px solid rgba(255,255,255,0.45)",
+
+        borderRadius: "20px",
+
+        padding: "16px 14px",
+
+        textAlign: "center",
+
+        boxShadow:
+          "0 15px 40px rgba(0,0,0,0.15)",
+      }}
+    >
+
+      <div
+        style={{
+          width: "50px",
+
+          height: "50px",
+
+          margin: "0 auto 12px",
+
+          borderRadius: "50%",
+
+          background:
+            "rgba(79,70,229,0.12)",
+
+          display: "flex",
+
+          justifyContent:
+            "center",
+
+          alignItems:
+            "center",
+        }}
+      >
+
+        <FaUserCircle
+          style={{
+            color: "#4f46e5",
+
+            fontSize: "26px",
+          }}
+        />
+
+      </div>
+
+      <h3
+        style={{
+          margin: 0,
+
+          fontSize: "16px",
+
+          fontWeight: "800",
+
+          color: "#0f172a",
+        }}
+      >
+        Photo de profil
+      </h3>
+
+      <p
+        style={{
+          marginTop: "8px",
+
+          marginBottom: "14px",
+
+          fontSize: "12px",
+
+          lineHeight: "1.5",
+
+          color: "#374151",
+
+          fontWeight: "500",
+        }}
+      >
+        Gérez votre photo de profil
+        Konan Shopping.
+      </p>
+
+      <button
+        onClick={() => {
+
+          fileInputRef.current?.click();
+
+          setShowPhotoModal(
+            false
+          );
+
+        }}
+
+        style={{
+          width: "100%",
+
+          height: "40px",
+
+          border: "none",
+
+          borderRadius: "12px",
+
+          background:
+            "linear-gradient(135deg,#4f46e5,#4338ca)",
+
+          color: "#fff",
+
+          fontWeight: "700",
+
+          fontSize: "12px",
+
+          cursor: "pointer",
+
+          marginBottom: "8px",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent:
+            "center",
+
+          gap: "6px",
+
+          boxShadow:
+            "0 8px 20px rgba(79,70,229,0.25)",
+        }}
+      >
+
+        <FaCamera />
+
+        Modifier la photo
+
+      </button>
+
+      <button
+        onClick={() => {
+
+          setProfileImage("");
+
+          localStorage.removeItem(
+            "profileImage"
+          );
+
+          setShowPhotoModal(
+            false
+          );
+
+        }}
+
+        style={{
+          width: "100%",
+
+          height: "40px",
+
+          border: "none",
+
+          borderRadius: "12px",
+
+          background:
+            "linear-gradient(135deg,#ef4444,#dc2626)",
+
+          color: "#fff",
+
+          fontWeight: "700",
+
+          fontSize: "12px",
+
+          cursor: "pointer",
+
+          marginBottom: "8px",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent:
+            "center",
+
+          gap: "6px",
+
+          boxShadow:
+            "0 8px 20px rgba(239,68,68,0.25)",
+        }}
+      >
+
+        <FaTrash />
+
+        Supprimer la photo
+
+      </button>
+
+    </div>
+
+  </div>
+
+)}
+
+{showLogoutModal && (
+
+  <div
+    onClick={() =>
+      setShowLogoutModal(
+        false
+      )
+    }
+
+    style={{
+      position: "fixed",
+      inset: 0,
+
+      background:
+        "rgba(0,0,0,0.35)",
+
+      backdropFilter:
+        "blur(12px)",
+
+      WebkitBackdropFilter:
+        "blur(12px)",
+
+      display: "flex",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      zIndex: 9999,
+
+      padding: "20px",
+    }}
+  >
+
+    <div
+      onClick={(e) =>
+        e.stopPropagation()
+      }
+
+      style={{
+        width: "88%",
+
+        maxWidth: "290px",
+
+        background:
+          "rgba(255,255,255,0.92)",
+
+        backdropFilter:
+          "blur(25px)",
+
+        WebkitBackdropFilter:
+          "blur(25px)",
+
+        border:
+          "1px solid rgba(255,255,255,0.45)",
+
+        borderRadius: "24px",
+
+        padding: "20px 18px",
+
+        textAlign: "center",
+
+        boxShadow:
+          "0 20px 50px rgba(0,0,0,0.18)",
+      }}
+    >
+
+      <div
+        style={{
+          width: "58px",
+
+          height: "58px",
+
+          margin: "0 auto 14px",
+
+          borderRadius: "50%",
+
+          background:
+            "rgba(239,68,68,0.12)",
+
+          display: "flex",
+
+          justifyContent:
+            "center",
+
+          alignItems:
+            "center",
+        }}
+      >
+
+        <FaExclamationTriangle
+          style={{
+            color: "#ef4444",
+
+            fontSize: "24px",
+          }}
+        />
+
+      </div>
+
+      <h3
+        style={{
+          margin: 0,
+
+          fontSize: "18px",
+
+          fontWeight: "800",
+
+          color: "#0f172a",
+        }}
+      >
+        Déconnexion
+      </h3>
+
+      <p
+        style={{
+          marginTop: "10px",
+
+          fontSize: "13px",
+
+          lineHeight: "1.6",
+
+          color: "#374151",
+
+          fontWeight: "500",
+        }}
+      >
+        Voulez-vous vraiment vous
+        déconnecter de votre compte
+        Konan Shopping ?
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+
+          gap: "10px",
+
+          marginTop: "18px",
+        }}
+      >
+
+        <button
+          onClick={() =>
+            setShowLogoutModal(
+              false
+            )
+          }
+
+          style={{
+            flex: 1,
+
+            height: "42px",
+
+            border:
+              "1px solid #e5e7eb",
+
+            borderRadius: "14px",
+
+            background:
+              "#ffffff",
+
+            color: "#111827",
+
+            fontWeight: "700",
+
+            fontSize: "13px",
+
+            cursor: "pointer",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            gap: "6px",
+          }}
+        >
+
+          <FaTimes />
+
+          Non
+
+        </button>
+
+        <button
+          onClick={() => {
+
+            localStorage.removeItem(
+              "user"
+            );
+
+            localStorage.removeItem(
+              "token"
+            );
+
+            navigate("/");
+
+          }}
+
+          style={{
+            flex: 1,
+
+            height: "42px",
+
+            border: "none",
+
+            borderRadius: "14px",
+
+            background:
+              "linear-gradient(135deg,#ef4444,#dc2626)",
+
+            color: "#fff",
+
+            fontWeight: "700",
+
+            fontSize: "13px",
+
+            cursor: "pointer",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            gap: "6px",
+
+            boxShadow:
+              "0 8px 20px rgba(239,68,68,0.25)",
+          }}
+        >
+
+          <FaSignOutAlt />
+
+          Oui
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
 
     </div>
 
