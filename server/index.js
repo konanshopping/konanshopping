@@ -18,6 +18,9 @@ const ordersRoutes =
 const Driver =
   require("./models/Driver");
 
+  const messageRoutes =
+  require("./routes/messages");
+
 const orderRoutes =
 require("./routes/orders");
 
@@ -3089,6 +3092,11 @@ app.get(
 app.use(
   "/api/orders",
   ordersRoutes
+);
+
+app.use(
+  "/api/messages",
+  messageRoutes
 );
 
 app.put(

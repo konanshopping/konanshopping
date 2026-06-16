@@ -473,11 +473,9 @@ return (
 </div>
 
 <button
-  onClick={() =>
-    navigate("/messages")
-  }
-
   style={{
+    position: "relative",
+
     border:
       "1px solid rgba(255,255,255,0.15)",
 
@@ -520,6 +518,45 @@ return (
       fontSize: "15px",
     }}
   />
+
+  <span
+    style={{
+      position: "absolute",
+
+      top: "-4px",
+
+      right: "-4px",
+
+      minWidth: "16px",
+
+      height: "16px",
+
+      borderRadius: "999px",
+
+      background:
+        "rgba(255,255,255,0.25)",
+
+      backdropFilter:
+        "blur(10px)",
+
+      border:
+        "1px solid rgba(255,255,255,0.25)",
+
+      color: "#fff",
+
+      fontSize: "9px",
+
+      fontWeight: "700",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+    }}
+  >
+    3
+  </span>
 
 </button>
 
