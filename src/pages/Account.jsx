@@ -21,6 +21,7 @@ import {
   FaCreditCard,
   FaRobot,
   FaBullseye,
+  FaArrowRight,
   FaUserCircle
 } from "react-icons/fa";
 
@@ -853,79 +854,221 @@ return (
 
 </div>
 
-      {/* IA SECTION */}
+    {/* IA SECTION */}
 
-      <div
+<div
+  style={{
+    margin: "16px",
+
+    background:
+      "linear-gradient(135deg,rgba(96,165,250,0.95),rgba(59,130,246,0.88))",
+
+    backdropFilter:
+      "blur(20px)",
+
+    WebkitBackdropFilter:
+      "blur(20px)",
+
+    border:
+      "1px solid rgba(255,255,255,0.25)",
+
+    borderRadius: "22px",
+
+    padding: "16px",
+
+    color: "#fff",
+
+    position: "relative",
+
+    overflow: "hidden",
+
+    boxShadow:
+      "0 12px 30px rgba(59,130,246,0.20)",
+  }}
+>
+
+  {/* Décoration */}
+
+  <div
+    style={{
+      position: "absolute",
+
+      top: "-35px",
+
+      right: "-35px",
+
+      width: "90px",
+
+      height: "90px",
+
+      borderRadius: "50%",
+
+      background:
+        "rgba(255,255,255,0.12)",
+    }}
+  />
+
+  <div
+    style={{
+      position: "absolute",
+
+      bottom: "-30px",
+
+      left: "-30px",
+
+      width: "70px",
+
+      height: "70px",
+
+      borderRadius: "50%",
+
+      background:
+        "rgba(255,255,255,0.08)",
+    }}
+  />
+
+  <div
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "10px",
+
+      marginBottom: "10px",
+
+      position: "relative",
+
+      zIndex: 2,
+    }}
+  >
+
+    <div
+      style={{
+        width: "40px",
+
+        height: "40px",
+
+        borderRadius: "12px",
+
+        background:
+          "rgba(255,255,255,0.18)",
+
+        display: "flex",
+
+        justifyContent:
+          "center",
+
+        alignItems:
+          "center",
+      }}
+    >
+
+      <FaRobot
         style={{
-          margin: "18px 16px",
+          fontSize: "18px",
+        }}
+      />
 
-          background:
-            "linear-gradient(135deg,#6d28d9,#4f46e5)",
+    </div>
 
-          borderRadius: "20px",
+    <div>
 
-          padding: "18px",
+      <h2
+        style={{
+          margin: 0,
 
-          color: "white",
+          fontSize: "16px",
 
-          boxShadow:
-            "0 10px 30px rgba(109,40,217,0.25)",
+          fontWeight: "800",
         }}
       >
+        IA Konan Shopping
+      </h2>
 
-        <h2
-          style={{
-            margin: 0,
+      <span
+        style={{
+          fontSize: "11px",
 
-            fontSize: "18px",
+          opacity: 0.9,
+        }}
+      >
+        Assistant intelligent
+      </span>
 
-            marginBottom: "10px",
-          }}
-        >
-          ✨ IA Konan Shopping
-        </h2>
+    </div>
 
-        <p
-          style={{
-            opacity: 0.9,
+  </div>
 
-            lineHeight: "1.5",
+  <p
+    style={{
+      fontSize: "12px",
 
-            fontSize: "14px",
+      lineHeight: "1.6",
 
-            marginBottom: "18px",
-          }}
-        >
-          Découvrez des recommandations
-          intelligentes adaptées à vos
-          goûts et vos achats.
-        </p>
+      marginBottom: "14px",
 
-        <button
-          onClick={() =>
-            navigate("/ai")
-          }
+      opacity: 0.95,
 
-          style={{
-            border: "none",
+      position: "relative",
 
-            background: "white",
+      zIndex: 2,
+    }}
+  >
+    Découvrez des recommandations
+    personnalisées selon vos goûts,
+    vos recherches et vos achats.
+  </p>
 
-            color: "#4f46e5",
+  <button
+    onClick={() =>
+      navigate("/ai")
+    }
 
-            padding: "10px 16px",
+    style={{
+      border: "none",
 
-            borderRadius: "14px",
+      background:
+        "rgba(255,255,255,0.95)",
 
-            fontWeight: "800",
+      color: "#2563eb",
 
-            cursor: "pointer",
-          }}
-        >
-          Explorer l'IA
-        </button>
+      height: "40px",
 
-      </div>
+      padding: "0 14px",
+
+      borderRadius: "12px",
+
+      fontWeight: "800",
+
+      fontSize: "12px",
+
+      cursor: "pointer",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "8px",
+
+      position: "relative",
+
+      zIndex: 2,
+
+      boxShadow:
+        "0 6px 15px rgba(255,255,255,0.20)",
+    }}
+  >
+
+    <FaRobot />
+
+    Explorer l'IA
+
+    <FaArrowRight />
+
+  </button>
+
+</div>
 
       {/* FEATURES */}
 
