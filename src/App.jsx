@@ -32,8 +32,12 @@ import Account from "./pages/Account";
 import ForgotPassword
 from "./pages/ForgotPassword";
 
+import Message from "./pages/Message";
+
 import ResetPassword
 from "./pages/ResetPassword";
+
+import AdminMessages from "./pages/AdminMessages";
 
 import ProductDetails from "./pages/ProductDetails";
 
@@ -3255,6 +3259,16 @@ if (
   element={
     <ResetPassword />
   }
+/>
+
+<Route
+  path="/message"
+  element={<Message />}
+/>
+
+<Route
+  path="/admin-messages"
+  element={<AdminMessages />}
 />
 
       </Routes>

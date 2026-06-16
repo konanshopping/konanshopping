@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import axios from "axios";
+
 import {
   FaEnvelope,
   FaPaperPlane,
@@ -18,37 +20,46 @@ const [message, setMessage] =
 const [messages, setMessages] =
   useState([]);
 
-const sendMessage = () => {
+  const sendMessage = async () => {
 
   if (
     !title.trim() ||
     !message.trim()
-  )
-    return;
+  ) return;
 
-  const newMessage = {
+  try {
 
-    id: Date.now(),
+    const response =
+      await axios.post(
+        "https://konanshopping-production.up.railway.app/api/messages",
+        {
+          title,
+          content: message,
+        }
+      );
 
-    title,
+    setMessages([
+      response.data,
+      ...messages,
+    ]);
 
-    message,
+    setTitle("");
 
-    date:
-      new Date()
-        .toLocaleString(),
+    setMessage("");
 
-    read: false,
-  };
+    alert(
+      "Message envoyé avec succès"
+    );
 
-  setMessages([
-    newMessage,
-    ...messages,
-  ]);
+  } catch (error) {
 
-  setTitle("");
+    console.error(error);
 
-  setMessage("");
+    alert(
+      "Erreur lors de l'envoi"
+    );
+
+  }
 
 };
 

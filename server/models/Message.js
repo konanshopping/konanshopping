@@ -12,6 +12,12 @@ const messageSchema =
       required: true,
     },
 
+    readBy: [
+      {
+        type: String,
+      },
+    ],
+
     createdAt: {
       type: Date,
       default: Date.now,

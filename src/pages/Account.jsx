@@ -473,6 +473,10 @@ return (
 </div>
 
 <button
+  onClick={() =>
+    navigate("/message")
+  }
+
   style={{
     position: "relative",
 
@@ -510,6 +514,23 @@ return (
     flexShrink: 0,
 
     marginRight: "8px",
+
+    transition:
+      "all 0.25s ease",
+  }}
+
+  onMouseEnter={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(-2px)";
+
+  }}
+
+  onMouseLeave={(e) => {
+
+    e.currentTarget.style.transform =
+      "translateY(0)";
+
   }}
 >
 

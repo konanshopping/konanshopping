@@ -32,6 +32,8 @@ import {
   Cell,
 } from "recharts";
 
+import { FaEnvelope } from "react-icons/fa";
+
 import { Link } from "react-router-dom";
 
 import "./Admin.css";
@@ -451,6 +453,19 @@ const addProduct =
   Produits
 
 </button>
+
+<button
+  onClick={() =>
+    navigate("/admin-messages")
+  }
+>
+  <FaEnvelope />
+
+  <span>
+    Messages
+  </span>
+</button>
+
 <button
   onClick={() =>
     navigate("/admin-clients")
