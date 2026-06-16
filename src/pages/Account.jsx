@@ -672,120 +672,186 @@ return (
 
 </div>
 
-      {/* MES COMMANDES */}
+{/* MES COMMANDES */}
+
+<div
+  style={{
+    background:
+      "rgba(255,255,255,0.95)",
+
+    margin: "0 16px",
+
+    borderRadius: "24px",
+
+    padding: "18px",
+
+    border:
+      "1px solid rgba(99,102,241,0.08)",
+
+    boxShadow:
+      "0 10px 25px rgba(0,0,0,0.06)",
+
+    backdropFilter:
+      "blur(10px)",
+  }}
+>
+
+  <div
+    style={{
+      display: "flex",
+
+      justifyContent:
+        "space-between",
+
+      alignItems: "center",
+
+      marginBottom: "18px",
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+
+        fontSize: "18px",
+
+        fontWeight: "800",
+
+        color: "#111827",
+      }}
+    >
+      Mes commandes
+    </h2>
+
+    <Link
+      to="/my-orders"
+
+      style={{
+        textDecoration:
+          "none",
+
+        color: "#5b3cc4",
+
+        fontWeight: "700",
+
+        fontSize: "13px",
+      }}
+    >
+      Voir tout
+    </Link>
+
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+
+      gridTemplateColumns:
+        "repeat(4,1fr)",
+
+      gap: "10px",
+    }}
+  >
+
+    {orders.map((item, index) => (
 
       <div
+        key={index}
+
+        onClick={() =>
+          navigate(item.path)
+        }
+
+        onTouchStart={(e) => {
+
+          e.currentTarget.style.transform =
+            "scale(0.97)";
+
+        }}
+
+        onTouchEnd={(e) => {
+
+          e.currentTarget.style.transform =
+            "scale(1)";
+
+        }}
+
         style={{
-          background: "white",
+          display: "flex",
 
-          margin: "0 16px",
+          flexDirection: "column",
 
-          borderRadius: "20px",
+          alignItems: "center",
 
-          padding: "16px",
+          justifyContent:
+            "center",
 
-          boxShadow:
-            "0 6px 20px rgba(0,0,0,0.04)",
+          gap: "8px",
+
+          padding: "12px 6px",
+
+          cursor: "pointer",
+
+          borderRadius: "16px",
+
+          transition:
+            "all 0.25s ease",
         }}
       >
 
         <div
           style={{
+            width: "42px",
+
+            height: "42px",
+
+            borderRadius: "14px",
+
+            background:
+              "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+
             display: "flex",
 
             justifyContent:
-              "space-between",
+              "center",
 
-            alignItems: "center",
+            alignItems:
+              "center",
 
-            marginBottom: "18px",
+            fontSize: "18px",
+
+            color: "#5b3cc4",
+
+            boxShadow:
+              "0 6px 15px rgba(91,60,196,0.15)",
           }}
         >
-
-          <h2
-            style={{
-              margin: 0,
-
-              fontSize: "22px",
-
-              color: "#111827",
-            }}
-          >
-            Mes commandes
-          </h2>
-
-          <Link
-            to="/my-orders"
-
-            style={{
-              textDecoration:
-                "none",
-
-              color: "#6d28d9",
-
-              fontWeight: "700",
-
-              fontSize: "14px",
-            }}
-          >
-            Voir tout
-          </Link>
-
+          {item.icon}
         </div>
 
-        <div
+        <span
           style={{
-            display: "grid",
+            fontSize: "11px",
 
-            gridTemplateColumns:
-              "repeat(4,1fr)",
+            color: "#4b5563",
 
-            gap: "12px",
+            textAlign: "center",
+
+            fontWeight: "600",
+
+            lineHeight: "1.3",
           }}
         >
-
-          {orders.map((item, index) => (
-  <div
-    key={index}
-    onClick={() => navigate(item.path)}
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "10px",
-      padding: "12px",
-      cursor: "pointer",
-    }}
-  >
-
-                <div
-                  style={{
-                    fontSize: "22px",
-                  }}
-                >
-                  {item.icon}
-                </div>
-
-                <span
-                  style={{
-                    fontSize: "12px",
-
-                    color: "#6b7280",
-
-                    textAlign: "center",
-                  }}
-                >
-                  {item.title}
-                </span>
-
-              </div>
-
-            )
-          )}
-
-        </div>
+          {item.title}
+        </span>
 
       </div>
+
+    ))}
+
+  </div>
+
+</div>
 
       {/* IA SECTION */}
 
