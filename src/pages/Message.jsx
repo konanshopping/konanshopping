@@ -234,131 +234,186 @@ function Message() {
 
       )}
 
-      {messages.map((msg) => (
+     {messages.map((msg) => (
+
+  <div
+    key={msg._id}
+    onClick={() =>
+      markAsRead(msg._id)
+    }
+    style={{
+      cursor: "pointer",
+      background:
+        (msg.readBy || [])
+        .includes(user._id)
+          ? "#fff"
+          : "#eef2ff",
+      border:
+        (msg.readBy || [])
+        .includes(user._id)
+          ? "1px solid #f3f4f6"
+          : "2px solid #4f46e5",
+      marginTop: "12px",
+      borderRadius: "16px",
+      padding: "14px",
+      boxShadow:
+        "0 8px 20px rgba(0,0,0,0.04)",
+      transition:
+        "all 0.25s ease",
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+        gap: "10px",
+      }}
+    >
+
+      <div
+        style={{
+          width: "38px",
+          height: "38px",
+          borderRadius: "12px",
+          background: "#eef2ff",
+          display: "flex",
+          justifyContent:
+            "center",
+          alignItems:
+            "center",
+        }}
+      >
+        <FaEnvelope
+          style={{
+            color: "#4f46e5",
+            fontSize: "14px",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+        }}
+      >
+
+        <strong
+          style={{
+            color: "#111827",
+            fontSize: "14px",
+            display: "block",
+          }}
+        >
+          {msg.title}
+        </strong>
+
+        <p
+          style={{
+            marginTop: "8px",
+            marginBottom: 0,
+            color: "#4b5563",
+            fontSize: "13px",
+            lineHeight: "1.6",
+          }}
+        >
+          {msg.content}
+        </p>
 
         <div
-  key={msg._id}
-
-  onClick={() =>
-    markAsRead(
-      msg._id
-    )
-  }
-
-  style={{
-    cursor: "pointer",
-
-    background: "#fff",
-
-    marginTop: "16px",
-
-    borderRadius: "22px",
-
-    padding: "18px",
-
-    boxShadow:
-      "0 10px 25px rgba(0,0,0,0.05)",
-  }}
->
+          style={{
+            display: "flex",
+            justifyContent:
+              "space-between",
+            alignItems:
+              "center",
+            marginTop: "12px",
+          }}
+        >
 
           <div
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              marginBottom: "10px",
-            }}
-          >
-
-            <FaEnvelope
-              style={{
-                color: "#4f46e5",
-              }}
-            />
-
-            <strong
-              style={{
-                color: "#111827",
-                fontSize: "15px",
-              }}
-            >
-              {msg.title}
-            </strong>
-
-          </div>
-
-          <div
-  style={{
-    marginTop: "6px",
-  }}
->
-
-  {(msg.readBy || [])
-    .includes(
-      user._id
-    ) ? (
-
-    <span
-      style={{
-        color: "#22c55e",
-        fontSize: "11px",
-        fontWeight: "700",
-      }}
-    >
-      ✓ Lu
-    </span>
-
-  ) : (
-
-    <span
-      style={{
-        color: "#4f46e5",
-        fontSize: "11px",
-        fontWeight: "700",
-      }}
-    >
-      🔵 Nouveau
-    </span>
-
-  )}
-
-</div>
-
-          <p
-            style={{
-              color: "#4b5563",
-              fontSize: "14px",
-              lineHeight: "1.7",
-              margin: 0,
-            }}
-          >
-            {msg.content}
-          </p>
-
-          <div
-            style={{
-              marginTop: "14px",
-              display: "flex",
-              alignItems: "center",
+              alignItems:
+                "center",
               gap: "6px",
               color: "#9ca3af",
-              fontSize: "12px",
+              fontSize: "11px",
             }}
           >
-
             <FaClock />
 
             {new Date(
               msg.createdAt
-            ).toLocaleString()}
-
+            ).toLocaleDateString(
+              "fr-FR",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }
+            )}
           </div>
+
+          {(msg.readBy || [])
+            .includes(
+              user._id
+            ) ? (
+
+            <span
+              style={{
+                background:
+                  "#ecfdf5",
+                color:
+                  "#22c55e",
+                padding:
+                  "4px 10px",
+                borderRadius:
+                  "999px",
+                fontSize:
+                  "11px",
+                fontWeight:
+                  "700",
+              }}
+            >
+              ✓ Lu
+            </span>
+
+          ) : (
+
+            <span
+              style={{
+                background:
+                  "#eef2ff",
+                color:
+                  "#4f46e5",
+                padding:
+                  "4px 10px",
+                borderRadius:
+                  "999px",
+                fontSize:
+                  "11px",
+                fontWeight:
+                  "700",
+              }}
+            >
+              ● Nouveau
+            </span>
+
+          )}
 
         </div>
 
-      ))}
+      </div>
 
     </div>
+
+  </div>
+
+))}
+
+
+
+</div>
 
   );
 
