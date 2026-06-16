@@ -93,6 +93,54 @@ const [showLogoutModal,
   setShowLogoutModal] =
   useState(false);
 
+  const [unreadCount, setUnreadCount] =
+  useState(0);
+
+  useEffect(() => {
+
+  const loadMessages =
+    async () => {
+
+      try {
+
+        const res =
+          await axios.get(
+            "https://konanshopping-production.up.railway.app/api/messages"
+          );
+
+        const user =
+          JSON.parse(
+            localStorage.getItem(
+              "user"
+            )
+          );
+
+        const unread =
+          res.data.filter(
+            (msg) =>
+              !(
+                msg.readBy || []
+              ).includes(
+                user._id
+              )
+          );
+
+        setUnreadCount(
+          unread.length
+        );
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+    };
+
+  loadMessages();
+
+}, []);
+
   const quickActions = [
   {
     icon: <FaHeart />,
@@ -576,7 +624,7 @@ return (
       alignItems: "center",
     }}
   >
-    3
+    {unreadCount}
   </span>
 
 </button>
