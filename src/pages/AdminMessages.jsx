@@ -38,13 +38,17 @@ const [messages, setMessages] =
       );
 
     setMessages([
-      response.data,
-      ...messages,
-    ]);
+  response.data,
+  ...messages,
+]);
 
-    setTitle("");
+setMessagesCount(
+  prev => prev + 1
+);
 
-    setMessage("");
+setTitle("");
+
+setMessage("");
 
     alert(
       "Message envoyé avec succès"
@@ -57,6 +61,36 @@ const [messages, setMessages] =
     alert(
       "Erreur lors de l'envoi"
     );
+
+  }
+
+};
+
+const [messagesCount, setMessagesCount] =
+  useState(0);
+
+  useEffect(() => {
+
+  fetchMessages();
+
+}, []);
+
+const fetchMessages = async () => {
+
+  try {
+
+    const res =
+      await axios.get(
+        "https://konanshopping-production.up.railway.app/api/messages"
+      );
+
+    setMessagesCount(
+      res.data.length
+    );
+
+  } catch (err) {
+
+    console.log(err);
 
   }
 
@@ -274,13 +308,12 @@ const fetchUsers = async () => {
           />
 
           <h3
-            style={{
-              margin:
-                "10px 0 0",
-            }}
-          >
-            0
-          </h3>
+  style={{
+    margin: "10px 0 0",
+  }}
+>
+  {messagesCount}
+</h3>
 
           <p
             style={{
