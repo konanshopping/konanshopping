@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 import {
@@ -58,6 +57,36 @@ const [messages, setMessages] =
     alert(
       "Erreur lors de l'envoi"
     );
+
+  }
+
+};
+
+const [clientsCount, setClientsCount] =
+  useState(0);
+
+  useEffect(() => {
+
+  fetchUsers();
+
+}, []);
+
+const fetchUsers = async () => {
+
+  try {
+
+    const res =
+      await axios.get(
+  "https://konanshopping-production.up.railway.app/users"
+);
+
+    setClientsCount(
+      res.data.length
+    );
+
+  } catch (err) {
+
+    console.log(err);
 
   }
 
@@ -202,13 +231,12 @@ const [messages, setMessages] =
           />
 
           <h3
-            style={{
-              margin:
-                "10px 0 0",
-            }}
-          >
-            0
-          </h3>
+  style={{
+    margin: "10px 0 0",
+  }}
+>
+  {clientsCount}
+</h3>
 
           <p
             style={{

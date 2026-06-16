@@ -15,6 +15,13 @@ function Message() {
   const [loading, setLoading] =
     useState(true);
 
+    const user =
+  JSON.parse(
+    localStorage.getItem(
+      "user"
+    )
+  );
+
   useEffect(() => {
 
     fetchMessages();
@@ -46,6 +53,45 @@ function Message() {
       }
 
     };
+
+    const markAsRead =
+  async (messageId) => {
+
+    try {
+
+      await axios.put(
+        `https://konanshopping-production.up.railway.app/api/messages/${messageId}/read`,
+        {
+          userId:
+            user._id,
+        }
+      );
+
+      setMessages(
+        messages.map((msg) =>
+
+          msg._id === messageId
+
+            ? {
+                ...msg,
+
+                readBy: [
+                  ...(msg.readBy || []),
+                  user._id,
+                ],
+              }
+
+            : msg
+        )
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
 
   return (
 
@@ -191,16 +237,29 @@ function Message() {
       {messages.map((msg) => (
 
         <div
-          key={msg._id}
-          style={{
-            background: "#fff",
-            marginTop: "16px",
-            borderRadius: "22px",
-            padding: "18px",
-            boxShadow:
-              "0 10px 25px rgba(0,0,0,0.05)",
-          }}
-        >
+  key={msg._id}
+
+  onClick={() =>
+    markAsRead(
+      msg._id
+    )
+  }
+
+  style={{
+    cursor: "pointer",
+
+    background: "#fff",
+
+    marginTop: "16px",
+
+    borderRadius: "22px",
+
+    padding: "18px",
+
+    boxShadow:
+      "0 10px 25px rgba(0,0,0,0.05)",
+  }}
+>
 
           <div
             style={{
@@ -227,6 +286,43 @@ function Message() {
             </strong>
 
           </div>
+
+          <div
+  style={{
+    marginTop: "6px",
+  }}
+>
+
+  {(msg.readBy || [])
+    .includes(
+      user._id
+    ) ? (
+
+    <span
+      style={{
+        color: "#22c55e",
+        fontSize: "11px",
+        fontWeight: "700",
+      }}
+    >
+      ✓ Lu
+    </span>
+
+  ) : (
+
+    <span
+      style={{
+        color: "#4f46e5",
+        fontSize: "11px",
+        fontWeight: "700",
+      }}
+    >
+      🔵 Nouveau
+    </span>
+
+  )}
+
+</div>
 
           <p
             style={{
