@@ -543,88 +543,134 @@ return (
 
       {/* QUICK ACTIONS */}
 
+<div
+  style={{
+    display: "grid",
+
+    gridTemplateColumns:
+      "repeat(4,1fr)",
+
+    gap: "10px",
+
+    padding: "16px",
+
+    marginTop: "-12px",
+  }}
+>
+
+  {quickActions.map(
+    (item, index) => (
+
       <div
+        key={index}
+
+        onClick={() =>
+          navigate(item.path)
+        }
+
+        onTouchStart={(e) => {
+
+          e.currentTarget.style.transform =
+            "scale(0.97)";
+
+        }}
+
+        onTouchEnd={(e) => {
+
+          e.currentTarget.style.transform =
+            "scale(1)";
+
+        }}
+
         style={{
-          display: "grid",
+          background:
+            "rgba(255,255,255,0.95)",
 
-          gridTemplateColumns:
-            "repeat(4,1fr)",
+          borderRadius: "20px",
 
-          gap: "10px",
+          padding: "16px 10px",
 
-          padding: "16px",
+          display: "flex",
 
-          marginTop: "-12px",
+          flexDirection: "column",
+
+          alignItems: "center",
+
+          justifyContent:
+            "center",
+
+          gap: "8px",
+
+          cursor: "pointer",
+
+          border:
+            "1px solid rgba(99,102,241,0.08)",
+
+          boxShadow:
+            "0 10px 25px rgba(0,0,0,0.06)",
+
+          backdropFilter:
+            "blur(10px)",
+
+          minHeight: "95px",
+
+          transition:
+            "all 0.25s ease",
         }}
       >
 
-        {quickActions.map(
-          (item, index) => (
+        <div
+          style={{
+            width: "42px",
 
-            <div
-              key={index}
+            height: "42px",
 
-              onClick={() =>
-                navigate(item.path)
-              }
+            borderRadius: "14px",
 
-              style={{
-                background: "white",
+            background:
+              "linear-gradient(135deg,#ede9fe,#ddd6fe)",
 
-                borderRadius: "18px",
+            display: "flex",
 
-                padding: "14px",
+            justifyContent:
+              "center",
 
-                display: "flex",
+            alignItems:
+              "center",
 
-                flexDirection: "column",
+            fontSize: "18px",
 
-                alignItems: "center",
+            color: "#5b3cc4",
 
-                justifyContent:
-                  "center",
+            boxShadow:
+              "0 6px 15px rgba(91,60,196,0.15)",
+          }}
+        >
+          {item.icon}
+        </div>
 
-                gap: "10px",
+        <span
+          style={{
+            fontSize: "12px",
 
-                cursor: "pointer",
+            fontWeight: "700",
 
-                boxShadow:
-                  "0 6px 20px rgba(0,0,0,0.04)",
+            color: "#111827",
 
-                transition: "0.3s",
-              }}
-            >
+            textAlign: "center",
 
-              <div
-  style={{
-    fontSize: "20px",
-    color: "#5b3cc4",
-    marginBottom: "8px",
-  }}
->
-  {item.icon}
-</div>
-
-              <span
-                style={{
-                  fontSize: "14px",
-
-                  fontWeight: "700",
-
-                  color: "#111827",
-
-                  textAlign: "center",
-                }}
-              >
-                {item.title}
-              </span>
-
-            </div>
-
-          )
-        )}
+            lineHeight: "1.3",
+          }}
+        >
+          {item.title}
+        </span>
 
       </div>
+
+    )
+  )}
+
+</div>
 
       {/* MES COMMANDES */}
 
