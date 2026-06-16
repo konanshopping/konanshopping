@@ -1072,120 +1072,171 @@ return (
 
       {/* FEATURES */}
 
-      <div
-        style={{
-          background: "white",
+<div
+  style={{
+    background:
+      "rgba(255,255,255,0.95)",
 
-          margin: "0 16px",
+    margin: "0 16px",
 
-          borderRadius: "20px",
+    borderRadius: "24px",
 
-          padding: "16px",
+    padding: "18px",
 
-          boxShadow:
-            "0 6px 20px rgba(0,0,0,0.04)",
-        }}
-      >
+    border:
+      "1px solid rgba(99,102,241,0.08)",
+
+    boxShadow:
+      "0 10px 25px rgba(0,0,0,0.06)",
+
+    backdropFilter:
+      "blur(10px)",
+  }}
+>
+
+  <div
+    style={{
+      display: "flex",
+
+      justifyContent:
+        "space-between",
+
+      alignItems: "center",
+
+      marginBottom: "18px",
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+
+        fontSize: "18px",
+
+        fontWeight: "800",
+
+        color: "#111827",
+      }}
+    >
+      Plus de fonctionnalités
+    </h2>
+
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+
+      gridTemplateColumns:
+        "repeat(4,1fr)",
+
+      gap: "10px",
+    }}
+  >
+
+    {features.map(
+      (item, index) => (
 
         <div
+          key={index}
+
+          onClick={() =>
+            navigate(item.path)
+          }
+
+          onTouchStart={(e) => {
+
+            e.currentTarget.style.transform =
+              "scale(0.97)";
+
+          }}
+
+          onTouchEnd={(e) => {
+
+            e.currentTarget.style.transform =
+              "scale(1)";
+
+          }}
+
           style={{
             display: "flex",
 
+            flexDirection:
+              "column",
+
+            alignItems:
+              "center",
+
             justifyContent:
-              "space-between",
+              "center",
 
-            alignItems: "center",
+            gap: "8px",
 
-            marginBottom: "20px",
+            cursor: "pointer",
+
+            padding: "12px 6px",
+
+            borderRadius: "16px",
+
+            transition:
+              "all 0.25s ease",
           }}
         >
 
-          <h2
+          <div
             style={{
-              margin: 0,
+              width: "42px",
 
-              fontSize: "22px",
+              height: "42px",
 
-              color: "#111827",
+              borderRadius: "14px",
+
+              background:
+                "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+
+              display: "flex",
+
+              justifyContent:
+                "center",
+
+              alignItems:
+                "center",
+
+              fontSize: "18px",
+
+              color: "#2563eb",
+
+              boxShadow:
+                "0 6px 15px rgba(37,99,235,0.15)",
             }}
           >
-            Plus de fonctionnalités
-          </h2>
+            {item.icon}
+          </div>
+
+          <span
+            style={{
+              fontSize: "11px",
+
+              textAlign: "center",
+
+              color: "#374151",
+
+              fontWeight: "600",
+
+              lineHeight: "1.3",
+            }}
+          >
+            {item.title}
+          </span>
 
         </div>
 
-        <div
-          style={{
-            display: "grid",
+      )
+    )}
 
-            gridTemplateColumns:
-              "repeat(4,1fr)",
+  </div>
 
-            gap: "12px",
-          }}
-        >
-
-          {features.map(
-            (item, index) => (
-
-              <div
-                key={index}
-
-                onClick={() =>
-                  navigate(item.path)
-                }
-
-                style={{
-                  display: "flex",
-
-                  flexDirection:
-                    "column",
-
-                  alignItems:
-                    "center",
-
-                  gap: "10px",
-
-                  cursor: "pointer",
-
-                  padding: "12px",
-
-                  borderRadius: "16px",
-
-                  transition: "0.3s",
-                }}
-              >
-
-                <div
-                  style={{
-                    fontSize: "24px",
-                  }}
-                >
-                  {item.icon}
-                </div>
-
-                <span
-                  style={{
-                    fontSize: "12px",
-
-                    textAlign: "center",
-
-                    color: "#111827",
-
-                    fontWeight: "600",
-                  }}
-                >
-                  {item.title}
-                </span>
-
-              </div>
-
-            )
-          )}
-
-        </div>
-
-      </div>
+</div>
 
      {showPhotoModal && (
 
