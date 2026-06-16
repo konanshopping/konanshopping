@@ -36,6 +36,8 @@ import {
   FaExclamationTriangle,
 } from "react-icons/fa";
 
+import { FaEnvelope } from "react-icons/fa";
+
 function Account() {
 
 const logout = () => {
@@ -469,6 +471,57 @@ return (
 
 </div>
 </div>
+
+<button
+  onClick={() =>
+    navigate("/messages")
+  }
+
+  style={{
+    border:
+      "1px solid rgba(255,255,255,0.15)",
+
+    background:
+      "rgba(255,255,255,0.12)",
+
+    backdropFilter:
+      "blur(12px)",
+
+    WebkitBackdropFilter:
+      "blur(12px)",
+
+    width: "38px",
+
+    height: "38px",
+
+    borderRadius: "12px",
+
+    color: "#fff",
+
+    cursor: "pointer",
+
+    display: "flex",
+
+    justifyContent: "center",
+
+    alignItems: "center",
+
+    boxShadow:
+      "0 6px 18px rgba(0,0,0,0.12)",
+
+    flexShrink: 0,
+
+    marginRight: "8px",
+  }}
+>
+
+  <FaEnvelope
+    style={{
+      fontSize: "15px",
+    }}
+  />
+
+</button>
 
     <button
   onClick={() =>
