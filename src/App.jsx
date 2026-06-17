@@ -2286,9 +2286,9 @@ window.dispatchEvent(
 
     right: "12px",
 
-    width: "40px",
+    width: "34px",
 
-    height: "40px",
+    height: "34px",
 
     borderRadius: "50%",
 
@@ -2296,35 +2296,35 @@ window.dispatchEvent(
 
     background:
 
-      JSON.parse(
-        localStorage.getItem(
-          favoritesKey
-        )
-      )?.find(
-        (item) =>
-          item._id === product._id
-      )
+JSON.parse(
+  localStorage.getItem(
+    favoritesKey
+  )
+)?.find(
+  (item) =>
+    item._id === product._id
+)
 
-      ? "#2563eb"
+? "#2563eb"
 
-      : "white",
+: "#f3f4f6",
 
     color:
 
-      JSON.parse(
-        localStorage.getItem(
-          favoritesKey
-        )
-      )?.find(
-        (item) =>
-          item._id === product._id
-      )
+JSON.parse(
+  localStorage.getItem(
+    favoritesKey
+  )
+)?.find(
+  (item) =>
+    item._id === product._id
+)
 
-      ? "white"
+? "white"
 
-      : "#2563eb",
+: "#9ca3af",
 
-    fontSize: "18px",
+    fontSize: "15px",
 
     cursor: "pointer",
 
@@ -2382,7 +2382,7 @@ item._id === product._id
 
 ? "white"
 
-: "#2563eb",
+: "#9ca3af",
 
 transition: "0.3s",
 
