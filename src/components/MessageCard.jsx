@@ -30,7 +30,7 @@ function MessageCard({
         setOffset(
           Math.max(
             event.deltaX,
-            -500
+            -200
           )
         );
 
@@ -40,7 +40,7 @@ function MessageCard({
 
     onSwipedLeft: () => {
 
-      if (offset <= -400) {
+      if (offset <= -150) {
 
         deleteMessage(
           msg._id
@@ -60,7 +60,7 @@ function MessageCard({
 
     onSwiped: () => {
 
-      if (offset > -250) {
+      if (offset > -150) {
 
         setOffset(0);
 
