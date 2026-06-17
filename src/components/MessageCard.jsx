@@ -8,6 +8,8 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
+import { useState } from "react";
+
 function MessageCard({
   msg,
   user,
@@ -15,22 +17,63 @@ function MessageCard({
   deleteMessage,
 }) {
 
-  const handlers =
-    useSwipeable({
+    const [offset, setOffset] =
+  useState(0)
 
-      onSwipedLeft: () => {
+  const handlers =
+  useSwipeable({
+
+    onSwiping: (event) => {
+
+      if (event.deltaX < 0) {
+
+        setOffset(
+          Math.max(
+            event.deltaX,
+            -500
+          )
+        );
+
+      }
+
+    },
+
+    onSwipedLeft: () => {
+
+      if (offset <= -400) {
 
         deleteMessage(
           msg._id
         );
 
-      },
+      }
 
-      preventScrollOnSwipe: true,
+      setOffset(0);
 
-      trackMouse: true,
+    },
 
-    });
+    onSwipedRight: () => {
+
+      setOffset(0);
+
+    },
+
+    onSwiped: () => {
+
+      if (offset > -250) {
+
+        setOffset(0);
+
+      }
+
+    },
+
+    trackMouse: true,
+
+    preventScrollOnSwipe: true,
+
+  });
+;
 
   return (
 
@@ -46,38 +89,61 @@ function MessageCard({
       {/* FOND SUPPRESSION */}
 
       <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: "90px",
+  style={{
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
 
-          background:
-            "#ef4444",
+    width:
+      `${Math.abs(offset)}px`,
 
-          borderRadius:
-            "18px",
+    background:
+  "linear-gradient(135deg,#ef4444,#dc2626)",
 
-          display: "flex",
+    borderRadius:
+      "18px",
 
-          justifyContent:
-            "center",
+    display: "flex",
 
-          alignItems:
-            "center",
+    justifyContent:
+      "center",
 
-          color: "#fff",
+    alignItems:
+      "center",
 
-          zIndex: 0,
-        }}
-      >
+    color: "#fff",
 
-        <FaTrash
-          style={{
-            fontSize: "20px",
-          }}
-        />
+    zIndex: 0,
+  }}
+>
+
+        <div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "6px",
+    color: "#fff",
+  }}
+>
+
+  <FaTrash
+    style={{
+      fontSize: "22px",
+    }}
+  />
+
+  <span
+    style={{
+      fontSize: "12px",
+      fontWeight: "700",
+    }}
+  >
+    Supprimer
+  </span>
+
+</div>
 
       </div>
 
@@ -90,137 +156,81 @@ function MessageCard({
           )
         }
         style={{
-          position: "relative",
+  position: "relative",
 
-          zIndex: 1,
+  zIndex: 1,
 
-          cursor: "pointer",
+  cursor: "pointer",
 
-          background:
-            "#fff",
+  transform:
+    `translateX(${offset}px)`,
 
-          border:
-            (msg.readBy || [])
-            .includes(user._id)
-              ? "1px solid #e5e7eb"
-              : "2px solid #2563eb",
+  transition:
+    offset === 0
+      ? "transform .25s ease"
+      : "none",
 
-          borderRadius:
-            "18px",
+  background: "#fff",
 
-          padding: "16px",
+  border:
+    (msg.readBy || [])
+    .includes(user._id)
+      ? "1px solid #e5e7eb"
+      : "2px solid #2563eb",
 
-          boxShadow:
-            "0 8px 24px rgba(0,0,0,0.06)",
+  borderRadius: "18px",
 
-          transition:
-            "all .3s ease",
-        }}
-      >
+  padding: "16px",
 
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-          }}
-        >
+  boxShadow:
+    "0 8px 24px rgba(0,0,0,0.06)",
+}}
 
-          {/* ICÔNE */}
+>
 
-          <div
-            style={{
-              width: "42px",
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+  }}
+>
+  <strong
+    style={{
+      fontSize: "15px",
+      fontWeight: "700",
+      color: "#111827",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    }}
+  >
+    {msg.title}
 
-              height: "42px",
+    <FaEnvelope
+      style={{
+        color: "#2563eb",
+        fontSize: "14px",
+      }}
+    />
+  </strong>
 
-              borderRadius:
-                "14px",
-
-              background:
-                "#eef2ff",
-
-              display: "flex",
-
-              justifyContent:
-                "center",
-
-              alignItems:
-                "center",
-
-              flexShrink: 0,
-            }}
-          >
-
-            <FaEnvelope
-              style={{
-                color:
-                  "#2563eb",
-
-                fontSize:
-                  "16px",
-              }}
-            />
-
-          </div>
-
-          {/* CONTENU */}
-
-          <div
-            style={{
-              flex: 1,
-            }}
-          >
-
-            <strong
-              style={{
-                display: "block",
-
-                fontSize: "15px",
-
-                fontWeight: "700",
-
-                color: "#111827",
-
-                marginBottom: "6px",
-              }}
-            >
-              {msg.title}
-            </strong>
-
-            {/* BADGE OFFICIEL */}
-
-            <div
-              style={{
-                display:
-                  "inline-flex",
-
-                alignItems:
-                  "center",
-
-                background:
-                  "#eef2ff",
-
-                color:
-                  "#2563eb",
-
-                padding:
-                  "4px 10px",
-
-                borderRadius:
-                  "999px",
-
-                fontSize:
-                  "10px",
-
-                fontWeight:
-                  "700",
-
-                marginBottom:
-                  "10px",
-              }}
-            >
-              KONAN SHOPPING
-            </div>
+  <div
+    style={{
+      background: "#eef2ff",
+      color: "#2563eb",
+      padding: "5px 12px",
+      borderRadius: "999px",
+      fontSize: "10px",
+      fontWeight: "700",
+      whiteSpace: "nowrap",
+      border: "1px solid #dbeafe",
+    }}
+  >
+    KONAN SHOPPING
+  </div>
+</div>
 
             {/* MESSAGE */}
 
@@ -364,9 +374,7 @@ function MessageCard({
 
         </div>
 
-      </div>
-
-    </div>
+       
 
   );
 
