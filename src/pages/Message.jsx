@@ -7,6 +7,10 @@ import {
   FaClock,
 } from "react-icons/fa";
 
+import MessageCard from "../components/MessageCard";
+
+import { useSwipeable } from "react-swipeable";
+
 function Message() {
 
   const [messages, setMessages] =
@@ -92,6 +96,76 @@ function Message() {
     }
 
   };
+
+  const deleteMessage =
+  async (messageId) => {
+
+    try {
+
+      await axios.put(
+        `https://konanshopping-production.up.railway.app/api/messages/${messageId}/delete`,
+        {
+          userId:
+            user._id,
+        }
+      );
+
+      setMessages(
+        messages.filter(
+          (msg) =>
+            msg._id !==
+            messageId
+        )
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+ const sortedMessages =
+  messages
+
+    .filter(
+      (msg) =>
+        !(msg.deletedBy || [])
+          .includes(user._id)
+    )
+
+    .sort((a, b) => {
+
+      const aRead =
+        (a.readBy || [])
+        .includes(user._id);
+
+      const bRead =
+        (b.readBy || [])
+        .includes(user._id);
+
+      if (
+        aRead === bRead
+      ) {
+
+        return (
+          new Date(
+            b.createdAt
+          ) -
+          new Date(
+            a.createdAt
+          )
+        );
+
+      }
+
+      return aRead
+        ? 1
+        : -1;
+
+    });
+
 
   return (
 
@@ -234,180 +308,15 @@ function Message() {
 
       )}
 
-     {messages.map((msg) => (
+{sortedMessages.map((msg) => (
 
-  <div
+  <MessageCard
     key={msg._id}
-    onClick={() =>
-      markAsRead(msg._id)
-    }
-    style={{
-      cursor: "pointer",
-      background:
-        (msg.readBy || [])
-        .includes(user._id)
-          ? "#fff"
-          : "#eef2ff",
-      border:
-        (msg.readBy || [])
-        .includes(user._id)
-          ? "1px solid #f3f4f6"
-          : "2px solid #4f46e5",
-      marginTop: "12px",
-      borderRadius: "16px",
-      padding: "14px",
-      boxShadow:
-        "0 8px 20px rgba(0,0,0,0.04)",
-      transition:
-        "all 0.25s ease",
-    }}
-  >
-
-    <div
-      style={{
-        display: "flex",
-        gap: "10px",
-      }}
-    >
-
-      <div
-        style={{
-          width: "38px",
-          height: "38px",
-          borderRadius: "12px",
-          background: "#eef2ff",
-          display: "flex",
-          justifyContent:
-            "center",
-          alignItems:
-            "center",
-        }}
-      >
-        <FaEnvelope
-          style={{
-            color: "#4f46e5",
-            fontSize: "14px",
-          }}
-        />
-      </div>
-
-      <div
-        style={{
-          flex: 1,
-        }}
-      >
-
-        <strong
-          style={{
-            color: "#111827",
-            fontSize: "14px",
-            display: "block",
-          }}
-        >
-          {msg.title}
-        </strong>
-
-        <p
-          style={{
-            marginTop: "8px",
-            marginBottom: 0,
-            color: "#4b5563",
-            fontSize: "13px",
-            lineHeight: "1.6",
-          }}
-        >
-          {msg.content}
-        </p>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "center",
-            marginTop: "12px",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              alignItems:
-                "center",
-              gap: "6px",
-              color: "#9ca3af",
-              fontSize: "11px",
-            }}
-          >
-            <FaClock />
-
-            {new Date(
-              msg.createdAt
-            ).toLocaleDateString(
-              "fr-FR",
-              {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              }
-            )}
-          </div>
-
-          {(msg.readBy || [])
-            .includes(
-              user._id
-            ) ? (
-
-            <span
-              style={{
-                background:
-                  "#ecfdf5",
-                color:
-                  "#22c55e",
-                padding:
-                  "4px 10px",
-                borderRadius:
-                  "999px",
-                fontSize:
-                  "11px",
-                fontWeight:
-                  "700",
-              }}
-            >
-              ✓ Lu
-            </span>
-
-          ) : (
-
-            <span
-              style={{
-                background:
-                  "#eef2ff",
-                color:
-                  "#4f46e5",
-                padding:
-                  "4px 10px",
-                borderRadius:
-                  "999px",
-                fontSize:
-                  "11px",
-                fontWeight:
-                  "700",
-              }}
-            >
-              ● Nouveau
-            </span>
-
-          )}
-
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
+    msg={msg}
+    user={user}
+    markAsRead={markAsRead}
+    deleteMessage={deleteMessage}
+  />
 
 ))}
 

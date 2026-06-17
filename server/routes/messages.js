@@ -119,4 +119,59 @@ router.put(
   }
 );
 
+router.put(
+  "/:id/delete",
+  async (req, res) => {
+
+    try {
+
+      const { userId } =
+        req.body;
+
+      const message =
+        await Message.findById(
+          req.params.id
+        );
+
+      if (!message) {
+
+        return res
+          .status(404)
+          .json({
+            message:
+              "Message introuvable",
+          });
+
+      }
+
+      if (
+        !message.deletedBy.includes(
+          userId
+        )
+      ) {
+
+        message.deletedBy.push(
+          userId
+        );
+
+        await message.save();
+
+      }
+
+      res.json({
+        success: true,
+      });
+
+    } catch (error) {
+
+      res.status(500).json({
+        message:
+          error.message,
+      });
+
+    }
+
+  }
+);
+
 module.exports = router;
