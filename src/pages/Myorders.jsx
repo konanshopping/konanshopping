@@ -864,7 +864,12 @@ function MyOrders() {
 
 <div
   style={{
-    marginBottom: "18px",
+    marginTop: "12px",
+
+    marginBottom:
+      window.innerWidth < 768
+        ? "28px"
+        : "35px",
 
     overflowX: "auto",
 
