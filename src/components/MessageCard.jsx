@@ -287,16 +287,18 @@ function MessageCard({
 
                 <FaClock />
 
-                {new Date(
-                  msg.createdAt
-                ).toLocaleDateString(
-                  "fr-FR",
-                  {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  }
-                )}
+               {new Date(
+  msg.createdAt
+).toLocaleString(
+  "fr-FR",
+  {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }
+)}
 
               </div>
 
