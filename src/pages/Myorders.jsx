@@ -1094,7 +1094,9 @@ function MyOrders() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "14px",
+        marginBottom: "16px",
+        flexWrap: "wrap",
+        gap: "10px",
       }}
     >
 
@@ -1114,15 +1116,23 @@ function MyOrders() {
       <div
         style={{
           ...getStatusStyle(order.status),
+
           padding: "8px 12px",
+
           borderRadius: "999px",
+
           fontSize: "12px",
+
           fontWeight: "700",
+
           display: "flex",
+
           alignItems: "center",
+
           gap: "6px",
         }}
       >
+
         {order.status === "Livrée" ? (
           <FaCheckCircle />
         ) : order.status === "Expédiée" ? (
@@ -1132,78 +1142,126 @@ function MyOrders() {
         )}
 
         {order.status}
+
       </div>
 
     </div>
 
-    {/* CONTENU */}
+    {/* PRODUITS */}
 
     <div
       style={{
         display: "flex",
-        gap: "14px",
-        alignItems: "center",
+        flexDirection: "column",
+        gap: "12px",
       }}
     >
 
-      {/* IMAGE */}
+      {(order.items || []).map((item, i) => (
 
-      <img
-        src={
-          order.items?.[0]?.image?.includes(
-            "localhost:5000"
-          )
-            ? order.items[0].image.replace(
-                "http://localhost:5000",
-                "https://konanshopping-production.up.railway.app"
-              )
-            : order.items?.[0]?.image ||
-              "/logo.jpg"
-        }
-        alt="Produit"
-        onError={(e) => {
-          e.target.src = "/logo.jpg";
-        }}
-        style={{
-          width: "75px",
-          height: "75px",
-          borderRadius: "14px",
-          objectFit: "cover",
-          border: "1px solid #E5E7EB",
-          flexShrink: 0,
-        }}
-      />
-
-      {/* INFOS */}
-
-      <div
-        style={{
-          flex: 1,
-        }}
-      >
-
-        <h3
+        <div
+          key={i}
           style={{
-            margin: 0,
-            color: "#111827",
-            fontSize: "15px",
-            fontWeight: "700",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            padding: "12px",
+            borderRadius: "14px",
+            background: "#F8FAFC",
+            border: "1px solid #EEF2F7",
           }}
         >
-          {order.items?.[0]?.name ||
-            "Produit"}
-        </h3>
 
-        <p
-          style={{
-            marginTop: "5px",
-            marginBottom: "5px",
-            color: "#6B7280",
-            fontSize: "13px",
-          }}
-        >
-          {order.items?.length} article(s)
-        </p>
+          <img
+            src={
+              item.image?.includes("localhost:5000")
+                ? item.image.replace(
+                    "http://localhost:5000",
+                    "https://konanshopping-production.up.railway.app"
+                  )
+                : item.image || "/logo.jpg"
+            }
+
+            alt={item.name}
+
+            onError={(e) => {
+              e.target.src = "/logo.jpg";
+            }}
+
+            style={{
+              width: "70px",
+              height: "70px",
+              borderRadius: "12px",
+              objectFit: "cover",
+              border: "1px solid #E5E7EB",
+              flexShrink: 0,
+            }}
+          />
+
+          <div
+            style={{
+              flex: 1,
+            }}
+          >
+
+            <h3
+              style={{
+                margin: 0,
+                color: "#111827",
+                fontSize: "14px",
+                fontWeight: "700",
+              }}
+            >
+              {item.name}
+            </h3>
+
+            <p
+              style={{
+                margin: "6px 0",
+                color: "#6B7280",
+                fontSize: "13px",
+              }}
+            >
+              Quantité : {item.quantity}
+            </p>
+
+            <div
+              style={{
+                color: "#2563EB",
+                fontWeight: "800",
+                fontSize: "15px",
+              }}
+            >
+              {item.price} FCFA
+            </div>
+
+          </div>
+
+        </div>
+
+      ))}
+
+    </div>
+
+    {/* INFOS COMMANDE */}
+
+    <div
+      style={{
+        marginTop: "16px",
+
+        display: "flex",
+
+        justifyContent: "space-between",
+
+        alignItems: "center",
+
+        flexWrap: "wrap",
+
+        gap: "10px",
+      }}
+    >
+
+      <div>
 
         <p
           style={{
@@ -1212,6 +1270,10 @@ function MyOrders() {
             fontSize: "12px",
           }}
         >
+          Date
+        </p>
+
+        <strong>
           {new Date(
             order.createdAt
           ).toLocaleDateString(
@@ -1222,13 +1284,30 @@ function MyOrders() {
               year: "numeric",
             }
           )}
+        </strong>
+
+      </div>
+
+      <div
+        style={{
+          textAlign: "right",
+        }}
+      >
+
+        <p
+          style={{
+            margin: 0,
+            color: "#94A3B8",
+            fontSize: "12px",
+          }}
+        >
+          Total
         </p>
 
         <h2
           style={{
+            margin: 0,
             color: "#2563EB",
-            marginTop: "8px",
-            marginBottom: 0,
             fontWeight: "900",
             fontSize: "24px",
           }}
@@ -1248,27 +1327,44 @@ function MyOrders() {
           `/track-order/${order._id}`
         )
       }
+
       style={{
         width: "100%",
-        marginTop: "16px",
+
+        marginTop: "18px",
+
         border: "none",
+
         background:
           "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
         color: "#FFFFFF",
+
         padding: "13px",
+
         borderRadius: "14px",
+
         fontWeight: "700",
+
         cursor: "pointer",
+
         display: "flex",
+
         justifyContent: "center",
+
         alignItems: "center",
+
         gap: "8px",
+
         boxShadow:
           "0 8px 20px rgba(37,99,235,0.20)",
       }}
     >
+
       <FaEye />
+
       Voir les détails
+
     </button>
 
   </div>
