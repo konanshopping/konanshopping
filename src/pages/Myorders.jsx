@@ -1073,383 +1073,207 @@ function MyOrders() {
 
   </div>
 
-  {filteredOrders.map(
-    (order, index) => (
-
-      <div
-        key={index}
-
-        style={{
-          display: "grid",
-
-          gridTemplateColumns:
-            window.innerWidth < 768
-              ? "1fr"
-              : "1.2fr 1fr 1.2fr 1fr 1fr 1fr",
-
-          gap:
-            window.innerWidth < 768
-              ? "14px"
-              : "18px",
-
-          padding:
-            window.innerWidth < 768
-              ? "18px"
-              : "22px",
-
-          alignItems: "center",
-
-          borderBottom:
-            "1px solid #F8FAFC",
-
-          background: "#FFFFFF",
-
-          transition:
-            "all .25s ease",
-        }}
-      >
-
-              {/* ID */}
-
-<div>
+  {filteredOrders.map((order, index) => (
 
   <div
+    key={index}
     style={{
-      display: "inline-flex",
-
-      alignItems: "center",
-
-      background: "#EEF2FF",
-
-      color: "#2563EB",
-
-      padding: "6px 12px",
-
-      borderRadius: "999px",
-
-      fontSize: "12px",
-
-      fontWeight: "800",
-
-      marginBottom: "8px",
+      background: "#FFFFFF",
+      border: "1px solid #EEF2F7",
+      borderRadius: "20px",
+      padding: "16px",
+      marginBottom: "16px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
     }}
   >
-    Commande #{order._id.slice(-8)}
-  </div>
 
-  <p
-    style={{
-      color: "#6B7280",
-
-      fontSize: "13px",
-
-      margin: 0,
-
-      fontWeight: "500",
-    }}
-  >
-    {order.items?.length} article(s)
-  </p>
-
-</div>
-
-{/* DATE */}
-
-<div>
-
-  <p
-    style={{
-      fontSize: "12px",
-
-      color: "#94A3B8",
-
-      marginBottom: "4px",
-
-      fontWeight: "600",
-    }}
-  >
-    Date
-  </p>
-
-  <h3
-    style={{
-      color: "#111827",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "14px"
-          : "16px",
-
-      fontWeight: "700",
-
-      margin: 0,
-    }}
-  >
-    {new Date(
-      order.createdAt
-    ).toLocaleDateString(
-      "fr-FR",
-      {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }
-    )}
-  </h3>
-
-</div>
-
-{/* PRODUCTS */}
-
-<div
-  style={{
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "8px",
-
-    flexWrap: "wrap",
-  }}
->
-
- {(order.items || [])
-  .slice(0, 3)
-  .map((item, i) => (
-
-    <img
-      key={i}
-      src={
-  item.image?.includes("localhost:5000")
-    ? item.image.replace(
-        "http://localhost:5000",
-        "https://konanshopping-production.up.railway.app"
-      )
-    : item.image || "/logo.jpg"
-}
-      alt="Produit"
-
-      onError={(e) => {
-        e.target.src = "/logo.jpg";
-      }}
-
-      style={{
-        width:
-          window.innerWidth < 768
-            ? "48px"
-            : "55px",
-
-        height:
-          window.innerWidth < 768
-            ? "48px"
-            : "55px",
-
-        borderRadius: "12px",
-
-        objectFit: "cover",
-
-        border:
-          "1px solid #E5E7EB",
-
-        boxShadow:
-          "0 3px 10px rgba(0,0,0,0.05)",
-      }}
-    />
-
-  ))}
-
-  {(order.items || [])
-    .length > 3 && (
+    {/* HEADER */}
 
     <div
       style={{
-        width: "48px",
-
-        height: "48px",
-
-        borderRadius: "12px",
-
-        background: "#F8FAFC",
-
-        border:
-          "1px solid #E5E7EB",
-
         display: "flex",
-
-        justifyContent:
-          "center",
-
-        alignItems:
-          "center",
-
-        fontWeight: "700",
-
-        color: "#64748B",
-
-        fontSize: "12px",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "14px",
       }}
     >
-      +{order.items.length - 3}
+
+      <div
+        style={{
+          background: "#EEF2FF",
+          color: "#2563EB",
+          padding: "8px 14px",
+          borderRadius: "999px",
+          fontSize: "12px",
+          fontWeight: "800",
+        }}
+      >
+        Commande #{order._id.slice(-8)}
+      </div>
+
+      <div
+        style={{
+          ...getStatusStyle(order.status),
+          padding: "8px 12px",
+          borderRadius: "999px",
+          fontSize: "12px",
+          fontWeight: "700",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+      >
+        {order.status === "Livrée" ? (
+          <FaCheckCircle />
+        ) : order.status === "Expédiée" ? (
+          <FaTruck />
+        ) : (
+          <FaTimesCircle />
+        )}
+
+        {order.status}
+      </div>
+
     </div>
 
-  )}
+    {/* CONTENU */}
 
-</div>
+    <div
+      style={{
+        display: "flex",
+        gap: "14px",
+        alignItems: "center",
+      }}
+    >
 
-{/* PRICE */}
+      {/* IMAGE */}
 
-<div>
+      <img
+        src={
+          order.items?.[0]?.image?.includes(
+            "localhost:5000"
+          )
+            ? order.items[0].image.replace(
+                "http://localhost:5000",
+                "https://konanshopping-production.up.railway.app"
+              )
+            : order.items?.[0]?.image ||
+              "/logo.jpg"
+        }
+        alt="Produit"
+        onError={(e) => {
+          e.target.src = "/logo.jpg";
+        }}
+        style={{
+          width: "75px",
+          height: "75px",
+          borderRadius: "14px",
+          objectFit: "cover",
+          border: "1px solid #E5E7EB",
+          flexShrink: 0,
+        }}
+      />
 
-  <p
-    style={{
-      fontSize: "12px",
+      {/* INFOS */}
 
-      color: "#94A3B8",
+      <div
+        style={{
+          flex: 1,
+        }}
+      >
 
-      marginBottom: "4px",
+        <h3
+          style={{
+            margin: 0,
+            color: "#111827",
+            fontSize: "15px",
+            fontWeight: "700",
+          }}
+        >
+          {order.items?.[0]?.name ||
+            "Produit"}
+        </h3>
 
-      fontWeight: "600",
-    }}
-  >
-    Montant
-  </p>
+        <p
+          style={{
+            marginTop: "5px",
+            marginBottom: "5px",
+            color: "#6B7280",
+            fontSize: "13px",
+          }}
+        >
+          {order.items?.length} article(s)
+        </p>
 
-  <h2
-    style={{
-      color: "#2563EB",
+        <p
+          style={{
+            margin: 0,
+            color: "#94A3B8",
+            fontSize: "12px",
+          }}
+        >
+          {new Date(
+            order.createdAt
+          ).toLocaleDateString(
+            "fr-FR",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}
+        </p>
 
-      fontWeight: "900",
+        <h2
+          style={{
+            color: "#2563EB",
+            marginTop: "8px",
+            marginBottom: 0,
+            fontWeight: "900",
+            fontSize: "24px",
+          }}
+        >
+          {order.total} FCFA
+        </h2>
 
-      fontSize:
-        window.innerWidth < 768
-          ? "20px"
-          : "24px",
+      </div>
 
-      margin: 0,
-    }}
-  >
-    {order.total} FCFA
-  </h2>
+    </div>
 
-</div>
+    {/* BOUTON */}
 
-{/* STATUS */}
-
-<div>
-
-  <div
-    style={{
-      ...getStatusStyle(
-        order.status
-      ),
-
-      padding:
-        window.innerWidth < 768
-          ? "8px 12px"
-          : "10px 16px",
-
-      borderRadius: "999px",
-
-      fontWeight: "700",
-
-      display: "inline-flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "12px"
-          : "13px",
-    }}
-  >
-
-    {order.status ===
-    "Livrée" ? (
-      <FaCheckCircle />
-    ) : order.status ===
-      "Expédiée" ? (
-      <FaTruck />
-    ) : (
-      <FaTimesCircle />
-    )}
-
-    {order.status}
+    <button
+      onClick={() =>
+        navigate(
+          `/track-order/${order._id}`
+        )
+      }
+      style={{
+        width: "100%",
+        marginTop: "16px",
+        border: "none",
+        background:
+          "linear-gradient(135deg,#2563EB,#1D4ED8)",
+        color: "#FFFFFF",
+        padding: "13px",
+        borderRadius: "14px",
+        fontWeight: "700",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px",
+        boxShadow:
+          "0 8px 20px rgba(37,99,235,0.20)",
+      }}
+    >
+      <FaEye />
+      Voir les détails
+    </button>
 
   </div>
 
-</div>
-
-             {/* BUTTON */}
-
-<div>
-
-  <button
-    onClick={() =>
-      navigate(
-        `/track-order/${order._id}`
-      )
-    }
-
-    style={{
-      border: "none",
-
-      background:
-        "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-      color: "#FFFFFF",
-
-      padding:
-        window.innerWidth < 768
-          ? "10px 14px"
-          : "12px 18px",
-
-      borderRadius: "12px",
-
-      fontWeight: "700",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "13px"
-          : "14px",
-
-      cursor: "pointer",
-
-      display: "inline-flex",
-
-      alignItems: "center",
-
-      justifyContent: "center",
-
-      gap: "8px",
-
-      minWidth:
-        window.innerWidth < 768
-          ? "100%"
-          : "150px",
-
-      boxShadow:
-        "0 8px 20px rgba(37,99,235,0.20)",
-
-      transition:
-        "all .25s ease",
-    }}
-  >
-
-    <FaEye />
-
-    Voir détails
-
-  </button>
-
-</div>
-
-</div>
-
 ))}
-
-</div>
 
       {/* FOOTER */}
 
@@ -1704,6 +1528,8 @@ function MyOrders() {
     </p>
 
   </div>
+
+</div>
 
 </div>
 
