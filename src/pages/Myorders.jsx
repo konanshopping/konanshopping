@@ -1213,43 +1213,43 @@ function MyOrders() {
   }}
 >
 
-  {(order.items || [])
-    .slice(0, 3)
-    .map(
-      (item, i) => (
+ {(order.items || [])
+  .slice(0, 3)
+  .map((item, i) => (
 
-        <img
-          key={i}
+    <img
+      key={i}
+      src={item.image || "/logo.jpg"}
+      alt="Produit"
 
-          src={item.image}
+      onError={(e) => {
+        e.target.src = "/logo.jpg";
+      }}
 
-          alt=""
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "48px"
+            : "55px",
 
-          style={{
-            width:
-              window.innerWidth < 768
-                ? "48px"
-                : "55px",
+        height:
+          window.innerWidth < 768
+            ? "48px"
+            : "55px",
 
-            height:
-              window.innerWidth < 768
-                ? "48px"
-                : "55px",
+        borderRadius: "12px",
 
-            borderRadius: "12px",
+        objectFit: "cover",
 
-            objectFit: "cover",
+        border:
+          "1px solid #E5E7EB",
 
-            border:
-              "1px solid #E5E7EB",
+        boxShadow:
+          "0 3px 10px rgba(0,0,0,0.05)",
+      }}
+    />
 
-            boxShadow:
-              "0 3px 10px rgba(0,0,0,0.05)",
-          }}
-        />
-
-      )
-    )}
+  ))}
 
   {(order.items || [])
     .length > 3 && (
