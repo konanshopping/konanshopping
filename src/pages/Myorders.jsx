@@ -180,476 +180,781 @@ function MyOrders() {
 
     };
 
-  return (
+ return (
 
-    <div
+  <div
+    style={{
+      background: "#F8FAFC",
+
+      minHeight: "100vh",
+
+      width: "100%",
+
+      maxWidth: "100vw",
+
+      overflowX: "hidden",
+
+      padding:
+        window.innerWidth < 768
+          ? "10px"
+          : "20px",
+
+      boxSizing: "border-box",
+    }}
+  >
+
+     {/* HERO */}
+
+<div
+  style={{
+    background:
+      "linear-gradient(135deg,#FFFFFF,#F8FAFC)",
+
+    border:
+      "1px solid #E5E7EB",
+
+    borderRadius: "24px",
+
+    padding:
+      window.innerWidth < 768
+        ? "18px"
+        : "30px",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    gap:
+      window.innerWidth < 768
+        ? "14px"
+        : "22px",
+
+    marginBottom: "20px",
+
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.05)",
+  }}
+>
+ 
+  {/* ICÔNE */}
+
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "65px"
+          : "85px",
+
+      height:
+        window.innerWidth < 768
+          ? "65px"
+          : "85px",
+
+      borderRadius: "18px",
+
+      background:
+        "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      flexShrink: 0,
+
+      boxShadow:
+        "0 10px 25px rgba(37,99,235,0.20)",
+    }}
+  >
+
+    <FaBoxOpen
       style={{
-        background:
-          "#F8F8FC",
+        fontSize:
+          window.innerWidth < 768
+            ? "28px"
+            : "38px",
 
-        minHeight:
-          "100vh",
+        color: "#fff",
+      }}
+    />
 
-        padding:
-          window.innerWidth <
-          768
-            ? "12px"
-            : "20px",
+  </div>
+
+  {/* TEXTE */}
+
+  <div
+    style={{
+      flex: 1,
+    }}
+  >
+
+    <h1
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "30px"
+            : "58px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+
+        lineHeight: 1.1,
       }}
     >
+      Mes commandes
+    </h1>
 
-      {/* HERO */}
+    <p
+      style={{
+        color: "#6B7280",
 
-      <div
-        style={{
-          background:
-            "#F5F3FF",
+        fontSize:
+          window.innerWidth < 768
+            ? "14px"
+            : "16px",
 
-          border:
-            "1px solid #E9E5FF",
+        marginTop: "8px",
 
-          borderRadius:
-            "30px",
+        marginBottom: 0,
 
-          padding:
-            window.innerWidth <
-            768
-              ? "20px"
-              : "35px",
+        lineHeight: "1.5",
+      }}
+    >
+      Suivez vos achats, livraisons et
+      commandes Konan Shopping en temps réel.
+    </p>
 
-          display: "flex",
+  </div>
 
-          justifyContent:
-            "space-between",
+</div>
 
-          alignItems:
-            "center",
 
-          flexWrap: "wrap",
 
-          gap: "25px",
 
-          marginBottom:
-            "25px",
-        }}
-      >
+{/* STATS */}
 
-        <div
-          style={{
-            flex: 1,
-          }}
-        >
+<div
+  style={{
+    display: "grid",
 
-          <div
-            style={{
-              display:
-                "flex",
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(2,1fr)"
+        : "repeat(4,1fr)",
 
-              alignItems:
-                "center",
+    gap:
+      window.innerWidth < 768
+        ? "10px"
+        : "16px",
 
-              gap: "18px",
+    marginTop: "10px",
+  }}
+>
 
-              marginBottom:
-                "20px",
-            }}
-          >
+           {/* TOTAL */}
 
-            <div
-              style={{
-                width: "85px",
+<div
+  style={{
+    background:
+      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
-                height:
-                  "85px",
+    border:
+      "1px solid #EEF2F7",
 
-                borderRadius:
-                  "24px",
+    borderRadius: "18px",
 
-                background:
-                  "white",
+    padding:
+      window.innerWidth < 768
+        ? "12px"
+        : "18px",
 
-                display:
-                  "flex",
+    display: "flex",
 
-                justifyContent:
-                  "center",
+    gap:
+      window.innerWidth < 768
+        ? "10px"
+        : "14px",
 
-                alignItems:
-                  "center",
+    alignItems: "center",
 
-                boxShadow:
-                  "0 8px 25px rgba(124,58,237,0.12)",
-              }}
-            >
+    minHeight:
+      window.innerWidth < 768
+        ? "85px"
+        : "105px",
 
-              <FaBoxOpen
-                style={{
-                  fontSize:
-                    "42px",
+    boxShadow:
+      "0 6px 18px rgba(0,0,0,0.04)",
 
-                  color:
-                    "#7C3AED",
-                }}
-              />
+    transition:
+      "all .3s ease",
+  }}
+>
 
-            </div>
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
 
-            <div>
+      height:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
 
-              <h1
-                style={{
-                  fontSize:
-                    window.innerWidth <
-                    768
-                      ? "38px"
-                      : "58px",
-
-                  fontWeight:
-                    "900",
-
-                  color:
-                    "#111827",
-
-                  marginBottom:
-                    "8px",
-                }}
-              >
-                Mes commandes
-              </h1>
-
-              <p
-                style={{
-                  color:
-                    "#4B5563",
-
-                  fontSize:
-                    "16px",
-                }}
-              >
-                Suivez vos achats,
-                livraisons et
-                commandes Konan
-                Shopping en temps
-                réel.
-              </p>
-
-            </div>
-
-          </div>
-
-          {/* STATS */}
-
-          <div
-            style={{
-              display:
-                "grid",
-
-              gridTemplateColumns:
-                window.innerWidth <
-                768
-                  ? "1fr 1fr"
-                  : "repeat(4,1fr)",
-
-              gap: "14px",
-            }}
-          >
-
-            {/* TOTAL */}
-
-            <div
-              style={{
-                background:
-                  "white",
-
-                borderRadius:
-                  "22px",
-
-                padding:
-                  "18px",
-
-                display:
-                  "flex",
-
-                gap: "14px",
-
-                alignItems:
-                  "center",
-              }}
-            >
-
-              <FaClipboardList
-                style={{
-                  color:
-                    "#7C3AED",
-
-                  fontSize:
-                    "28px",
-                }}
-              />
-
-              <div>
-
-                <h2
-                  style={{
-                    fontSize:
-                      "30px",
-
-                    fontWeight:
-                      "900",
-
-                    color:
-                      "#111827",
-                  }}
-                >
-                  {
-                    orders.length
-                  }
-                </h2>
-
-                <p
-                  style={{
-                    color:
-                      "#6B7280",
-
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  Total commandes
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* SHIPPED */}
-
-            <div
-              style={{
-                background:
-                  "white",
-
-                borderRadius:
-                  "22px",
-
-                padding:
-                  "18px",
-
-                display:
-                  "flex",
-
-                gap: "14px",
-
-                alignItems:
-                  "center",
-              }}
-            >
-
-              <FaTruck
-                style={{
-                  color:
-                    "#2563EB",
-
-                  fontSize:
-                    "28px",
-                }}
-              />
-
-              <div>
-
-                <h2
-                  style={{
-                    fontSize:
-                      "30px",
-
-                    fontWeight:
-                      "900",
-
-                    color:
-                      "#111827",
-                  }}
-                >
-                  {
-                    shippedOrders
-                  }
-                </h2>
-
-                <p
-                  style={{
-                    color:
-                      "#6B7280",
-
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  En livraison
-                </p>
-
-              </div>
-
-            </div>
+      borderRadius: "14px",
+
+      background:
+        "#EEF2FF",
+
+      display: "flex",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      flexShrink: 0,
+    }}
+  >
+
+    <FaClipboardList
+      style={{
+        color: "#2563EB",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "18px"
+            : "24px",
+      }}
+    />
+
+  </div>
+
+  <div>
+
+    <h2
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "24px"
+            : "30px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+
+        lineHeight: 1,
+      }}
+    >
+      {orders.length}
+    </h2>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "12px"
+            : "13px",
+
+        marginTop: "6px",
+
+        marginBottom: 0,
+
+        fontWeight: "500",
+      }}
+    >
+      Total commandes
+    </p>
+
+  </div>
+
+</div>
+
+{/* SHIPPED */}
+
+<div
+  style={{
+    background:
+      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+    border:
+      "1px solid #EEF2F7",
+
+    borderRadius: "18px",
+
+    padding:
+      window.innerWidth < 768
+        ? "12px"
+        : "18px",
+
+    display: "flex",
+
+    gap:
+      window.innerWidth < 768
+        ? "10px"
+        : "14px",
+
+    alignItems: "center",
+
+    minHeight:
+      window.innerWidth < 768
+        ? "85px"
+        : "105px",
+
+    boxShadow:
+      "0 6px 18px rgba(0,0,0,0.04)",
+
+    transition:
+      "all .3s ease",
+  }}
+>
+
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
+
+      height:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
+
+      borderRadius: "14px",
+
+      background:
+        "#DBEAFE",
+
+      display: "flex",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      flexShrink: 0,
+    }}
+  >
+
+    <FaTruck
+      style={{
+        color: "#2563EB",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "18px"
+            : "24px",
+      }}
+    />
+
+  </div>
+
+  <div>
+
+    <h2
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "24px"
+            : "30px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+
+        lineHeight: 1,
+      }}
+    >
+      {shippedOrders}
+    </h2>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "12px"
+            : "13px",
+
+        marginTop: "6px",
+
+        marginBottom: 0,
+
+        fontWeight: "500",
+      }}
+    >
+      En livraison
+    </p>
+
+  </div>
+
+</div>
 
             {/* DELIVERED */}
 
-            <div
-              style={{
-                background:
-                  "white",
+<div
+  style={{
+    background:
+      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
-                borderRadius:
-                  "22px",
+    border:
+      "1px solid #EEF2F7",
 
-                padding:
-                  "18px",
+    borderRadius: "18px",
 
-                display:
-                  "flex",
+    padding:
+      window.innerWidth < 768
+        ? "12px"
+        : "18px",
 
-                gap: "14px",
+    display: "flex",
 
-                alignItems:
-                  "center",
-              }}
-            >
+    gap:
+      window.innerWidth < 768
+        ? "10px"
+        : "14px",
 
-              <FaCheckCircle
-                style={{
-                  color:
-                    "#16A34A",
+    alignItems: "center",
 
-                  fontSize:
-                    "28px",
-                }}
-              />
+    minHeight:
+      window.innerWidth < 768
+        ? "85px"
+        : "105px",
 
-              <div>
+    boxShadow:
+      "0 6px 18px rgba(0,0,0,0.04)",
 
-                <h2
-                  style={{
-                    fontSize:
-                      "30px",
+    transition:
+      "all .3s ease",
+  }}
+>
 
-                    fontWeight:
-                      "900",
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
 
-                    color:
-                      "#111827",
-                  }}
-                >
-                  {
-                    deliveredOrders
-                  }
-                </h2>
+      height:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
 
-                <p
-                  style={{
-                    color:
-                      "#6B7280",
+      borderRadius: "14px",
 
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  Livrées
-                </p>
+      background:
+        "#DCFCE7",
 
-              </div>
+      display: "flex",
 
-            </div>
+      justifyContent:
+        "center",
 
-            {/* CANCELLED */}
+      alignItems:
+        "center",
 
-            <div
-              style={{
-                background:
-                  "white",
+      flexShrink: 0,
+    }}
+  >
 
-                borderRadius:
-                  "22px",
+    <FaCheckCircle
+      style={{
+        color: "#16A34A",
 
-                padding:
-                  "18px",
+        fontSize:
+          window.innerWidth < 768
+            ? "18px"
+            : "24px",
+      }}
+    />
 
-                display:
-                  "flex",
+  </div>
 
-                gap: "14px",
+  <div>
 
-                alignItems:
-                  "center",
-              }}
-            >
+    <h2
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "24px"
+            : "30px",
 
-              <FaTimesCircle
-                style={{
-                  color:
-                    "#DC2626",
+        fontWeight: "900",
 
-                  fontSize:
-                    "28px",
-                }}
-              />
+        color: "#111827",
 
-              <div>
+        margin: 0,
 
-                <h2
-                  style={{
-                    fontSize:
-                      "30px",
+        lineHeight: 1,
+      }}
+    >
+      {deliveredOrders}
+    </h2>
 
-                    fontWeight:
-                      "900",
+    <p
+      style={{
+        color: "#6B7280",
 
-                    color:
-                      "#111827",
-                  }}
-                >
-                  {
-                    cancelledOrders
-                  }
-                </h2>
+        fontSize:
+          window.innerWidth < 768
+            ? "12px"
+            : "13px",
 
-                <p
-                  style={{
-                    color:
-                      "#6B7280",
+        marginTop: "6px",
 
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  Annulées
-                </p>
+        marginBottom: 0,
 
-              </div>
+        fontWeight: "500",
+      }}
+    >
+      Livrées
+    </p>
 
-            </div>
+  </div>
 
-          </div>
+</div>
 
-        </div>
+           {/* CANCELLED */}
 
-      </div>
+<div
+  style={{
+    background:
+      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
-      {/* FILTERS */}
+    border:
+      "1px solid #EEF2F7",
 
-      <div
+    borderRadius: "18px",
+
+    padding:
+      window.innerWidth < 768
+        ? "12px"
+        : "18px",
+
+    display: "flex",
+
+    gap:
+      window.innerWidth < 768
+        ? "10px"
+        : "14px",
+
+    alignItems: "center",
+
+    minHeight:
+      window.innerWidth < 768
+        ? "85px"
+        : "105px",
+
+    boxShadow:
+      "0 6px 18px rgba(0,0,0,0.04)",
+
+    transition:
+      "all .3s ease",
+  }}
+>
+
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
+
+      height:
+        window.innerWidth < 768
+          ? "42px"
+          : "52px",
+
+      borderRadius: "14px",
+
+      background:
+        "#FEE2E2",
+
+      display: "flex",
+
+      justifyContent:
+        "center",
+
+      alignItems:
+        "center",
+
+      flexShrink: 0,
+    }}
+  >
+
+    <FaTimesCircle
+      style={{
+        color: "#DC2626",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "18px"
+            : "24px",
+      }}
+    />
+
+  </div>
+
+  <div>
+
+    <h2
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "24px"
+            : "30px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+
+        lineHeight: 1,
+      }}
+    >
+      {cancelledOrders}
+    </h2>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "12px"
+            : "13px",
+
+        marginTop: "6px",
+
+        marginBottom: 0,
+
+        fontWeight: "500",
+      }}
+    >
+      Annulées
+    </p>
+
+  </div>
+
+</div>
+
+</div>
+
+
+
+
+{/* FILTERS */}
+
+<div
+  style={{
+    marginBottom: "18px",
+
+    overflowX: "auto",
+
+    scrollbarWidth: "none",
+
+    msOverflowStyle: "none",
+  }}
+>
+
+  <div
+    style={{
+      display: "flex",
+
+      gap: "10px",
+
+      flexWrap: "nowrap",
+
+      minWidth: "max-content",
+
+      paddingBottom: "4px",
+    }}
+  >
+
+    {[
+      {
+        name: "Tous",
+        count: orders.length,
+      },
+
+      {
+        name: "Expédiée",
+        count: shippedOrders,
+      },
+
+      {
+        name: "Livrée",
+        count: deliveredOrders,
+      },
+
+      {
+        name: "Annulée",
+        count: cancelledOrders,
+      },
+
+    ].map((item) => (
+
+      <button
+        key={item.name}
+
+        onClick={() =>
+          setFilter(item.name)
+        }
+
         style={{
-          display: "flex",
+          border:
+            filter === item.name
+              ? "none"
+              : "1px solid #E5E7EB",
 
-          justifyContent:
-            "space-between",
+          padding:
+            window.innerWidth < 768
+              ? "10px 16px"
+              : "14px 22px",
 
-          alignItems:
-            "center",
+          borderRadius: "14px",
 
-          flexWrap: "wrap",
+          fontWeight: "700",
 
-          gap: "14px",
+          cursor: "pointer",
 
-          marginBottom:
-            "22px",
+          background:
+            filter === item.name
+              ? "#2563EB"
+              : "#FFFFFF",
+
+          color:
+            filter === item.name
+              ? "white"
+              : "#111827",
+
+          boxShadow:
+            filter === item.name
+              ? "0 8px 20px rgba(37,99,235,0.18)"
+              : "0 4px 12px rgba(0,0,0,0.04)",
+
+          whiteSpace: "nowrap",
+
+          flexShrink: 0,
+
+          transition: "all .25s ease",
         }}
       >
 
@@ -657,581 +962,745 @@ function MyOrders() {
           style={{
             display: "flex",
 
-            gap: "12px",
+            alignItems: "center",
 
-            flexWrap:
-              "wrap",
+            gap: "8px",
           }}
         >
 
-          {[
-  {
-    name: "Tous",
-    count: orders.length,
-  },
+          <span>
+            {item.name}
+          </span>
 
-  {
-    name: "Expédiée",
-    count: shippedOrders,
-  },
+          <div
+            style={{
+              background:
+                filter === item.name
+                  ? "rgba(255,255,255,0.2)"
+                  : "#EEF2F7",
 
-  {
-    name: "Livrée",
-    count: deliveredOrders,
-  },
+              color:
+                filter === item.name
+                  ? "#FFFFFF"
+                  : "#475569",
 
-  {
-    name: "Annulée",
-    count: cancelledOrders,
-  },
+              padding: "3px 8px",
 
-].map((item) => (
+              borderRadius: "20px",
 
-           <button
-  key={item.name}
+              fontSize: "12px",
 
-  onClick={() =>
-    setFilter(item.name)
-  }
+              fontWeight: "800",
+            }}
+          >
+            {item.count}
+          </div>
 
-              style={{
-                border: "none",
+        </div>
 
-                padding:
-                  "14px 22px",
+      </button>
 
-                borderRadius:
-                  "18px",
+    ))}
 
-                fontWeight:
-                  "700",
+  </div>
 
-                cursor:
-                  "pointer",
+</div>
 
-                background:
-  filter === item.name
-                    ? "#7C3AED"
-                    : "white",
+     {/* TABLE */}
 
-                color:
-                  filter === item.name
-                    ? "white"
-                    : "#111827",
-
-                boxShadow:
-                  "0 5px 18px rgba(0,0,0,0.05)",
-              }}
-            >
-              <div
+<div
   style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "8px",
+    background: "#FFFFFF",
+
+    borderRadius: "24px",
+
+    overflow: "hidden",
+
+    border: "1px solid #EEF2F7",
+
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.04)",
   }}
 >
 
-  <span>
-    {item.name}
-  </span>
+  {/* HEADER */}
 
   <div
     style={{
+      padding:
+        window.innerWidth < 768
+          ? "18px"
+          : "24px",
+
+      borderBottom:
+        "1px solid #F1F5F9",
+
       background:
-        filter === item.name
-          ? "rgba(255,255,255,0.2)"
-          : "#EEE",
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+    }}
+  >
 
-      padding: "3px 8px",
+    <h2
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "20px"
+            : "28px",
 
-      borderRadius: "20px",
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+      }}
+    >
+      Historique de vos commandes
+    </h2>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize: "13px",
+
+        marginTop: "6px",
+
+        marginBottom: 0,
+      }}
+    >
+      Consultez toutes vos commandes et leur statut en temps réel.
+    </p>
+
+  </div>
+
+  {filteredOrders.map(
+    (order, index) => (
+
+      <div
+        key={index}
+
+        style={{
+          display: "grid",
+
+          gridTemplateColumns:
+            window.innerWidth < 768
+              ? "1fr"
+              : "1.2fr 1fr 1.2fr 1fr 1fr 1fr",
+
+          gap:
+            window.innerWidth < 768
+              ? "14px"
+              : "18px",
+
+          padding:
+            window.innerWidth < 768
+              ? "18px"
+              : "22px",
+
+          alignItems: "center",
+
+          borderBottom:
+            "1px solid #F8FAFC",
+
+          background: "#FFFFFF",
+
+          transition:
+            "all .25s ease",
+        }}
+      >
+
+              {/* ID */}
+
+<div>
+
+  <div
+    style={{
+      display: "inline-flex",
+
+      alignItems: "center",
+
+      background: "#EEF2FF",
+
+      color: "#2563EB",
+
+      padding: "6px 12px",
+
+      borderRadius: "999px",
 
       fontSize: "12px",
 
       fontWeight: "800",
+
+      marginBottom: "8px",
     }}
   >
-    {item.count}
+    Commande #{order._id.slice(-8)}
+  </div>
+
+  <p
+    style={{
+      color: "#6B7280",
+
+      fontSize: "13px",
+
+      margin: 0,
+
+      fontWeight: "500",
+    }}
+  >
+    {order.items?.length} article(s)
+  </p>
+
+</div>
+
+{/* DATE */}
+
+<div>
+
+  <p
+    style={{
+      fontSize: "12px",
+
+      color: "#94A3B8",
+
+      marginBottom: "4px",
+
+      fontWeight: "600",
+    }}
+  >
+    Date
+  </p>
+
+  <h3
+    style={{
+      color: "#111827",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "14px"
+          : "16px",
+
+      fontWeight: "700",
+
+      margin: 0,
+    }}
+  >
+    {new Date(
+      order.createdAt
+    ).toLocaleDateString(
+      "fr-FR",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    )}
+  </h3>
+
+</div>
+
+{/* PRODUCTS */}
+
+<div
+  style={{
+    display: "flex",
+
+    alignItems: "center",
+
+    gap: "8px",
+
+    flexWrap: "wrap",
+  }}
+>
+
+  {(order.items || [])
+    .slice(0, 3)
+    .map(
+      (item, i) => (
+
+        <img
+          key={i}
+
+          src={item.image}
+
+          alt=""
+
+          style={{
+            width:
+              window.innerWidth < 768
+                ? "48px"
+                : "55px",
+
+            height:
+              window.innerWidth < 768
+                ? "48px"
+                : "55px",
+
+            borderRadius: "12px",
+
+            objectFit: "cover",
+
+            border:
+              "1px solid #E5E7EB",
+
+            boxShadow:
+              "0 3px 10px rgba(0,0,0,0.05)",
+          }}
+        />
+
+      )
+    )}
+
+  {(order.items || [])
+    .length > 3 && (
+
+    <div
+      style={{
+        width: "48px",
+
+        height: "48px",
+
+        borderRadius: "12px",
+
+        background: "#F8FAFC",
+
+        border:
+          "1px solid #E5E7EB",
+
+        display: "flex",
+
+        justifyContent:
+          "center",
+
+        alignItems:
+          "center",
+
+        fontWeight: "700",
+
+        color: "#64748B",
+
+        fontSize: "12px",
+      }}
+    >
+      +{order.items.length - 3}
+    </div>
+
+  )}
+
+</div>
+
+{/* PRICE */}
+
+<div>
+
+  <p
+    style={{
+      fontSize: "12px",
+
+      color: "#94A3B8",
+
+      marginBottom: "4px",
+
+      fontWeight: "600",
+    }}
+  >
+    Montant
+  </p>
+
+  <h2
+    style={{
+      color: "#2563EB",
+
+      fontWeight: "900",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "20px"
+          : "24px",
+
+      margin: 0,
+    }}
+  >
+    {order.total} FCFA
+  </h2>
+
+</div>
+
+{/* STATUS */}
+
+<div>
+
+  <div
+    style={{
+      ...getStatusStyle(
+        order.status
+      ),
+
+      padding:
+        window.innerWidth < 768
+          ? "8px 12px"
+          : "10px 16px",
+
+      borderRadius: "999px",
+
+      fontWeight: "700",
+
+      display: "inline-flex",
+
+      alignItems: "center",
+
+      gap: "8px",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "12px"
+          : "13px",
+    }}
+  >
+
+    {order.status ===
+    "Livrée" ? (
+      <FaCheckCircle />
+    ) : order.status ===
+      "Expédiée" ? (
+      <FaTruck />
+    ) : (
+      <FaTimesCircle />
+    )}
+
+    {order.status}
+
   </div>
 
 </div>
-            </button>
 
-          ))}
+             {/* BUTTON */}
 
-        </div>
+<div>
 
-      </div>
+  <button
+    onClick={() =>
+      navigate(
+        `/track-order/${order._id}`
+      )
+    }
 
-      {/* TABLE */}
+    style={{
+      border: "none",
 
-      <div
-        style={{
-          background:
-            "white",
+      background:
+        "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
-          borderRadius:
-            "28px",
-
-          overflow:
-            "hidden",
-
-          boxShadow:
-            "0 10px 30px rgba(0,0,0,0.05)",
-        }}
-      >
+      color: "#FFFFFF",
 
-        <div
-          style={{
-            padding:
-              "24px",
+      padding:
+        window.innerWidth < 768
+          ? "10px 14px"
+          : "12px 18px",
 
-            borderBottom:
-              "1px solid #F1F1F1",
-          }}
-        >
-
-          <h2
-            style={{
-              fontSize:
-                "28px",
+      borderRadius: "12px",
 
-              fontWeight:
-                "900",
+      fontWeight: "700",
 
-              color:
-                "#111827",
-            }}
-          >
-            Historique de vos commandes
-          </h2>
-
-        </div>
+      fontSize:
+        window.innerWidth < 768
+          ? "13px"
+          : "14px",
 
-        {filteredOrders.map(
-          (order, index) => (
-
-            <div
-              key={index}
-
-              style={{
-                display:
-                  "grid",
-
-                gridTemplateColumns:
-                  window.innerWidth <
-                  768
-                    ? "1fr"
-                    : "1.2fr 1fr 1.2fr 1fr 1fr 1fr",
+      cursor: "pointer",
 
-                gap: "18px",
-
-                padding:
-                  "22px",
-
-                alignItems:
-                  "center",
+      display: "inline-flex",
 
-                borderBottom:
-                  "1px solid #F5F5F5",
-              }}
-            >
-
-              {/* ID */}
+      alignItems: "center",
 
-              <div>
-
-                <h3
-                  style={{
-                    fontWeight:
-                      "900",
+      justifyContent: "center",
 
-                    color:
-                      "#111827",
+      gap: "8px",
 
-                    marginBottom:
-                      "6px",
-                  }}
-                >
-                  #
-                  {order._id.slice(
-                    -8
-                  )}
-                </h3>
-
-                <p
-                  style={{
-                    color:
-                      "#6B7280",
-
-                    fontSize:
-                      "13px",
-                  }}
-                >
-                  {
-                    order.items
-                      ?.length
-                  }
-                  {" "}
-                  articles
-                </p>
-
-              </div>
-
-              {/* DATE */}
-
-              <div>
-
-                <h3
-                  style={{
-                    color:
-                      "#111827",
-                  }}
-                >
-                  {new Date(
-                    order.createdAt
-                  ).toLocaleDateString()}
-                </h3>
-
-              </div>
+      minWidth:
+        window.innerWidth < 768
+          ? "100%"
+          : "150px",
 
-              {/* PRODUCTS */}
-
-              <div
-                style={{
-                  display:
-                    "flex",
-
-                  gap: "8px",
-                }}
-              >
-
-                {(order.items || [])
-                  .slice(0, 3)
-                  .map(
-                    (
-                      item,
-                      i
-                    ) => (
-
-                      <img
-                        key={i}
+      boxShadow:
+        "0 8px 20px rgba(37,99,235,0.20)",
 
-                        src={
-                          item.image
-                        }
-
-                        alt=""
-
-                        style={{
-                          width:
-                            "55px",
-
-                          height:
-                            "55px",
-
-                          borderRadius:
-                            "14px",
-
-                          objectFit:
-                            "cover",
-                        }}
-                      />
+      transition:
+        "all .25s ease",
+    }}
+  >
 
-                    )
-                  )}
+    <FaEye />
 
-              </div>
+    Voir détails
 
-              {/* PRICE */}
+  </button>
 
-              <div>
+</div>
 
-                <h2
-                  style={{
-                    color:
-                      "#7C3AED",
+</div>
 
-                    fontWeight:
-                      "900",
-                  }}
-                >
-                  {
-                    order.total
-                  }
-                  {" "}
-                  FCFA
-                </h2>
+))}
 
-              </div>
-
-              {/* STATUS */}
-
-              <div>
-
-                <div
-                  style={{
-                    ...getStatusStyle(
-                      order.status
-                    ),
-
-                    padding:
-                      "10px 16px",
-
-                    borderRadius:
-                      "30px",
-
-                    fontWeight:
-                      "700",
-
-                    display:
-                      "inline-flex",
-
-                    alignItems:
-                      "center",
-
-                    gap: "8px",
-                  }}
-                >
-
-                  {order.status ===
-                  "Livrée" ? (
-                    <FaCheckCircle />
-                  ) : order.status ===
-                    "Expédiée" ? (
-                    <FaTruck />
-                  ) : (
-                    <FaTimesCircle />
-                  )}
-
-                  {
-                    order.status
-                  }
-
-                </div>
-
-              </div>
-
-              {/* BUTTON */}
-
-              <div>
-
-                <button
-                  onClick={() =>
-                    navigate(
-                      `/track-order/${order._id}`
-                    )
-                  }
-
-                  style={{
-                    border:
-                      "2px solid #E9E5FF",
-
-                    background:
-                      "white",
-
-                    color:
-                      "#7C3AED",
-
-                    padding:
-                      "12px 18px",
-
-                    borderRadius:
-                      "14px",
-
-                    fontWeight:
-                      "700",
-
-                    cursor:
-                      "pointer",
-
-                    display:
-                      "flex",
-
-                    alignItems:
-                      "center",
-
-                    gap: "8px",
-                  }}
-                >
-
-                  <FaEye />
-
-                  Voir détails
-
-                </button>
-
-              </div>
-
-            </div>
-
-          )
-        )}
-
-      </div>
+</div>
 
       {/* FOOTER */}
 
-      <div
-        style={{
-          marginTop: "30px",
+<div
+  style={{
+    marginTop: "24px",
 
-          background:
-            "white",
+    background: "#FFFFFF",
 
-          borderRadius:
-            "24px",
+    border: "1px solid #EEF2F7",
 
-          padding: "24px",
+    borderRadius: "20px",
 
-          display: "grid",
+    padding:
+      window.innerWidth < 768
+        ? "16px"
+        : "24px",
 
-          gridTemplateColumns:
-            window.innerWidth <
-            768
-              ? "1fr 1fr"
-              : "repeat(4,1fr)",
+    display: "grid",
 
-          gap: "20px",
-        }}
-      >
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(2,1fr)"
+        : "repeat(4,1fr)",
 
-        <div>
+    gap:
+      window.innerWidth < 768
+        ? "14px"
+        : "20px",
 
-          <FaShieldAlt
-            style={{
-              color:
-                "#7C3AED",
+    boxShadow:
+      "0 8px 25px rgba(0,0,0,0.04)",
+  }}
+>
 
-              fontSize:
-                "28px",
+  {/* PAIEMENT */}
 
-              marginBottom:
-                "12px",
-            }}
-          />
+  <div
+    style={{
+      textAlign: "center",
+    }}
+  >
 
-          <h3>
-            Paiement sécurisé
-          </h3>
+    <FaShieldAlt
+      style={{
+        color: "#2563EB",
 
-          <p
-            style={{
-              color:
-                "#6B7280",
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
 
-              fontSize:
-                "14px",
-            }}
-          >
-            Transactions protégées
-          </p>
+        marginBottom: "8px",
+      }}
+    />
 
-        </div>
+    <h3
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "13px"
+            : "15px",
 
-        <div>
+        fontWeight: "700",
 
-          <FaTruck
-            style={{
-              color:
-                "#2563EB",
+        color: "#111827",
 
-              fontSize:
-                "28px",
+        marginBottom: "4px",
+      }}
+    >
+      Paiement sécurisé
+    </h3>
 
-              marginBottom:
-                "12px",
-            }}
-          />
+    <p
+      style={{
+        color: "#6B7280",
 
-          <h3>
-            Livraison rapide
-          </h3>
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "13px",
 
-          <p
-            style={{
-              color:
-                "#6B7280",
+        margin: 0,
+      }}
+    >
+      Transactions protégées
+    </p>
 
-              fontSize:
-                "14px",
-            }}
-          >
-            Partout au Cameroun
-          </p>
+  </div>
 
-        </div>
+  {/* LIVRAISON */}
 
-        <div>
+  <div
+    style={{
+      textAlign: "center",
+    }}
+  >
 
-          <FaHeadset
-            style={{
-              color:
-                "#7C3AED",
+    <FaTruck
+      style={{
+        color: "#2563EB",
 
-              fontSize:
-                "28px",
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
 
-              marginBottom:
-                "12px",
-            }}
-          />
+        marginBottom: "8px",
+      }}
+    />
 
-          <h3>
-            Support 24/7
-          </h3>
+    <h3
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "13px"
+            : "15px",
 
-          <p
-            style={{
-              color:
-                "#6B7280",
+        fontWeight: "700",
 
-              fontSize:
-                "14px",
-            }}
-          >
-            Assistance premium
-          </p>
+        color: "#111827",
 
-        </div>
+        marginBottom: "4px",
+      }}
+    >
+      Livraison rapide
+    </h3>
 
-        <div>
+    <p
+      style={{
+        color: "#6B7280",
 
-          <FaCheckCircle
-            style={{
-              color:
-                "#16A34A",
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "13px",
 
-              fontSize:
-                "28px",
+        margin: 0,
+      }}
+    >
+      Partout au Cameroun
+    </p>
 
-              marginBottom:
-                "12px",
-            }}
-          />
+  </div>
 
-          <h3>
-            Satisfaction garantie
-          </h3>
+  {/* SUPPORT */}
 
-          <p
-            style={{
-              color:
-                "#6B7280",
+  <div
+    style={{
+      textAlign: "center",
+    }}
+  >
 
-              fontSize:
-                "14px",
-            }}
-          >
-            Qualité assurée
-          </p>
+    <FaHeadset
+      style={{
+        color: "#2563EB",
 
-        </div>
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
 
-      </div>
+        marginBottom: "8px",
+      }}
+    />
 
-    </div>
+    <h3
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "13px"
+            : "15px",
 
+        fontWeight: "700",
+
+        color: "#111827",
+
+        marginBottom: "4px",
+      }}
+    >
+      Support 24/7
+    </h3>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "13px",
+
+        margin: 0,
+      }}
+    >
+      Assistance premium
+    </p>
+
+  </div>
+
+  {/* GARANTIE */}
+
+  <div
+    style={{
+      textAlign: "center",
+    }}
+  >
+
+    <FaCheckCircle
+      style={{
+        color: "#16A34A",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
+
+        marginBottom: "8px",
+      }}
+    />
+
+    <h3
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "13px"
+            : "15px",
+
+        fontWeight: "700",
+
+        color: "#111827",
+
+        marginBottom: "4px",
+      }}
+    >
+      Satisfaction garantie
+    </h3>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "13px",
+
+        margin: 0,
+      }}
+    >
+      Qualité assurée
+    </p>
+
+  </div>
+
+</div>
+
+</div>
   );
 
 }
