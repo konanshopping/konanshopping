@@ -1,5 +1,15 @@
 import { useState } from "react";
 
+import { FaGift } from "react-icons/fa";
+
+import {
+  FaTag,
+  FaBullseye,
+  FaClock,
+  FaCopy,
+  FaCheck,
+} from "react-icons/fa";
+
 function Coupons() {
 
   const [copied, setCopied] =
@@ -153,300 +163,526 @@ function Coupons() {
       }}
     >
 
-      {/* HEADER */}
+     {/* HEADER PREMIUM */}
+
+<div
+  style={{
+    background:
+      "linear-gradient(135deg,#FFFFFF,#F8FAFC)",
+
+    border: "1px solid #E5E7EB",
+
+    borderRadius: "26px",
+
+    padding:
+      window.innerWidth < 768
+        ? "20px"
+        : "30px",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    gap:
+      window.innerWidth < 768
+        ? "16px"
+        : "24px",
+
+    marginBottom: "24px",
+
+    boxShadow:
+      "0 10px 30px rgba(0,0,0,0.05)",
+  }}
+>
+
+  {/* ICON */}
+
+  <div
+    style={{
+      width:
+        window.innerWidth < 768
+          ? "72px"
+          : "90px",
+
+      height:
+        window.innerWidth < 768
+          ? "72px"
+          : "90px",
+
+      borderRadius: "22px",
+
+      background:
+        "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      flexShrink: 0,
+
+      boxShadow:
+        "0 12px 28px rgba(37,99,235,0.25)",
+    }}
+  >
+    <FaGift
+      style={{
+        color: "#FFFFFF",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "32px"
+            : "40px",
+      }}
+    />
+  </div>
+
+  {/* CONTENT */}
+
+  <div
+    style={{
+      flex: 1,
+    }}
+  >
+
+    <div
+      style={{
+        display: "inline-flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        background: "#EEF2FF",
+
+        color: "#2563EB",
+
+        padding: "6px 12px",
+
+        borderRadius: "999px",
+
+        fontSize: "12px",
+
+        fontWeight: "800",
+
+        marginBottom: "10px",
+      }}
+    >
+      OFFRES EXCLUSIVES
+    </div>
+
+    <h1
+      style={{
+        fontSize:
+          window.innerWidth < 768
+            ? "30px"
+            : "48px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+
+        margin: 0,
+
+        lineHeight: 1.1,
+      }}
+    >
+      Coupons Konan
+    </h1>
+
+    <p
+      style={{
+        color: "#6B7280",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "14px"
+            : "16px",
+
+        marginTop: "8px",
+
+        marginBottom: 0,
+
+        lineHeight: "1.6",
+      }}
+    >
+      Profitez de réductions exclusives,
+      livraisons gratuites et avantages
+      réservés aux clients Konan Shopping.
+    </p>
+
+  </div>
+
+</div>
+
+{/* COUPONS */}
+
+<div
+  style={{
+    display: "grid",
+
+    gap: "18px",
+
+    marginTop: "10px",
+  }}
+>
+
+  {coupons.map(
+    (coupon, index) => (
 
       <div
+        key={index}
+
         style={{
-          marginBottom: "14px",
+          background:
+            coupon.color,
+
+          borderRadius: "26px",
+
+          padding:
+            window.innerWidth < 768
+              ? "20px"
+              : "26px",
+
+          color: "#FFFFFF",
+
+          position: "relative",
+
+          overflow: "hidden",
+
+          border:
+            "1px solid rgba(255,255,255,0.15)",
+
+          boxShadow:
+            "0 12px 30px rgba(0,0,0,0.12)",
+
+          minHeight:
+            window.innerWidth < 768
+              ? "210px"
+              : "240px",
         }}
       >
 
-        <h1
+        {/* DECORATION */}
+
+        <div
           style={{
-            color: "#111827",
+            position: "absolute",
 
-            marginBottom: "2px",
+            top: "-50px",
 
-            fontSize: "21px",
+            right: "-50px",
+
+            width: "150px",
+
+            height: "150px",
+
+            borderRadius: "50%",
+
+            background:
+              "rgba(255,255,255,0.10)",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+
+            bottom: "-40px",
+
+            left: "-40px",
+
+            width: "120px",
+
+            height: "120px",
+
+            borderRadius: "50%",
+
+            background:
+              "rgba(255,255,255,0.08)",
+          }}
+        />
+
+        {/* BADGE */}
+
+        <div
+          style={{
+            position: "absolute",
+
+            top: "16px",
+
+            right: "16px",
+
+            background:
+              "rgba(255,255,255,0.15)",
+
+            backdropFilter:
+              "blur(10px)",
+
+            padding: "8px 12px",
+
+            borderRadius: "999px",
+
+            fontSize: "11px",
 
             fontWeight: "800",
           }}
         >
-          🎁 Coupons Konan
-        </h1>
+          KONAN VIP
+        </div>
 
-        <p
+        {/* CONTENT */}
+
+        <div
           style={{
-            color: "#6b7280",
+            position: "relative",
 
-            fontSize: "12px",
-
-            margin: 0,
+            zIndex: 2,
           }}
         >
-          Réductions exclusives
-          disponibles
-        </p>
 
-      </div>
+          {/* REDUCTION */}
 
-      {/* COUPONS */}
+          <div
+            style={{
+              display: "flex",
 
-      <div
-        style={{
-          display: "grid",
+              alignItems: "center",
 
-          gap: "12px",
-        }}
-      >
+              gap: "10px",
 
-        {coupons.map(
-          (coupon, index) => (
+              marginBottom: "10px",
+            }}
+          >
 
-            <div
-              key={index}
-
+            <FaTag
               style={{
-                background:
-                  coupon.color,
+                fontSize:
+                  window.innerWidth < 768
+                    ? "20px"
+                    : "24px",
+              }}
+            />
 
-                borderRadius: "18px",
+            <h2
+              style={{
+                margin: 0,
 
-                padding: "14px",
+                fontSize:
+                  window.innerWidth < 768
+                    ? "30px"
+                    : "38px",
 
-                color: "white",
+                fontWeight: "900",
 
-                position: "relative",
-
-                overflow: "hidden",
-
-                boxShadow:
-                  "0 4px 14px rgba(0,0,0,0.08)",
+                lineHeight: 1,
               }}
             >
+              {coupon.discount}
+            </h2>
 
-              {/* PREMIUM CIRCLES */}
+          </div>
 
-              <div
+          {/* DESCRIPTION */}
+
+          <p
+            style={{
+              opacity: 0.95,
+
+              marginBottom: "12px",
+
+              fontSize:
+                window.innerWidth < 768
+                  ? "13px"
+                  : "15px",
+
+              lineHeight: "1.5",
+            }}
+          >
+            {coupon.description}
+          </p>
+
+          {/* CONDITION */}
+
+          <div
+            style={{
+              display: "flex",
+
+              alignItems: "center",
+
+              gap: "8px",
+
+              marginBottom: "8px",
+
+              fontSize: "13px",
+
+              fontWeight: "600",
+            }}
+          >
+
+            <FaBullseye />
+
+            {coupon.condition}
+
+          </div>
+
+          {/* EXPIRATION */}
+
+          <div
+            style={{
+              display: "flex",
+
+              alignItems: "center",
+
+              gap: "8px",
+
+              marginBottom: "14px",
+
+              fontSize: "12px",
+
+              opacity: 0.9,
+            }}
+          >
+
+            <FaClock />
+
+            Expire le {coupon.expire}
+
+          </div>
+
+          {/* CODE */}
+
+          <div
+            style={{
+              display: "flex",
+
+              justifyContent:
+                "space-between",
+
+              alignItems: "center",
+
+              gap: "10px",
+
+              background:
+                "rgba(255,255,255,0.15)",
+
+              backdropFilter:
+                "blur(12px)",
+
+              padding: "14px",
+
+              borderRadius: "16px",
+            }}
+          >
+
+            <div>
+
+              <p
                 style={{
-                  position: "absolute",
+                  margin: 0,
 
-                  top: "-30px",
+                  fontSize: "11px",
 
-                  right: "-30px",
-
-                  width: "70px",
-
-                  height: "70px",
-
-                  borderRadius: "50%",
-
-                  background:
-                    "rgba(255,255,255,0.08)",
-                }}
-              />
-
-              <div
-                style={{
-                  position: "absolute",
-
-                  bottom: "-20px",
-
-                  left: "-20px",
-
-                  width: "55px",
-
-                  height: "55px",
-
-                  borderRadius: "50%",
-
-                  background:
-                    "rgba(255,255,255,0.06)",
-                }}
-              />
-
-              {/* CONTENT */}
-
-              <div
-                style={{
-                  position: "relative",
-
-                  zIndex: 2,
+                  opacity: 0.8,
                 }}
               >
+                CODE PROMO
+              </p>
 
-                {/* DISCOUNT */}
+              <h3
+                style={{
+                  margin: 0,
 
-                <h2
-                  style={{
-                    margin: 0,
+                  marginTop: "4px",
 
-                    fontSize: "20px",
+                  fontSize:
+                    window.innerWidth < 768
+                      ? "20px"
+                      : "24px",
 
-                    fontWeight: "900",
+                  fontWeight: "900",
 
-                    marginBottom: "5px",
-                  }}
-                >
-                  {coupon.discount}
-                </h2>
-
-                {/* DESCRIPTION */}
-
-                <p
-                  style={{
-                    opacity: 0.95,
-
-                    marginBottom: "8px",
-
-                    fontSize: "12px",
-
-                    lineHeight: "1.3",
-                  }}
-                >
-                  {coupon.description}
-                </p>
-
-                {/* CONDITION */}
-
-                <p
-                  style={{
-                    margin: 0,
-
-                    fontSize: "11px",
-
-                    opacity: 0.9,
-
-                    marginBottom: "3px",
-                  }}
-                >
-                  🎯 {coupon.condition}
-                </p>
-
-                {/* EXPIRE */}
-
-                <p
-                  style={{
-                    margin: 0,
-
-                    fontSize: "10px",
-
-                    opacity: 0.85,
-
-                    marginBottom: "10px",
-                  }}
-                >
-                  ⏳ Expire le :
-                  {" "}
-                  {coupon.expire}
-                </p>
-
-                {/* CODE BOX */}
-
-                <div
-                  style={{
-                    display: "flex",
-
-                    justifyContent:
-                      "space-between",
-
-                    alignItems: "center",
-
-                    gap: "8px",
-
-                    background:
-                      "rgba(255,255,255,0.14)",
-
-                    padding: "8px 10px",
-
-                    borderRadius: "12px",
-
-                    backdropFilter:
-                      "blur(10px)",
-                  }}
-                >
-
-                  <div>
-
-                    <p
-                      style={{
-                        margin: 0,
-
-                        fontSize: "9px",
-
-                        opacity: 0.8,
-                      }}
-                    >
-                      CODE
-                    </p>
-
-                    <h3
-                      style={{
-                        margin: 0,
-
-                        marginTop: "2px",
-
-                        letterSpacing: "1px",
-
-                        fontSize: "14px",
-
-                        fontWeight: "800",
-                      }}
-                    >
-                      {coupon.code}
-                    </h3>
-
-                  </div>
-
-                  <button
-
-                    onClick={() =>
-                      copyCoupon(
-                        coupon.code
-                      )
-                    }
-
-                    style={{
-                      border: "none",
-
-                      background: "white",
-
-                      color: "#111827",
-
-                      padding:
-                        "8px 12px",
-
-                      borderRadius: "10px",
-
-                      fontWeight: "800",
-
-                      fontSize: "11px",
-
-                      cursor: "pointer",
-
-                      minWidth: "72px",
-                    }}
-                  >
-
-                    {copied ===
-                    coupon.code
-                      ? "Copié ✅"
-                      : "Copier"}
-
-                  </button>
-
-                </div>
-
-              </div>
+                  letterSpacing: "1px",
+                }}
+              >
+                {coupon.code}
+              </h3>
 
             </div>
 
-          )
-        )}
+            <button
+              onClick={() =>
+                copyCoupon(
+                  coupon.code
+                )
+              }
+
+              style={{
+                border: "none",
+
+                background: "#FFFFFF",
+
+                color: "#111827",
+
+                padding:
+                  window.innerWidth < 768
+                    ? "10px 14px"
+                    : "12px 18px",
+
+                borderRadius: "12px",
+
+                fontWeight: "800",
+
+                fontSize: "12px",
+
+                cursor: "pointer",
+
+                display: "flex",
+
+                alignItems: "center",
+
+                gap: "6px",
+
+                minWidth: "95px",
+
+                justifyContent:
+                  "center",
+
+                boxShadow:
+                  "0 4px 12px rgba(0,0,0,0.12)",
+              }}
+            >
+
+              {copied ===
+              coupon.code ? (
+                <>
+                  <FaCheck />
+                  Copié
+                </>
+              ) : (
+                <>
+                  <FaCopy />
+                  Copier
+                </>
+              )}
+
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
-    </div>
+    )
+  )}
+
+</div>
+
+      </div>
+
+   
 
   );
 
