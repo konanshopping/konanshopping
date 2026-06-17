@@ -1219,7 +1219,14 @@ function MyOrders() {
 
     <img
       key={i}
-      src={item.image || "/logo.jpg"}
+      src={
+  item.image?.includes("localhost:5000")
+    ? item.image.replace(
+        "http://localhost:5000",
+        "https://konanshopping-production.up.railway.app"
+      )
+    : item.image || "/logo.jpg"
+}
       alt="Produit"
 
       onError={(e) => {
