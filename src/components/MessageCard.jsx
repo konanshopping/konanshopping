@@ -145,16 +145,15 @@ function MessageCard({
 
 </div>
 
-      </div>
+</div>
+
+      
 
       {/* CARTE MESSAGE */}
 
       <div
-        onClick={() =>
-          markAsRead(
-            msg._id
-          )
-        }
+     onClick={() => user?._id && markAsRead(msg._id)}
+        
         style={{
   position: "relative",
 
@@ -173,8 +172,7 @@ function MessageCard({
   background: "#fff",
 
   border:
-    (msg.readBy || [])
-    .includes(user._id)
+    (msg.readBy || []).includes(user?._id)
       ? "1px solid #e5e7eb"
       : "2px solid #2563eb",
 
@@ -302,10 +300,7 @@ function MessageCard({
 
               </div>
 
-              {(msg.readBy || [])
-              .includes(
-                user._id
-              ) ? (
+              {(msg.readBy || []).includes(user?._id)? (
 
                 <div
                   style={{
