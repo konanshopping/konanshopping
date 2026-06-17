@@ -186,6 +186,12 @@ function MessageCard({
 
 >
 
+    <div
+  style={{
+    flex: 1,
+  }}
+>
+
 <div
   style={{
     display: "flex",
@@ -371,8 +377,7 @@ function MessageCard({
 
         </div>
 
-       
-
+    </div>
   );
 
 }
