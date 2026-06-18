@@ -1384,9 +1384,7 @@ return (
         item?.image ||
         "https://via.placeholder.com/80"
       }
-
       alt="product"
-
       style={{
         width:
           window.innerWidth < 768
@@ -1418,16 +1416,11 @@ return (
       }}
     >
 
-      {/* TITRE */}
-
       <div
         style={{
           display: "flex",
-
           alignItems: "center",
-
           gap: "6px",
-
           marginBottom: "6px",
         }}
       >
@@ -1442,14 +1435,11 @@ return (
         <p
           style={{
             margin: 0,
-
             color: "#64748B",
-
             fontSize: "11px",
-
             fontWeight: "800",
-
-            textTransform: "uppercase",
+            textTransform:
+              "uppercase",
           }}
         >
           Produit {index + 1}
@@ -1457,66 +1447,41 @@ return (
 
       </div>
 
-      {/* NOM */}
-
       <h3
         style={{
           margin: 0,
-
           color: "#0F172A",
-
           fontSize:
             window.innerWidth < 768
               ? "14px"
               : "16px",
-
           fontWeight: "900",
-
-          lineHeight: "20px",
-
-          overflow: "hidden",
-
-          textOverflow: "ellipsis",
-
-          display: "-webkit-box",
-
-          WebkitLineClamp: 2,
-
-          WebkitBoxOrient: "vertical",
         }}
       >
         {item?.name}
       </h3>
 
-      {/* QUANTITE */}
-
       <div
         style={{
           display: "inline-flex",
-
           alignItems: "center",
-
           gap: "6px",
-
           marginTop: "10px",
-
-          background: "#EEF2FF",
-
+          background:
+            "#EEF2FF",
           color: "#2563EB",
-
           padding: "6px 10px",
-
           borderRadius: "999px",
-
           fontSize: "11px",
-
           fontWeight: "800",
         }}
       >
 
         <FaCube />
 
-        Quantité : x{item?.quantity}
+        Quantité :
+        {" "}
+        x{item?.quantity}
 
       </div>
 
