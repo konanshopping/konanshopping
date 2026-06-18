@@ -1621,7 +1621,7 @@ return (
 
 </div>
 
-
+</div>
 
   {/* DESTINATION */}
 
@@ -2988,7 +2988,7 @@ return (
 </div>
 
 </div>
-</div>
+
 
 );
 
