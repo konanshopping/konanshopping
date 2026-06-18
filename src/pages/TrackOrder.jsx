@@ -43,6 +43,7 @@ import {
 } from "react-icons/fa";
 
 import {
+  FaMapMarkerAlt,
   FaMapPin,
 } from "react-icons/fa";
 
