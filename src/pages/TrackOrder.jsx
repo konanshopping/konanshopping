@@ -1153,17 +1153,6 @@ height: "auto",
     }}
   />
 
-  <span
-    style={{
-      whiteSpace: "nowrap",
-
-      overflow: "hidden",
-
-      textOverflow: "ellipsis",
-    }}
-  >
-    {liveStatus}
-  </span>
 
 </div>
 
