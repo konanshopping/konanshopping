@@ -14,6 +14,10 @@ import {
 } from "react-leaflet";
 
 import {
+  FaMoneyBillWave
+} from "react-icons/fa";
+
+import {
   FaTruck,
   FaMapMarkedAlt,
   FaMotorcycle,
@@ -1464,6 +1468,43 @@ height: "auto",
       >
         {item?.name}
       </h3>
+
+{/* PRIX */}
+
+<div
+  style={{
+    display: "flex",
+
+    alignItems: "center",
+
+    gap: "6px",
+
+    marginTop: "8px",
+
+    color: "#16A34A",
+
+    fontSize:
+      window.innerWidth < 768
+        ? "13px"
+        : "14px",
+
+    fontWeight: "900",
+  }}
+>
+
+  <FaMoneyBillWave
+    style={{
+      color: "#16A34A",
+      fontSize: "12px",
+    }}
+  />
+
+  <span>
+    {item?.price?.toLocaleString?.() ||
+      0} FCFA
+  </span>
+
+</div>
 
       <div
         style={{
