@@ -1422,7 +1422,6 @@ return (
 
   </div>
 
-</div>
 
       {/* PHONE */}
 
@@ -1619,6 +1618,8 @@ return (
     GPS LIVE
 
   </div>
+
+</div>
 
 </div>
 
