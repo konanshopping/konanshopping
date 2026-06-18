@@ -504,6 +504,8 @@ return (
 
       overflowX: "hidden",
 
+      overflowY: "auto",
+
       boxSizing: "border-box",
 
       fontFamily:
@@ -1055,10 +1057,12 @@ return (
 
       width: "100%",
 
-      height:
-        window.innerWidth < 768
-          ? "75vh"
-          : "100vh",
+     minHeight:
+  window.innerWidth < 768
+    ? "75vh"
+    : "100vh",
+
+height: "auto",
 
       border:
         "1px solid #E5E7EB",
@@ -1253,8 +1257,8 @@ return (
 
       fontSize:
         window.innerWidth < 768
-          ? "15px"
-          : "17px",
+          ? "12px"
+          : "16px",
 
       fontWeight: "900",
 
@@ -1357,12 +1361,12 @@ return (
 
       background: "#FFFFFF",
 
-      borderRadius: "18px",
+      borderRadius: "14px",
 
       padding:
         window.innerWidth < 768
-          ? "14px"
-          : "16px",
+          ? "12px"
+          : "14px",
 
       border: "1px solid #E2E8F0",
 
@@ -1370,7 +1374,7 @@ return (
 
       alignItems: "center",
 
-      gap: "12px",
+      gap: "10px",
 
       boxShadow:
         "0 4px 12px rgba(0,0,0,0.04)",
@@ -1388,13 +1392,13 @@ return (
       style={{
         width:
           window.innerWidth < 768
-            ? "65px"
-            : "75px",
+            ? "58px"
+            : "72px",
 
         height:
           window.innerWidth < 768
-            ? "65px"
-            : "75px",
+            ? "58px"
+            : "72px",
 
         borderRadius: "14px",
 
@@ -1453,8 +1457,8 @@ return (
           color: "#0F172A",
           fontSize:
             window.innerWidth < 768
-              ? "14px"
-              : "16px",
+              ? "13px"
+              : "15px",
           fontWeight: "900",
         }}
       >
@@ -1533,7 +1537,7 @@ return (
 
     minHeight:
       window.innerWidth < 768
-        ? "100px"
+        ? "85px"
         : "120px",
   }}
 >
@@ -1869,8 +1873,8 @@ return (
 
     minHeight:
       window.innerWidth < 768
-        ? "65vh"
-        : "100%",
+        ? "50vh"
+        : "70vh",
 
     zIndex: 2,
 
