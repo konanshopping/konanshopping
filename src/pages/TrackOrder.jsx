@@ -1405,9 +1405,17 @@ height: "auto",
 
     <img
       src={
-        item?.image ||
-        "https://via.placeholder.com/80"
-      }
+  item?.image
+    ? item.image.includes("localhost:5000")
+      ? item.image.replace(
+          "http://localhost:5000",
+          "https://konanshopping-production.up.railway.app"
+        )
+      : item.image.startsWith("/uploads")
+      ? `https://konanshopping-production.up.railway.app${item.image}`
+      : item.image
+    : "/logo.jpg"
+}
       alt="product"
       style={{
         width:
