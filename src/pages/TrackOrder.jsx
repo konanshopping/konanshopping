@@ -1078,8 +1078,7 @@ height: "auto",
         "all .3s ease",
     }}
   >
-
-    {/* LIVE BADGE */}
+{/* LIVE BADGE */}
 
 <div
   style={{
@@ -1087,13 +1086,13 @@ height: "auto",
 
     top:
       window.innerWidth < 768
-        ? "14px"
-        : "24px",
+        ? "10px"
+        : "20px",
 
     right:
       window.innerWidth < 768
-        ? "14px"
-        : "24px",
+        ? "10px"
+        : "20px",
 
     zIndex: 999,
 
@@ -1102,8 +1101,8 @@ height: "auto",
 
     padding:
       window.innerWidth < 768
-        ? "8px 12px"
-        : "12px 18px",
+        ? "6px 10px"
+        : "10px 14px",
 
     borderRadius: "999px",
 
@@ -1115,25 +1114,25 @@ height: "auto",
 
     alignItems: "center",
 
-    gap: "8px",
+    gap: "6px",
 
     fontSize:
       window.innerWidth < 768
-        ? "11px"
-        : "13px",
+        ? "9px"
+        : "12px",
 
     boxShadow:
-      "0 10px 25px rgba(37,99,235,0.25)",
+      "0 6px 18px rgba(37,99,235,0.18)",
 
     border:
-      "1px solid rgba(255,255,255,0.2)",
+      "1px solid rgba(255,255,255,0.15)",
 
     backdropFilter: "blur(10px)",
 
     maxWidth:
       window.innerWidth < 768
-        ? "160px"
-        : "220px",
+        ? "130px"
+        : "180px",
   }}
 >
 
@@ -1143,20 +1142,29 @@ height: "auto",
 
       fontSize:
         window.innerWidth < 768
-          ? "8px"
-          : "10px",
+          ? "6px"
+          : "8px",
 
       filter:
-        "drop-shadow(0 0 8px rgba(34,197,94,0.9))",
+        "drop-shadow(0 0 6px rgba(34,197,94,0.9))",
 
       flexShrink: 0,
     }}
   />
 
+  <span
+    style={{
+      whiteSpace: "nowrap",
+
+      overflow: "hidden",
+
+      textOverflow: "ellipsis",
+    }}
+  >
+    {liveStatus}
+  </span>
 
 </div>
-
-
 
 {/* DESTINATION */}
 
