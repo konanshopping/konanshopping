@@ -108,6 +108,9 @@ const customerIcon =
 
   });
 
+  const [showDriverCard, setShowDriverCard] =
+  useState(false);
+
 // =========================
 // RECENTER MAP
 // =========================
@@ -1158,9 +1161,9 @@ return (
 
 </div>
 
-{/* ========================= */}
 {/* DELIVERY GLASS CARD */}
-{/* ========================= */}
+
+{showDriverCard && (
 
 <div
   style={{
@@ -1620,8 +1623,9 @@ return (
   </div>
 
 </div>
-
 </div>
+
+)}
 
   {/* DESTINATION */}
 
