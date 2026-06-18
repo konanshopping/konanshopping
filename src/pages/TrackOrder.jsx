@@ -1163,8 +1163,6 @@ return (
 
 {/* DELIVERY GLASS CARD */}
 
-{showDriverCard && (
-
 <div
   style={{
     position: "absolute",
@@ -1624,8 +1622,6 @@ return (
 
 </div>
 </div>
-
-)}
 
   {/* DESTINATION */}
 
