@@ -1344,196 +1344,187 @@ return (
 
 </div>
 
-  {/* ========================= */}
-{/* PRODUIT */}
+{/* ========================= */}
+{/* PRODUITS COMMANDÉS */}
 {/* ========================= */}
 
-<div
-  style={{
-    marginTop: "16px",
-
-    background:
-      "#FFFFFF",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "16px",
-
-    border:
-      "1px solid #E2E8F0",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "12px",
-
-    boxShadow:
-      "0 4px 12px rgba(0,0,0,0.04)",
-  }}
->
-
-  {/* IMAGE */}
-
-  <img
-    src={
-      order?.items?.[0]?.image ||
-      "https://via.placeholder.com/80"
-    }
-
-    alt="product"
-
-    style={{
-      width:
-        window.innerWidth < 768
-          ? "65px"
-          : "75px",
-
-      height:
-        window.innerWidth < 768
-          ? "65px"
-          : "75px",
-
-      borderRadius: "14px",
-
-      objectFit: "cover",
-
-      border:
-        "1px solid #E2E8F0",
-
-      flexShrink: 0,
-    }}
-  />
-
-  {/* INFOS */}
+{order?.items?.map((item, index) => (
 
   <div
+    key={index}
     style={{
-      flex: 1,
+      marginTop: index === 0 ? "16px" : "10px",
 
-      minWidth: 0,
+      background: "#FFFFFF",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "14px"
+          : "16px",
+
+      border: "1px solid #E2E8F0",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "12px",
+
+      boxShadow:
+        "0 4px 12px rgba(0,0,0,0.04)",
     }}
   >
 
-    {/* TITRE */}
+    {/* IMAGE */}
+
+    <img
+      src={
+        item?.image ||
+        "https://via.placeholder.com/80"
+      }
+
+      alt="product"
+
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "65px"
+            : "75px",
+
+        height:
+          window.innerWidth < 768
+            ? "65px"
+            : "75px",
+
+        borderRadius: "14px",
+
+        objectFit: "cover",
+
+        border:
+          "1px solid #E2E8F0",
+
+        flexShrink: 0,
+      }}
+    />
+
+    {/* INFOS */}
 
     <div
       style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "6px",
-
-        marginBottom: "6px",
+        flex: 1,
+        minWidth: 0,
       }}
     >
 
-      <FaShoppingBag
+      {/* TITRE */}
+
+      <div
         style={{
-          color: "#2563EB",
+          display: "flex",
 
-          fontSize: "12px",
+          alignItems: "center",
+
+          gap: "6px",
+
+          marginBottom: "6px",
         }}
-      />
+      >
 
-      <p
+        <FaShoppingBag
+          style={{
+            color: "#2563EB",
+            fontSize: "12px",
+          }}
+        />
+
+        <p
+          style={{
+            margin: 0,
+
+            color: "#64748B",
+
+            fontSize: "11px",
+
+            fontWeight: "800",
+
+            textTransform: "uppercase",
+          }}
+        >
+          Produit {index + 1}
+        </p>
+
+      </div>
+
+      {/* NOM */}
+
+      <h3
         style={{
           margin: 0,
 
-          color: "#64748B",
+          color: "#0F172A",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "14px"
+              : "16px",
+
+          fontWeight: "900",
+
+          lineHeight: "20px",
+
+          overflow: "hidden",
+
+          textOverflow: "ellipsis",
+
+          display: "-webkit-box",
+
+          WebkitLineClamp: 2,
+
+          WebkitBoxOrient: "vertical",
+        }}
+      >
+        {item?.name}
+      </h3>
+
+      {/* QUANTITE */}
+
+      <div
+        style={{
+          display: "inline-flex",
+
+          alignItems: "center",
+
+          gap: "6px",
+
+          marginTop: "10px",
+
+          background: "#EEF2FF",
+
+          color: "#2563EB",
+
+          padding: "6px 10px",
+
+          borderRadius: "999px",
 
           fontSize: "11px",
 
           fontWeight: "800",
-
-          textTransform:
-            "uppercase",
         }}
       >
-        Produit commandé
-      </p>
 
-    </div>
+        <FaCube />
 
-    {/* NOM */}
+        Quantité : x{item?.quantity}
 
-    <h3
-      style={{
-        margin: 0,
-
-        color: "#0F172A",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "14px"
-            : "16px",
-
-        fontWeight: "900",
-
-        lineHeight: "20px",
-
-        overflow: "hidden",
-
-        textOverflow:
-          "ellipsis",
-
-        display: "-webkit-box",
-
-        WebkitLineClamp: 2,
-
-        WebkitBoxOrient:
-          "vertical",
-      }}
-    >
-      {
-        order?.product?.title ||
-        order?.product?.name ||
-        order?.items?.[0]?.name
-      }
-    </h3>
-
-    {/* QUANTITE */}
-
-    <div
-      style={{
-        display: "inline-flex",
-
-        alignItems: "center",
-
-        gap: "6px",
-
-        marginTop: "10px",
-
-        background:
-          "#EEF2FF",
-
-        color: "#2563EB",
-
-        padding: "6px 10px",
-
-        borderRadius: "999px",
-
-        fontSize: "11px",
-
-        fontWeight: "800",
-      }}
-    >
-
-      <FaCube />
-
-      Quantité :
-      {" "}
-      x{order?.items?.[0]?.quantity}
+      </div>
 
     </div>
 
   </div>
 
-</div>
+))}
 
   {/* STATS */}
 
