@@ -1169,27 +1169,25 @@ height: "auto",
 
 
 
-  {/* DESTINATION */}
+{/* DESTINATION */}
 
 <div
   style={{
-    marginTop: "16px",
+    marginTop: "12px",
 
-    background:
-      "linear-gradient(180deg,#F8FAFC,#F1F5F9)",
+    background: "#FFFFFF",
 
-    borderRadius: "18px",
+    borderRadius: "14px",
 
     padding:
       window.innerWidth < 768
-        ? "14px"
-        : "18px",
+        ? "10px"
+        : "14px",
 
-    border:
-      "1px solid #E2E8F0",
+    border: "1px solid #E2E8F0",
 
     boxShadow:
-      "0 4px 12px rgba(0,0,0,0.03)",
+      "0 4px 12px rgba(15,23,42,0.04)",
   }}
 >
 
@@ -1203,20 +1201,25 @@ height: "auto",
 
       gap: "8px",
 
-      marginBottom: "10px",
+      marginBottom: "8px",
     }}
   >
 
     <div
       style={{
-        width: "30px",
+        width:
+          window.innerWidth < 768
+            ? "26px"
+            : "30px",
 
-        height: "30px",
+        height:
+          window.innerWidth < 768
+            ? "26px"
+            : "30px",
 
-        borderRadius: "10px",
+        borderRadius: "8px",
 
-        background:
-          "#DBEAFE",
+        background: "#DBEAFE",
 
         display: "flex",
 
@@ -1225,9 +1228,15 @@ height: "auto",
         alignItems: "center",
 
         color: "#2563EB",
+
+        flexShrink: 0,
       }}
     >
-      <FaMapMarkerAlt />
+      <FaMapMarkerAlt
+        style={{
+          fontSize: "12px",
+        }}
+      />
     </div>
 
     <p
@@ -1236,14 +1245,16 @@ height: "auto",
 
         color: "#64748B",
 
-        fontSize: "11px",
+        fontSize:
+          window.innerWidth < 768
+            ? "10px"
+            : "11px",
 
         fontWeight: "800",
 
-        textTransform:
-          "uppercase",
+        textTransform: "uppercase",
 
-        letterSpacing: "1px",
+        letterSpacing: "0.8px",
       }}
     >
       Adresse de livraison
@@ -1261,12 +1272,12 @@ height: "auto",
 
       fontSize:
         window.innerWidth < 768
-          ? "12px"
-          : "16px",
+          ? "13px"
+          : "15px",
 
       fontWeight: "900",
 
-      lineHeight: "24px",
+      lineHeight: "20px",
     }}
   >
     {order?.address}
@@ -1280,11 +1291,11 @@ height: "auto",
 
       alignItems: "center",
 
-      gap: "10px",
+      gap: "8px",
 
       flexWrap: "wrap",
 
-      marginTop: "12px",
+      marginTop: "10px",
     }}
   >
 
@@ -1294,11 +1305,14 @@ height: "auto",
 
         alignItems: "center",
 
-        gap: "6px",
+        gap: "5px",
 
         color: "#64748B",
 
-        fontSize: "12px",
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "12px",
 
         fontWeight: "700",
       }}
@@ -1306,6 +1320,7 @@ height: "auto",
       <FaCity
         style={{
           color: "#2563EB",
+          fontSize: "11px",
         }}
       />
 
@@ -1314,9 +1329,9 @@ height: "auto",
 
     <div
       style={{
-        width: "5px",
+        width: "4px",
 
-        height: "5px",
+        height: "4px",
 
         borderRadius: "50%",
 
@@ -1330,11 +1345,14 @@ height: "auto",
 
         alignItems: "center",
 
-        gap: "6px",
+        gap: "5px",
 
         color: "#64748B",
 
-        fontSize: "12px",
+        fontSize:
+          window.innerWidth < 768
+            ? "11px"
+            : "12px",
 
         fontWeight: "700",
       }}
@@ -1342,6 +1360,7 @@ height: "auto",
       <FaLocationArrow
         style={{
           color: "#2563EB",
+          fontSize: "11px",
         }}
       />
 
