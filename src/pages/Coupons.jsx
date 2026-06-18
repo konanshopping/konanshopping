@@ -172,12 +172,12 @@ function Coupons() {
 
     border: "1px solid #E5E7EB",
 
-    borderRadius: "26px",
+    borderRadius: "22px",
 
     padding:
       window.innerWidth < 768
-        ? "20px"
-        : "30px",
+        ? "16px"
+        : "24px",
 
     display: "flex",
 
@@ -188,7 +188,7 @@ function Coupons() {
         ? "16px"
         : "24px",
 
-    marginBottom: "24px",
+    marginBottom: "28px",
 
     boxShadow:
       "0 10px 30px rgba(0,0,0,0.05)",
@@ -201,13 +201,13 @@ function Coupons() {
     style={{
       width:
         window.innerWidth < 768
-          ? "72px"
-          : "90px",
+          ? "60px"
+          : "78px",
 
       height:
         window.innerWidth < 768
-          ? "72px"
-          : "90px",
+          ? "60px"
+          : "78px",
 
       borderRadius: "22px",
 
@@ -276,8 +276,8 @@ function Coupons() {
       style={{
         fontSize:
           window.innerWidth < 768
-            ? "30px"
-            : "48px",
+            ? "26px"
+            : "38px",
 
         fontWeight: "900",
 
@@ -338,12 +338,12 @@ function Coupons() {
           background:
             coupon.color,
 
-          borderRadius: "26px",
+          borderRadius: "20px",
 
           padding:
             window.innerWidth < 768
-              ? "20px"
-              : "26px",
+              ? "16px"
+              : "20px",
 
           color: "#FFFFFF",
 
@@ -355,12 +355,12 @@ function Coupons() {
             "1px solid rgba(255,255,255,0.15)",
 
           boxShadow:
-            "0 12px 30px rgba(0,0,0,0.12)",
+            "0 12px 30px rgba(0,0,0,0.10)",
 
           minHeight:
             window.innerWidth < 768
-              ? "210px"
-              : "240px",
+              ? "180px"
+              : "210px",
         }}
       >
 
@@ -429,7 +429,8 @@ function Coupons() {
             fontWeight: "800",
           }}
         >
-          KONAN VIP
+          <FaGift />
+{" "}Coupon Premium
         </div>
 
         {/* CONTENT */}
@@ -471,8 +472,8 @@ function Coupons() {
 
                 fontSize:
                   window.innerWidth < 768
-                    ? "30px"
-                    : "38px",
+                    ? "24px"
+                    : "30px",
 
                 fontWeight: "900",
 
@@ -502,6 +503,8 @@ function Coupons() {
           >
             {coupon.description}
           </p>
+
+       
 
           {/* CONDITION */}
 
@@ -570,9 +573,9 @@ function Coupons() {
               backdropFilter:
                 "blur(12px)",
 
-              padding: "14px",
+              padding: "10px 12px",
 
-              borderRadius: "16px",
+              borderRadius: "12px",
             }}
           >
 
@@ -598,8 +601,8 @@ function Coupons() {
 
                   fontSize:
                     window.innerWidth < 768
-                      ? "20px"
-                      : "24px",
+                      ? "16px"
+                      : "20px",
 
                   fontWeight: "900",
 
@@ -627,8 +630,8 @@ function Coupons() {
 
                 padding:
                   window.innerWidth < 768
-                    ? "10px 14px"
-                    : "12px 18px",
+                    ? "8px 12px"
+                    : "10px 14px",
 
                 borderRadius: "12px",
 
@@ -644,7 +647,7 @@ function Coupons() {
 
                 gap: "6px",
 
-                minWidth: "95px",
+                minWidth: "80px",
 
                 justifyContent:
                   "center",
