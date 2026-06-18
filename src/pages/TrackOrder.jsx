@@ -108,8 +108,6 @@ const customerIcon =
 
   });
 
-  const [showDriverCard, setShowDriverCard] =
-  useState(false);
 
 // =========================
 // RECENTER MAP
