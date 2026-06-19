@@ -133,4 +133,45 @@ router.put(
 
 );
 
+// =========================
+// AUTO LIVRÉ
+// =========================
+
+router.put(
+  "/:id/status",
+
+  async (req, res) => {
+
+    try {
+
+      const order =
+        await Order.findByIdAndUpdate(
+
+          req.params.id,
+
+          {
+            status: req.body.status,
+          },
+
+          {
+            new: true,
+          }
+
+        );
+
+      res.json(order);
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        error: "Erreur serveur",
+      });
+
+    }
+
+  }
+);
+
 module.exports = router;

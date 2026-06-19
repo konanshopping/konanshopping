@@ -365,8 +365,11 @@ else {
   // =========================
 
  const deliveryStatus =
-  order?.status ||
-  "En attente";
+
+  realDistance <= 0.05
+    ? "Livré"
+    : order?.status ||
+      "En attente";
 
   // =========================
   // PROGRESS
@@ -415,7 +418,10 @@ else {
 
  const liveStatus =
 
-  realDistance > 5
+  realDistance <= 0.05
+    ? "Livré"
+
+    : realDistance > 5
     ? "En livraison"
 
     : realDistance > 2
@@ -425,6 +431,48 @@ else {
     ? "Presque arrivé"
 
     : "Livré";
+
+    // =========================
+// AUTO LIVRÉ
+// =========================
+
+useEffect(() => {
+
+  const autoDelivered = async () => {
+
+    if (
+      realDistance <= 0.05 &&
+      order?._id &&
+      order?.status !== "Livré"
+    ) {
+
+      try {
+
+        await axios.put(
+          `https://konanshopping-production.up.railway.app/api/orders/${order._id}/status`,
+          {
+            status: "Livré",
+          }
+        );
+
+        setOrder((prev) => ({
+          ...prev,
+          status: "Livré",
+        }));
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+    }
+
+  };
+
+  autoDelivered();
+
+}, [realDistance, order]);
 
   if (!order) {
 
@@ -1416,7 +1464,10 @@ height: "auto",
       : item.image
     : "/logo.jpg"
 }
-      alt="product"
+      alt={item?.name || "Produit"}
+  onError={(e) => {
+    e.target.src = "/logo.jpg";
+  }}
       style={{
         width:
           window.innerWidth < 768
