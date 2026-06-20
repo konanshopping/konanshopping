@@ -1087,40 +1087,47 @@ FCFA
     <span
 
       style={{
+  position: "absolute",
 
-        position: "absolute",
+  top: "-8px",
 
-        top: "-8px",
+  right: "-10px",
 
-        right: "-10px",
+  minWidth: "18px",
 
-        background: "#ef4444",
+  height: "18px",
 
-        color: "white",
+  borderRadius: "50%",
 
-        minWidth: "18px",
+  background:
+    "rgba(96,165,250,0.25)",
 
-        height: "18px",
+  backdropFilter:
+    "blur(12px)",
 
-        borderRadius: "50%",
+  WebkitBackdropFilter:
+    "blur(12px)",
 
-        fontSize: "10px",
+  border:
+    "1px solid rgba(255,255,255,0.35)",
 
-        fontWeight: "800",
+  color: "#2563EB",
 
-        display: "flex",
+  fontSize: "10px",
 
-        alignItems: "center",
+  fontWeight: "800",
 
-        justifyContent: "center",
+  display: "flex",
 
-        padding: "0 4px",
+  alignItems: "center",
 
-        boxShadow:
-          "0 4px 10px rgba(239,68,68,0.35)",
+  justifyContent: "center",
 
-      }}
+  padding: "0 4px",
 
+  boxShadow:
+    "0 4px 12px rgba(37,99,235,0.15)",
+}}
     >
 
     {favoritesCount}
