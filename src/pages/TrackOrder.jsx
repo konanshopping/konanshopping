@@ -446,25 +446,28 @@ useEffect(() => {
       order?.status !== "Livrée"
     ) {
 
-      try {
+     try {
 
-        await axios.put(
-          `https://konanshopping-production.up.railway.app/api/orders/${order._id}/status`,
-          {
-            status: "Livrée",
-          }
-        );
+  console.log("AUTO LIVRAISON");
 
-        setOrder((prev) => ({
-          ...prev,
-          status: "Livrée",
-        }));
+  await axios.put(
+    `https://konanshopping-production.up.railway.app/orders/${order._id}`,
+    {
+      status: "Livrée",
+    }
+  );
 
-      } catch (err) {
+  setOrder((prev) => ({
+    ...prev,
+    status: "Livrée",
+  }));
 
-        console.log(err);
+} catch (err) {
 
-      }
+  console.log("ERREUR AUTO LIVRAISON");
+  console.log(err);
+
+}
 
     }
 
