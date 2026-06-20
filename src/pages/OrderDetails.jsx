@@ -47,14 +47,15 @@ export default function OrderDetails() {
 
   }, [id]);
 
-  if (!order) {
+ if (!order) {
 
   return (
 
     <div
       style={{
         background: "#F5F7FB",
-        minHeight: "100vh",
+
+        minHeight: "100dvh",
 
         display: "flex",
 
@@ -62,7 +63,7 @@ export default function OrderDetails() {
 
         alignItems: "center",
 
-        padding: "20px",
+        padding: "16px",
       }}
     >
 
@@ -70,59 +71,89 @@ export default function OrderDetails() {
         style={{
           background: "#FFFFFF",
 
-          padding: "24px",
+          width: "100%",
 
-          borderRadius: "20px",
+          maxWidth: "340px",
+
+          padding: "22px",
+
+          borderRadius: "22px",
+
+          border: "1px solid #E5E7EB",
 
           boxShadow:
-            "0 8px 25px rgba(15,23,42,0.05)",
+            "0 10px 30px rgba(15,23,42,0.06)",
 
           display: "flex",
 
+          flexDirection: "column",
+
           alignItems: "center",
 
-          gap: "12px",
-
-          border:
-            "1px solid #E5E7EB",
+          textAlign: "center",
         }}
       >
 
-        <FaBoxOpen
+        <div
           style={{
-            fontSize: "22px",
+            width: "65px",
 
-            color: "#7C3AED",
+            height: "65px",
+
+            borderRadius: "18px",
+
+            background:
+              "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+
+            display: "flex",
+
+            justifyContent: "center",
+
+            alignItems: "center",
+
+            marginBottom: "14px",
           }}
-        />
+        >
 
-        <div>
-
-          <div
+          <FaBoxOpen
             style={{
-              color: "#111827",
+              fontSize: "28px",
 
-              fontWeight: "800",
-
-              fontSize: "16px",
+              color: "#7C3AED",
             }}
-          >
-            Chargement...
-          </div>
-
-          <div
-            style={{
-              color: "#64748B",
-
-              fontSize: "13px",
-
-              marginTop: "4px",
-            }}
-          >
-            Récupération des détails de la commande
-          </div>
+          />
 
         </div>
+
+        <h2
+          style={{
+            margin: 0,
+
+            color: "#111827",
+
+            fontSize: "18px",
+
+            fontWeight: "900",
+          }}
+        >
+          Chargement...
+        </h2>
+
+        <p
+          style={{
+            marginTop: "8px",
+
+            marginBottom: 0,
+
+            color: "#64748B",
+
+            fontSize: "13px",
+
+            lineHeight: "22px",
+          }}
+        >
+          Récupération des détails de votre commande
+        </p>
 
       </div>
 
@@ -165,24 +196,19 @@ export default function OrderDetails() {
 <div
   style={{
     display: "flex",
-
     justifyContent: "space-between",
-
     alignItems:
       window.innerWidth < 768
         ? "flex-start"
         : "center",
-
-    flexWrap: "wrap",
-
+    flexDirection:
+      window.innerWidth < 768
+        ? "column"
+        : "row",
     gap: "12px",
-
-    paddingBottom: "16px",
-
+    paddingBottom: "14px",
     marginBottom: "16px",
-
-    borderBottom:
-      "1px solid #F1F5F9",
+    borderBottom: "1px solid #E5E7EB",
   }}
 >
 
@@ -191,13 +217,9 @@ export default function OrderDetails() {
   <div
     style={{
       display: "flex",
-
       alignItems: "center",
-
-      gap: "12px",
-
-      flex: 1,
-
+      gap: "10px",
+      width: "100%",
       minWidth: 0,
     }}
   >
@@ -206,15 +228,15 @@ export default function OrderDetails() {
       style={{
         width:
           window.innerWidth < 768
-            ? "50px"
-            : "58px",
+            ? "44px"
+            : "54px",
 
         height:
           window.innerWidth < 768
-            ? "50px"
-            : "58px",
+            ? "44px"
+            : "54px",
 
-        borderRadius: "16px",
+        borderRadius: "14px",
 
         background:
           "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
@@ -233,8 +255,8 @@ export default function OrderDetails() {
         style={{
           fontSize:
             window.innerWidth < 768
-              ? "22px"
-              : "26px",
+              ? "18px"
+              : "24px",
 
           color: "#7C3AED",
         }}
@@ -244,6 +266,7 @@ export default function OrderDetails() {
 
     <div
       style={{
+        flex: 1,
         minWidth: 0,
       }}
     >
@@ -256,7 +279,7 @@ export default function OrderDetails() {
 
           fontSize:
             window.innerWidth < 768
-              ? "20px"
+              ? "17px"
               : "24px",
 
           fontWeight: "900",
@@ -273,21 +296,33 @@ export default function OrderDetails() {
 
           alignItems: "center",
 
-          gap: "6px",
+          gap: "5px",
 
-          marginTop: "5px",
+          marginTop: "4px",
 
           color: "#64748B",
 
-          fontSize: "12px",
+          fontSize: "11px",
 
-          fontWeight: "500",
+          overflow: "hidden",
         }}
       >
 
-        <FaHashtag />
+        <FaHashtag
+          style={{
+            fontSize: "10px",
+          }}
+        />
 
-        {order._id}
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {order._id}
+        </span>
 
       </div>
 
@@ -313,13 +348,13 @@ export default function OrderDetails() {
           ? "#2563EB"
           : "#92400E",
 
-      padding: "8px 14px",
+      padding: "8px 12px",
 
       borderRadius: "999px",
 
       fontWeight: "800",
 
-      fontSize: "12px",
+      fontSize: "11px",
 
       display: "flex",
 
@@ -333,6 +368,11 @@ export default function OrderDetails() {
           : order.status === "En livraison"
           ? "1px solid #BFDBFE"
           : "1px solid #FCD34D",
+
+      alignSelf:
+        window.innerWidth < 768
+          ? "flex-start"
+          : "center",
     }}
   >
 
@@ -358,20 +398,27 @@ export default function OrderDetails() {
   <div
     key={index}
     style={{
-      display: "flex",
+      background: "#FFFFFF",
 
-      alignItems: "center",
+      border:
+        "1px solid #E5E7EB",
+
+      borderRadius: "16px",
+
+      padding: "12px",
+
+      marginBottom: "12px",
+
+      display: "flex",
 
       justifyContent: "space-between",
 
+      alignItems: "center",
+
       gap: "12px",
 
-      padding: "12px 0",
-
-      borderBottom:
-        index !== products.length - 1
-          ? "1px solid #F1F5F9"
-          : "none",
+      boxShadow:
+        "0 2px 8px rgba(15,23,42,0.04)",
     }}
   >
 
@@ -391,49 +438,61 @@ export default function OrderDetails() {
       }}
     >
 
-     <img
-  src={
-    (
-      item.image ||
-      item.product?.image ||
-      item.productImage
-    )?.includes("localhost:5000")
+      <img
+        src={
+          (
+            item.image ||
+            item.product?.image ||
+            item.productImage
+          )?.includes("localhost:5000")
 
-      ? (
-          item.image ||
-          item.product?.image ||
-          item.productImage
-        ).replace(
-          "http://localhost:5000",
-          "https://konanshopping-production.up.railway.app"
-        )
+            ? (
+                item.image ||
+                item.product?.image ||
+                item.productImage
+              ).replace(
+                "http://localhost:5000",
+                "https://konanshopping-production.up.railway.app"
+              )
 
-      : (
-          item.image ||
-          item.product?.image ||
-          item.productImage ||
-          "/logo.jpg"
-        )
-  }
+            : (
+                item.image ||
+                item.product?.image ||
+                item.productImage ||
+                "/logo.jpg"
+              )
+        }
 
-  alt={
-    item.name ||
-    item.product?.name
-  }
+        alt={
+          item.name ||
+          item.product?.name
+        }
 
-  onError={(e) => {
-    e.target.src = "/logo.jpg";
-  }}
+        onError={(e) => {
+          e.target.src = "/logo.jpg";
+        }}
 
-  style={{
-    width: "60px",
-    height: "60px",
-    objectFit: "cover",
-    borderRadius: "12px",
-    border: "1px solid #E5E7EB",
-    flexShrink: 0,
-  }}
-/>
+        style={{
+          width:
+            window.innerWidth < 768
+              ? "65px"
+              : "75px",
+
+          height:
+            window.innerWidth < 768
+              ? "65px"
+              : "75px",
+
+          objectFit: "cover",
+
+          borderRadius: "14px",
+
+          border:
+            "1px solid #E5E7EB",
+
+          flexShrink: 0,
+        }}
+      />
 
       <div
         style={{
@@ -443,15 +502,48 @@ export default function OrderDetails() {
         }}
       >
 
+        <div
+          style={{
+            display: "inline-flex",
+
+            alignItems: "center",
+
+            gap: "6px",
+
+            background: "#F5F3FF",
+
+            color: "#7C3AED",
+
+            padding: "4px 8px",
+
+            borderRadius: "999px",
+
+            fontSize: "10px",
+
+            fontWeight: "700",
+
+            marginBottom: "6px",
+          }}
+        >
+
+          <FaShoppingBag />
+
+          Produit
+
+        </div>
+
         <h3
           style={{
             margin: 0,
 
             color: "#111827",
 
-            fontSize: "15px",
+            fontSize:
+              window.innerWidth < 768
+                ? "14px"
+                : "16px",
 
-            fontWeight: "700",
+            fontWeight: "800",
 
             overflow: "hidden",
 
@@ -484,7 +576,9 @@ export default function OrderDetails() {
 
           <FaBox />
 
-          Qté : {item.quantity || 1}
+          Quantité :
+          {" "}
+          {item.quantity || 1}
 
         </div>
 
@@ -496,22 +590,42 @@ export default function OrderDetails() {
 
     <div
       style={{
-        color: "#4F46E5",
+        textAlign: "right",
 
-        fontWeight: "800",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "15px"
-            : "17px",
-
-        whiteSpace: "nowrap",
+        flexShrink: 0,
       }}
     >
-      {
-        item.price ||
-        item.product?.price
-      } FCFA
+
+      <div
+        style={{
+          fontSize: "11px",
+
+          color: "#94A3B8",
+
+          fontWeight: "600",
+        }}
+      >
+        Prix
+      </div>
+
+      <div
+        style={{
+          color: "#4F46E5",
+
+          fontWeight: "900",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "15px"
+              : "18px",
+        }}
+      >
+        {
+          item.price ||
+          item.product?.price
+        } FCFA
+      </div>
+
     </div>
 
   </div>
@@ -522,11 +636,15 @@ export default function OrderDetails() {
 
 <div
   style={{
-    marginTop: "16px",
+    marginTop: "18px",
 
-    paddingTop: "16px",
+    background: "#F8FAFC",
 
-    borderTop: "1px solid #E5E7EB",
+    border: "1px solid #E2E8F0",
+
+    borderRadius: "18px",
+
+    padding: "16px",
 
     display: "flex",
 
@@ -534,7 +652,7 @@ export default function OrderDetails() {
 
     alignItems:
       window.innerWidth < 768
-        ? "flex-start"
+        ? "stretch"
         : "center",
 
     flexDirection:
@@ -548,7 +666,11 @@ export default function OrderDetails() {
 
   {/* TOTAL */}
 
-  <div>
+  <div
+    style={{
+      flex: 1,
+    }}
+  >
 
     <div
       style={{
@@ -556,13 +678,13 @@ export default function OrderDetails() {
 
         alignItems: "center",
 
-        gap: "6px",
+        gap: "8px",
 
         color: "#64748B",
 
         fontSize: "12px",
 
-        fontWeight: "600",
+        fontWeight: "700",
       }}
     >
 
@@ -572,22 +694,24 @@ export default function OrderDetails() {
         }}
       />
 
-      Total commande
+      Montant total
 
     </div>
 
     <h2
       style={{
-        margin: "6px 0 0 0",
+        margin: "8px 0 0 0",
 
         color: "#111827",
 
         fontSize:
           window.innerWidth < 768
-            ? "22px"
-            : "28px",
+            ? "24px"
+            : "30px",
 
         fontWeight: "900",
+
+        lineHeight: 1,
       }}
     >
       {order.total} FCFA
@@ -612,10 +736,10 @@ export default function OrderDetails() {
 
       padding:
         window.innerWidth < 768
-          ? "12px 16px"
-          : "12px 20px",
+          ? "14px"
+          : "14px 22px",
 
-      borderRadius: "12px",
+      borderRadius: "14px",
 
       fontWeight: "800",
 
@@ -635,12 +759,15 @@ export default function OrderDetails() {
         window.innerWidth < 768
           ? "100%"
           : "auto",
+
+      boxShadow:
+        "0 8px 20px rgba(79,70,229,0.18)",
     }}
   >
 
     <FaTruck />
 
-    Suivre commande
+    Suivre la livraison
 
   </button>
 
@@ -653,4 +780,3 @@ export default function OrderDetails() {
   );
 
 }
-export default  OrderDetails;
