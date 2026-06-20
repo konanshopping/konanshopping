@@ -422,35 +422,50 @@ overflow:"hidden"
 
 <div
 style={{
-padding:"18px 20px",
+padding:"14px 16px",
 display:"flex",
 justifyContent:"space-between",
-alignItems:"center"
+alignItems:"center",
+gap:"10px"
 }}
 >
+
+{/* LOGO + NOM */}
 
 <div
 style={{
 display:"flex",
 alignItems:"center",
-gap:"12px"
+gap:"10px"
 }}
 >
 
 <div
 style={{
-width:"58px",
-height:"58px",
-borderRadius:"18px",
+width:
+window.innerWidth < 768
+? "46px"
+: "52px",
+
+height:
+window.innerWidth < 768
+? "46px"
+: "52px",
+
+borderRadius:"14px",
+
 overflow:"hidden",
+
+flexShrink:0,
+
 boxShadow:
-"0 8px 20px rgba(37,99,235,.18)"
+"0 6px 18px rgba(37,99,235,.15)"
 }}
 >
 
 <img
 src="/logo.jpg"
-alt=""
+alt="Konan Shopping"
 style={{
 width:"100%",
 height:"100%",
@@ -465,9 +480,16 @@ objectFit:"cover"
 <h1
 style={{
 margin:0,
-fontSize:"22px",
+
+fontSize:
+window.innerWidth < 768
+? "17px"
+: "20px",
+
 fontWeight:"900",
+
 color:"#111827",
+
 lineHeight:"1"
 }}
 >
@@ -476,17 +498,23 @@ KONAN
 
 <p
 style={{
-marginTop:"4px",
-fontSize:"12px",
+marginTop:"3px",
+
+fontSize:"10px",
+
 fontWeight:"700",
+
 color:"#2563eb",
+
 display:"flex",
+
 alignItems:"center",
-gap:"6px"
+
+gap:"5px"
 }}
 >
 
-<FaGlobeAfrica size={11}/>
+<FaGlobeAfrica size={10} />
 
 SHOPPING CAMEROUN
 
@@ -496,44 +524,80 @@ SHOPPING CAMEROUN
 
 </div>
 
+{/* BADGE IA */}
+
 <div
 style={{
 background:
 "linear-gradient(135deg,#2563eb,#1d4ed8)",
-padding:"10px 16px",
-borderRadius:"40px",
+
+padding:
+window.innerWidth < 768
+? "8px 12px"
+: "9px 14px",
+
+borderRadius:"999px",
+
 color:"#fff",
+
 fontWeight:"700",
-fontSize:"13px",
+
+fontSize:
+window.innerWidth < 768
+? "11px"
+: "12px",
+
 display:"flex",
+
 alignItems:"center",
-gap:"8px",
+
+gap:"6px",
+
+whiteSpace:"nowrap",
+
 boxShadow:
-"0 6px 20px rgba(37,99,235,.25)"
+"0 6px 18px rgba(37,99,235,.20)"
 }}
 >
 
-<FaBrain size={13}/>
+<FaBrain size={11} />
 
-IA KONAN SHOPPING
+IA Konan
+
+</div>
 
 </div>
 
-</div>
+{/* HALO ARRIÈRE PLAN */}
 
 <div
 style={{
 position:"absolute",
-top:"120px",
+
+top:"80px",
+
 left:"50%",
+
 transform:"translateX(-50%)",
-width:"700px",
-height:"700px",
+
+width:
+window.innerWidth < 768
+? "350px"
+: "550px",
+
+height:
+window.innerWidth < 768
+? "350px"
+: "550px",
+
 borderRadius:"50%",
+
 background:
-"radial-gradient(circle,rgba(37,99,235,.15),transparent 70%)",
-filter:"blur(40px)",
-zIndex:0
+"radial-gradient(circle,rgba(37,99,235,.12),transparent 70%)",
+
+filter:"blur(50px)",
+
+zIndex:0,
 }}
 />
 
@@ -542,9 +606,15 @@ zIndex:0
 <div
 style={{
 display:"flex",
+
 justifyContent:"center",
+
 alignItems:"center",
-height:"75vh"
+
+height:
+window.innerWidth < 768
+? "60vh"
+: "70vh",
 }}
 >
 
@@ -562,9 +632,15 @@ setHover(false)
 
 style={{
 
-width:"260px",
+width:
+window.innerWidth < 768
+? "180px"
+: "230px",
 
-height:"260px",
+height:
+window.innerWidth < 768
+? "180px"
+: "230px",
 
 borderRadius:"50%",
 
@@ -584,26 +660,25 @@ boxShadow:
 pulse
 
 ? `
-0 0 50px rgba(37,99,235,.7),
-0 0 100px rgba(37,99,235,.5),
-0 0 180px rgba(37,99,235,.35),
-0 0 260px rgba(37,99,235,.2)
+0 0 40px rgba(37,99,235,.6),
+0 0 80px rgba(37,99,235,.4),
+0 0 140px rgba(37,99,235,.25)
 `
 
 : `
-0 0 30px rgba(37,99,235,.2),
-0 0 80px rgba(37,99,235,.15)
+0 0 20px rgba(37,99,235,.15),
+0 0 60px rgba(37,99,235,.10)
 `,
 
 transform:
 
 pulse
 
-? "scale(1.08)"
+? "scale(1.06)"
 
 : hover
 
-? "scale(1.04)"
+? "scale(1.03)"
 
 : "scale(1)",
 
@@ -617,102 +692,141 @@ pulse
 : "floatOrb 4s ease-in-out infinite"
 
 }}
-
 >
 
-{/* Aura externe 1 */}
+{/* Aura 1 */}
 
 <div
 style={{
 position:"absolute",
-width:"320px",
-height:"320px",
+
+width:
+window.innerWidth < 768
+? "220px"
+: "280px",
+
+height:
+window.innerWidth < 768
+? "220px"
+: "280px",
+
 borderRadius:"50%",
+
 border:
-"3px solid rgba(96,165,250,.35)",
+"2px solid rgba(96,165,250,.30)",
+
 animation:
 "rotateAura 12s linear infinite"
 }}
 />
 
-{/* Aura externe 2 */}
+{/* Aura 2 */}
 
 <div
 style={{
 position:"absolute",
-width:"360px",
-height:"360px",
+
+width:
+window.innerWidth < 768
+? "260px"
+: "320px",
+
+height:
+window.innerWidth < 768
+? "260px"
+: "320px",
+
 borderRadius:"50%",
+
 border:
-"2px solid rgba(255,255,255,.18)",
+"1.5px solid rgba(255,255,255,.18)",
+
 animation:
 "rotateAuraReverse 18s linear infinite"
 }}
 />
 
-{/* Aura externe 3 */}
+{/* Aura 3 */}
 
 <div
 style={{
 position:"absolute",
-width:"420px",
-height:"420px",
+
+width:
+window.innerWidth < 768
+? "300px"
+: "380px",
+
+height:
+window.innerWidth < 768
+? "300px"
+: "380px",
+
 borderRadius:"50%",
+
 border:
-"1px solid rgba(96,165,250,.12)",
+"1px solid rgba(96,165,250,.10)",
+
 animation:
 "rotateAura 25s linear infinite"
 }}
 />
 
-{/* Cerveau IA */}
+{/* CERVEAU IA */}
 
 <FaBrain
-size={95}
+size={
+window.innerWidth < 768
+? 60
+: 85
+}
 color="#ffffff"
 style={{
 filter:
-"drop-shadow(0 0 20px rgba(255,255,255,.8))"
+"drop-shadow(0 0 15px rgba(255,255,255,.7))"
 }}
 />
 
-{/* ETAT IA */}
+{/* ÉTAT IA */}
 
 <div
 style={{
 position:"absolute",
-bottom:"-65px",
+
+bottom:
+window.innerWidth < 768
+? "-50px"
+: "-60px",
+
 display:"flex",
+
 alignItems:"center",
-gap:"8px",
+
+gap:"6px",
+
 color:"#2563eb",
+
 fontWeight:"700",
-fontSize:"15px"
+
+fontSize:
+window.innerWidth < 768
+? "13px"
+: "15px",
 }}
 >
 
 {
-listening
-
-? (
+listening ? (
 <>
 <FaMicrophone />
 <span>J'écoute...</span>
 </>
-)
-
-: thinking
-
-? (
+) : thinking ? (
 <>
-<FaSpinner
-className="spin"
-/>
+<FaSpinner className="spin" />
 <span>Analyse...</span>
 </>
-)
-
-: (
+) : (
 <>
 <FaBrain />
 <span>Prêt</span>
@@ -730,40 +844,43 @@ className="spin"
 
 <div
 style={{
-maxWidth:"900px",
-margin:"30px auto",
-padding:"0 15px",
+maxWidth:"750px",
+
+margin:"20px auto",
+
+padding:"0 12px",
+
 display:"flex",
+
 flexDirection:"column",
-gap:"12px"
+
+gap:"10px",
 }}
 >
 
 {messages.map((msg,index)=>(
 
 <div
-
 key={index}
-
 style={{
-
 display:"flex",
 
 justifyContent:
 msg.role === "user"
 ? "flex-end"
-: "flex-start"
-
+: "flex-start",
 }}
-
 >
 
 <div
 style={{
 display:"flex",
-alignItems:"flex-start",
-gap:"10px",
-maxWidth:"85%"
+
+alignItems:"flex-end",
+
+gap:"8px",
+
+maxWidth:"90%",
 }}
 >
 
@@ -773,28 +890,37 @@ maxWidth:"85%"
 
 <div
 style={{
-width:"34px",
-height:"34px",
+width:"30px",
+
+height:"30px",
+
 borderRadius:"50%",
+
 background:
 "linear-gradient(135deg,#2563eb,#60a5fa)",
+
 display:"flex",
+
 justifyContent:"center",
+
 alignItems:"center",
+
 color:"#fff",
+
 flexShrink:0,
+
 boxShadow:
-"0 4px 12px rgba(37,99,235,.25)"
+"0 4px 10px rgba(37,99,235,.20)",
 }}
 >
 
-<FaBrain size={14}/>
+<FaBrain size={12} />
 
 </div>
 
 )}
 
-{/* BULLE MESSAGE */}
+{/* BULLE */}
 
 <div
 style={{
@@ -815,36 +941,45 @@ msg.role === "ai"
 
 : "#ffffff",
 
-padding:"14px 16px",
+padding:"12px 14px",
 
 borderRadius:
 
 msg.role === "ai"
 
-? "18px 18px 18px 4px"
+? "16px 16px 16px 5px"
 
-: "18px 18px 4px 18px",
+: "16px 16px 5px 16px",
 
 boxShadow:
 
 msg.role === "ai"
 
-? "0 4px 15px rgba(0,0,0,.05)"
+? "0 3px 12px rgba(0,0,0,.04)"
 
-: "0 8px 20px rgba(37,99,235,.20)",
+: "0 6px 15px rgba(37,99,235,.15)",
 
-fontSize:"14px",
+fontSize:
+window.innerWidth < 768
+? "13px"
+: "14px",
 
-lineHeight:"1.6",
+lineHeight:"1.55",
 
 fontWeight:"500",
 
-maxWidth:"600px",
+maxWidth:
+window.innerWidth < 768
+? "100%"
+: "550px",
 
-wordBreak:"break-word"
+wordBreak:"break-word",
 
+border:
+msg.role === "ai"
+? "1px solid #E5E7EB"
+: "none",
 }}
-
 >
 
 {/* HEADER */}
@@ -852,19 +987,38 @@ wordBreak:"break-word"
 <div
 style={{
 display:"flex",
+
 justifyContent:"space-between",
+
 alignItems:"center",
-marginBottom:"6px"
+
+marginBottom:"8px",
+
+paddingBottom:"6px",
+
+borderBottom:
+msg.role === "ai"
+? "1px solid #F1F5F9"
+: "none",
 }}
 >
 
 <div
 style={{
 display:"flex",
+
 alignItems:"center",
+
 gap:"6px",
+
 fontWeight:"700",
-fontSize:"12px"
+
+fontSize:"11px",
+
+color:
+msg.role === "ai"
+? "#2563eb"
+: "#ffffff",
 }}
 >
 
@@ -873,14 +1027,14 @@ msg.role === "ai"
 
 ? (
 <>
-<FaBrain size={11}/>
+<FaBrain size={10} />
 Konan AI
 </>
 )
 
 : (
 <>
-<FaUser size={11}/>
+<FaUser size={10} />
 Vous
 </>
 )
@@ -892,7 +1046,10 @@ Vous
 <div
 style={{
 fontSize:"10px",
-opacity:.55
+
+opacity:0.6,
+
+fontWeight:"500",
 }}
 >
 
@@ -900,7 +1057,7 @@ opacity:.55
 "fr-FR",
 {
 hour:"2-digit",
-minute:"2-digit"
+minute:"2-digit",
 }
 )}
 
@@ -912,7 +1069,14 @@ minute:"2-digit"
 
 <div
 style={{
-whiteSpace:"pre-wrap"
+whiteSpace:"pre-wrap",
+
+fontSize:
+window.innerWidth < 768
+? "13px"
+: "14px",
+
+lineHeight:"1.6",
 }}
 >
 
@@ -928,20 +1092,31 @@ whiteSpace:"pre-wrap"
 
 <div
 style={{
-width:"34px",
-height:"34px",
+width:"30px",
+
+height:"30px",
+
 borderRadius:"50%",
+
 background:
 "linear-gradient(135deg,#111827,#374151)",
+
 display:"flex",
+
 justifyContent:"center",
+
 alignItems:"center",
+
 color:"#fff",
-flexShrink:0
+
+flexShrink:0,
+
+boxShadow:
+"0 4px 10px rgba(0,0,0,.15)",
 }}
 >
 
-<FaUser size={13}/>
+<FaUser size={11} />
 
 </div>
 
@@ -959,18 +1134,23 @@ flexShrink:0
 
 <div
 style={{
-maxWidth:"1000px",
-margin:"40px auto",
-padding:"0 20px"
+maxWidth:"900px",
+
+margin:"25px auto",
+
+padding:"0 14px",
 }}
 >
 
 <h3
 style={{
-fontSize:"18px",
+fontSize:"16px",
+
 fontWeight:"800",
-marginBottom:"20px",
-color:"#111827"
+
+marginBottom:"14px",
+
+color:"#111827",
 }}
 >
 
@@ -981,19 +1161,23 @@ Suggestions populaires
 <div
 style={{
 display:"grid",
+
 gridTemplateColumns:
-"repeat(auto-fit,minmax(220px,1fr))",
-gap:"15px"
+window.innerWidth < 768
+? "1fr"
+: "repeat(auto-fit,minmax(220px,1fr))",
+
+gap:"12px",
 }}
 >
 
 {featuredProducts.map(
 (product)=>(
-<button
 
+<button
 key={product._id}
 
-onClick={()=>
+onClick={() =>
 sendMessage(
 product.name
 )
@@ -1001,13 +1185,13 @@ product.name
 
 style={{
 
-background:"#fff",
+background:"#FFFFFF",
 
-border:"none",
+border:"1px solid #E5E7EB",
 
-padding:"15px",
+padding:"12px",
 
-borderRadius:"20px",
+borderRadius:"16px",
 
 cursor:"pointer",
 
@@ -1015,37 +1199,52 @@ display:"flex",
 
 alignItems:"center",
 
-gap:"12px",
+gap:"10px",
 
 textAlign:"left",
 
 boxShadow:
-"0 8px 20px rgba(0,0,0,.05)",
+"0 4px 12px rgba(0,0,0,.04)",
 
-transition:"0.3s"
-
+transition:"all .25s ease",
 }}
-
 >
 
 <img
 src={product.image}
 alt=""
 style={{
-width:"55px",
-height:"55px",
-borderRadius:"12px",
-objectFit:"cover"
+width:"48px",
+
+height:"48px",
+
+borderRadius:"10px",
+
+objectFit:"cover",
+
+flexShrink:0,
 }}
 />
 
-<div>
+<div
+style={{
+overflow:"hidden",
+}}
+>
 
 <div
 style={{
 fontWeight:"700",
-fontSize:"14px",
-color:"#111827"
+
+fontSize:"13px",
+
+color:"#111827",
+
+whiteSpace:"nowrap",
+
+overflow:"hidden",
+
+textOverflow:"ellipsis",
 }}
 >
 
@@ -1055,8 +1254,13 @@ color:"#111827"
 
 <div
 style={{
-fontSize:"12px",
-color:"#6b7280"
+fontSize:"11px",
+
+color:"#2563EB",
+
+fontWeight:"700",
+
+marginTop:"4px",
 }}
 >
 
@@ -1070,6 +1274,7 @@ FCFA
 </div>
 
 </button>
+
 ))
 }
 
@@ -1085,130 +1290,170 @@ FCFA
 
 <div
 style={{
-padding:"30px 20px"
+padding:
+window.innerWidth < 768
+? "20px 12px"
+: "30px 20px",
 }}
 >
 
 <h2
 style={{
 textAlign:"center",
-fontSize:"28px",
+
+fontSize:
+window.innerWidth < 768
+? "20px"
+: "28px",
+
 fontWeight:"900",
-marginBottom:"30px",
-color:"#111827"
+
+marginBottom:"20px",
+
+color:"#111827",
 }}
 >
-
 Résultats trouvés
-
 </h2>
 
 <div
 style={{
 display:"grid",
+
 gridTemplateColumns:
-"repeat(auto-fit,minmax(260px,1fr))",
-gap:"20px"
+window.innerWidth < 768
+? "repeat(2,1fr)"
+: "repeat(auto-fit,minmax(230px,1fr))",
+
+gap:
+window.innerWidth < 768
+? "12px"
+: "18px",
 }}
 >
 
 {products.map((product)=>(
 
 <div
-
 key={product._id}
 
-style={{
+onClick={() =>
+window.location.href =
+`/product/${product._id}`
+}
 
+style={{
 background:"#fff",
 
-borderRadius:"24px",
+borderRadius:"18px",
 
 overflow:"hidden",
 
 cursor:"pointer",
 
+border:"1px solid #EEF2F7",
+
 boxShadow:
-"0 10px 25px rgba(0,0,0,.06)",
+"0 6px 18px rgba(0,0,0,.05)",
 
-transition:"all .3s ease"
-
+transition:"all .3s ease",
 }}
-
-onClick={()=>
-window.location.href =
-`/product/${product._id}`
-}
-
 >
+
+{/* IMAGE */}
 
 <div
 style={{
-position:"relative"
+position:"relative",
 }}
 >
 
 <img
-
 src={product.image}
 
 alt={product.name}
 
 style={{
-
 width:"100%",
 
-height:"240px",
+height:
+window.innerWidth < 768
+? "150px"
+: "220px",
 
-objectFit:"cover"
-
+objectFit:"cover",
 }}
-
 />
 
 <div
 style={{
 position:"absolute",
-top:"12px",
-right:"12px",
-background:"#fff",
-padding:"8px",
+
+top:"10px",
+
+right:"10px",
+
+background:"#FFFFFF",
+
+width:"32px",
+
+height:"32px",
+
 borderRadius:"50%",
+
+display:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
 boxShadow:
-"0 5px 15px rgba(0,0,0,.08)"
+"0 4px 12px rgba(0,0,0,.08)",
 }}
 >
 
 <FaEye
-color="#2563eb"
+size={13}
+color="#2563EB"
 />
 
 </div>
 
 </div>
 
+{/* INFOS */}
+
 <div
 style={{
-padding:"18px"
+padding:"14px",
 }}
 >
 
 <div
 style={{
 display:"inline-flex",
+
 alignItems:"center",
-gap:"6px",
-padding:"6px 10px",
-borderRadius:"30px",
-background:"#eff6ff",
-color:"#2563eb",
-fontSize:"12px",
+
+gap:"5px",
+
+padding:"5px 8px",
+
+borderRadius:"20px",
+
+background:"#EFF6FF",
+
+color:"#2563EB",
+
+fontSize:"10px",
+
 fontWeight:"700",
-marginBottom:"12px"
+
+marginBottom:"10px",
 }}
 >
 
-<FaTag />
+<FaTag size={10} />
 
 {product.category}
 
@@ -1216,11 +1461,26 @@ marginBottom:"12px"
 
 <h3
 style={{
-fontSize:"17px",
+fontSize:
+window.innerWidth < 768
+? "13px"
+: "15px",
+
 fontWeight:"800",
+
 color:"#111827",
-marginBottom:"10px",
-minHeight:"50px"
+
+marginBottom:"8px",
+
+overflow:"hidden",
+
+display:"-webkit-box",
+
+WebkitLineClamp:"2",
+
+WebkitBoxOrient:"vertical",
+
+minHeight:"38px",
 }}
 >
 
@@ -1230,45 +1490,48 @@ minHeight:"50px"
 
 <p
 style={{
-fontSize:"24px",
+fontSize:
+window.innerWidth < 768
+? "18px"
+: "22px",
+
 fontWeight:"900",
-color:"#2563eb",
-marginBottom:"12px"
+
+color:"#2563EB",
+
+marginBottom:"10px",
 }}
 >
 
 {Number(
 product.price
 ).toLocaleString()}
-FCFA
+ FCFA
 
 </p>
 
 <div
 style={{
 display:"flex",
-justifyContent:"space-between",
-alignItems:"center",
-marginBottom:"15px"
-}}
->
 
-<div
-style={{
-display:"flex",
 alignItems:"center",
-gap:"6px"
+
+gap:"5px",
 }}
 >
 
 <FaStar
-color="#f59e0b"
+size={12}
+color="#F59E0B"
 />
 
 <span
 style={{
-fontSize:"13px",
-fontWeight:"600"
+fontSize:"11px",
+
+fontWeight:"600",
+
+color:"#6B7280",
 }}
 >
 
@@ -1277,18 +1540,15 @@ product.reviews
 ? product.reviews.length
 : 0
 }
-
-avis
+ avis
 
 </span>
 
 </div>
-</div>
 
 </div>
 
 </div>
-
 
 ))}
 
@@ -1303,22 +1563,39 @@ avis
 <div
 style={{
 position:"fixed",
-bottom:"12px",
+
+bottom:"10px",
+
 left:"50%",
+
 transform:"translateX(-50%)",
-width:"92%",
-maxWidth:"520px",
-background:"rgba(255,255,255,.92)",
-backdropFilter:"blur(25px)",
-borderRadius:"24px",
-padding:"10px 8px",
+
+width:"94%",
+
+maxWidth:"500px",
+
+background:"rgba(255,255,255,.96)",
+
+backdropFilter:"blur(20px)",
+
+WebkitBackdropFilter:"blur(20px)",
+
+border:"1px solid rgba(229,231,235,.8)",
+
+borderRadius:"20px",
+
+padding:"8px 6px",
+
 display:"flex",
+
 justifyContent:"space-between",
+
 alignItems:"center",
+
 boxShadow:
-"0 12px 35px rgba(0,0,0,.10)",
+"0 8px 30px rgba(0,0,0,.08)",
+
 zIndex:999,
-transition:"all .4s ease"
 }}
 >
 
@@ -1326,7 +1603,7 @@ transition:"all .4s ease"
 to="/"
 style={bottomStyle}
 >
-<FaHome size={18}/>
+<FaHome size={17}/>
 <span>Accueil</span>
 </Link>
 
@@ -1334,38 +1611,54 @@ style={bottomStyle}
 to="/boutique"
 style={bottomStyle}
 >
-<FaStore size={18}/>
+<FaStore size={17}/>
 <span>Boutique</span>
 </Link>
+
+{/* IA */}
 
 <Link
 to="/ai-mode"
 style={{
 ...bottomStyle,
-color:"#2563eb"
+
+color:"#2563EB",
 }}
 >
+
 <div
 style={{
-width:"42px",
-height:"42px",
-borderRadius:"14px",
+width:"40px",
+
+height:"40px",
+
+borderRadius:"12px",
+
 background:
-"linear-gradient(135deg,#2563eb,#1d4ed8)",
+"linear-gradient(135deg,#2563EB,#1D4ED8)",
+
 display:"flex",
+
 justifyContent:"center",
+
 alignItems:"center",
-color:"#fff",
+
+color:"#FFF",
+
 boxShadow:
-"0 8px 20px rgba(37,99,235,.25)"
+"0 6px 18px rgba(37,99,235,.20)",
 }}
 >
-<FaRobot size={18}/>
+
+<FaRobot size={16}/>
+
 </div>
 
 <span
 style={{
-marginTop:"4px"
+marginTop:"3px",
+
+fontWeight:"800",
 }}
 >
 IA
@@ -1377,7 +1670,7 @@ IA
 to="/checkout"
 style={bottomStyle}
 >
-<FaShoppingCart size={18}/>
+<FaShoppingCart size={17}/>
 <span>Panier</span>
 </Link>
 
@@ -1385,11 +1678,9 @@ style={bottomStyle}
 to="/user-login"
 style={bottomStyle}
 >
-<FaUser size={18}/>
+<FaUser size={17}/>
 <span>Compte</span>
 </Link>
-
-
 
 </div>
 
@@ -1408,27 +1699,26 @@ style={bottomStyle}
 
 const suggestionStyle = {
 
-background:"#ffffff",
+background:"#FFFFFF",
 
-border:"none",
+border:"1px solid #E5E7EB",
 
-padding:"18px",
+padding:"14px",
 
-borderRadius:"20px",
+borderRadius:"16px",
 
-fontSize:"16px",
+fontSize:"14px",
 
 fontWeight:"700",
 
 cursor:"pointer",
 
 boxShadow:
-"0 10px 25px rgba(0,0,0,.06)",
+"0 4px 12px rgba(0,0,0,.04)",
 
 color:"#111827",
 
-transition:"0.3s"
-
+transition:"all .25s ease",
 };
 
 const bottomStyle = {
@@ -1441,20 +1731,19 @@ alignItems:"center",
 
 justifyContent:"center",
 
-gap:"4px",
+gap:"3px",
 
 textDecoration:"none",
 
-color:"#6b7280",
+color:"#64748B",
 
-fontSize:"11px",
+fontSize:"10px",
 
 fontWeight:"700",
 
-minWidth:"55px",
+minWidth:"50px",
 
-transition:"all .3s ease"
-
+transition:"all .25s ease",
 };
 
 <style>
@@ -1492,7 +1781,7 @@ transform: scale(1);
 }
 
 50% {
-transform: scale(1.08);
+transform: scale(1.06);
 }
 
 100% {
@@ -1508,23 +1797,11 @@ transform: translateY(0px);
 }
 
 50% {
-transform: translateY(-10px);
+transform: translateY(-8px);
 }
 
 100% {
 transform: translateY(0px);
-}
-
-}
-
-@keyframes rotateAura {
-
-from {
-transform: rotate(0deg);
-}
-
-to {
-transform: rotate(360deg);
 }
 
 }
@@ -1546,8 +1823,26 @@ animation:
 spin 1s linear infinite;
 }
 
-`}
+body {
+margin: 0;
+padding: 0;
+background: #F8FBFF;
+font-family:
+Inter,
+system-ui,
+sans-serif;
+}
 
+::-webkit-scrollbar {
+width: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+background: #CBD5E1;
+border-radius: 20px;
+}
+
+`}
 </style>
 
 export default AiMode;
