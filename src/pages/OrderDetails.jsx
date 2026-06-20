@@ -176,20 +176,29 @@ export default function OrderDetails() {
       }}
     >
 
-      {/* MAIN CARD */}
+     {/* MAIN CARD */}
 
-      <div
-        style={{
-          background: "white",
+<div
+  style={{
+    background: "#FFFFFF",
 
-          borderRadius: "18px",
+    maxWidth: "850px",
 
-          padding: "20px",
+    margin: "0 auto",
 
-          boxShadow:
-            "0 4px 20px rgba(0,0,0,0.06)",
-        }}
-      >
+    borderRadius: "16px",
+
+    padding:
+      window.innerWidth < 768
+        ? "16px"
+        : "22px",
+
+    border: "1px solid #E5E7EB",
+
+    boxShadow:
+      "0 2px 12px rgba(15,23,42,0.05)",
+  }}
+>
 
   {/* HEADER */}
 

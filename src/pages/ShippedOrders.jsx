@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import {
-  FaTruckFast,
   FaBoxOpen,
   FaShippingFast,
   FaMapMarkerAlt,
   FaMoneyBillWave,
   FaBox,
 } from "react-icons/fa";
+
+import { FaTruckFast } from "react-icons/fa6";
 
 export default function ShippedOrders() {
 
