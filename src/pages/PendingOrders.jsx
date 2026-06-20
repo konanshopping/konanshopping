@@ -646,8 +646,12 @@ return (
         {/* IMAGE */}
 
         <img
-          src={item.image}
-          alt={item.name}
+  src={
+    item.image?.startsWith("http")
+      ? item.image
+      : `https://konanshopping-production.up.railway.app${item.image}`
+  }
+  alt={item.name}
           style={{
             width: "60px",
             height: "60px",
