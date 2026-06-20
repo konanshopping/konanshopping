@@ -65,193 +65,168 @@ export default function PendingOrders() {
 
 ;
 
-  return (
-
-    <div
-      style={{
-        background: "#f5f7fb",
-        minHeight: "100vh",
-        padding: "20px",
-      }}
-    >
-
-     {/* HEADER */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-    padding:
-      window.innerWidth < 768
-        ? "20px"
-        : "30px",
-
-    borderRadius: "28px",
-
-    color: "#FFFFFF",
-
-    marginBottom: "25px",
-
-    position: "relative",
-
-    overflow: "hidden",
-
-    boxShadow:
-      "0 15px 35px rgba(37,99,235,0.18)",
-
-    border:
-      "1px solid rgba(255,255,255,0.08)",
-  }}
->
-
-  {/* GLOW 1 */}
+return (
 
   <div
     style={{
-      position: "absolute",
-
-      top: "-70px",
-
-      right: "-70px",
-
-      width: "180px",
-
-      height: "180px",
-
-      borderRadius: "50%",
-
-      background:
-        "rgba(255,255,255,0.08)",
-    }}
-  />
-
-  {/* GLOW 2 */}
-
-  <div
-    style={{
-      position: "absolute",
-
-      bottom: "-50px",
-
-      left: "-50px",
-
-      width: "140px",
-
-      height: "140px",
-
-      borderRadius: "50%",
-
-      background:
-        "rgba(255,255,255,0.05)",
-    }}
-  />
-
-  {/* CONTENT */}
-
-  <div
-    style={{
-      position: "relative",
-
-      zIndex: 2,
-
-      display: "flex",
-
-      alignItems: "center",
-
-      gap:
-        window.innerWidth < 768
-          ? "14px"
-          : "18px",
+      background: "#f5f7fb",
+      minHeight: "100vh",
+      padding: "20px",
     }}
   >
 
-    {/* ICON */}
+    {/* HEADER */}
 
     <div
       style={{
-        width:
-          window.innerWidth < 768
-            ? "60px"
-            : "70px",
-
-        height:
-          window.innerWidth < 768
-            ? "60px"
-            : "70px",
-
-        borderRadius: "20px",
-
         background:
-          "rgba(255,255,255,0.15)",
+          "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
-        display: "flex",
+        padding:
+          window.innerWidth < 768
+            ? "14px"
+            : "18px",
 
-        justifyContent: "center",
+        borderRadius: "18px",
 
-        alignItems: "center",
+        color: "#FFFFFF",
 
-        backdropFilter: "blur(12px)",
+        marginBottom: "18px",
 
-        border:
-          "1px solid rgba(255,255,255,0.15)",
+        position: "relative",
 
-        flexShrink: 0,
+        overflow: "hidden",
+
+        boxShadow:
+          "0 8px 20px rgba(37,99,235,0.12)",
       }}
     >
 
-      <FaHourglassHalf
-        style={{
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "28px",
-
-          color: "#FFFFFF",
-        }}
-      />
-
-    </div>
-
-    {/* TEXT */}
-
-    <div
-      style={{
-        flex: 1,
-        minWidth: 0,
-      }}
-    >
+      {/* GLOW */}
 
       <div
         style={{
+          position: "absolute",
+
+          top: "-40px",
+
+          right: "-40px",
+
+          width: "100px",
+
+          height: "100px",
+
+          borderRadius: "50%",
+
+          background:
+            "rgba(255,255,255,0.06)",
+        }}
+      />
+
+      {/* CONTENT */}
+
+      <div
+        style={{
+          position: "relative",
+
+          zIndex: 2,
+
           display: "flex",
 
           alignItems: "center",
 
-          gap: "8px",
-
-          flexWrap: "wrap",
+          gap: "12px",
         }}
       >
 
-        <h1
+        {/* ICON */}
+
+        <div
           style={{
-            margin: 0,
-
-            fontSize:
+            width:
               window.innerWidth < 768
-                ? "24px"
-                : "32px",
+                ? "45px"
+                : "50px",
 
-            fontWeight: "900",
+            height:
+              window.innerWidth < 768
+                ? "45px"
+                : "50px",
 
-            lineHeight: 1.1,
+            borderRadius: "14px",
 
-            letterSpacing: "-0.8px",
+            background:
+              "rgba(255,255,255,0.15)",
+
+            display: "flex",
+
+            justifyContent: "center",
+
+            alignItems: "center",
+
+            flexShrink: 0,
           }}
         >
-          Commandes en attente
-        </h1>
+
+          <FaHourglassHalf
+            style={{
+              fontSize:
+                window.innerWidth < 768
+                  ? "18px"
+                  : "20px",
+
+              color: "#FFFFFF",
+            }}
+          />
+
+        </div>
+
+        {/* TEXT */}
+
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+
+          <h1
+            style={{
+              margin: 0,
+
+              fontSize:
+                window.innerWidth < 768
+                  ? "20px"
+                  : "24px",
+
+              fontWeight: "800",
+
+              lineHeight: 1.2,
+            }}
+          >
+            Commandes en attente
+          </h1>
+
+          <p
+            style={{
+              margin: "4px 0 0 0",
+
+              fontSize:
+                window.innerWidth < 768
+                  ? "12px"
+                  : "13px",
+
+              opacity: 0.9,
+
+              lineHeight: "18px",
+            }}
+          >
+            Suivez vos commandes en cours de traitement.
+          </p>
+
+        </div>
+
+        {/* BADGE */}
 
         <div
           style={{
@@ -262,46 +237,18 @@ export default function PendingOrders() {
 
             borderRadius: "999px",
 
-            fontSize: "10px",
+            fontSize: "11px",
 
-            fontWeight: "800",
-
-            border:
-              "1px solid rgba(255,255,255,0.15)",
+            fontWeight: "700",
           }}
         >
-          EN COURS
+          {orders.length}
         </div>
 
       </div>
 
-      <p
-        style={{
-          marginTop: "8px",
-
-          marginBottom: 0,
-
-          fontSize:
-            window.innerWidth < 768
-              ? "13px"
-              : "15px",
-
-          opacity: 0.95,
-
-          lineHeight: "22px",
-
-          maxWidth: "500px",
-        }}
-      >
-        Consultez vos commandes en cours de traitement
-        et suivez leur évolution en temps réel.
-      </p>
-
     </div>
 
-  </div>
-
-</div>
 
 {/* AUCUNE COMMANDE */}
 
@@ -313,21 +260,21 @@ export default function PendingOrders() {
 
       padding:
         window.innerWidth < 768
-          ? "40px 20px"
-          : "60px 35px",
+          ? "28px 18px"
+          : "40px 25px",
 
-      borderRadius: "28px",
+      borderRadius: "20px",
 
       textAlign: "center",
 
       border: "1px solid #E5E7EB",
 
       boxShadow:
-        "0 15px 35px rgba(15,23,42,0.06)",
-
-      overflow: "hidden",
+        "0 8px 20px rgba(15,23,42,0.05)",
 
       position: "relative",
+
+      overflow: "hidden",
     }}
   >
 
@@ -337,18 +284,18 @@ export default function PendingOrders() {
       style={{
         position: "absolute",
 
-        top: "-60px",
+        top: "-40px",
 
-        right: "-60px",
+        right: "-40px",
 
-        width: "150px",
+        width: "100px",
 
-        height: "150px",
+        height: "100px",
 
         borderRadius: "50%",
 
         background:
-          "rgba(37,99,235,0.05)",
+          "rgba(37,99,235,0.04)",
       }}
     />
 
@@ -358,17 +305,17 @@ export default function PendingOrders() {
       style={{
         width:
           window.innerWidth < 768
-            ? "90px"
-            : "110px",
+            ? "70px"
+            : "85px",
 
         height:
           window.innerWidth < 768
-            ? "90px"
-            : "110px",
+            ? "70px"
+            : "85px",
 
-        margin: "0 auto 24px",
+        margin: "0 auto 16px",
 
-        borderRadius: "28px",
+        borderRadius: "20px",
 
         background:
           "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
@@ -378,9 +325,6 @@ export default function PendingOrders() {
         justifyContent: "center",
 
         alignItems: "center",
-
-        boxShadow:
-          "0 12px 25px rgba(37,99,235,0.10)",
       }}
     >
 
@@ -388,8 +332,8 @@ export default function PendingOrders() {
         style={{
           fontSize:
             window.innerWidth < 768
-              ? "40px"
-              : "50px",
+              ? "28px"
+              : "34px",
 
           color: "#2563EB",
         }}
@@ -405,21 +349,21 @@ export default function PendingOrders() {
 
         alignItems: "center",
 
-        gap: "8px",
+        gap: "6px",
 
         background: "#EFF6FF",
 
         color: "#2563EB",
 
-        padding: "8px 14px",
+        padding: "6px 12px",
 
         borderRadius: "999px",
 
-        fontSize: "12px",
+        fontSize: "11px",
 
-        fontWeight: "800",
+        fontWeight: "700",
 
-        marginBottom: "18px",
+        marginBottom: "14px",
       }}
     >
 
@@ -437,12 +381,12 @@ export default function PendingOrders() {
 
         fontSize:
           window.innerWidth < 768
-            ? "24px"
-            : "30px",
+            ? "20px"
+            : "24px",
 
-        fontWeight: "900",
+        fontWeight: "800",
 
-        marginBottom: "12px",
+        marginBottom: "8px",
 
         lineHeight: 1.2,
       }}
@@ -458,21 +402,17 @@ export default function PendingOrders() {
 
         fontSize:
           window.innerWidth < 768
-            ? "14px"
-            : "16px",
+            ? "13px"
+            : "14px",
 
-        lineHeight: "28px",
+        lineHeight: "22px",
 
-        maxWidth: "500px",
+        maxWidth: "420px",
 
         margin: "0 auto",
-
-        fontWeight: "500",
       }}
     >
-      Vous n'avez actuellement aucune commande en cours
-      de traitement. Toutes vos nouvelles commandes
-      apparaîtront ici automatiquement.
+      Vous n'avez actuellement aucune commande en cours de traitement.
     </p>
 
   </div>
@@ -491,13 +431,21 @@ export default function PendingOrders() {
   }
   style={{
     background: "#FFFFFF",
-    borderRadius: "28px",
-    padding: "20px",
-    marginBottom: "25px",
+
+    borderRadius: "18px",
+
+    padding: "16px",
+
+    marginBottom: "16px",
+
     boxShadow:
-      "0 10px 30px rgba(15,23,42,0.06)",
+      "0 4px 15px rgba(15,23,42,0.05)",
+
     border: "1px solid #E5E7EB",
+
     cursor: "pointer",
+
+    transition: "0.3s",
   }}
 >
 
@@ -509,18 +457,13 @@ export default function PendingOrders() {
 
     justifyContent: "space-between",
 
-    alignItems:
-      window.innerWidth < 768
-        ? "flex-start"
-        : "center",
+    alignItems: "center",
 
-    gap: "12px",
+    gap: "10px",
 
-    flexWrap: "wrap",
+    marginBottom: "12px",
 
-    marginBottom: "20px",
-
-    paddingBottom: "16px",
+    paddingBottom: "12px",
 
     borderBottom:
       "1px solid #F1F5F9",
@@ -535,7 +478,7 @@ export default function PendingOrders() {
 
       alignItems: "center",
 
-      gap: "12px",
+      gap: "10px",
 
       flex: 1,
 
@@ -543,22 +486,18 @@ export default function PendingOrders() {
     }}
   >
 
+    {/* ICON */}
+
     <div
       style={{
-        width:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
+        width: "42px",
 
-        height:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
+        height: "42px",
 
-        borderRadius: "16px",
+        borderRadius: "12px",
 
         background:
-          "linear-gradient(135deg,#DBEAFE,#BFDBFE)",
+          "#EFF6FF",
 
         display: "flex",
 
@@ -574,17 +513,18 @@ export default function PendingOrders() {
         style={{
           color: "#2563EB",
 
-          fontSize:
-            window.innerWidth < 768
-              ? "20px"
-              : "24px",
+          fontSize: "18px",
         }}
       />
 
     </div>
 
+    {/* INFO */}
+
     <div
       style={{
+        flex: 1,
+
         minWidth: 0,
       }}
     >
@@ -595,12 +535,9 @@ export default function PendingOrders() {
 
           color: "#0F172A",
 
-          fontSize:
-            window.innerWidth < 768
-              ? "18px"
-              : "24px",
+          fontSize: "16px",
 
-          fontWeight: "900",
+          fontWeight: "800",
         }}
       >
         Commande
@@ -610,27 +547,15 @@ export default function PendingOrders() {
         style={{
           color: "#64748B",
 
-          marginTop: "6px",
+          margin: "3px 0 0 0",
 
-          marginBottom: 0,
-
-          fontSize:
-            window.innerWidth < 768
-              ? "11px"
-              : "13px",
-
-          fontWeight: "600",
+          fontSize: "11px",
 
           overflow: "hidden",
 
           textOverflow: "ellipsis",
 
           whiteSpace: "nowrap",
-
-          maxWidth:
-            window.innerWidth < 768
-              ? "180px"
-              : "320px",
         }}
       >
         #{order._id}
@@ -648,28 +573,19 @@ export default function PendingOrders() {
 
       color: "#92400E",
 
-      padding:
-        window.innerWidth < 768
-          ? "8px 12px"
-          : "10px 16px",
+      padding: "6px 10px",
 
       borderRadius: "999px",
 
-      fontWeight: "800",
+      fontSize: "11px",
 
-      fontSize:
-        window.innerWidth < 768
-          ? "12px"
-          : "13px",
+      fontWeight: "700",
 
       display: "flex",
 
       alignItems: "center",
 
-      gap: "6px",
-
-      border:
-        "1px solid #FCD34D",
+      gap: "5px",
     }}
   >
 
@@ -681,48 +597,35 @@ export default function PendingOrders() {
 
 </div>
 
-          {/* PRODUITS */}
 
-{order.items?.map(
-  (item, index) => (
+{/* PRODUITS */}
+
+<div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    marginBottom: "15px",
+  }}
+>
+
+  {order.items?.map((item, index) => (
 
     <div
       key={index}
-
       style={{
         display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "12px",
 
-        justifyContent:
-          "space-between",
+        padding: "10px",
 
-        alignItems:
-          window.innerWidth < 768
-            ? "flex-start"
-            : "center",
+        borderRadius: "14px",
 
-        flexDirection:
-          window.innerWidth < 768
-            ? "column"
-            : "row",
+        background: "#F8FAFC",
 
-        gap: "15px",
-
-        border:
-          "1px solid #E5E7EB",
-
-        borderRadius: "20px",
-
-        padding:
-          window.innerWidth < 768
-            ? "14px"
-            : "18px",
-
-        marginBottom: "15px",
-
-        background: "#FFFFFF",
-
-        boxShadow:
-          "0 6px 20px rgba(15,23,42,0.04)",
+        border: "1px solid #E2E8F0",
       }}
     >
 
@@ -731,127 +634,37 @@ export default function PendingOrders() {
       <div
         style={{
           display: "flex",
-
           alignItems: "center",
+          gap: "12px",
 
-          gap: "14px",
+          flex: 1,
 
-          width: "100%",
+          minWidth: 0,
         }}
       >
 
         {/* IMAGE */}
 
-        <div
+        <img
+          src={item.image}
+          alt={item.name}
           style={{
-            position: "relative",
-
+            width: "60px",
+            height: "60px",
+            objectFit: "cover",
+            borderRadius: "12px",
             flexShrink: 0,
           }}
-        >
-
-          <img
-            src={item.image}
-
-            alt={item.name}
-
-            style={{
-              width:
-                window.innerWidth < 768
-                  ? "80px"
-                  : "95px",
-
-              height:
-                window.innerWidth < 768
-                  ? "80px"
-                  : "95px",
-
-              objectFit: "cover",
-
-              borderRadius: "18px",
-
-              border:
-                "1px solid #E5E7EB",
-            }}
-          />
-
-          <div
-            style={{
-              position: "absolute",
-
-              top: "-6px",
-
-              right: "-6px",
-
-              background:
-                "#2563EB",
-
-              color: "#FFFFFF",
-
-              width: "24px",
-
-              height: "24px",
-
-              borderRadius: "50%",
-
-              display: "flex",
-
-              justifyContent:
-                "center",
-
-              alignItems:
-                "center",
-
-              fontSize: "11px",
-
-              fontWeight: "900",
-            }}
-          >
-            {index + 1}
-          </div>
-
-        </div>
+        />
 
         {/* INFOS */}
 
         <div
           style={{
             flex: 1,
-
             minWidth: 0,
           }}
         >
-
-          <div
-            style={{
-              display: "inline-flex",
-
-              alignItems: "center",
-
-              gap: "6px",
-
-              background:
-                "#EFF6FF",
-
-              color: "#2563EB",
-
-              padding: "5px 10px",
-
-              borderRadius: "999px",
-
-              fontSize: "11px",
-
-              fontWeight: "800",
-
-              marginBottom: "8px",
-            }}
-          >
-
-            <FaShoppingBag />
-
-            Produit
-
-          </div>
 
           <h3
             style={{
@@ -859,14 +672,15 @@ export default function PendingOrders() {
 
               color: "#111827",
 
-              fontSize:
-                window.innerWidth < 768
-                  ? "15px"
-                  : "17px",
+              fontSize: "14px",
 
-              fontWeight: "800",
+              fontWeight: "700",
 
-              lineHeight: 1.4,
+              overflow: "hidden",
+
+              textOverflow: "ellipsis",
+
+              whiteSpace: "nowrap",
             }}
           >
             {item.name}
@@ -874,37 +688,23 @@ export default function PendingOrders() {
 
           <div
             style={{
-              marginTop: "10px",
+              marginTop: "4px",
 
-              display: "inline-flex",
+              display: "flex",
 
               alignItems: "center",
 
-              gap: "6px",
+              gap: "5px",
 
-              background:
-                "#F8FAFC",
-
-              border:
-                "1px solid #E2E8F0",
-
-              padding: "6px 10px",
-
-              borderRadius: "999px",
-
-              color: "#475569",
+              color: "#64748B",
 
               fontSize: "12px",
-
-              fontWeight: "700",
             }}
           >
 
             <FaBoxOpen />
 
-            Quantité :
-            {" "}
-            {item.quantity || 1}
+            Qté : {item.quantity || 1}
 
           </div>
 
@@ -912,72 +712,42 @@ export default function PendingOrders() {
 
       </div>
 
-      {/* RIGHT */}
+      {/* PRIX */}
 
       <div
         style={{
-          width:
-            window.innerWidth < 768
-              ? "100%"
-              : "auto",
-
-          textAlign:
-            window.innerWidth < 768
-              ? "left"
-              : "right",
+          textAlign: "right",
+          flexShrink: 0,
         }}
       >
 
-        <p
+        <span
           style={{
-            margin: 0,
-
-            color: "#94A3B8",
-
-            fontSize: "11px",
-
-            fontWeight: "700",
-
-            textTransform:
-              "uppercase",
-          }}
-        >
-          Prix
-        </p>
-
-        <h2
-          style={{
-            margin: "6px 0 0 0",
-
             color: "#2563EB",
 
-            fontSize:
-              window.innerWidth < 768
-                ? "22px"
-                : "26px",
+            fontSize: "14px",
 
-            fontWeight: "900",
+            fontWeight: "800",
           }}
         >
-          {item.price}
-          {" "}
-          FCFA
-        </h2>
+          {item.price} FCFA
+        </span>
 
       </div>
 
     </div>
 
-  )
-)}
+  ))}
 
-          {/* FOOTER */}
+</div>
+
+{/* FOOTER */}
 
 <div
   style={{
-    marginTop: "18px",
+    marginTop: "12px",
 
-    paddingTop: "18px",
+    paddingTop: "12px",
 
     borderTop:
       "1px solid #E5E7EB",
@@ -987,17 +757,11 @@ export default function PendingOrders() {
     justifyContent:
       "space-between",
 
-    alignItems:
-      window.innerWidth < 768
-        ? "flex-start"
-        : "center",
+    alignItems: "center",
 
-    flexDirection:
-      window.innerWidth < 768
-        ? "column"
-        : "row",
+    gap: "10px",
 
-    gap: "12px",
+    flexWrap: "wrap",
   }}
 >
 
@@ -1011,13 +775,13 @@ export default function PendingOrders() {
 
         alignItems: "center",
 
-        gap: "8px",
+        gap: "5px",
 
         color: "#64748B",
 
-        fontSize: "13px",
+        fontSize: "11px",
 
-        fontWeight: "700",
+        fontWeight: "600",
       }}
     >
 
@@ -1027,70 +791,56 @@ export default function PendingOrders() {
         }}
       />
 
-      Montant total
+      Total
 
     </div>
 
     <h2
       style={{
-        margin: "8px 0 0 0",
+        margin: "4px 0 0 0",
 
         color: "#0F172A",
 
         fontSize:
           window.innerWidth < 768
-            ? "28px"
-            : "34px",
+            ? "22px"
+            : "24px",
 
-        fontWeight: "900",
-
-        lineHeight: 1,
+        fontWeight: "800",
       }}
     >
-      {order.total}
-      {" "}
-      FCFA
+      {order.total} FCFA
     </h2>
 
   </div>
 
-  {/* BADGE */}
+  {/* STATUS */}
 
   <div
     style={{
-      background:
-        "linear-gradient(135deg,#DCFCE7,#BBF7D0)",
+      background: "#DCFCE7",
 
       color: "#15803D",
 
-      padding:
-        window.innerWidth < 768
-          ? "10px 14px"
-          : "12px 18px",
+      padding: "6px 10px",
 
       borderRadius: "999px",
 
-      fontWeight: "800",
+      fontSize: "11px",
 
-      fontSize:
-        window.innerWidth < 768
-          ? "12px"
-          : "13px",
+      fontWeight: "700",
 
       display: "flex",
 
       alignItems: "center",
 
-      gap: "8px",
-
-      border:
-        "1px solid #BBF7D0",
+      gap: "5px",
     }}
   >
 
     <FaCheckCircle />
 
-    Commande enregistrée
+    Enregistrée
 
   </div>
 
@@ -1102,7 +852,7 @@ export default function PendingOrders() {
   style={{
     width: "100%",
 
-    marginTop: "18px",
+    marginTop: "12px",
 
     border: "none",
 
@@ -1111,19 +861,13 @@ export default function PendingOrders() {
 
     color: "#FFFFFF",
 
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "16px",
+    padding: "12px",
 
-    borderRadius: "16px",
+    borderRadius: "12px",
 
-    fontWeight: "800",
+    fontWeight: "700",
 
-    fontSize:
-      window.innerWidth < 768
-        ? "14px"
-        : "15px",
+    fontSize: "13px",
 
     cursor: "pointer",
 
@@ -1133,16 +877,13 @@ export default function PendingOrders() {
 
     alignItems: "center",
 
-    gap: "10px",
-
-    boxShadow:
-      "0 10px 25px rgba(37,99,235,0.20)",
+    gap: "8px",
   }}
 >
 
   <FaTruck />
 
-  Voir les détails de livraison
+  Suivre la livraison
 
 </button>
 
