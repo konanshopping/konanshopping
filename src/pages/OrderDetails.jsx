@@ -167,14 +167,14 @@ style={{
 background:
 order.status === "Livrée"
 ? "#dcfce7"
-: order.status === "Expédiée"
+: order.status === "En livraison"
 ? "#dbeafe"
 : "#fef3c7",
 
 color:
 order.status === "Livrée"
 ? "#166534"
-: order.status === "Expédiée"
+: order.status === "En livraison"
 ? "#1d4ed8"
 : "#92400e",
 
@@ -203,7 +203,7 @@ order.status === "Livrée"
 
 ? <FaCheckCircle />
 
-: order.status === "Expédiée"
+: order.status === "En livraison"
 
 ? <FaTruck />
 

@@ -30,7 +30,7 @@ export default function ShippedOrders() {
           (o) =>
 
             o.status ===
-              "Expédiée"
+              "En livraison"
 
         );
 
