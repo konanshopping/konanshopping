@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import {
+  FaTruckFast,
+  FaBoxOpen,
+  FaShippingFast,
+  FaMapMarkerAlt,
+  FaMoneyBillWave,
+  FaBox,
+} from "react-icons/fa";
+
 export default function ShippedOrders() {
 
   const [orders, setOrders] =
@@ -62,28 +71,28 @@ export default function ShippedOrders() {
 
       {/* HEADER */}
 
-      <div
+<div
   style={{
     background:
-      "linear-gradient(135deg,#3b82f6,#2563eb)",
+      "linear-gradient(135deg,#3B82F6,#2563EB)",
 
     padding:
       window.innerWidth < 768
-        ? "22px"
-        : "28px",
+        ? "16px"
+        : "22px",
 
-    borderRadius: "24px",
+    borderRadius: "20px",
 
-    color: "white",
+    color: "#FFF",
 
-    marginBottom: "25px",
+    marginBottom: "18px",
 
     position: "relative",
 
     overflow: "hidden",
 
     boxShadow:
-      "0 12px 30px rgba(37,99,235,0.18)",
+      "0 8px 20px rgba(37,99,235,0.15)",
   }}
 >
 
@@ -92,108 +101,144 @@ export default function ShippedOrders() {
   <div
     style={{
       position: "absolute",
-
-      top: "-90px",
-
-      right: "-90px",
-
-      width: "180px",
-
-      height: "180px",
-
+      top: "-60px",
+      right: "-60px",
+      width: "120px",
+      height: "120px",
       borderRadius: "50%",
-
       background:
         "rgba(255,255,255,0.07)",
     }}
   />
 
-  {/* CONTENT */}
-
   <div
     style={{
       position: "relative",
-
       zIndex: 2,
-
       display: "flex",
-
       alignItems: "center",
-
-      gap: "14px",
+      justifyContent:
+        "space-between",
+      gap: "12px",
     }}
   >
 
-    {/* ICON */}
+    {/* LEFT */}
 
     <div
       style={{
-        width: "58px",
-
-        height: "58px",
-
-        borderRadius: "18px",
-
-        background:
-          "rgba(255,255,255,0.12)",
-
         display: "flex",
-
-        justifyContent: "center",
-
         alignItems: "center",
-
-        backdropFilter: "blur(10px)",
+        gap: "12px",
+        flex: 1,
       }}
     >
 
-      <i
-        className="fa-solid fa-truck-fast"
-        style={{
-          fontSize: "24px",
+      {/* ICON */}
 
-          color: "white",
+      <div
+        style={{
+          width:
+            window.innerWidth < 768
+              ? "50px"
+              : "58px",
+
+          height:
+            window.innerWidth < 768
+              ? "50px"
+              : "58px",
+
+          borderRadius: "16px",
+
+          background:
+            "rgba(255,255,255,0.15)",
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          alignItems: "center",
+
+          flexShrink: 0,
         }}
-      ></i>
+      >
+
+        <FaTruckFast
+          style={{
+            fontSize:
+              window.innerWidth < 768
+                ? "22px"
+                : "26px",
+
+            color: "#FFFFFF",
+          }}
+        />
+
+      </div>
+
+      {/* TEXT */}
+
+      <div
+        style={{
+          minWidth: 0,
+        }}
+      >
+
+        <h1
+          style={{
+            margin: 0,
+
+            fontSize:
+              window.innerWidth < 768
+                ? "18px"
+                : "26px",
+
+            fontWeight: "900",
+
+            lineHeight: 1.2,
+          }}
+        >
+          Commandes expédiées
+        </h1>
+
+        <p
+          style={{
+            margin: "4px 0 0 0",
+
+            fontSize:
+              window.innerWidth < 768
+                ? "12px"
+                : "14px",
+
+            opacity: 0.95,
+
+            lineHeight: "20px",
+          }}
+        >
+          Consultez toutes vos commandes déjà envoyées.
+        </p>
+
+      </div>
 
     </div>
 
-    {/* TEXT */}
+    {/* BADGE */}
 
-    <div>
+    <div
+      style={{
+        background:
+          "rgba(255,255,255,0.15)",
 
-      <h1
-        style={{
-          margin: 0,
+        padding: "8px 12px",
 
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "30px",
+        borderRadius: "999px",
 
-          fontWeight: "800",
+        fontSize: "13px",
 
-          letterSpacing: "-0.5px",
-        }}
-      >
-        Commandes expédiées
-      </h1>
-
-      <p
-        style={{
-          marginTop: "6px",
-
-          fontSize: "14px",
-
-          opacity: 0.9,
-
-          lineHeight: "24px",
-        }}
-      >
-        Consultez toutes vos commandes
-        déjà envoyées.
-      </p>
-
+        fontWeight: "800",
+      }}
+    >
+      {orders.length}
     </div>
 
   </div>
@@ -206,33 +251,66 @@ export default function ShippedOrders() {
 
   <div
     style={{
-      background: "white",
+      background: "#FFFFFF",
 
       padding:
         window.innerWidth < 768
-          ? "45px 20px"
-          : "55px 30px",
+          ? "32px 18px"
+          : "45px 28px",
 
-      borderRadius: "24px",
+      borderRadius: "20px",
 
       textAlign: "center",
 
+      border: "1px solid #E5E7EB",
+
       boxShadow:
-        "0 8px 25px rgba(0,0,0,0.05)",
+        "0 8px 25px rgba(15,23,42,0.05)",
+
+      position: "relative",
+
+      overflow: "hidden",
     }}
   >
+
+    {/* GLOW */}
+
+    <div
+      style={{
+        position: "absolute",
+
+        top: "-50px",
+
+        right: "-50px",
+
+        width: "120px",
+
+        height: "120px",
+
+        borderRadius: "50%",
+
+        background:
+          "rgba(37,99,235,0.05)",
+      }}
+    />
 
     {/* ICON */}
 
     <div
       style={{
-        width: "95px",
+        width:
+          window.innerWidth < 768
+            ? "75px"
+            : "90px",
 
-        height: "95px",
+        height:
+          window.innerWidth < 768
+            ? "75px"
+            : "90px",
 
-        margin: "0 auto 22px auto",
+        margin: "0 auto 18px",
 
-        borderRadius: "50%",
+        borderRadius: "22px",
 
         background:
           "linear-gradient(135deg,#DBEAFE,#BFDBFE)",
@@ -245,14 +323,48 @@ export default function ShippedOrders() {
       }}
     >
 
-      <i
-        className="fa-solid fa-box-open"
+      <FaBoxOpen
         style={{
-          fontSize: "42px",
+          fontSize:
+            window.innerWidth < 768
+              ? "34px"
+              : "40px",
 
-          color: "#2563eb",
+          color: "#2563EB",
         }}
-      ></i>
+      />
+
+    </div>
+
+    {/* BADGE */}
+
+    <div
+      style={{
+        display: "inline-flex",
+
+        alignItems: "center",
+
+        gap: "8px",
+
+        background: "#EFF6FF",
+
+        color: "#2563EB",
+
+        padding: "8px 14px",
+
+        borderRadius: "999px",
+
+        fontSize: "12px",
+
+        fontWeight: "800",
+
+        marginBottom: "16px",
+      }}
+    >
+
+      <FaClipboardList />
+
+      Historique vide
 
     </div>
 
@@ -260,13 +372,18 @@ export default function ShippedOrders() {
 
     <h2
       style={{
-        marginTop: "10px",
-
-        fontSize: "24px",
-
-        fontWeight: "700",
-
         color: "#111827",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
+
+        fontWeight: "900",
+
+        marginBottom: "10px",
+
+        lineHeight: 1.2,
       }}
     >
       Aucune commande expédiée
@@ -276,24 +393,24 @@ export default function ShippedOrders() {
 
     <p
       style={{
-        color: "#6b7280",
+        color: "#64748B",
 
-        marginTop: "10px",
+        fontSize:
+          window.innerWidth < 768
+            ? "14px"
+            : "15px",
 
-        fontSize: "15px",
-
-        lineHeight: "28px",
+        lineHeight: "24px",
 
         maxWidth: "420px",
 
-        marginLeft: "auto",
+        margin: "0 auto",
 
-        marginRight: "auto",
+        fontWeight: "500",
       }}
     >
-      Vos commandes expédiées
-      apparaîtront ici dès
-      leur envoi.
+      Les commandes expédiées apparaîtront ici
+      automatiquement dès leur envoi.
     </p>
 
   </div>
@@ -302,205 +419,444 @@ export default function ShippedOrders() {
 
       {/* COMMANDES */}
 
-      {orders.map((order) => (
+{orders.map((order) => (
 
-        <div
-          key={order._id}
+<div
+  key={order._id}
+  style={{
+    background: "#FFFFFF",
 
-          style={{
-            background: "white",
-            borderRadius: "20px",
-            padding: "18px",
-            marginBottom: "18px",
+    borderRadius: "20px",
 
-            boxShadow:
-              "0 4px 12px rgba(0,0,0,0.06)",
-          }}
-        >
+    padding:
+      window.innerWidth < 768
+        ? "16px"
+        : "18px",
+
+    marginBottom: "16px",
+
+    border: "1px solid #E5E7EB",
+
+    boxShadow:
+      "0 4px 12px rgba(15,23,42,0.05)",
+
+    overflow: "hidden",
+  }}
+>
 
           {/* TOP */}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
+<div
+  style={{
+    display: "flex",
 
-              alignItems: "center",
+    justifyContent: "space-between",
 
-              marginBottom: "15px",
-            }}
-          >
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
 
-            <div>
+    gap: "12px",
 
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "18px",
-                  color: "#111827",
-                }}
-              >
-                {order.customerName}
-              </h2>
+    flexWrap: "wrap",
 
-              <p
-                style={{
-                  marginTop: "4px",
-                  color: "#6b7280",
-                  fontSize: "13px",
-                }}
-              >
-                {order.phone}
-              </p>
+    marginBottom: "15px",
 
-            </div>
+    paddingBottom: "14px",
 
-            <div
-              style={{
-                background: "#dbeafe",
-                color: "#2563eb",
+    borderBottom:
+      "1px solid #F1F5F9",
+  }}
+>
 
-                padding:
-                  "8px 14px",
+  <div
+    style={{
+      display: "flex",
 
-                borderRadius: "50px",
+      alignItems: "center",
 
-                fontSize: "13px",
+      gap: "12px",
 
-                fontWeight: "600",
-              }}
-            >
-              Expédiée
-            </div>
+      flex: 1,
 
-          </div>
+      minWidth: 0,
+    }}
+  >
+
+    <div
+      style={{
+        width: "48px",
+
+        height: "48px",
+
+        borderRadius: "14px",
+
+        background:
+          "linear-gradient(135deg,#DBEAFE,#BFDBFE)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
+      }}
+    >
+
+      <FaTruckFast
+        style={{
+          color: "#2563EB",
+
+          fontSize: "22px",
+        }}
+      />
+
+    </div>
+
+    <div
+      style={{
+        minWidth: 0,
+      }}
+    >
+
+      <h2
+        style={{
+          margin: 0,
+
+          color: "#111827",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "17px"
+              : "19px",
+
+          fontWeight: "800",
+
+          overflow: "hidden",
+
+          textOverflow: "ellipsis",
+
+          whiteSpace: "nowrap",
+        }}
+      >
+        {order.customerName}
+      </h2>
+
+      <p
+        style={{
+          marginTop: "4px",
+
+          marginBottom: 0,
+
+          color: "#64748B",
+
+          fontSize: "13px",
+
+          fontWeight: "500",
+        }}
+      >
+        {order.phone}
+      </p>
+
+    </div>
+
+  </div>
+
+  <div
+    style={{
+      background: "#DBEAFE",
+
+      color: "#2563EB",
+
+      padding: "8px 14px",
+
+      borderRadius: "999px",
+
+      fontSize: "12px",
+
+      fontWeight: "800",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "6px",
+
+      border:
+        "1px solid #BFDBFE",
+    }}
+  >
+
+    <FaShippingFast />
+
+    Expédiée
+
+  </div>
+
+</div>
 
           {/* PRODUITS */}
 
-          {order.items.map(
-            (item, index) => (
+{order.items.map(
+  (item, index) => (
 
-              <div
-                key={index}
+    <div
+      key={index}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "12px",
 
-                style={{
-                  display: "flex",
-                  gap: "14px",
+        padding: "12px 0",
 
-                  background: "#f9fafb",
+        borderBottom:
+          index !== order.items.length - 1
+            ? "1px solid #F1F5F9"
+            : "none",
+      }}
+    >
 
-                  padding: "12px",
+      {/* LEFT */}
 
-                  borderRadius: "15px",
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "12px",
 
-                  marginBottom: "12px",
-                }}
-              >
+          flex: 1,
 
-                <img
-                  src={item.image}
+          minWidth: 0,
+        }}
+      >
 
-                  alt=""
+        <img
+            src={
+              item.image?.includes("localhost:5000")
+                ? item.image.replace(
+                    "http://localhost:5000",
+                    "https://konanshopping-production.up.railway.app"
+                  )
+                : item.image || "/logo.jpg"
+            }
 
-                  style={{
-                    width: "75px",
-                    height: "75px",
+            alt={item.name}
 
-                    borderRadius: "12px",
+            onError={(e) => {
+              e.target.src = "/logo.jpg";
+            }}
+          style={{
+            width: "60px",
+            height: "60px",
 
-                    objectFit: "cover",
-                  }}
-                />
+            borderRadius: "12px",
 
-                <div
-                  style={{
-                    flex: 1,
-                  }}
-                >
+            objectFit: "cover",
 
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "16px",
-                      color: "#111827",
-                    }}
-                  >
-                    {item.name}
-                  </h3>
+            flexShrink: 0,
+          }}
+        />
 
-                  <p
-                    style={{
-                      color: "#6b7280",
-                      fontSize: "13px",
-                      marginTop: "5px",
-                    }}
-                  >
-                    Quantité :
-                    {item.quantity}
-                  </p>
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
 
-                  <h2
-                    style={{
-                      color: "#2563eb",
-                      marginTop: "5px",
-                      fontSize: "18px",
-                    }}
-                  >
-                    {item.price} FCFA
-                  </h2>
+          <h3
+            style={{
+              margin: 0,
 
-                </div>
+              color: "#111827",
 
-              </div>
+              fontSize: "15px",
 
-            )
-          )}
+              fontWeight: "700",
 
-          {/* FOOTER */}
+              overflow: "hidden",
+
+              textOverflow: "ellipsis",
+
+              whiteSpace: "nowrap",
+            }}
+          >
+            {item.name}
+          </h3>
 
           <div
             style={{
-              marginTop: "10px",
-
-              borderTop:
-                "1px solid #e5e7eb",
-
-              paddingTop: "12px",
-
               display: "flex",
-
-              justifyContent:
-                "space-between",
-
               alignItems: "center",
+              gap: "6px",
+
+              marginTop: "6px",
+
+              color: "#64748B",
+
+              fontSize: "12px",
             }}
           >
 
-            <div
-              style={{
-                fontSize: "13px",
-                color: "#6b7280",
-              }}
-            >
-              📍 {order.city}
-            </div>
+            <FaBox />
 
-            <h2
-              style={{
-                margin: 0,
-                color: "#111827",
-                fontSize: "20px",
-              }}
-            >
-              {order.total} FCFA
-            </h2>
+            Qté : {item.quantity}
 
           </div>
 
         </div>
 
-      ))}
+      </div>
+
+      {/* PRIX */}
+
+      <div
+        style={{
+          color: "#2563EB",
+
+          fontWeight: "800",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "15px"
+              : "16px",
+
+          whiteSpace: "nowrap",
+        }}
+      >
+        {item.price} FCFA
+      </div>
+
+    </div>
+
+  )
+)}
+
+{/* FOOTER */}
+
+<div
+  style={{
+    marginTop: "14px",
+
+    paddingTop: "14px",
+
+    borderTop: "1px solid #E5E7EB",
+
+    display: "flex",
+
+    justifyContent: "space-between",
+
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
+
+    flexDirection:
+      window.innerWidth < 768
+        ? "column"
+        : "row",
+
+    gap: "12px",
+  }}
+>
+
+  {/* ADRESSE */}
+
+  <div
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "8px",
+
+      color: "#64748B",
+
+      fontSize: "13px",
+
+      fontWeight: "600",
+    }}
+  >
+
+    <FaMapMarkerAlt
+      style={{
+        color: "#2563EB",
+      }}
+    />
+
+    {order.city}
+
+  </div>
+
+  {/* TOTAL */}
+
+  <div
+    style={{
+      textAlign:
+        window.innerWidth < 768
+          ? "left"
+          : "right",
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        color: "#64748B",
+
+        fontSize: "12px",
+
+        fontWeight: "600",
+
+        justifyContent:
+          window.innerWidth < 768
+            ? "flex-start"
+            : "flex-end",
+      }}
+    >
+
+      <FaMoneyBillWave
+        style={{
+          color: "#2563EB",
+        }}
+      />
+
+      Montant total
+
+    </div>
+
+    <h2
+      style={{
+        margin: "4px 0 0 0",
+
+        color: "#111827",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "20px"
+            : "24px",
+
+        fontWeight: "900",
+      }}
+    >
+      {order.total} FCFA
+    </h2>
+
+  </div>
+
+</div>
+
+</div>
+
+))}
 
     </div>
 

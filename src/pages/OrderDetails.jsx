@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 
 import {
-
-FaBoxOpen,
-
-FaMoneyBillWave,
-
-FaShoppingBag,
-
-FaHashtag,
-
-FaTruck,
-
-FaCheckCircle
-
+  FaBoxOpen,
+  FaMoneyBillWave,
+  FaShoppingBag,
+  FaHashtag,
+  FaTruck,
+  FaCheckCircle,
+  FaMapMarkerAlt,
+  FaBox,
+  FaEye,
 } from "react-icons/fa";
 
 import axios from "axios";
@@ -53,19 +49,88 @@ export default function OrderDetails() {
 
   if (!order) {
 
-    return (
+  return (
+
+    <div
+      style={{
+        background: "#F5F7FB",
+        minHeight: "100vh",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        padding: "20px",
+      }}
+    >
 
       <div
         style={{
-          padding: "30px",
+          background: "#FFFFFF",
+
+          padding: "24px",
+
+          borderRadius: "20px",
+
+          boxShadow:
+            "0 8px 25px rgba(15,23,42,0.05)",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          gap: "12px",
+
+          border:
+            "1px solid #E5E7EB",
         }}
       >
-        Chargement...
+
+        <FaBoxOpen
+          style={{
+            fontSize: "22px",
+
+            color: "#7C3AED",
+          }}
+        />
+
+        <div>
+
+          <div
+            style={{
+              color: "#111827",
+
+              fontWeight: "800",
+
+              fontSize: "16px",
+            }}
+          >
+            Chargement...
+          </div>
+
+          <div
+            style={{
+              color: "#64748B",
+
+              fontSize: "13px",
+
+              marginTop: "4px",
+            }}
+          >
+            Récupération des détails de la commande
+          </div>
+
+        </div>
+
       </div>
 
-    );
+    </div>
 
-  }
+  );
+
+}
 
   const products =
     order.items || order.products || [];
@@ -95,319 +160,491 @@ export default function OrderDetails() {
         }}
       >
 
-        {/* HEADER */}
-
-          <div
-style={{
-display: "flex",
-justifyContent: "space-between",
-alignItems: "center",
-flexWrap: "wrap",
-gap: "15px",
-}}
->
-
-<div>
+  {/* HEADER */}
 
 <div
-style={{
-display: "flex",
-alignItems: "center",
-gap: "12px",
-}}
+  style={{
+    display: "flex",
+
+    justifyContent: "space-between",
+
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
+
+    flexWrap: "wrap",
+
+    gap: "12px",
+
+    paddingBottom: "16px",
+
+    marginBottom: "16px",
+
+    borderBottom:
+      "1px solid #F1F5F9",
+  }}
 >
 
-<FaBoxOpen
-style={{
-fontSize: "30px",
-color: "#7C3AED",
-}}
+  {/* LEFT */}
+
+  <div
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "12px",
+
+      flex: 1,
+
+      minWidth: 0,
+    }}
+  >
+
+    <div
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
+
+        height:
+          window.innerWidth < 768
+            ? "50px"
+            : "58px",
+
+        borderRadius: "16px",
+
+        background:
+          "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
+      }}
+    >
+
+      <FaBoxOpen
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "22px"
+              : "26px",
+
+          color: "#7C3AED",
+        }}
+      />
+
+    </div>
+
+    <div
+      style={{
+        minWidth: 0,
+      }}
+    >
+
+      <h1
+        style={{
+          margin: 0,
+
+          color: "#111827",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "20px"
+              : "24px",
+
+          fontWeight: "900",
+
+          lineHeight: 1.2,
+        }}
+      >
+        Détails commande
+      </h1>
+
+      <div
+        style={{
+          display: "flex",
+
+          alignItems: "center",
+
+          gap: "6px",
+
+          marginTop: "5px",
+
+          color: "#64748B",
+
+          fontSize: "12px",
+
+          fontWeight: "500",
+        }}
+      >
+
+        <FaHashtag />
+
+        {order._id}
+
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* STATUS */}
+
+  <div
+    style={{
+      background:
+        order.status === "Livrée"
+          ? "#DCFCE7"
+          : order.status === "En livraison"
+          ? "#DBEAFE"
+          : "#FEF3C7",
+
+      color:
+        order.status === "Livrée"
+          ? "#15803D"
+          : order.status === "En livraison"
+          ? "#2563EB"
+          : "#92400E",
+
+      padding: "8px 14px",
+
+      borderRadius: "999px",
+
+      fontWeight: "800",
+
+      fontSize: "12px",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      gap: "6px",
+
+      border:
+        order.status === "Livrée"
+          ? "1px solid #BBF7D0"
+          : order.status === "En livraison"
+          ? "1px solid #BFDBFE"
+          : "1px solid #FCD34D",
+    }}
+  >
+
+    {
+      order.status === "Livrée"
+        ? <FaCheckCircle />
+        : order.status === "En livraison"
+        ? <FaTruck />
+        : <FaBoxOpen />
+    }
+
+    {order.status}
+
+  </div>
+
+</div>
+
+
+{/* PRODUITS */}
+
+{products.map((item, index) => (
+
+  <div
+    key={index}
+    style={{
+      display: "flex",
+
+      alignItems: "center",
+
+      justifyContent: "space-between",
+
+      gap: "12px",
+
+      padding: "12px 0",
+
+      borderBottom:
+        index !== products.length - 1
+          ? "1px solid #F1F5F9"
+          : "none",
+    }}
+  >
+
+    {/* LEFT */}
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "12px",
+
+        flex: 1,
+
+        minWidth: 0,
+      }}
+    >
+
+     <img
+  src={
+    (
+      item.image ||
+      item.product?.image ||
+      item.productImage
+    )?.includes("localhost:5000")
+
+      ? (
+          item.image ||
+          item.product?.image ||
+          item.productImage
+        ).replace(
+          "http://localhost:5000",
+          "https://konanshopping-production.up.railway.app"
+        )
+
+      : (
+          item.image ||
+          item.product?.image ||
+          item.productImage ||
+          "/logo.jpg"
+        )
+  }
+
+  alt={
+    item.name ||
+    item.product?.name
+  }
+
+  onError={(e) => {
+    e.target.src = "/logo.jpg";
+  }}
+
+  style={{
+    width: "60px",
+    height: "60px",
+    objectFit: "cover",
+    borderRadius: "12px",
+    border: "1px solid #E5E7EB",
+    flexShrink: 0,
+  }}
 />
 
-<h1
-style={{
-margin: 0,
-fontSize: "28px",
-color: "#111827",
-fontWeight: "800",
-}}
->
+      <div
+        style={{
+          flex: 1,
 
-Détails commande
+          minWidth: 0,
+        }}
+      >
 
-</h1>
+        <h3
+          style={{
+            margin: 0,
 
-</div>
+            color: "#111827",
 
-<p
-style={{
-color: "#6b7280",
-marginTop: "10px",
-fontSize: "14px",
-display: "flex",
-alignItems: "center",
-gap: "8px",
-}}
->
+            fontSize: "15px",
 
-<FaHashtag
-style={{
-color: "#9ca3af",
-}}
-/>
+            fontWeight: "700",
 
-ID : {order._id}
+            overflow: "hidden",
 
-</p>
+            textOverflow: "ellipsis",
 
-</div>
-
-<div
-style={{
-background:
-order.status === "Livrée"
-? "#dcfce7"
-: order.status === "En livraison"
-? "#dbeafe"
-: "#fef3c7",
-
-color:
-order.status === "Livrée"
-? "#166534"
-: order.status === "En livraison"
-? "#1d4ed8"
-: "#92400e",
-
-padding: "10px 18px",
-
-borderRadius: "999px",
-
-fontWeight: "bold",
-
-fontSize: "13px",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "8px",
-
-boxShadow:
-"0 4px 10px rgba(0,0,0,0.05)",
-}}
->
-
-{
-
-order.status === "Livrée"
-
-? <FaCheckCircle />
-
-: order.status === "En livraison"
-
-? <FaTruck />
-
-: <FaBoxOpen />
-
-}
-
-{order.status}
-
-</div>
-
-</div>
-
-
-        {/* PRODUCTS */}
-
-        {products.map((item, index) => (
-
-          <div
-            key={index}
-
-            style={{
-              display: "flex",
-
-              justifyContent:
-                "space-between",
-
-              alignItems: "center",
-
-              border:
-                "1px solid #eee",
-
-              borderRadius: "15px",
-
-              padding: "12px",
-
-              marginBottom: "12px",
-            }}
-          >
-
-            {/* LEFT */}
-
-            <div
-              style={{
-                display: "flex",
-
-                gap: "15px",
-
-                alignItems: "center",
-              }}
-            >
-
-              <img
-                src={
-                  item.image ||
-                  item.product?.image ||
-                  item.productImage
-                }
-
-                alt={
-                  item.name ||
-                  item.product?.name
-                }
-
-                style={{
-                  width: "75px",
-
-                  height: "75px",
-
-                  objectFit:
-                    "cover",
-
-                  borderRadius:
-                    "14px",
-
-                  border:
-                    "1px solid #eee",
-                }}
-              />
-
-              <div>
-
-                <h2
-                  style={{
-                    margin: 0,
-                    color: "#111827",
-                    fontSize: "18px",
-                  }}
-                >
-                  {
-                    item.name ||
-                    item.product?.name
-                  }
-                </h2>
-
-                <p
-                  style={{
-                    color: "#6b7280",
-                    marginTop: "6px",
-                    fontSize: "14px",
-                  }}
-                >
-                  Quantité :
-                  {" "}
-                  {item.quantity || 1}
-                </p>
-
-              </div>
-
-            </div>
-
-            {/* RIGHT */}
-
-            <h2
-              style={{
-                color: "#4f46e5",
-                fontSize: "20px",
-              }}
-            >
-              {
-                item.price ||
-                item.product?.price
-              }
-              {" "}
-              FCFA
-            </h2>
-
-          </div>
-
-        ))}
-
-        {/* FOOTER */}
+            whiteSpace: "nowrap",
+          }}
+        >
+          {
+            item.name ||
+            item.product?.name
+          }
+        </h3>
 
         <div
           style={{
-            marginTop: "25px",
-
-            paddingTop: "20px",
-
-            borderTop:
-              "1px solid #eee",
-
             display: "flex",
 
-            justifyContent:
-              "space-between",
-
             alignItems: "center",
+
+            gap: "6px",
+
+            marginTop: "6px",
+
+            color: "#64748B",
+
+            fontSize: "12px",
           }}
         >
 
-          <div>
+          <FaBox />
 
-            <p
-              style={{
-                color: "#6b7280",
-                margin: 0,
-                fontSize: "14px",
-              }}
-            >
-              Total commande
-            </p>
-
-            <h1
-              style={{
-                marginTop: "5px",
-                color: "#111827",
-                fontSize: "28px",
-              }}
-            >
-              {order.total}
-              {" "}
-              FCFA
-            </h1>
-
-          </div>
-
-          <button
-  onClick={() =>
-    window.location.href =
-  `/track-order/${order._id}`
-  }
-
-  style={{
-    background:
-      "linear-gradient(135deg,#4f46e5,#7c3aed)",
-
-    color: "white",
-
-    border: "none",
-
-    padding: "12px 20px",
-
-    borderRadius: "12px",
-
-    fontWeight: "bold",
-
-    cursor: "pointer",
-  }}
->
-  Suivre commande
-</button>
+          Qté : {item.quantity || 1}
 
         </div>
+
+      </div>
+
+    </div>
+
+    {/* PRIX */}
+
+    <div
+      style={{
+        color: "#4F46E5",
+
+        fontWeight: "800",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "15px"
+            : "17px",
+
+        whiteSpace: "nowrap",
+      }}
+    >
+      {
+        item.price ||
+        item.product?.price
+      } FCFA
+    </div>
+
+  </div>
+
+))}
+
+        {/* FOOTER */}
+
+<div
+  style={{
+    marginTop: "16px",
+
+    paddingTop: "16px",
+
+    borderTop: "1px solid #E5E7EB",
+
+    display: "flex",
+
+    justifyContent: "space-between",
+
+    alignItems:
+      window.innerWidth < 768
+        ? "flex-start"
+        : "center",
+
+    flexDirection:
+      window.innerWidth < 768
+        ? "column"
+        : "row",
+
+    gap: "14px",
+  }}
+>
+
+  {/* TOTAL */}
+
+  <div>
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        color: "#64748B",
+
+        fontSize: "12px",
+
+        fontWeight: "600",
+      }}
+    >
+
+      <FaMoneyBillWave
+        style={{
+          color: "#4F46E5",
+        }}
+      />
+
+      Total commande
+
+    </div>
+
+    <h2
+      style={{
+        margin: "6px 0 0 0",
+
+        color: "#111827",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "22px"
+            : "28px",
+
+        fontWeight: "900",
+      }}
+    >
+      {order.total} FCFA
+    </h2>
+
+  </div>
+
+  {/* BUTTON */}
+
+  <button
+    onClick={() =>
+      window.location.href =
+      `/track-order/${order._id}`
+    }
+    style={{
+      background:
+        "linear-gradient(135deg,#4F46E5,#7C3AED)",
+
+      color: "#FFFFFF",
+
+      border: "none",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px 16px"
+          : "12px 20px",
+
+      borderRadius: "12px",
+
+      fontWeight: "800",
+
+      fontSize: "14px",
+
+      cursor: "pointer",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      justifyContent: "center",
+
+      gap: "8px",
+
+      width:
+        window.innerWidth < 768
+          ? "100%"
+          : "auto",
+    }}
+  >
+
+    <FaTruck />
+
+    Suivre commande
+
+  </button>
+
+</div>
 
       </div>
 
