@@ -367,7 +367,7 @@ else {
  const deliveryStatus =
 
   realDistance <= 0.05
-    ? "Livré"
+    ? "Livrée"
     : order?.status ||
       "En attente";
 
@@ -419,7 +419,7 @@ else {
  const liveStatus =
 
   realDistance <= 0.05
-    ? "Livré"
+    ? "Livrée"
 
     : realDistance > 5
     ? "En livraison"
@@ -430,7 +430,7 @@ else {
     : realDistance > 0.3
     ? "Presque arrivé"
 
-    : "Livré";
+    : "Livrée";
 
     // =========================
 // AUTO LIVRÉ
@@ -451,13 +451,13 @@ useEffect(() => {
         await axios.put(
           `https://konanshopping-production.up.railway.app/api/orders/${order._id}/status`,
           {
-            status: "Livré",
+            status: "Livrée",
           }
         );
 
         setOrder((prev) => ({
           ...prev,
-          status: "Livré",
+          status: "Livrée",
         }));
 
       } catch (err) {

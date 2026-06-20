@@ -181,7 +181,7 @@ const navigate = useNavigate();
 
   const pieData = [
     {
-      name: "Livrées",
+      name: "Livrée",
       value: delivered,
       color: "#7c3aed",
     },

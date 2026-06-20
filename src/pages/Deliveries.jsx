@@ -274,7 +274,7 @@ export default function Deliveries() {
             </h2>
 
             <p>
-              Livrées
+              Livrée
             </p>
 
           </div>

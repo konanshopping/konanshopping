@@ -723,7 +723,7 @@ function MyOrders() {
         fontWeight: "500",
       }}
     >
-      Livrées
+      Livrée
     </p>
 
   </div>

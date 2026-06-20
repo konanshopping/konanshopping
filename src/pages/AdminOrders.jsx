@@ -228,7 +228,7 @@ function AdminOrders() {
 
             <p>
 
-              Livrées
+              Livrée
 
             </p>
 

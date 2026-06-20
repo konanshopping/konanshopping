@@ -176,7 +176,7 @@ export default function DeliveredOrders() {
           letterSpacing: "-0.4px",
         }}
       >
-        Commandes livrées
+        Commandes Livrée
       </h1>
 
       <p
@@ -291,7 +291,7 @@ export default function DeliveredOrders() {
         marginRight: "auto",
       }}
     >
-      Vos commandes livrées
+      Vos commandes Livrée
       apparaîtront ici après
       réception.
     </p>

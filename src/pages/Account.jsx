@@ -185,7 +185,7 @@ const orders = [
 
   {
     icon: <FaCheckCircle />,
-    title: "Livrées",
+    title: "Livrée",
     path: "/orders/delivered",
   },
 
