@@ -653,3 +653,4 @@ export default function OrderDetails() {
   );
 
 }
+export default  OrderDetails;
