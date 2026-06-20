@@ -99,6 +99,18 @@ const [showLogoutModal,
   const [unreadCount, setUnreadCount] =
   useState(0);
 
+  const [pendingOrders, setPendingOrders] =
+  useState(0);
+
+const [shippedOrders, setShippedOrders] =
+  useState(0);
+
+const [deliveredOrders, setDeliveredOrders] =
+  useState(0);
+
+const [cancelledOrders, setCancelledOrders] =
+  useState(0);
+
   useEffect(() => {
 
   const loadMessages =
@@ -142,6 +154,54 @@ const [showLogoutModal,
 
   loadMessages();
 
+  const loadOrders = async () => {
+
+  try {
+
+    const user = JSON.parse(
+      localStorage.getItem("user")
+    );
+
+    const res = await axios.get(
+      `https://konanshopping-production.up.railway.app/my-orders/${user._id}`
+    );
+
+    const orders = res.data;
+
+    setPendingOrders(
+      orders.filter(
+        (o) => o.status === "En attente"
+      ).length
+    );
+
+    setShippedOrders(
+      orders.filter(
+        (o) => o.status === "En livraison"
+      ).length
+    );
+
+    setDeliveredOrders(
+      orders.filter(
+        (o) => o.status === "Livrée"
+      ).length
+    );
+
+    setCancelledOrders(
+      orders.filter(
+        (o) => o.status === "Annulée"
+      ).length
+    );
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+};
+
+loadOrders();
+
 }, []);
 
   const quickActions = [
@@ -174,24 +234,28 @@ const orders = [
   {
     icon: <FaClock />,
     title: "En attente",
+    count: pendingOrders,
     path: "/orders/pending",
   },
 
   {
     icon: <FaTruck />,
     title: "Expédiées",
+    count: shippedOrders,
     path: "/orders/shipped",
   },
 
   {
     icon: <FaCheckCircle />,
     title: "Livrée",
+    count: deliveredOrders,
     path: "/orders/delivered",
   },
 
   {
     icon: <FaTimesCircle />,
     title: "Annulées",
+    count: cancelledOrders,
     path: "/orders/cancelled",
   },
 ];
@@ -963,34 +1027,80 @@ return (
       >
 
         <div
-          style={{
-            width: "42px",
+  style={{
+    position: "relative",
 
-            height: "42px",
+    width: "42px",
+    height: "42px",
 
-            borderRadius: "14px",
+    borderRadius: "14px",
 
-            background:
-              "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+    background:
+      "linear-gradient(135deg,#ede9fe,#ddd6fe)",
 
-            display: "flex",
+    display: "flex",
 
-            justifyContent:
-              "center",
+    justifyContent: "center",
 
-            alignItems:
-              "center",
+    alignItems: "center",
 
-            fontSize: "18px",
+    fontSize: "18px",
 
-            color: "#5b3cc4",
+    color: "#5b3cc4",
 
-            boxShadow:
-              "0 6px 15px rgba(91,60,196,0.15)",
-          }}
-        >
-          {item.icon}
-        </div>
+    boxShadow:
+      "0 6px 15px rgba(91,60,196,0.15)",
+  }}
+>
+
+  {item.icon}
+
+  <span
+    style={{
+      position: "absolute",
+
+      top: "-5px",
+
+      right: "-5px",
+
+      minWidth: "18px",
+
+      height: "18px",
+
+      borderRadius: "999px",
+
+      background:
+        "rgba(255,255,255,0.25)",
+
+      backdropFilter:
+        "blur(10px)",
+
+      WebkitBackdropFilter:
+        "blur(10px)",
+
+      border:
+        "1px solid rgba(255,255,255,0.35)",
+
+      color: "#5b3cc4",
+
+      fontSize: "10px",
+
+      fontWeight: "800",
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      boxShadow:
+        "0 4px 10px rgba(91,60,196,0.15)",
+    }}
+  >
+    {item.count}
+  </span>
+
+</div>
 
         <span
           style={{
