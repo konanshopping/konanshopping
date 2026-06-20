@@ -120,7 +120,7 @@ function MyOrders() {
     orders.filter(
       (o) =>
         o.status ===
-        "Expédiée"
+        "En livraison"
     ).length;
 
   const deliveredOrders =
@@ -152,7 +152,7 @@ function MyOrders() {
               "#16A34A",
           };
 
-        case "Expédiée":
+        case "En livraison":
           return {
             background:
               "#DBEAFE",
@@ -900,7 +900,7 @@ function MyOrders() {
       },
 
       {
-        name: "Expédiée",
+        name: "Expédiées",
         count: shippedOrders,
       },
 
@@ -1140,7 +1140,7 @@ function MyOrders() {
 
         {order.status === "Livrée" ? (
           <FaCheckCircle />
-        ) : order.status === "Expédiée" ? (
+        ) : order.status === "En livraison" ? (
           <FaTruck />
         ) : (
           <FaTimesCircle />
