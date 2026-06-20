@@ -1085,54 +1085,30 @@ FCFA
   {favoritesCount > 0 && (
 
     <span
+  style={{
+    position: "absolute",
+    top: "-4px",
+    right: "-2px",
 
-      style={{
-  position: "absolute",
+    width: "16px",
+    height: "16px",
 
-  top: "-8px",
+    borderRadius: "50%",
 
-  right: "-10px",
+    background: "#5b3cc4",
 
-  minWidth: "18px",
+    color: "white",
 
-  height: "18px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
 
-  borderRadius: "50%",
-
-  background:
-    "rgba(96,165,250,0.25)",
-
-  backdropFilter:
-    "blur(12px)",
-
-  WebkitBackdropFilter:
-    "blur(12px)",
-
-  border:
-    "1px solid rgba(255,255,255,0.35)",
-
-  color: "#2563EB",
-
-  fontSize: "10px",
-
-  fontWeight: "800",
-
-  display: "flex",
-
-  alignItems: "center",
-
-  justifyContent: "center",
-
-  padding: "0 4px",
-
-  boxShadow:
-    "0 4px 12px rgba(37,99,235,0.15)",
-}}
-    >
-
-    {favoritesCount}
-
-    </span>
+    fontSize: "9px",
+    fontWeight: "bold",
+  }}
+>
+  {favoritesCount}
+</span>
 
   )}
 
