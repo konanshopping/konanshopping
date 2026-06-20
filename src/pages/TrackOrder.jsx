@@ -443,7 +443,7 @@ useEffect(() => {
     if (
       realDistance <= 0.05 &&
       order?._id &&
-      order?.status !== "Livré"
+      order?.status !== "Livrée"
     ) {
 
       try {
