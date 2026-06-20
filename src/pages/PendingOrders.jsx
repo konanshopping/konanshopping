@@ -646,12 +646,16 @@ return (
         {/* IMAGE */}
 
         <img
-  src={
-    item.image?.startsWith("http")
-      ? item.image
-      : `https://konanshopping-production.up.railway.app${item.image}`
-  }
-  alt={item.name}
+            src={
+              item.image?.includes("localhost:5000")
+                ? item.image.replace(
+                    "http://localhost:5000",
+                    "https://konanshopping-production.up.railway.app"
+                  )
+                : item.image || "/logo.jpg"
+            }
+
+            alt={item.name}
           style={{
             width: "60px",
             height: "60px",
