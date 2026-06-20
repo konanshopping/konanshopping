@@ -11,6 +11,10 @@ import {
 
 import { FaTruckFast } from "react-icons/fa6";
 
+import {
+  FaClipboardList
+} from "react-icons/fa6";
+
 export default function ShippedOrders() {
 
   const [orders, setOrders] =
