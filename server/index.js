@@ -3342,17 +3342,37 @@ app.get("/fix-images", async (req, res) => {
 mongoose
   .connect(process.env.MONGO_URI)
 
-  .then(() => {
+  .then(async () => {
 
     console.log(
       "MongoDB Atlas connecté ✅"
     );
 
-    const PORT = process.env.PORT || 5000;
+    await Order.updateMany(
+      {
+        status: "Livré",
+      },
+      {
+        $set: {
+          status: "Livrée",
+        },
+      }
+    );
 
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT} 🚀`);
-});
+    console.log(
+      "Statuts corrigés ✅"
+    );
+
+    const PORT =
+      process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+
+      console.log(
+        `Serveur démarré sur le port ${PORT} 🚀`
+      );
+
+    });
 
   })
 
