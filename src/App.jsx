@@ -65,7 +65,9 @@ import {
 
   FaCamera,
 
-  FaCheck
+  FaCheck,
+
+  FaSpinner
 
 } from "react-icons/fa";
 
@@ -1323,207 +1325,208 @@ FCFA
 
 <div
   style={{
-    background: "white",
-
-    borderRadius: "18px",
-
-    padding: "10px 14px",
-
+    background: "#FFFFFF",
+    borderRadius: "22px",
+    padding: "12px",
     display: "flex",
-
     alignItems: "center",
-
     gap: "10px",
-
-    marginTop: "18px",
-
-    marginBottom: "18px",
-
-    border: "1px solid #ececec",
-
+    marginTop: "16px",
+    marginBottom: "20px",
+    border: "1px solid #F1F5F9",
     boxShadow:
-      "0 3px 10px rgba(0,0,0,0.04)",
+      "0 8px 25px rgba(0,0,0,0.05)",
   }}
 >
 
-  <button
+  {/* CAMERA */}
 
+  <button
     onClick={() =>
-
       document
-        .getElementById(
-          "imageUpload"
-        )
+        .getElementById("imageUpload")
         .click()
-
     }
-
     style={{
+      width: "42px",
+      height: "42px",
       border: "none",
-      background: "transparent",
-      fontSize: "18px",
+      borderRadius: "12px",
+      background: "#F5F3FF",
+      color: "#4B2E83",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
       cursor: "pointer",
+      flexShrink: 0,
     }}
   >
-    <FaCamera />
+    <FaCamera size={17} />
   </button>
 
-  <input
-    type="text"
-
-   placeholder={placeholders[placeholderIndex]}
-
-    value={search}
-
-    onChange={(e) =>
-      setSearch(e.target.value)
-    }
-
-    style={{
-  flex: 1,
-  border: "none",
-  outline: "none",
-  fontSize: "13px",
-  padding: "6px 0",
-  background: "transparent",
-
-  color: "#111827",
-  WebkitTextFillColor: "#111827",
-  caretColor: "#4B2E83",
-}}
-  />
-
-  <button
-
-    onClick={startVoice}
-
-    style={{
-      border: "none",
-      background: "transparent",
-      fontSize: "18px",
-      cursor: "pointer",
-    }}
-  >
-    <FaMicrophone />
-  </button>
-
-  {image && (
+  {/* INPUT */}
 
   <div
     style={{
-      position: "relative",
-
-      width: "90px",
-
-      marginTop: "15px",
+      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      background: "#F9FAFB",
+      borderRadius: "14px",
+      padding: "0 12px",
+      height: "44px",
     }}
   >
 
-    {/* IMAGE */}
-
-    <img
-
-      src={URL.createObjectURL(image)}
-
-      alt=""
-
+    <FaSearch
       style={{
-
-        width: "90px",
-
-        height: "90px",
-
-        borderRadius: "18px",
-
-        objectFit: "cover",
-
-        boxShadow:
-          "0 8px 20px rgba(0,0,0,0.12)",
+        color: "#9CA3AF",
+        fontSize: "13px",
       }}
-
     />
 
-    {/* DELETE BUTTON */}
-
-    <button
-
-      onClick={() => {
-
-        setImage(null);
-
-      }}
-
+    <input
+      type="text"
+      placeholder={
+        placeholders[placeholderIndex]
+      }
+      value={search}
+      onChange={(e) =>
+        setSearch(e.target.value)
+      }
       style={{
-
-        position: "absolute",
-
-        top: "-8px",
-
-        right: "-8px",
-
-        width: "28px",
-
-        height: "28px",
-
-        borderRadius: "50%",
-
+        flex: 1,
         border: "none",
-
-        background:
-          "#ef4444",
-
-        color: "white",
-
-        cursor: "pointer",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        fontSize: "14px",
-
-        fontWeight: "bold",
-
-        boxShadow:
-          "0 4px 10px rgba(239,68,68,0.35)",
+        outline: "none",
+        background: "transparent",
+        fontSize: "13px",
+        color: "#111827",
+        WebkitTextFillColor: "#111827",
+        caretColor: "#4B2E83",
       }}
-
-    >
-
-      ✕
-
-    </button>
+    />
 
   </div>
 
-)}
+  {/* MICRO */}
 
   <button
-
-onClick={searchProducts}
+    onClick={startVoice}
     style={{
+      width: "42px",
+      height: "42px",
       border: "none",
-
-      background: "#4B2E83",
-
-      color: "white",
-
-      padding: "10px 16px",
-
       borderRadius: "12px",
-
-      fontWeight: "700",
-
-      fontSize: "12px",
-
+      background: "#F5F3FF",
+      color: "#4B2E83",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
       cursor: "pointer",
+      flexShrink: 0,
     }}
   >
-    {loading
-? "Recherche..."
-: "Rechercher"}
+    <FaMicrophone size={17} />
+  </button>
+
+  {/* IMAGE PREVIEW */}
+
+  {image && (
+
+    <div
+      style={{
+        position: "relative",
+        width: "70px",
+        height: "70px",
+        flexShrink: 0,
+      }}
+    >
+
+      <img
+        src={URL.createObjectURL(image)}
+        alt=""
+        style={{
+          width: "70px",
+          height: "70px",
+          borderRadius: "14px",
+          objectFit: "cover",
+          boxShadow:
+            "0 6px 18px rgba(0,0,0,0.12)",
+        }}
+      />
+
+      <button
+        onClick={() =>
+          setImage(null)
+        }
+        style={{
+          position: "absolute",
+          top: "-6px",
+          right: "-6px",
+          width: "22px",
+          height: "22px",
+          borderRadius: "50%",
+          border: "none",
+          background: "#EF4444",
+          color: "#FFFFFF",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "11px",
+          fontWeight: "700",
+          boxShadow:
+            "0 4px 10px rgba(239,68,68,.30)",
+        }}
+      >
+        ✕
+      </button>
+
+    </div>
+
+  )}
+
+  {/* RECHERCHE */}
+
+  <button
+    onClick={searchProducts}
+    disabled={loading}
+    style={{
+      border: "none",
+      background:
+        "linear-gradient(135deg,#4B2E83,#6D28D9)",
+      color: "#FFFFFF",
+      height: "44px",
+      padding: "0 16px",
+      borderRadius: "14px",
+      fontWeight: "700",
+      fontSize: "12px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      gap: "7px",
+      boxShadow:
+        "0 6px 15px rgba(75,46,131,.22)",
+      flexShrink: 0,
+    }}
+  >
+
+    {loading ? (
+      <>
+        <FaSpinner
+          className="spin"
+          size={12}
+        />
+        Recherche...
+      </>
+    ) : (
+      <>
+        <FaSearch size={12} />
+        Rechercher
+      </>
+    )}
+
   </button>
 
 </div>
