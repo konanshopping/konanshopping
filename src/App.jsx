@@ -1326,16 +1326,15 @@ FCFA
 <div
   style={{
     background: "#FFFFFF",
-    borderRadius: "22px",
-    padding: "12px",
+    borderRadius: "18px",
+    padding: "8px",
     display: "flex",
     alignItems: "center",
-    gap: "10px",
-    marginTop: "16px",
-    marginBottom: "20px",
+    gap: "8px",
+    marginTop: "14px",
+    marginBottom: "18px",
     border: "1px solid #F1F5F9",
-    boxShadow:
-      "0 8px 25px rgba(0,0,0,0.05)",
+    boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
   }}
 >
 
@@ -1348,10 +1347,10 @@ FCFA
         .click()
     }
     style={{
-      width: "42px",
-      height: "42px",
+      width: "38px",
+      height: "38px",
       border: "none",
-      borderRadius: "12px",
+      borderRadius: "10px",
       background: "#F5F3FF",
       color: "#4B2E83",
       display: "flex",
@@ -1361,7 +1360,7 @@ FCFA
       flexShrink: 0,
     }}
   >
-    <FaCamera size={17} />
+    <FaCamera size={15} />
   </button>
 
   {/* INPUT */}
@@ -1371,18 +1370,18 @@ FCFA
       flex: 1,
       display: "flex",
       alignItems: "center",
-      gap: "8px",
+      gap: "7px",
       background: "#F9FAFB",
-      borderRadius: "14px",
-      padding: "0 12px",
-      height: "44px",
+      borderRadius: "12px",
+      padding: "0 10px",
+      height: "38px",
     }}
   >
 
     <FaSearch
       style={{
         color: "#9CA3AF",
-        fontSize: "13px",
+        fontSize: "12px",
       }}
     />
 
@@ -1400,7 +1399,7 @@ FCFA
         border: "none",
         outline: "none",
         background: "transparent",
-        fontSize: "13px",
+        fontSize: "12px",
         color: "#111827",
         WebkitTextFillColor: "#111827",
         caretColor: "#4B2E83",
@@ -1414,10 +1413,10 @@ FCFA
   <button
     onClick={startVoice}
     style={{
-      width: "42px",
-      height: "42px",
+      width: "38px",
+      height: "38px",
       border: "none",
-      borderRadius: "12px",
+      borderRadius: "10px",
       background: "#F5F3FF",
       color: "#4B2E83",
       display: "flex",
@@ -1427,7 +1426,7 @@ FCFA
       flexShrink: 0,
     }}
   >
-    <FaMicrophone size={17} />
+    <FaMicrophone size={15} />
   </button>
 
   {/* IMAGE PREVIEW */}
@@ -1437,8 +1436,8 @@ FCFA
     <div
       style={{
         position: "relative",
-        width: "70px",
-        height: "70px",
+        width: "60px",
+        height: "60px",
         flexShrink: 0,
       }}
     >
@@ -1447,12 +1446,12 @@ FCFA
         src={URL.createObjectURL(image)}
         alt=""
         style={{
-          width: "70px",
-          height: "70px",
-          borderRadius: "14px",
+          width: "60px",
+          height: "60px",
+          borderRadius: "12px",
           objectFit: "cover",
           boxShadow:
-            "0 6px 18px rgba(0,0,0,0.12)",
+            "0 4px 12px rgba(0,0,0,0.10)",
         }}
       />
 
@@ -1462,10 +1461,10 @@ FCFA
         }
         style={{
           position: "absolute",
-          top: "-6px",
-          right: "-6px",
-          width: "22px",
-          height: "22px",
+          top: "-5px",
+          right: "-5px",
+          width: "20px",
+          height: "20px",
           borderRadius: "50%",
           border: "none",
           background: "#EF4444",
@@ -1474,10 +1473,10 @@ FCFA
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          fontSize: "11px",
+          fontSize: "10px",
           fontWeight: "700",
           boxShadow:
-            "0 4px 10px rgba(239,68,68,.30)",
+            "0 3px 8px rgba(239,68,68,.30)",
         }}
       >
         ✕
@@ -1497,17 +1496,17 @@ FCFA
       background:
         "linear-gradient(135deg,#4B2E83,#6D28D9)",
       color: "#FFFFFF",
-      height: "44px",
-      padding: "0 16px",
-      borderRadius: "14px",
+      height: "38px",
+      padding: "0 12px",
+      borderRadius: "12px",
       fontWeight: "700",
-      fontSize: "12px",
+      fontSize: "11px",
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
-      gap: "7px",
+      gap: "5px",
       boxShadow:
-        "0 6px 15px rgba(75,46,131,.22)",
+        "0 4px 12px rgba(75,46,131,.18)",
       flexShrink: 0,
     }}
   >
@@ -1516,13 +1515,13 @@ FCFA
       <>
         <FaSpinner
           className="spin"
-          size={12}
+          size={11}
         />
         Recherche...
       </>
     ) : (
       <>
-        <FaSearch size={12} />
+        <FaSearch size={11} />
         Rechercher
       </>
     )}
