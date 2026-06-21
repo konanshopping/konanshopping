@@ -1797,37 +1797,43 @@ onClick={searchProducts}
   <div
     style={{
       display: "flex",
-      justifyContent:
-        "space-between",
+      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "22px",
+      marginBottom: "20px",
     }}
   >
 
     <h2
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-    fontWeight: "800",
-    color: "#1f2937",
-  }}
->
-  Meilleures offres
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
 
-  <FaFireAlt
-    style={{
-      color: "#ff6b00",
-      fontSize: "24px",
-      filter:
-        "drop-shadow(0 4px 10px rgba(255,107,0,0.35))",
-    }}
-  />
-</h2>
+        margin: 0,
+
+        fontSize: "22px",
+
+        fontWeight: "800",
+
+        color: "#1f2937",
+      }}
+    >
+      Meilleures offres
+
+      <FaFireAlt
+        style={{
+          color: "#ff6b00",
+
+          fontSize: "22px",
+
+          filter:
+            "drop-shadow(0 3px 8px rgba(255,107,0,0.25))",
+        }}
+      />
+    </h2>
 
     <Link
       to="/boutique"
-
       style={{
         textDecoration: "none",
       }}
@@ -1836,12 +1842,25 @@ onClick={searchProducts}
       <button
         style={{
           border: "none",
+
           background: "#4B2E83",
+
           color: "white",
-          padding: "12px 18px",
-          borderRadius: "16px",
+
+          padding: "8px 14px",
+
+          borderRadius: "12px",
+
           fontWeight: "700",
+
+          fontSize: "12px",
+
           cursor: "pointer",
+
+          boxShadow:
+            "0 4px 12px rgba(75,46,131,0.15)",
+
+          transition: "0.3s",
         }}
       >
         Voir tout
