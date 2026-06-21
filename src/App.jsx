@@ -1674,7 +1674,7 @@ onClick={searchProducts}
 
 </div>
 
-        {/* CATEGORIES */}
+       {/* CATEGORIES */}
 
 <div
   style={{
@@ -1687,41 +1687,67 @@ onClick={searchProducts}
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "18px",
+      marginBottom: "16px",
     }}
   >
 
     <h2
       style={{
         margin: 0,
-        fontSize: "19px",
-        color: "#111827",
+        fontSize: "22px",
         fontWeight: "800",
+        color: "#1f2937",
       }}
     >
       Catégories
     </h2>
 
-    <button
+    <Link
+      to="/boutique"
       style={{
-        border: "none",
-        background: "transparent",
-        color: "#4B2E83",
-        fontWeight: "700",
-        cursor: "pointer",
+        textDecoration: "none",
       }}
     >
-      Voir tout
-    </button>
+
+      <button
+       style={{
+          border: "none",
+
+          background: "#4B2E83",
+
+          color: "white",
+
+          padding: "8px 14px",
+
+          borderRadius: "12px",
+
+          fontWeight: "700",
+
+          fontSize: "12px",
+
+          cursor: "pointer",
+
+          boxShadow:
+            "0 4px 12px rgba(75,46,131,0.15)",
+
+          transition: "0.3s",
+        }}
+      >
+        Voir tout
+      </button>
+
+    </Link>
 
   </div>
 
   <div
     style={{
       display: "flex",
-      gap: "10px",
+      gap: "8px",
       overflowX: "auto",
       paddingBottom: "8px",
+      scrollbarWidth: "none",
+      msOverflowStyle: "none",
     }}
   >
 
@@ -1750,31 +1776,33 @@ onClick={searchProducts}
           border: "none",
 
           background:
-            selectedCategory ===
-            category
+            selectedCategory === category
               ? "#4B2E83"
-              : "white",
+              : "#FFFFFF",
 
           color:
-            selectedCategory ===
-            category
-              ? "white"
-              : "#111827",
+            selectedCategory === category
+              ? "#FFFFFF"
+              : "#374151",
 
-          padding: "10px 16px",
+          padding: "10px 18px",
 
-          borderRadius: "12px",
+          borderRadius: "14px",
 
           fontWeight: "700",
 
           cursor: "pointer",
 
-          fontSize: "13px",
+          fontSize: "12px",
 
           whiteSpace: "nowrap",
 
           boxShadow:
-            "0 4px 15px rgba(0,0,0,0.05)",
+            selectedCategory === category
+              ? "0 6px 15px rgba(75,46,131,0.18)"
+              : "0 3px 10px rgba(0,0,0,0.04)",
+
+          transition: "all 0.25s ease",
         }}
       >
         {category}
