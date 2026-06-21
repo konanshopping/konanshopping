@@ -2698,113 +2698,109 @@ addedProduct === product._id
 
 <div
   style={{
-  position: "fixed",
-  bottom: "10px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  width: "90%",
-  background: "rgba(255,255,255,0.95)",
-  backdropFilter: "blur(14px)",
-  border: "1px solid rgba(255,255,255,0.4)",
-  borderRadius: "22px",
-  display: "flex",
-  justifyContent: "space-around",
-  alignItems: "center",
-  padding: "6px 0",
-  zIndex: 999,
-  boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
-}}
+    position: "fixed",
+    bottom: "8px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "92%",
+    maxWidth: "500px",
+    background: "rgba(255,255,255,0.95)",
+    backdropFilter: "blur(14px)",
+    border: "1px solid rgba(255,255,255,0.4)",
+    borderRadius: "18px",
+    display: "flex",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: "4px 0",
+    zIndex: 999,
+    boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+  }}
 >
 
- {[
-  {
-    icon: <FaHome />,
-    name: "Accueil",
-    link: "/",
-  },
+  {[
+    {
+      icon: <FaHome />,
+      name: "Accueil",
+      link: "/",
+    },
 
-  {
-    icon: <FaThLarge />,
-    name: "Catégories",
-    link: "/boutique",
-  },
+    {
+      icon: <FaThLarge />,
+      name: "Catégories",
+      link: "/boutique",
+    },
 
-  {
-    icon: <FaComments />,
-    name: "Messages",
-    link: "https://wa.me/237694641329",
-  },
+    {
+      icon: <FaComments />,
+      name: "Messages",
+      link: "https://wa.me/237694641329",
+    },
 
-  {
-    icon: <FaShoppingCart />,
-    name: "Panier",
-    link: "/checkout",
-  },
+    {
+      icon: <FaShoppingCart />,
+      name: "Panier",
+      link: "/checkout",
+    },
 
-  {
-    icon: <FaUser />,
-    name: "Compte",
-    link: "/account",
-  },
+    {
+      icon: <FaUser />,
+      name: "Compte",
+      link: "/account",
+    },
+
   ].map((item, index) => (
 
     item.name === "Messages" ? (
 
       <a
         key={index}
-
         href={item.link}
-
         target="_blank"
-
+        rel="noreferrer"
         style={{
           textDecoration: "none",
         }}
       >
 
-        <div 
+        <div
+          className="bottomNavItem"
 
-  className="bottomNavItem"
+          onTouchStart={(e)=>{
+            e.currentTarget.style.transform="scale(0.95)";
+          }}
+
+          onTouchEnd={(e)=>{
+            e.currentTarget.style.transform="scale(1)";
+          }}
+
           style={{
             display: "flex",
-
             flexDirection: "column",
-
             alignItems: "center",
-
-            gap: "2px",
-
+            gap: "1px",
             cursor: "pointer",
-
-            padding: "4px 10px",
-borderRadius: "14px",
-transition: "0.3s",
+            padding: "3px 8px",
+            borderRadius: "12px",
+            transition: "0.2s ease",
           }}
         >
 
           <div
-
-  className="bottomNavIcon"
-
-  style={{
-    fontSize: "20px",
-  }}
-
->
-
-  {item.icon}
-
-</div>
+            className="bottomNavIcon"
+            style={{
+              fontSize: "20px",
+            }}
+          >
+            {item.icon}
+          </div>
 
           <span
             style={{
-              fontSize: "10px",
-
+              fontSize: "9px",
               color:
                 index === 0
                   ? "#4B2E83"
                   : "#6b7280",
-
               fontWeight:
                 index === 0
                   ? "700"
@@ -2822,15 +2818,12 @@ transition: "0.3s",
 
       <Link
         key={index}
-
         to={item.link}
-
         state={
           item.name === "Panier"
             ? { cart }
             : undefined
         }
-
         style={{
           textDecoration: "none",
         }}
@@ -2838,28 +2831,31 @@ transition: "0.3s",
 
         <div
           className="bottomNavItem"
+
+          onTouchStart={(e)=>{
+            e.currentTarget.style.transform="scale(0.95)";
+          }}
+
+          onTouchEnd={(e)=>{
+            e.currentTarget.style.transform="scale(1)";
+          }}
+
           style={{
             display: "flex",
-
             flexDirection: "column",
-
             alignItems: "center",
-
-            gap: "4px",
-
+            gap: "2px",
             cursor: "pointer",
-
-padding: "4px 10px",
-borderRadius: "14px",
-transition: "0.3s",
-
+            padding: "3px 8px",
+            borderRadius: "12px",
+            transition: "0.2s ease",
           }}
         >
 
           <div
-          className="bottomNavIcon"
+            className="bottomNavIcon"
             style={{
-              fontSize: "24px",
+              fontSize: "20px",
             }}
           >
             {item.icon}
@@ -2867,13 +2863,11 @@ transition: "0.3s",
 
           <span
             style={{
-              fontSize: "12px",
-
+              fontSize: "11px",
               color:
                 index === 0
                   ? "#4B2E83"
                   : "#6b7280",
-
               fontWeight:
                 index === 0
                   ? "700"
@@ -2886,7 +2880,6 @@ transition: "0.3s",
         </div>
 
       </Link>
-
 
     )
 
