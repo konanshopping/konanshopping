@@ -1906,40 +1906,53 @@ FCFA
 
   {/* GRID */}
 
-  <div
-    style={{
-      display: "grid",
+<div
+  style={{
+    display: "grid",
 
-      gridTemplateColumns:
-        window.innerWidth < 768
-          ? "repeat(2,1fr)"
-          : "repeat(auto-fit,minmax(260px,1fr))",
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(2,1fr)"
+        : "repeat(auto-fill,minmax(240px,1fr))",
 
-      gap: "18px",
-    }}
-  >
+    gap: "14px",
+
+    width: "100%",
+  }}
+>
 
 {aiProducts.length > 0 && (
 
 <div
 style={{
-marginBottom:"25px",
+marginBottom:"20px",
+gridColumn:"1/-1",
 }}
 >
 
 <h2
 style={{
-fontSize:"22px",
+display:"flex",
+alignItems:"center",
+gap:"8px",
+
+fontSize:"20px",
 
 fontWeight:"800",
 
 color:"#111827",
 
-marginBottom:"20px",
+marginBottom:"10px",
 }}
 >
 
-Résultats IA 🔥
+<FaRobot
+style={{
+color:"#4B2E83",
+}}
+/>
+
+Résultats IA
 
 </h2>
 
@@ -1953,36 +1966,36 @@ Résultats IA 🔥
 <div
 style={{
 
-background:"white",
+background:"#FFFFFF",
 
-padding:"30px",
+padding:"25px",
 
-borderRadius:"24px",
+borderRadius:"20px",
 
 textAlign:"center",
 
-marginBottom:"25px",
+marginBottom:"20px",
+
+gridColumn:"1/-1",
 
 boxShadow:
 "0 4px 15px rgba(0,0,0,0.05)",
 
 border:
-"1px solid #f3f4f6",
+"1px solid #F3F4F6",
 
 }}
 
 >
 
-{/* ICON */}
-
 <div
 style={{
 
-width:"90px",
+width:"80px",
 
-height:"90px",
+height:"80px",
 
-margin:"0 auto 20px auto",
+margin:"0 auto 18px auto",
 
 borderRadius:"50%",
 
@@ -1996,39 +2009,31 @@ justifyContent:"center",
 alignItems:"center",
 
 boxShadow:
-"0 4px 15px rgba(79,70,229,0.12)",
+"0 4px 12px rgba(79,70,229,0.12)",
 
 }}
 
 >
 
-<i
-className="fa-solid fa-robot"
-
+<FaRobot
 style={{
-
-fontSize:"40px",
-
-color:"#4f46e5",
-
+fontSize:"36px",
+color:"#4F46E5",
 }}
-
-></i>
+/>
 
 </div>
-
-{/* TITLE */}
 
 <h2
 style={{
 
 color:"#111827",
 
-fontSize:"24px",
+fontSize:"22px",
 
 fontWeight:"800",
 
-marginBottom:"10px",
+marginBottom:"8px",
 
 }}
 >
@@ -2037,32 +2042,23 @@ Aucun produit similaire trouvé
 
 </h2>
 
-{/* TEXT */}
-
 <p
 style={{
 
-color:"#6b7280",
+color:"#6B7280",
 
-marginTop:"10px",
+lineHeight:"24px",
 
-lineHeight:"28px",
+fontSize:"14px",
 
-fontSize:"15px",
+maxWidth:"400px",
 
-maxWidth:"420px",
-
-marginLeft:"auto",
-
-marginRight:"auto",
+margin:"0 auto",
 
 }}
 >
 
-Essayez une autre image
-ou utilisez une photo plus
-claire pour améliorer
-la recherche IA.
+Essayez une autre image ou utilisez une photo plus claire pour améliorer la recherche IA.
 
 </p>
 
@@ -2070,88 +2066,97 @@ la recherche IA.
 
 )}
 
-    {(aiProducts.length > 0
+{(aiProducts.length > 0
 ? aiProducts
 : randomizedProducts)
 
 .filter((product) => {
 
-        const matchSearch =
-          product.name
-            .toLowerCase()
-            .includes(
-              search.toLowerCase()
-            );
+const matchSearch =
+product.name
+.toLowerCase()
+.includes(
+search.toLowerCase()
+);
 
-        const matchCategory =
-          selectedCategory ===
-          "Tous"
+const matchCategory =
+selectedCategory === "Tous"
+? true
+: product.category ===
+selectedCategory;
 
-            ? true
+return (
+matchSearch &&
+matchCategory
+);
 
-            : product.category ===
-              selectedCategory;
+})
 
-        return (
-          matchSearch &&
-          matchCategory
-        );
+.slice(0, visibleProducts)
 
-      })
-
-      .slice(0, visibleProducts)
-
-      .map((product) => (
+.map((product) => (
 
 <Link
-  to={`/product/${product._id}`}
-  key={product._id}
-
-  style={{
-    textDecoration: "none",
-    color: "black",
-  }}
+to={`/product/${product._id}`}
+key={product._id}
+style={{
+textDecoration:"none",
+color:"#111827",
+}}
 >
 
-          <div
-  style={{
-    background: "white",
-    borderRadius: "18px", // réduit légèrement
-    overflow: "hidden",
-    boxShadow:
-      "0 6px 20px rgba(0,0,0,0.05)",
-    cursor: "pointer",
-    transition: "0.3s",
-    position: "relative",
-  }}
+<div
+style={{
+background:"#FFFFFF",
+
+borderRadius:"16px",
+
+overflow:"hidden",
+
+border:
+"1px solid #F3F4F6",
+
+boxShadow:
+"0 4px 12px rgba(0,0,0,0.05)",
+
+cursor:"pointer",
+
+transition:"all .25s ease",
+
+position:"relative",
+}}
 >
 
-  {/* IMAGE */}
+{/* IMAGE */}
 
-  <div
-    style={{
-      background: "#f8f8fb",
-      padding: "12px", // réduit
-    }}
-  >
+<div
+style={{
+background:"#F9FAFB",
+padding:"10px",
+}}
+>
 
-    <img
-      src={product.image}
-      alt=""
+<img
+src={product.image}
+alt={product.name}
 
-      style={{
-        width: "100%",
+style={{
+width:"100%",
 
-        height:
-          window.innerWidth < 768
-            ? "140px" // réduit
-            : "190px", // réduit
+height:
+window.innerWidth < 768
+? "160px"
+: "200px",
 
-        objectFit: "cover",
-      }}
-    />
+objectFit:"cover",
 
-  </div>
+borderRadius:"10px",
+
+display:"block",
+}}
+/>
+
+</div>
 
 {/* FAVORIS */}
 
