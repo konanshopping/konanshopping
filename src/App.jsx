@@ -67,7 +67,9 @@ import {
 
   FaCheck,
 
-  FaSpinner
+  FaSpinner,
+
+  FaRobot
 
 } from "react-icons/fa";
 
