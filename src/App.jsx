@@ -1041,7 +1041,7 @@ FCFA
 <div
   style={{
     display: "flex",
-    gap: "10px",
+    gap: "8px",
     alignItems: "center",
     flexShrink: 0,
   }}
@@ -1059,22 +1059,22 @@ FCFA
 
     <div
       style={{
-        width: "44px",
-        height: "44px",
-        borderRadius: "14px",
+        width: "38px",
+        height: "38px",
+        borderRadius: "12px",
         background: "#FFFFFF",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
         boxShadow:
-          "0 4px 12px rgba(0,0,0,0.06)",
+          "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
 
       <FaHeart
         style={{
-          fontSize: "22px",
+          fontSize: "18px",
         }}
       />
 
@@ -1083,11 +1083,11 @@ FCFA
         <span
           style={{
             position: "absolute",
-            top: "-5px",
-            right: "-5px",
+            top: "-4px",
+            right: "-4px",
 
-            width: "18px",
-            height: "18px",
+            width: "16px",
+            height: "16px",
 
             borderRadius: "50%",
 
@@ -1099,8 +1099,11 @@ FCFA
             justifyContent: "center",
             alignItems: "center",
 
-            fontSize: "10px",
+            fontSize: "9px",
             fontWeight: "700",
+
+            boxShadow:
+              "0 2px 8px rgba(91,60,196,0.3)",
           }}
         >
           {favoritesCount}
@@ -1125,33 +1128,33 @@ FCFA
 
     <div
       style={{
-        width: "44px",
-        height: "44px",
-        borderRadius: "14px",
+        width: "38px",
+        height: "38px",
+        borderRadius: "12px",
         background: "#FFFFFF",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         position: "relative",
         boxShadow:
-          "0 4px 12px rgba(0,0,0,0.06)",
+          "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
 
       <FaShoppingCart
         style={{
-          fontSize: "22px",
+          fontSize: "18px",
         }}
       />
 
       <span
         style={{
           position: "absolute",
-          top: "-5px",
-          right: "-5px",
+          top: "-4px",
+          right: "-4px",
 
-          width: "18px",
-          height: "18px",
+          width: "16px",
+          height: "16px",
 
           borderRadius: "50%",
 
@@ -1163,14 +1166,16 @@ FCFA
           justifyContent: "center",
           alignItems: "center",
 
-          fontSize: "10px",
+          fontSize: "9px",
           fontWeight: "700",
+
+          boxShadow:
+            "0 2px 8px rgba(91,60,196,0.3)",
         }}
       >
         {cart.reduce(
           (total, item) =>
-            total +
-            (item.quantity || 1),
+            total + (item.quantity || 1),
           0
         )}
       </span>
@@ -1191,21 +1196,21 @@ FCFA
 
     <div
       style={{
-        width: "44px",
-        height: "44px",
-        borderRadius: "14px",
+        width: "38px",
+        height: "38px",
+        borderRadius: "12px",
         background: "#FFFFFF",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         boxShadow:
-          "0 4px 12px rgba(0,0,0,0.06)",
+          "0 2px 8px rgba(0,0,0,0.05)",
       }}
     >
 
       <FaUserCircle
         style={{
-          fontSize: "22px",
+          fontSize: "18px",
         }}
       />
 
@@ -1213,8 +1218,7 @@ FCFA
 
   </Link>
 
-
-    </div>
+</div>
 
   </div>
 
