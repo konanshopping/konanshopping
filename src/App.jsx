@@ -1375,6 +1375,7 @@ FCFA
       borderRadius: "12px",
       padding: "0 10px",
       height: "38px",
+      minWidth: 0,
     }}
   >
 
@@ -1382,14 +1383,13 @@ FCFA
       style={{
         color: "#9CA3AF",
         fontSize: "12px",
+        flexShrink: 0,
       }}
     />
 
     <input
       type="text"
-      placeholder={
-        placeholders[placeholderIndex]
-      }
+      placeholder={placeholders[placeholderIndex]}
       value={search}
       onChange={(e) =>
         setSearch(e.target.value)
@@ -1401,8 +1401,7 @@ FCFA
         background: "transparent",
         fontSize: "12px",
         color: "#111827",
-        WebkitTextFillColor: "#111827",
-        caretColor: "#4B2E83",
+        minWidth: 0,
       }}
     />
 
@@ -1429,124 +1428,113 @@ FCFA
     <FaMicrophone size={15} />
   </button>
 
-  {/* IMAGE PREVIEW */}
-
-  {image && (
-
-    <div
-      style={{
-        position: "relative",
-        width: "60px",
-        height: "60px",
-        flexShrink: 0,
-      }}
-    >
-
-      <img
-        src={URL.createObjectURL(image)}
-        alt=""
-        style={{
-          width: "60px",
-          height: "60px",
-          borderRadius: "12px",
-          objectFit: "cover",
-          boxShadow:
-            "0 4px 12px rgba(0,0,0,0.10)",
-        }}
-      />
-
-      <button
-        onClick={() =>
-          setImage(null)
-        }
-        style={{
-          position: "absolute",
-          top: "-5px",
-          right: "-5px",
-          width: "20px",
-          height: "20px",
-          borderRadius: "50%",
-          border: "none",
-          background: "#EF4444",
-          color: "#FFFFFF",
-          cursor: "pointer",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          fontSize: "10px",
-          fontWeight: "700",
-          boxShadow:
-            "0 3px 8px rgba(239,68,68,.30)",
-        }}
-      >
-        ✕
-      </button>
-
-    </div>
-
-  )}
-
   {/* RECHERCHE */}
 
-<button
-  onClick={searchProducts}
-  disabled={loading}
+  <button
+    onClick={searchProducts}
+    disabled={loading}
+    style={{
+      border: "none",
+      background:
+        "linear-gradient(135deg,#4B2E83,#6D28D9)",
+      color: "#FFFFFF",
+      height: "38px",
+      padding: "0 12px",
+      borderRadius: "12px",
+      fontWeight: "700",
+      fontSize: "11px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      gap: "5px",
+      boxShadow:
+        "0 4px 12px rgba(75,46,131,.18)",
+      flexShrink: 0,
+      whiteSpace: "nowrap",
+    }}
+  >
+
+    {loading ? (
+      <>
+        <FaSpinner
+          className="spin"
+          size={11}
+        />
+        Recherche...
+      </>
+    ) : (
+      <>
+        <FaSearch size={11} />
+        Rechercher
+      </>
+    )}
+
+  </button>
+
+</div>
+
+{image && (
+
+<div
   style={{
-    border: "none",
-    background:
-      "linear-gradient(135deg,#4B2E83,#6D28D9)",
-    color: "#FFFFFF",
-
-    height: "38px",
-
-    minWidth: "38px",
-
-    padding:
-      image
-        ? "0 10px"
-        : "0 12px",
-
-    borderRadius: "12px",
-
-    fontWeight: "700",
-
-    fontSize: "11px",
-
-    cursor: "pointer",
-
     display: "flex",
-
-    alignItems: "center",
-
     justifyContent: "center",
-
-    gap: image ? "0px" : "5px",
-
-    boxShadow:
-      "0 4px 12px rgba(75,46,131,.18)",
-
-    flexShrink: 0,
+    marginTop: "-5px",
+    marginBottom: "18px",
   }}
 >
 
-  {loading ? (
-    <>
-      <FaSpinner
-        className="spin"
-        size={11}
-      />
-      {!image && "Recherche..."}
-    </>
-  ) : (
-    <>
-      <FaSearch size={11} />
-      {!image && "Rechercher"}
-    </>
-  )}
+  <div
+    style={{
+      position: "relative",
+      width: "80px",
+      height: "80px",
+    }}
+  >
 
-</button>
+    <img
+      src={URL.createObjectURL(image)}
+      alt=""
+      style={{
+        width: "80px",
+        height: "80px",
+        borderRadius: "16px",
+        objectFit: "cover",
+        boxShadow:
+          "0 6px 15px rgba(0,0,0,.10)",
+      }}
+    />
+
+    <button
+      onClick={() => setImage(null)}
+      style={{
+        position: "absolute",
+        top: "-6px",
+        right: "-6px",
+        width: "24px",
+        height: "24px",
+        borderRadius: "50%",
+        border: "none",
+        background: "#EF4444",
+        color: "#FFFFFF",
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: "11px",
+        fontWeight: "700",
+        boxShadow:
+          "0 4px 10px rgba(239,68,68,.25)",
+      }}
+    >
+      ✕
+    </button>
+
+  </div>
 
 </div>
+
+)}
 
    {/* QUICK ACTIONS */}
 
