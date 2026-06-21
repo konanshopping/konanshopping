@@ -263,7 +263,11 @@ const placeholders = [
 
 "⌚ Montres tendance 2026",
 
-"🎁 Offres spéciales Konan Shopping",
+"Creé un compte konanshopping",
+
+"Béneficie de JUSQU A",
+
+"5000FCFA OFFERT PREMIER ACHAT",
 
 "🚚 Livraison rapide partout au Cameroun"
 
