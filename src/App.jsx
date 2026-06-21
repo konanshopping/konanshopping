@@ -1488,45 +1488,63 @@ FCFA
 
   {/* RECHERCHE */}
 
-  <button
-    onClick={searchProducts}
-    disabled={loading}
-    style={{
-      border: "none",
-      background:
-        "linear-gradient(135deg,#4B2E83,#6D28D9)",
-      color: "#FFFFFF",
-      height: "38px",
-      padding: "0 12px",
-      borderRadius: "12px",
-      fontWeight: "700",
-      fontSize: "11px",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      gap: "5px",
-      boxShadow:
-        "0 4px 12px rgba(75,46,131,.18)",
-      flexShrink: 0,
-    }}
-  >
+<button
+  onClick={searchProducts}
+  disabled={loading}
+  style={{
+    border: "none",
+    background:
+      "linear-gradient(135deg,#4B2E83,#6D28D9)",
+    color: "#FFFFFF",
 
-    {loading ? (
-      <>
-        <FaSpinner
-          className="spin"
-          size={11}
-        />
-        Recherche...
-      </>
-    ) : (
-      <>
-        <FaSearch size={11} />
-        Rechercher
-      </>
-    )}
+    height: "38px",
 
-  </button>
+    minWidth: "38px",
+
+    padding:
+      image
+        ? "0 10px"
+        : "0 12px",
+
+    borderRadius: "12px",
+
+    fontWeight: "700",
+
+    fontSize: "11px",
+
+    cursor: "pointer",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    justifyContent: "center",
+
+    gap: image ? "0px" : "5px",
+
+    boxShadow:
+      "0 4px 12px rgba(75,46,131,.18)",
+
+    flexShrink: 0,
+  }}
+>
+
+  {loading ? (
+    <>
+      <FaSpinner
+        className="spin"
+        size={11}
+      />
+      {!image && "Recherche..."}
+    </>
+  ) : (
+    <>
+      <FaSearch size={11} />
+      {!image && "Rechercher"}
+    </>
+  )}
+
+</button>
 
 </div>
 
