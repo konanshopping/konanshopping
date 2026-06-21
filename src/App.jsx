@@ -1330,11 +1330,12 @@ FCFA
     padding: "8px",
     display: "flex",
     alignItems: "center",
-    gap: "8px",
+    gap: image ? "5px" : "8px",
     marginTop: "14px",
     marginBottom: "18px",
     border: "1px solid #F1F5F9",
     boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
+    overflow: "hidden",
   }}
 >
 
@@ -1368,14 +1369,15 @@ FCFA
   <div
     style={{
       flex: 1,
+      minWidth: image ? "80px" : "140px",
       display: "flex",
       alignItems: "center",
-      gap: "7px",
+      gap: "6px",
       background: "#F9FAFB",
       borderRadius: "12px",
-      padding: "0 10px",
+      padding: image ? "0 6px" : "0 10px",
       height: "38px",
-      minWidth: 0,
+      overflow: "hidden",
     }}
   >
 
@@ -1396,12 +1398,14 @@ FCFA
       }
       style={{
         flex: 1,
+        minWidth: 0,
         border: "none",
         outline: "none",
         background: "transparent",
         fontSize: "12px",
         color: "#111827",
-        minWidth: 0,
+        WebkitTextFillColor: "#111827",
+        caretColor: "#4B2E83",
       }}
     />
 
@@ -1428,6 +1432,61 @@ FCFA
     <FaMicrophone size={15} />
   </button>
 
+  {/* IMAGE */}
+
+  {image && (
+
+    <div
+      style={{
+        position: "relative",
+        width: "45px",
+        height: "45px",
+        flexShrink: 0,
+      }}
+    >
+
+      <img
+        src={URL.createObjectURL(image)}
+        alt=""
+        style={{
+          width: "45px",
+          height: "45px",
+          borderRadius: "10px",
+          objectFit: "cover",
+          boxShadow:
+            "0 3px 10px rgba(0,0,0,.08)",
+        }}
+      />
+
+      <button
+        onClick={() =>
+          setImage(null)
+        }
+        style={{
+          position: "absolute",
+          top: "-4px",
+          right: "-4px",
+          width: "16px",
+          height: "16px",
+          borderRadius: "50%",
+          border: "none",
+          background: "#EF4444",
+          color: "#FFFFFF",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          fontSize: "8px",
+          fontWeight: "700",
+        }}
+      >
+        ✕
+      </button>
+
+    </div>
+
+  )}
+
   {/* RECHERCHE */}
 
   <button
@@ -1439,13 +1498,15 @@ FCFA
         "linear-gradient(135deg,#4B2E83,#6D28D9)",
       color: "#FFFFFF",
       height: "38px",
-      padding: "0 12px",
+      minWidth: image ? "38px" : "95px",
+      padding: image ? "0 10px" : "0 12px",
       borderRadius: "12px",
       fontWeight: "700",
       fontSize: "11px",
       cursor: "pointer",
       display: "flex",
       alignItems: "center",
+      justifyContent: "center",
       gap: "5px",
       boxShadow:
         "0 4px 12px rgba(75,46,131,.18)",
@@ -1460,81 +1521,18 @@ FCFA
           className="spin"
           size={11}
         />
-        Recherche...
+        {!image && "Recherche..."}
       </>
     ) : (
       <>
         <FaSearch size={11} />
-        Rechercher
+        {!image && "Rechercher"}
       </>
     )}
 
   </button>
 
 </div>
-
-{image && (
-
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    marginTop: "-5px",
-    marginBottom: "18px",
-  }}
->
-
-  <div
-    style={{
-      position: "relative",
-      width: "80px",
-      height: "80px",
-    }}
-  >
-
-    <img
-      src={URL.createObjectURL(image)}
-      alt=""
-      style={{
-        width: "80px",
-        height: "80px",
-        borderRadius: "16px",
-        objectFit: "cover",
-        boxShadow:
-          "0 6px 15px rgba(0,0,0,.10)",
-      }}
-    />
-
-    <button
-      onClick={() => setImage(null)}
-      style={{
-        position: "absolute",
-        top: "-6px",
-        right: "-6px",
-        width: "24px",
-        height: "24px",
-        borderRadius: "50%",
-        border: "none",
-        background: "#EF4444",
-        color: "#FFFFFF",
-        cursor: "pointer",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "11px",
-        fontWeight: "700",
-        boxShadow:
-          "0 4px 10px rgba(239,68,68,.25)",
-      }}
-    >
-      ✕
-    </button>
-
-  </div>
-
-</div>
-
-)}
 
    {/* QUICK ACTIONS */}
 
