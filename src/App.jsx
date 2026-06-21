@@ -1038,173 +1038,181 @@ FCFA
 
 {/* ICONS */}
 
-   <div
+<div
   style={{
     display: "flex",
-    gap: "8px",
+    gap: "10px",
     alignItems: "center",
     flexShrink: 0,
-    
   }}
 >
 
-      <div
+  {/* FAVORIS */}
+
+  <Link
+    to="/favorites"
+    style={{
+      textDecoration: "none",
+      color: "#111827",
+    }}
+  >
+
+    <div
+      style={{
+        width: "44px",
+        height: "44px",
+        borderRadius: "14px",
+        background: "#FFFFFF",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        boxShadow:
+          "0 4px 12px rgba(0,0,0,0.06)",
+      }}
+    >
+
+      <FaHeart
         style={{
-          textAlign: "center",
-          cursor: "pointer",
+          fontSize: "22px",
         }}
-      >
-        <Link
+      />
 
-          to="/favorites"
+      {favoritesCount > 0 && (
 
+        <span
           style={{
-            textDecoration: "none",
-            color: "#111827",
-          }}
+            position: "absolute",
+            top: "-5px",
+            right: "-5px",
 
-        >
+            width: "18px",
+            height: "18px",
 
-          <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-  }}
->
+            borderRadius: "50%",
 
-            <div
-  style={{
-    fontSize: "18px",
-    position: "relative",
-  }}
->
+            background: "#5b3cc4",
 
-  <FaHeart />
+            color: "#fff",
 
-  {favoritesCount > 0 && (
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
 
-    <span
-  style={{
-    position: "absolute",
-    top: "-4px",
-    right: "-2px",
-
-    width: "16px",
-    height: "16px",
-
-    borderRadius: "50%",
-
-    background: "#5b3cc4",
-
-    color: "white",
-
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-
-    fontSize: "9px",
-    fontWeight: "bold",
-  }}
->
-  {favoritesCount}
-</span>
-
-  )}
-
-</div>
-
-
-          </div>
-
-        </Link>
-
-      </div>
-
-      <Link
-        to="/checkout"
-        state={{ cart }}
-
-        style={{
-          textDecoration: "none",
-          color: "black",
-        }}
-      >
-
-        <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "6px",
-    position: "relative",
-  }}
->
-
-          <div
-            style={{
-              fontSize: "18px",
-            }}
-          >
-            <FaShoppingCart />
-          </div>
-
-          <div
-            style={{
-              position: "absolute",
-              top: "-4px",
-              right: "-2px",
-              width: "16px",
-              height: "16px",
-              borderRadius: "50%",
-              background: "#5b3cc4",
-              color: "white",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              fontSize: "9px",
-              fontWeight: "bold",
-            }}
-          >
-            {cart.reduce(
-              (total, item) =>
-                total +
-                (item.quantity || 1),
-              0
-            )}
-          </div>
-
-
-        </div>
-
-      </Link>
-
-      <div
-        style={{
-          textAlign: "center",
-          cursor: "pointer",
-        }}
-      >
-
-        <Link
-          to="/account"
-          style={{
-            textDecoration: "none",
-            color: "#111827",
+            fontSize: "10px",
+            fontWeight: "700",
           }}
         >
+          {favoritesCount}
+        </span>
 
-          <div
-            style={{
-              fontSize: "18px",
-            }}
-          >
-            <FaUserCircle />
-          </div>
+      )}
 
+    </div>
 
-        </Link>
+  </Link>
 
-      </div>
+  {/* PANIER */}
+
+  <Link
+    to="/checkout"
+    state={{ cart }}
+    style={{
+      textDecoration: "none",
+      color: "#111827",
+    }}
+  >
+
+    <div
+      style={{
+        width: "44px",
+        height: "44px",
+        borderRadius: "14px",
+        background: "#FFFFFF",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        boxShadow:
+          "0 4px 12px rgba(0,0,0,0.06)",
+      }}
+    >
+
+      <FaShoppingCart
+        style={{
+          fontSize: "22px",
+        }}
+      />
+
+      <span
+        style={{
+          position: "absolute",
+          top: "-5px",
+          right: "-5px",
+
+          width: "18px",
+          height: "18px",
+
+          borderRadius: "50%",
+
+          background: "#5b3cc4",
+
+          color: "#fff",
+
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+
+          fontSize: "10px",
+          fontWeight: "700",
+        }}
+      >
+        {cart.reduce(
+          (total, item) =>
+            total +
+            (item.quantity || 1),
+          0
+        )}
+      </span>
+
+    </div>
+
+  </Link>
+
+  {/* COMPTE */}
+
+  <Link
+    to="/account"
+    style={{
+      textDecoration: "none",
+      color: "#111827",
+    }}
+  >
+
+    <div
+      style={{
+        width: "44px",
+        height: "44px",
+        borderRadius: "14px",
+        background: "#FFFFFF",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        boxShadow:
+          "0 4px 12px rgba(0,0,0,0.06)",
+      }}
+    >
+
+      <FaUserCircle
+        style={{
+          fontSize: "22px",
+        }}
+      />
+
+    </div>
+
+  </Link>
+
 
     </div>
 
