@@ -2968,13 +2968,13 @@ function App() {
       y: window.innerHeight - 160,
     });
 
-  useEffect(() => {
+ useEffect(() => {
 
   const currentPath =
     window.location.pathname;
 
   // =========================
-  // BOT UNIQUEMENT SUR L'ACCUEIL
+  // BOT UNIQUEMENT SUR /
   // =========================
 
   const existingBot =
@@ -3053,25 +3053,43 @@ function App() {
             waitBot
           );
 
-          // =====================
+          // =========================
           // POSITION PROFESSIONNELLE
-          // =====================
+          // =========================
 
           botpress.style.position =
             "fixed";
 
-          botpress.style.bottom =
-            "110px";
-
-          botpress.style.right =
-            "18px";
-
           botpress.style.zIndex =
             "99999";
 
-          // =====================
-          // ANIMATION D'APPARITION
-          // =====================
+          // MOBILE
+
+          if (
+            window.innerWidth < 768
+          ) {
+
+            botpress.style.bottom =
+              "170px";
+
+            botpress.style.right =
+              "15px";
+
+          } else {
+
+            // PC
+
+            botpress.style.bottom =
+              "30px";
+
+            botpress.style.right =
+              "30px";
+
+          }
+
+          // =========================
+          // ANIMATION
+          // =========================
 
           botpress.style.opacity =
             "0";
@@ -3085,6 +3103,22 @@ function App() {
               "1";
 
           }, 300);
+
+          // =========================
+          // EMPÊCHER DISPARITION
+          // =========================
+
+          const keepVisible = setInterval(() => {
+
+  if (!document.body.contains(botpress)) {
+    clearInterval(keepVisible);
+    return;
+  }
+
+  botpress.style.display = "block";
+  botpress.style.visibility = "visible";
+
+}, 3000);
 
         }, 500);
 
