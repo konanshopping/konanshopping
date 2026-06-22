@@ -3346,31 +3346,33 @@ app.put(
 
     try {
 
+      console.log("FILE =", req.file);
+
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Aucun fichier reçu"
+        });
+      }
+
       const user =
         await User.findByIdAndUpdate(
-
           req.params.id,
-
           {
-            avatar:
-              req.file.path,
+            avatar: req.file.path,
           },
-
           {
             new: true,
           }
-
         );
 
       res.json(user);
 
     } catch (err) {
 
-      console.log(err);
+      console.log("ERREUR AVATAR =", err);
 
       res.status(500).json({
-        message:
-          "Erreur serveur",
+        message: "Erreur serveur",
       });
 
     }
