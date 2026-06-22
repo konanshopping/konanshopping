@@ -1744,20 +1744,28 @@ return (
       </button>
 
       <button
-        onClick={() => {
+       onClick={async () => {
 
-          setProfileImage("");
+  try {
 
-await axios.put(
-  `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
-  {
-    avatar: ""
+    setProfileImage("");
+
+    await axios.put(
+      `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+      {
+        avatar: "",
+      }
+    );
+
+    setShowPhotoModal(false);
+
+  } catch (err) {
+
+    console.log(err);
+
   }
-);
 
-setShowPhotoModal(false);
-
-        }}
+}}
 
         style={{
           width: "100%",
