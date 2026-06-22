@@ -3068,6 +3068,9 @@ script2.onload = () => {
     botpress.style.zIndex =
       "99999";
 
+    botpress.style.transition =
+      "transform .15s ease";
+
     let isDragging = false;
 
     let startX = 0;
@@ -3076,43 +3079,63 @@ script2.onload = () => {
     let currentX = 0;
     let currentY = 0;
 
+    // =====================
     // MOBILE
+    // =====================
 
     botpress.addEventListener(
       "touchstart",
       (e) => {
 
-        isDragging = true;
+        isDragging = false;
 
         startX =
-          e.touches[0].clientX -
-          currentX;
+          e.touches[0].clientX;
 
         startY =
-          e.touches[0].clientY -
-          currentY;
+          e.touches[0].clientY;
 
-      }
+      },
+      { passive: true }
     );
 
     document.addEventListener(
       "touchmove",
       (e) => {
 
-        if (!isDragging) return;
-
-        currentX =
+        const dx =
           e.touches[0].clientX -
           startX;
 
-        currentY =
+        const dy =
           e.touches[0].clientY -
           startY;
+
+        if (
+          Math.abs(dx) > 10 ||
+          Math.abs(dy) > 10
+        ) {
+
+          isDragging = true;
+
+        }
+
+        if (!isDragging) return;
+
+        currentX += dx;
+        currentY += dy;
 
         botpress.style.transform =
           `translate(${currentX}px, ${currentY}px)`;
 
-      }
+        startX =
+          e.touches[0].clientX;
+
+        startY =
+          e.touches[0].clientY;
+
+      },
+      { passive: true }
     );
 
     document.addEventListener(
@@ -3124,21 +3147,21 @@ script2.onload = () => {
       }
     );
 
+    // =====================
     // PC
+    // =====================
 
     botpress.addEventListener(
       "mousedown",
       (e) => {
 
-        isDragging = true;
+        isDragging = false;
 
         startX =
-          e.clientX -
-          currentX;
+          e.clientX;
 
         startY =
-          e.clientY -
-          currentY;
+          e.clientY;
 
       }
     );
@@ -3147,18 +3170,36 @@ script2.onload = () => {
       "mousemove",
       (e) => {
 
-        if (!isDragging) return;
-
-        currentX =
+        const dx =
           e.clientX -
           startX;
 
-        currentY =
+        const dy =
           e.clientY -
           startY;
 
+        if (
+          Math.abs(dx) > 10 ||
+          Math.abs(dy) > 10
+        ) {
+
+          isDragging = true;
+
+        }
+
+        if (!isDragging) return;
+
+        currentX += dx;
+        currentY += dy;
+
         botpress.style.transform =
           `translate(${currentX}px, ${currentY}px)`;
+
+        startX =
+          e.clientX;
+
+        startY =
+          e.clientY;
 
       }
     );
