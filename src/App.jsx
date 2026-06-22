@@ -2962,31 +2962,25 @@ addedProduct === product._id
 
 function App() {
 
-  const [chatPosition,
-  setChatPosition] =
-  useState({
+  const [chatPosition, setChatPosition] =
+    useState({
+      x: window.innerWidth - 90,
+      y: window.innerHeight - 160,
+    });
 
-    x:
-      window.innerWidth - 90,
-
-    y:
-      window.innerHeight - 160,
-
-  });
-
-useEffect(() => {
+  useEffect(() => {
 
   const currentPath =
     window.location.pathname;
 
   // =========================
-  // AFFICHER BOT UNIQUEMENT SUR /
+  // BOT UNIQUEMENT SUR L'ACCUEIL
   // =========================
 
   const existingBot =
     document.querySelector(
-  ".bpChatContainer"
-);
+      ".bpChatContainer"
+    );
 
   if (existingBot) {
 
@@ -2997,13 +2991,13 @@ useEffect(() => {
 
   }
 
-  // PAS SUR ACCUEIL
-
   if (currentPath !== "/") {
     return;
   }
 
-  // ÉVITER CHARGEMENT MULTIPLE
+  // =========================
+  // ÉVITER LE DOUBLE CHARGEMENT
+  // =========================
 
   if (
     document.querySelector(
@@ -3014,7 +3008,7 @@ useEffect(() => {
   }
 
   // =========================
-  // SCRIPT BOTPRESS
+  // CHARGEMENT BOTPRESS
   // =========================
 
   const script1 =
@@ -3043,185 +3037,62 @@ useEffect(() => {
       script2
     );
 
-script2.onload = () => {
+    script2.onload = () => {
 
-  const waitBot = setInterval(() => {
+      const waitBot =
+        setInterval(() => {
 
-    const botpress =
-      document.querySelector(
-        ".bpChatContainer"
-      );
+          const botpress =
+            document.querySelector(
+              ".bpChatContainer"
+            );
 
-    if (!botpress) return;
+          if (!botpress) return;
 
-    clearInterval(waitBot);
+          clearInterval(
+            waitBot
+          );
 
-    botpress.style.position =
-      "fixed";
+          // =====================
+          // POSITION PROFESSIONNELLE
+          // =====================
 
-    botpress.style.bottom =
-      "20px";
+          botpress.style.position =
+            "fixed";
 
-    botpress.style.right =
-      "20px";
+          botpress.style.bottom =
+            "110px";
 
-    botpress.style.zIndex =
-      "99999";
+          botpress.style.right =
+            "18px";
 
-    botpress.style.transition =
-      "transform .15s ease";
+          botpress.style.zIndex =
+            "99999";
 
-    let isDragging = false;
+          // =====================
+          // ANIMATION D'APPARITION
+          // =====================
 
-    let startX = 0;
-    let startY = 0;
+          botpress.style.opacity =
+            "0";
 
-    let currentX = 0;
-    let currentY = 0;
+          botpress.style.transition =
+            "opacity .4s ease";
 
-    // =====================
-    // MOBILE
-    // =====================
+          setTimeout(() => {
 
-    botpress.addEventListener(
-      "touchstart",
-      (e) => {
+            botpress.style.opacity =
+              "1";
 
-        isDragging = false;
+          }, 300);
 
-        startX =
-          e.touches[0].clientX;
+        }, 500);
 
-        startY =
-          e.touches[0].clientY;
-
-      },
-      { passive: true }
-    );
-
-    document.addEventListener(
-      "touchmove",
-      (e) => {
-
-        const dx =
-          e.touches[0].clientX -
-          startX;
-
-        const dy =
-          e.touches[0].clientY -
-          startY;
-
-        if (
-          Math.abs(dx) > 10 ||
-          Math.abs(dy) > 10
-        ) {
-
-          isDragging = true;
-
-        }
-
-        if (!isDragging) return;
-
-        currentX += dx;
-        currentY += dy;
-
-        botpress.style.transform =
-          `translate(${currentX}px, ${currentY}px)`;
-
-        startX =
-          e.touches[0].clientX;
-
-        startY =
-          e.touches[0].clientY;
-
-      },
-      { passive: true }
-    );
-
-    document.addEventListener(
-      "touchend",
-      () => {
-
-        isDragging = false;
-
-      }
-    );
-
-    // =====================
-    // PC
-    // =====================
-
-    botpress.addEventListener(
-      "mousedown",
-      (e) => {
-
-        isDragging = false;
-
-        startX =
-          e.clientX;
-
-        startY =
-          e.clientY;
-
-      }
-    );
-
-    document.addEventListener(
-      "mousemove",
-      (e) => {
-
-        const dx =
-          e.clientX -
-          startX;
-
-        const dy =
-          e.clientY -
-          startY;
-
-        if (
-          Math.abs(dx) > 10 ||
-          Math.abs(dy) > 10
-        ) {
-
-          isDragging = true;
-
-        }
-
-        if (!isDragging) return;
-
-        currentX += dx;
-        currentY += dy;
-
-        botpress.style.transform =
-          `translate(${currentX}px, ${currentY}px)`;
-
-        startX =
-          e.clientX;
-
-        startY =
-          e.clientY;
-
-      }
-    );
-
-    document.addEventListener(
-      "mouseup",
-      () => {
-
-        isDragging = false;
-
-      }
-    );
-
-  }, 500);
-
-};
+    };
 
   };
 
 }, []);
-
-
 
   return (
 
