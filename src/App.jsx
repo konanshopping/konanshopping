@@ -6,7 +6,6 @@ import {
 
 import AiMode from "./pages/AiMode";
 
-
 import {
   BrowserRouter,
   Routes,
@@ -2975,34 +2974,48 @@ function App() {
 
   });
 
- useEffect(() => {
+useEffect(() => {
 
   const currentPath =
     window.location.pathname;
 
-  // BOT UNIQUEMENT SUR L'ACCUEIL
+  // =========================
+  // AFFICHER BOT UNIQUEMENT SUR /
+  // =========================
 
-  if (currentPath !== "/") {
-
-    console.log(
-      "Botpress caché sur :",
-      currentPath
+  const existingBot =
+    document.querySelector(
+      "#bp-web-widget-container"
     );
 
-    return;
+  if (existingBot) {
 
+    existingBot.style.display =
+      currentPath === "/"
+        ? "block"
+        : "none";
+
+  }
+
+  // PAS SUR ACCUEIL
+
+  if (currentPath !== "/") {
+    return;
+  }
+
+  // ÉVITER CHARGEMENT MULTIPLE
+
+  if (
+    document.querySelector(
+      'script[src*="botpress"]'
+    )
+  ) {
+    return;
   }
 
   // =========================
   // SCRIPT BOTPRESS
   // =========================
-
-  console.log(
-    "Botpress scripts:",
-    document.querySelectorAll(
-      'script[src*="botpress"]'
-    ).length
-  );
 
   const script1 =
     document.createElement("script");
@@ -3051,136 +3064,9 @@ function App() {
       botpress.style.zIndex =
         "99999";
 
-        let isDragging = false;
-
-let startX = 0;
-let startY = 0;
-
-let currentX = 0;
-let currentY = 0;
-
-// MOBILE
-
-botpress.addEventListener(
-  "touchstart",
-  (e) => {
-
-    isDragging = true;
-
-    startX =
-      e.touches[0].clientX -
-      currentX;
-
-    startY =
-      e.touches[0].clientY -
-      currentY;
-
-  }
-);
-
-document.addEventListener(
-  "touchmove",
-  (e) => {
-
-    if (!isDragging) return;
-
-    currentX =
-      e.touches[0].clientX -
-      startX;
-
-    currentY =
-      e.touches[0].clientY -
-      startY;
-
-    botpress.style.transform =
-      `translate(${currentX}px, ${currentY}px)`;
-
-  }
-);
-
-document.addEventListener(
-  "touchend",
-  () => {
-
-    isDragging = false;
-
-  }
-);
-
-// PC
-
-botpress.addEventListener(
-  "mousedown",
-  (e) => {
-
-    isDragging = true;
-
-    startX =
-      e.clientX -
-      currentX;
-
-    startY =
-      e.clientY -
-      currentY;
-
-  }
-);
-
-document.addEventListener(
-  "mousemove",
-  (e) => {
-
-    if (!isDragging) return;
-
-    currentX =
-      e.clientX -
-      startX;
-
-    currentY =
-      e.clientY -
-      startY;
-
-    botpress.style.transform =
-      `translate(${currentX}px, ${currentY}px)`;
-
-  }
-);
-
-document.addEventListener(
-  "mouseup",
-  () => {
-
-    isDragging = false;
-
-  }
-);
-
     };
 
   };
-
-  setTimeout(() => {
-
-    const botpress =
-      document.querySelector(
-        "#bp-web-widget-container"
-      );
-
-    if (botpress) {
-
-      botpress.style.display =
-        "none";
-
-      setTimeout(() => {
-
-        botpress.style.display =
-          "block";
-
-      }, 20000);
-
-    }
-
-  }, 12000);
 
 }, []);
 
