@@ -79,11 +79,7 @@ const logout = () => {
     useState("account");
 
 const [profileImage, setProfileImage] =
-  useState(
-    localStorage.getItem(
-      "profileImage"
-    ) || ""
-  );
+  useState("");
 
   const [showPhotoModal,
   setShowPhotoModal] =
@@ -110,6 +106,40 @@ const [deliveredOrders, setDeliveredOrders] =
 
 const [cancelledOrders, setCancelledOrders] =
   useState(0);
+
+    useEffect(() => {
+
+  const loadAvatar =
+    async () => {
+
+      try {
+
+        const res =
+          await axios.get(
+
+            `https://konanshopping-production.up.railway.app/users/${user._id}`
+
+          );
+
+        if (res.data.avatar) {
+
+          setProfileImage(
+            res.data.avatar
+          );
+
+        }
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
+
+    };
+
+  loadAvatar();
+
+}, [user._id]);
 
   useEffect(() => {
 
@@ -432,32 +462,49 @@ return (
     display: "none",
   }}
 
-  onChange={(e) => {
+  onChange={async (e) => {
 
-    const file =
-      e.target.files[0];
+  const file =
+    e.target.files[0];
 
-    if (!file) return;
+  if (!file) return;
 
-    const reader =
-      new FileReader();
+  const reader =
+    new FileReader();
 
-    reader.onloadend = () => {
+  reader.onloadend =
+    async () => {
 
-      setProfileImage(
-        reader.result
-      );
+      try {
 
-      localStorage.setItem(
-        "profileImage",
-        reader.result
-      );
+        setProfileImage(
+          reader.result
+        );
+
+        await axios.put(
+
+          `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+
+          {
+            avatar:
+              reader.result,
+          }
+
+        );
+
+      } catch (err) {
+
+        console.log(err);
+
+      }
 
     };
 
-    reader.readAsDataURL(file);
+  reader.readAsDataURL(
+    file
+  );
 
-  }}
+}}
 />
 
   <div
@@ -1701,13 +1748,14 @@ return (
 
           setProfileImage("");
 
-          localStorage.removeItem(
-            "profileImage"
-          );
+await axios.put(
+  `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+  {
+    avatar: ""
+  }
+);
 
-          setShowPhotoModal(
-            false
-          );
+setShowPhotoModal(false);
 
         }}
 

@@ -3336,6 +3336,75 @@ app.get("/fix-images", async (req, res) => {
 });
 
 // =========================
+// PHOTO PROFIL UTILISATEUR
+// =========================
+
+app.put(
+  "/users/:id/avatar",
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findByIdAndUpdate(
+
+          req.params.id,
+
+          {
+            avatar:
+              req.body.avatar,
+          },
+
+          {
+            new: true,
+          }
+
+        );
+
+      res.json(user);
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        message:
+          "Erreur serveur",
+      });
+
+    }
+
+  }
+);
+
+app.get(
+  "/users/:id",
+  async (req, res) => {
+
+    try {
+
+      const user =
+        await User.findById(
+          req.params.id
+        );
+
+      res.json(user);
+
+    } catch (err) {
+
+      console.log(err);
+
+      res.status(500).json({
+        message:
+          "Erreur serveur",
+      });
+
+    }
+
+  }
+);
+
+// =========================
 // START SERVER
 // =========================
 
