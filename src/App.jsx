@@ -2794,9 +2794,9 @@ addedProduct === product._id
     },
 
     {
-      icon: <FaComments />,
-      name: "Messages",
-      link: "https://wa.me/237694641329",
+      icon: <FaUser />,
+      name: "Compte",
+      link: "/account",
     },
 
     {
@@ -2806,9 +2806,9 @@ addedProduct === product._id
     },
 
     {
-      icon: <FaUser />,
-      name: "Compte",
-      link: "/account",
+      icon: <FaComments />,
+      name: "Messages",
+      link: "https://wa.me/237694641329",
     },
 
   ].map((item, index) => (
