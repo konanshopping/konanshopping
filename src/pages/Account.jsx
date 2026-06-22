@@ -469,40 +469,41 @@ return (
 
   if (!file) return;
 
-  const reader =
-    new FileReader();
+  try {
 
-  reader.onloadend =
-    async () => {
+    const formData =
+      new FormData();
 
-      try {
+    formData.append(
+      "avatar",
+      file
+    );
 
-        setProfileImage(
-          reader.result
-        );
+    const res =
+      await axios.put(
 
-        await axios.put(
+        `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
 
-          `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+        formData,
 
-          {
-            avatar:
-              reader.result,
-          }
+        {
+          headers: {
+            "Content-Type":
+              "multipart/form-data",
+          },
+        }
 
-        );
+      );
 
-      } catch (err) {
+    setProfileImage(
+      res.data.avatar
+    );
 
-        console.log(err);
+  } catch (err) {
 
-      }
+    console.log(err);
 
-    };
-
-  reader.readAsDataURL(
-    file
-  );
+  }
 
 }}
 />

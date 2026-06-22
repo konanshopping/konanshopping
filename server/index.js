@@ -3341,6 +3341,7 @@ app.get("/fix-images", async (req, res) => {
 
 app.put(
   "/users/:id/avatar",
+  upload.single("avatar"),
   async (req, res) => {
 
     try {
@@ -3352,7 +3353,7 @@ app.put(
 
           {
             avatar:
-              req.body.avatar,
+              req.file.path,
           },
 
           {
