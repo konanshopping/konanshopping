@@ -725,128 +725,6 @@ setLoading(false);
 
 };
 
-{
-showAlert && (
-
-<div
-  style={{
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background:
-      "rgba(0,0,0,0.45)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999999,
-    padding: "20px",
-  }}
->
-
-  <div
-    style={{
-      background: "#fff",
-      width: "90%",
-      maxWidth: "340px",
-      borderRadius: "22px",
-      padding: "28px",
-      textAlign: "center",
-      boxShadow:
-        "0 15px 40px rgba(0,0,0,.15)",
-    }}
-  >
-
-    {/* ICON */}
-
-    <div
-      style={{
-        width: "70px",
-        height: "70px",
-        margin: "0 auto 15px",
-        borderRadius: "50%",
-        background:
-          "linear-gradient(135deg,#F3F0FF,#E9E2FF)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-
-      <FaSearch
-        style={{
-          fontSize: "28px",
-          color: "#4B2E83",
-        }}
-      />
-
-    </div>
-
-    {/* TITRE */}
-
-    <h3
-      style={{
-        color: "#111827",
-        fontWeight: "800",
-        fontSize: "20px",
-        marginBottom: "10px",
-      }}
-    >
-      KONAN SHOPPING
-    </h3>
-
-    {/* TEXTE */}
-
-    <p
-      style={{
-        color: "#6B7280",
-        lineHeight: "24px",
-        fontSize: "14px",
-      }}
-    >
-      Veuillez ajouter une image
-      ou saisir un produit avant
-      de lancer la recherche.
-    </p>
-
-    {/* BOUTON */}
-
-    <button
-      onClick={() =>
-        setShowAlert(false)
-      }
-      style={{
-        marginTop: "20px",
-        border: "none",
-        width: "100%",
-        height: "46px",
-        borderRadius: "14px",
-        background:
-          "linear-gradient(135deg,#4B2E83,#6D28D9)",
-        color: "#fff",
-        fontWeight: "700",
-        cursor: "pointer",
-        fontSize: "14px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "8px",
-      }}
-    >
-
-      <FaCheckCircle />
-
-      OK
-
-    </button>
-
-  </div>
-
-</div>
-
-)
-}
 
   return (
 
@@ -3081,6 +2959,129 @@ addedProduct === product._id
   </div>
    
    </div>
+
+   {
+showAlert && (
+
+<div
+  style={{
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background:
+      "rgba(0,0,0,0.45)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999999,
+    padding: "20px",
+  }}
+>
+
+  <div
+    style={{
+      background: "#fff",
+      width: "90%",
+      maxWidth: "340px",
+      borderRadius: "22px",
+      padding: "28px",
+      textAlign: "center",
+      boxShadow:
+        "0 15px 40px rgba(0,0,0,.15)",
+    }}
+  >
+
+    {/* ICON */}
+
+    <div
+      style={{
+        width: "70px",
+        height: "70px",
+        margin: "0 auto 15px",
+        borderRadius: "50%",
+        background:
+          "linear-gradient(135deg,#F3F0FF,#E9E2FF)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+
+      <FaSearch
+        style={{
+          fontSize: "28px",
+          color: "#4B2E83",
+        }}
+      />
+
+    </div>
+
+    {/* TITRE */}
+
+    <h3
+      style={{
+        color: "#111827",
+        fontWeight: "800",
+        fontSize: "20px",
+        marginBottom: "10px",
+      }}
+    >
+      KONAN SHOPPING
+    </h3>
+
+    {/* TEXTE */}
+
+    <p
+      style={{
+        color: "#6B7280",
+        lineHeight: "24px",
+        fontSize: "14px",
+      }}
+    >
+      Veuillez ajouter une image
+      ou saisir un produit avant
+      de lancer la recherche.
+    </p>
+
+    {/* BOUTON */}
+
+    <button
+      onClick={() =>
+        setShowAlert(false)
+      }
+      style={{
+        marginTop: "20px",
+        border: "none",
+        width: "100%",
+        height: "46px",
+        borderRadius: "14px",
+        background:
+          "linear-gradient(135deg,#4B2E83,#6D28D9)",
+        color: "#fff",
+        fontWeight: "700",
+        cursor: "pointer",
+        fontSize: "14px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px",
+      }}
+    >
+
+      <FaCheckCircle />
+
+      OK
+
+    </button>
+
+  </div>
+
+</div>
+
+)
+}
 
    </div>
  );
