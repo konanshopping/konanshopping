@@ -2985,8 +2985,8 @@ useEffect(() => {
 
   const existingBot =
     document.querySelector(
-      "#bp-web-widget-container"
-    );
+  ".bpChatContainer"
+);
 
   if (existingBot) {
 
@@ -3043,28 +3043,138 @@ useEffect(() => {
       script2
     );
 
-    script2.onload = () => {
+script2.onload = () => {
 
-      const botpress =
-        document.querySelector(
-          "#bp-web-widget-container"
-        );
+  const waitBot = setInterval(() => {
 
-      if (!botpress) return;
+    const botpress =
+      document.querySelector(
+        ".bpChatContainer"
+      );
 
-      botpress.style.position =
-        "fixed";
+    if (!botpress) return;
 
-      botpress.style.bottom =
-        "20px";
+    clearInterval(waitBot);
 
-      botpress.style.right =
-        "20px";
+    botpress.style.position =
+      "fixed";
 
-      botpress.style.zIndex =
-        "99999";
+    botpress.style.bottom =
+      "20px";
 
-    };
+    botpress.style.right =
+      "20px";
+
+    botpress.style.zIndex =
+      "99999";
+
+    let isDragging = false;
+
+    let startX = 0;
+    let startY = 0;
+
+    let currentX = 0;
+    let currentY = 0;
+
+    // MOBILE
+
+    botpress.addEventListener(
+      "touchstart",
+      (e) => {
+
+        isDragging = true;
+
+        startX =
+          e.touches[0].clientX -
+          currentX;
+
+        startY =
+          e.touches[0].clientY -
+          currentY;
+
+      }
+    );
+
+    document.addEventListener(
+      "touchmove",
+      (e) => {
+
+        if (!isDragging) return;
+
+        currentX =
+          e.touches[0].clientX -
+          startX;
+
+        currentY =
+          e.touches[0].clientY -
+          startY;
+
+        botpress.style.transform =
+          `translate(${currentX}px, ${currentY}px)`;
+
+      }
+    );
+
+    document.addEventListener(
+      "touchend",
+      () => {
+
+        isDragging = false;
+
+      }
+    );
+
+    // PC
+
+    botpress.addEventListener(
+      "mousedown",
+      (e) => {
+
+        isDragging = true;
+
+        startX =
+          e.clientX -
+          currentX;
+
+        startY =
+          e.clientY -
+          currentY;
+
+      }
+    );
+
+    document.addEventListener(
+      "mousemove",
+      (e) => {
+
+        if (!isDragging) return;
+
+        currentX =
+          e.clientX -
+          startX;
+
+        currentY =
+          e.clientY -
+          startY;
+
+        botpress.style.transform =
+          `translate(${currentX}px, ${currentY}px)`;
+
+      }
+    );
+
+    document.addEventListener(
+      "mouseup",
+      () => {
+
+        isDragging = false;
+
+      }
+    );
+
+  }, 500);
+
+};
 
   };
 
