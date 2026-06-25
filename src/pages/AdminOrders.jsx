@@ -90,171 +90,278 @@ function AdminOrders() {
 
     <div className="adminOrders">
 
-      {/* HEADER */}
+      {/* =========================
+   HEADER PREMIUM
+========================= */}
 
-      <div className="ordersTop">
+<div className="ordersTop">
 
-        <div>
+  <div className="ordersLeft">
 
-          <h1>
+    <div className="ordersBadge">
 
-            Gestion Commandes
+      <FaShoppingCart />
 
-          </h1>
+      <span>
 
-          <p>
+        Gestion Premium
 
-            Gérez toutes les
-            commandes clients
-            en temps réel
+      </span>
 
-          </p>
+    </div>
 
-        </div>
+    <h1>
+
+      Gestion des commandes
+
+    </h1>
+
+    <p>
+
+      Gérez toutes les commandes, suivez leur évolution
+      et mettez à jour leur statut en temps réel.
+
+    </p>
+
+  </div>
+
+  <div className="ordersRight">
+
+    <button className="ordersBtn">
+
+      <FaCheckCircle />
+
+      Tableau des commandes
+
+    </button>
+
+  </div>
+
+</div>
+
+      {/* =========================
+   STATS PREMIUM
+========================= */}
+
+<div className="ordersStats">
+
+  {/* TOTAL */}
+
+  <div className="orderCard">
+
+    <div className="orderLeft">
+
+      <p className="cardMini">
+
+        Total commandes
+
+      </p>
+
+      <h2>
+
+        {orders.length}
+
+      </h2>
+
+      <div className="cardBottom">
+
+        <FaShoppingCart />
+
+        <span>
+
+          Toutes les commandes
+
+        </span>
 
       </div>
 
-      {/* STATS */}
+    </div>
 
-      <div className="ordersStats">
+    <div className="icon blue">
 
-        {/* TOTAL */}
+      <FaShoppingCart />
 
-        <div className="orderCard">
+    </div>
 
-          <div className="icon blue">
+  </div>
 
-            <FaShoppingCart />
+  {/* EN ATTENTE */}
 
-          </div>
+  <div className="orderCard">
 
-          <div>
+    <div className="orderLeft">
 
-            <p>
+      <p className="cardMini">
 
-              Total commandes
+        En attente
 
-            </p>
+      </p>
 
-            <h2>
+      <h2>
 
-              {orders.length}
+        {
+          orders.filter(
+            (o) =>
+              o.status === "En attente"
+          ).length
+        }
 
-            </h2>
+      </h2>
 
-          </div>
+      <div className="cardBottom">
 
-        </div>
+        <FaClock />
 
-        {/* EN ATTENTE */}
+        <span>
 
-        <div className="orderCard">
+          À traiter
 
-          <div className="icon orange">
-
-            <FaClock />
-
-          </div>
-
-          <div>
-
-            <p>
-
-              En attente
-
-            </p>
-
-            <h2>
-
-              {
-                orders.filter(
-                  (o) =>
-                    o.status ===
-                    "En attente"
-                ).length
-              }
-
-            </h2>
-
-          </div>
-
-        </div>
-
-        {/* LIVRAISON */}
-
-        <div className="orderCard">
-
-          <div className="icon purple">
-
-            <FaTruck />
-
-          </div>
-
-          <div>
-
-            <p>
-
-              Livraison
-
-            </p>
-
-            <h2>
-
-              {
-                orders.filter(
-                  (o) =>
-                    o.status ===
-                    "Livraison"
-                ).length
-              }
-
-            </h2>
-
-          </div>
-
-        </div>
-
-        {/* LIVRE */}
-
-        <div className="orderCard">
-
-          <div className="icon green">
-
-            <FaCheckCircle />
-
-          </div>
-
-          <div>
-
-            <p>
-
-              Livrée
-
-            </p>
-
-            <h2>
-
-              {
-                orders.filter(
-                  (o) =>
-                    o.status ===
-                    "Livrée"
-                ).length
-              }
-
-            </h2>
-
-          </div>
-
-        </div>
+        </span>
 
       </div>
+
+    </div>
+
+    <div className="icon orange">
+
+      <FaClock />
+
+    </div>
+
+  </div>
+
+  {/* LIVRAISON */}
+
+  <div className="orderCard">
+
+    <div className="orderLeft">
+
+      <p className="cardMini">
+
+        En livraison
+
+      </p>
+
+      <h2>
+
+        {
+          orders.filter(
+            (o) =>
+              o.status === "Livraison"
+          ).length
+        }
+
+      </h2>
+
+      <div className="cardBottom">
+
+        <FaTruck />
+
+        <span>
+
+          Livraison active
+
+        </span>
+
+      </div>
+
+    </div>
+
+    <div className="icon purple">
+
+      <FaTruck />
+
+    </div>
+
+  </div>
+
+  {/* LIVRÉES */}
+
+  <div className="orderCard">
+
+    <div className="orderLeft">
+
+      <p className="cardMini">
+
+        Livrées
+
+      </p>
+
+      <h2>
+
+        {
+          orders.filter(
+            (o) =>
+              o.status === "Livrée"
+          ).length
+        }
+
+      </h2>
+
+      <div className="cardBottom">
+
+        <FaCheckCircle />
+
+        <span>
+
+          Terminées
+
+        </span>
+
+      </div>
+
+    </div>
+
+    <div className="icon green">
+
+      <FaCheckCircle />
+
+    </div>
+
+  </div>
+
+</div>
 
       {/* TABLE */}
 
       <div className="ordersTable">
 
-        <table>
+  <div className="tableHeader">
+
+    <div>
+
+      <p className="tableMini">
+
+        <FaShoppingCart
+          style={{
+            marginRight:"6px",
+            color:"#7c3aed"
+          }}
+        />
+
+        COMMANDES
+
+      </p>
+
+      <h2>
+
+        Toutes les commandes
+
+      </h2>
+
+    </div>
+
+    <button className="tableBtn">
+
+      <FaCheckCircle />
+
+      Synchronisé
+
+    </button>
+
+  </div>
+
+  <table className="premiumTable">
 
           <thead>
 
@@ -290,201 +397,211 @@ function AdminOrders() {
 
           <tbody>
 
-            {orders.map(
-              (
-                order,
-                index
-              ) => (
+  {orders.map((order, index) => (
 
-                <tr key={index}>
+    <tr
+  key={index}
+  className="orderRow"
+>
 
-                  {/* CLIENT */}
+      {/* CLIENT */}
 
-                  <td>
+      <td>
 
-                    <div
-                      className="customerBox"
-                    >
+        <div className="customerBox">
 
-                      <h4>
+          <div className="customerAvatar">
 
-                        {
-                          order.customerName
-                        }
+            <img
+              src="/logo.jpg"
+              alt="Konan Shopping"
+            />
 
-                      </h4>
+          </div>
 
-                      <p>
+          <div className="customerInfo">
 
-                        {
-                          order.phone
-                        }
+            <h4 className="customerName">
 
-                      </p>
+  {order.customerName}
 
-                    </div>
+</h4>
 
-                  </td>
+            <p>
 
-                  {/* PRODUITS */}
+              {order.phone}
 
-                  <td>
+            </p>
 
-                    <div
-                      className="productsList"
-                    >
+          </div>
 
-                      {order.items?.map(
-                        (
-                          item,
-                          i
-                        ) => (
+        </div>
 
-                          <div
-                            key={i}
-                            className="productItem"
-                          >
+      </td>
 
-                            <img
-                              src={
-                                item.image
-                              }
-                              alt=""
-                            />
+{/* PRODUITS */}
 
-                            <div>
+<td>
 
-                              <h5>
+  <div className="productsList">
 
-                                {
-                                  item.name
-                                }
+    {order.items?.map((item, i) => (
 
-                              </h5>
+      <div
+        key={i}
+        className="productItem"
+      >
 
-                              <p>
+        <img
+          src={item.image}
+          alt={item.name}
+        />
 
-                                x
-                                {
-                                  item.quantity
-                                }
+        <div className="productDetails">
 
-                              </p>
+          <h5>
 
-                            </div>
+            {item.name}
 
-                          </div>
+          </h5>
 
-                        )
-                      )}
+          <p>
 
-                    </div>
+            <FaShoppingCart
+              style={{
+                marginRight: "6px",
+                color: "#7c3aed",
+              }}
+            />
 
-                  </td>
+            Quantité : {item.quantity}
 
-                  {/* ADRESSE */}
+          </p>
 
-                  <td>
+        </div>
 
-                    <div>
+      </div>
 
-                      <h5>
+    ))}
 
-                        {
-                          order.city
-                        }
+  </div>
 
-                      </h5>
+</td>
 
-                      <p>
 
-                        {
-                          order.district
-                        }
+      {/* ADRESSE */}
 
-                      </p>
+      <td>
 
-                    </div>
+        <div className="addressBox">
 
-                  </td>
+  <h5>
 
-                  {/* TOTAL */}
+    📍 {order.city}
 
-                  <td>
+  </h5>
 
-                    <strong>
+  <p>
 
-                      {
-                        order.total
-                      } FCFA
+    {order.district}
 
-                    </strong>
+  </p>
 
-                  </td>
+</div>
 
-                  {/* STATUS */}
+      </td>
 
-                  <td>
+      {/* TOTAL */}
 
-                    <select
+      <td>
 
-                      value={
-                        order.status
-                      }
+        <strong className="priceText"
+          style={{
+            color:"#16a34a",
+            fontSize:"15px"
+          }}
+        >
 
-                      onChange={(e)=>
+          {Number(order.total).toLocaleString()} FCFA
 
-                        updateStatus(
-                          order._id,
-                          e.target.value
-                        )
+        </strong>
 
-                      }
+      </td>
 
-                    >
+      {/* STATUS */}
 
-                      <option>
-                        En attente
-                      </option>
+      <td>
 
-                      <option>
-                        Préparation
-                      </option>
+        <select
+    className="statusSelect"
+    value={order.status}
+    onChange={(e)=>
+        updateStatus(
+            order._id,
+            e.target.value
+        )
+    }
+>
 
-                      <option>
-                        Livraison
-                      </option>
+          <option>
 
-                      <option>
-                        Livrée
-                      </option>
+            En attente
 
-                      <option>
-                        Annulée
-                      </option>
+          </option>
 
-                    </select>
+          <option>
 
-                  </td>
+            Préparation
 
-                  {/* DATE */}
+          </option>
 
-                  <td>
+          <option>
 
-                    {
-                      new Date(
-                        order.createdAt
-                      ).toLocaleDateString()
-                    }
+            Livraison
 
-                  </td>
+          </option>
 
-                </tr>
+          <option>
 
-              )
-            )}
+            Livrée
 
-          </tbody>
+          </option>
+
+          <option>
+
+            Annulée
+
+          </option>
+
+        </select>
+
+      </td>
+
+      {/* DATE */}
+
+      <td>
+
+       <div className="dateBadge">
+
+    <FaClock
+        style={{
+            marginRight:"6px"
+        }}
+    />
+
+    {new Date(
+        order.createdAt
+    ).toLocaleDateString()}
+
+</div>
+
+      </td>
+
+    </tr>
+
+  ))}
+
+</tbody>
 
         </table>
 

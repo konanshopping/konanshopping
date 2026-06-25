@@ -512,35 +512,34 @@ visitedCountries.includes(
 
                   <td>
 
-                    <div className="userBox">
+  <div className="userBox">
 
-                      <img
-                        src={
-                          user.avatar ||
-                          "/avatar.png"
-                        }
-                        alt=""
-                      />
+    <div className="userAvatar">
 
-                      <div>
+     <img
+  src={user.avatar || "/logo.jpg"}
+  alt={user.name || "Konan Shopping"}
+/>
 
-                        <h4>
+    </div>
 
-                          {user.name}
+    <div className="userInfo">
 
-                        </h4>
+      <h4>
+        {user.name}
+      </h4>
 
-                        <p>
+      <p>
+        Client Konan Shopping
+      </p>
 
-                          Client Konan
+    </div>
 
-                        </p>
+  </div>
 
-                      </div>
+</td>
 
-                    </div>
-
-                  </td>
+                    
 
                   {/* EMAIL */}
 

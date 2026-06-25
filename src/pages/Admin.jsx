@@ -16,7 +16,21 @@ import {
   FaBell,
   FaSearch,
   FaPlus,
+  FaPlusCircle,
   FaEdit,
+  FaTrash,
+  FaCheckCircle,
+  FaChartLine,
+  FaFileAlt,
+  FaEnvelope,
+  FaStore,
+  FaCrown,
+  FaFire,
+  FaArrowUp,
+  FaEye,
+  FaPhone,
+  FaClipboardCheck,
+  FaUserCircle,
 } from "react-icons/fa";
 
 import {
@@ -31,8 +45,6 @@ import {
   Pie,
   Cell,
 } from "recharts";
-
-import { FaEnvelope } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 
@@ -377,7 +389,7 @@ const addProduct =
 
   };
 
-  return (
+return (
 
   <div className="admin">
 
@@ -385,184 +397,245 @@ const addProduct =
 
     <div className="sidebar">
 
-      <div>
+  {/* LOGO */}
 
-        {/* LOGO */}
+  <div>
 
-        <div className="logo">
+    <div className="logo">
 
-          <img
-            src="/logo.jpg"
-            alt="Konan Shopping"
-          />
+      <img
+        src="/logo.jpg"
+        alt="Konan Shopping"
+      />
 
-          <div className="logoText">
+      <div className="logoText">
 
-            <h2>
-              KONAN
-            </h2>
+        <h2>
+          KONAN
+        </h2>
 
-            <span>
-              SHOPPING
-            </span>
-
-          </div>
-
-        </div>
-
-        {/* MENU */}
-
-        <div className="menu">
-
-          <button className="active">
-
-            <FaHome />
-
-            <span>
-              Tableau de bord
-            </span>
-
-          </button>
-
-          <button
-  onClick={() =>
-    navigate(
-      "/admin-orders"
-    )
-  }
->
-
-  <FaShoppingCart />
-
-  <span>
-    Commandes
-  </span>
-
-</button>
-
-
-   <button
-  onClick={() =>
-    window.location.href =
-      "/admin-products"
-  }
->
-
-  <FaBox />
-
-  Produits
-
-</button>
-
-<button
-  onClick={() =>
-    navigate("/admin-messages")
-  }
->
-  <FaEnvelope />
-
-  <span>
-    Messages
-  </span>
-</button>
-
-<button
-  onClick={() =>
-    navigate("/admin-clients")
-  }
->
-
-  <FaUsers />
-
-  Clients
-
-</button>
-
-          <button
-
-  onClick={() =>
-    navigate("/deliveries")
-  }
-
->
-
-  <FaTruck />
-
-  <span>
-    Livraisons
-  </span>
-
-</button>
-
-          <button
-  onClick={() =>
-    navigate("/admin-stats")
-  }
->
-
-  <FaChartPie />
-
-  <span>
-    Statistiques
-  </span>
-
-</button>
-
-         <Link
-  to="/admin/settings"
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "14px 18px",
-    color: "white",
-    textDecoration: "none",
-    fontWeight: "600",
-  }}
->
-
-  <FaCog />
-
-  <span>
-    Paramètres
-  </span>
-
-</Link>
-
-        </div>
-
-      </div>
-
-      {/* BUSINESS CARD */}
-
-      <div className="businessCard">
-
-        <div className="businessGlow" />
-
-        <h3>
-
-          Dashboard Premium 🚀
-
-        </h3>
-
-        <p>
-
-          Gérez vos ventes,
-          produits et livraisons
-          avec une expérience
-          professionnelle.
-
-        </p>
-
-        <button>
-
-          Voir analytics
-
-        </button>
+        <span>
+          SHOPPING CAMEROUN
+        </span>
 
       </div>
 
     </div>
+
+    {/* TITRE */}
+
+    <div
+      style={{
+        padding: "0 22px",
+        marginBottom: "14px",
+        fontSize: "11px",
+        textTransform: "uppercase",
+        letterSpacing: "1px",
+        color: "#94a3b8",
+        fontWeight: "700",
+      }}
+    >
+      Administration
+    </div>
+
+    {/* MENU */}
+
+    <div className="menu">
+
+      <button className="active">
+
+        <FaHome />
+
+        <span>
+          Tableau de bord
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          navigate("/admin-orders")
+        }
+      >
+
+        <FaShoppingCart />
+
+        <span>
+          Commandes
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          window.location.href =
+            "/admin-products"
+        }
+      >
+
+        <FaBox />
+
+        <span>
+          Produits
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          navigate("/admin-messages")
+        }
+      >
+
+        <FaEnvelope />
+
+        <span>
+          Messages
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          navigate("/admin-clients")
+        }
+      >
+
+        <FaUsers />
+
+        <span>
+          Clients
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          navigate("/deliveries")
+        }
+      >
+
+        <FaTruck />
+
+        <span>
+          Livraisons
+        </span>
+
+      </button>
+
+      <button
+        onClick={() =>
+          navigate("/admin-stats")
+        }
+      >
+
+        <FaChartPie />
+
+        <span>
+          Statistiques
+        </span>
+
+      </button>
+
+      <Link
+        to="/admin/settings"
+        className="menuLink"
+      >
+
+        <FaCog />
+
+        <span>
+          Paramètres
+        </span>
+
+      </Link>
+
+    </div>
+
+  </div>
+
+  {/* CARD PREMIUM */}
+
+  <div
+    style={{
+      margin: "20px",
+      padding: "20px",
+      borderRadius: "20px",
+      background:
+        "linear-gradient(135deg,#7c3aed,#8b5cf6)",
+      color: "#fff",
+      boxShadow:
+        "0 15px 35px rgba(124,58,237,0.35)",
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        marginBottom: "12px",
+      }}
+    >
+
+      <FaCrown
+        style={{
+          fontSize: "22px",
+        }}
+      />
+
+      <h3
+        style={{
+          margin: 0,
+          fontSize: "17px",
+        }}
+      >
+        Dashboard Premium
+      </h3>
+
+    </div>
+
+    <p
+      style={{
+        fontSize: "13px",
+        lineHeight: "1.6",
+        opacity: 0.95,
+      }}
+    >
+      Gérez les commandes,
+      produits, clients,
+      livraisons et revenus
+      depuis un tableau de bord
+      moderne.
+    </p>
+
+    <button
+      style={{
+        width: "100%",
+        height: "44px",
+        border: "none",
+        borderRadius: "12px",
+        marginTop: "12px",
+        background: "#fff",
+        color: "#7c3aed",
+        fontWeight: "700",
+        cursor: "pointer",
+      }}
+    >
+
+      <FaStore
+        style={{
+          marginRight: "8px",
+        }}
+      />
+
+      Voir Analytics
+
+    </button>
+
+  </div>
+
+</div>
 
     {/* MAIN */}
 
@@ -570,101 +643,113 @@ const addProduct =
 
       {/* TOPBAR */}
 
-      <div className="topbar">
+<div className="topbar">
 
-        {/* LEFT */}
+  {/* GAUCHE */}
 
-        <div className="topLeft">
+  <div className="topLeft">
 
-          <div className="welcomeBox">
+    <div className="welcomeBox">
 
-            <p className="welcomeMini">
+      <div className="welcomeBadge">
 
-              KONAN SHOPPING
+        <FaChartPie />
 
-            </p>
-
-            <h1>
-
-              Bonjour Konan 👋
-
-            </h1>
-
-            <p className="welcomeText">
-
-              Voici les performances
-              de votre boutique
-              aujourd’hui.
-
-            </p>
-
-          </div>
-
-        </div>
-
-        {/* RIGHT */}
-
-        <div className="topActions">
-
-          {/* SEARCH */}
-
-          <div className="searchBox">
-
-            <FaSearch className="searchIcon" />
-
-            <input
-              type="text"
-              placeholder="Rechercher..."
-            />
-
-          </div>
-
-          {/* NOTIFICATION */}
-
-          <div className="notif">
-
-            <FaBell />
-
-            <div className="notifDot">
-
-              3
-
-            </div>
-
-          </div>
-
-          {/* PROFILE */}
-
-          <div className="adminProfile">
-
-            <img
-              src="/logo.jpg"
-              alt="Konan Shopping"
-            />
-
-            <div>
-
-              <h4>
-
-                Konan Shopping
-
-              </h4>
-
-              <p>
-
-                Administrateur
-
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
+        <span>
+          Tableau de bord Premium
+        </span>
 
       </div>
 
-        {/* =========================
+      <h1>
+
+        Bonjour Konan
+
+      </h1>
+
+      <p className="welcomeText">
+
+        Suivez vos ventes,
+        commandes, clients et
+        performances en temps réel.
+
+      </p>
+
+    </div>
+
+  </div>
+
+  {/* DROITE */}
+
+  <div className="topActions">
+
+    {/* RECHERCHE */}
+
+    <div className="searchBox">
+
+      <FaSearch
+        className="searchIcon"
+      />
+
+      <input
+        type="text"
+        placeholder="Rechercher un produit, commande ou client..."
+      />
+
+    </div>
+
+    {/* NOTIFICATIONS */}
+
+    <button
+      className="notif"
+    >
+
+      <FaBell />
+
+      <div
+        className="notifDot"
+      >
+
+        3
+
+      </div>
+
+    </button>
+
+    {/* PROFIL ADMIN */}
+
+    <div
+      className="adminProfile"
+    >
+
+      <img
+        src="/logo.jpg"
+        alt="Konan Shopping"
+      />
+
+      <div>
+
+        <h4>
+
+          Konan Shopping
+
+        </h4>
+
+        <p>
+
+          Administrateur
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+      {/* =========================
    STATS PREMIUM
 ========================= */}
 
@@ -674,43 +759,40 @@ const addProduct =
 
   <div className="statCard revenueCard">
 
-    <div className="statLeft">
+    <div className="statHeader">
 
-      <p className="statMini">
+      <div>
 
-        Revenus totaux
-
-      </p>
-
-      <h2>
-
-        {totalRevenue.toLocaleString()}
-        FCFA
-
-      </h2>
-
-      <div className="statBottom">
-
-        <span className="positive">
-
-          +12%
-
-        </span>
-
-        <p>
-
-          Revenus réels
-          ce mois
-
+        <p className="statMini">
+          Revenus Totaux
         </p>
+
+        <h2>
+          {totalRevenue.toLocaleString()}
+          FCFA
+        </h2>
+
+      </div>
+
+      <div className="statIcon green">
+
+        <FaMoneyBillWave />
 
       </div>
 
     </div>
 
-    <div className="statIcon green">
+    <div className="statFooter">
 
-      <FaMoneyBillWave />
+      <span className="positive">
+
+        +12%
+
+      </span>
+
+      <p>
+        Croissance ce mois
+      </p>
 
     </div>
 
@@ -720,42 +802,39 @@ const addProduct =
 
   <div className="statCard ordersCard">
 
-    <div className="statLeft">
+    <div className="statHeader">
 
-      <p className="statMini">
+      <div>
 
-        Commandes
-
-      </p>
-
-      <h2>
-
-        {orders.length}
-
-      </h2>
-
-      <div className="statBottom">
-
-        <span className="purpleText">
-
-          +8%
-
-        </span>
-
-        <p>
-
+        <p className="statMini">
           Commandes
-          enregistrées
-
         </p>
+
+        <h2>
+          {orders.length}
+        </h2>
+
+      </div>
+
+      <div className="statIcon blue">
+
+        <FaShoppingCart />
 
       </div>
 
     </div>
 
-    <div className="statIcon blue">
+    <div className="statFooter">
 
-      <FaShoppingCart />
+      <span className="purpleText">
+
+        +8%
+
+      </span>
+
+      <p>
+        Commandes enregistrées
+      </p>
 
     </div>
 
@@ -765,41 +844,39 @@ const addProduct =
 
   <div className="statCard clientsCard">
 
-    <div className="statLeft">
+    <div className="statHeader">
 
-      <p className="statMini">
+      <div>
 
-        Clients
-
-      </p>
-
-      <h2>
-
-        {uniqueClients}
-
-      </h2>
-
-      <div className="statBottom">
-
-        <span className="orangeText">
-
-          +5%
-
-        </span>
-
-        <p>
-
-          Clients actifs
-
+        <p className="statMini">
+          Clients
         </p>
+
+        <h2>
+          {uniqueClients}
+        </h2>
+
+      </div>
+
+      <div className="statIcon orange">
+
+        <FaUsers />
 
       </div>
 
     </div>
 
-    <div className="statIcon orange">
+    <div className="statFooter">
 
-      <FaUsers />
+      <span className="orangeText">
+
+        +5%
+
+      </span>
+
+      <p>
+        Clients actifs
+      </p>
 
     </div>
 
@@ -809,41 +886,39 @@ const addProduct =
 
   <div className="statCard productCard">
 
-    <div className="statLeft">
+    <div className="statHeader">
 
-      <p className="statMini">
+      <div>
 
-        Produits
-
-      </p>
-
-      <h2>
-
-        {products.length}
-
-      </h2>
-
-      <div className="statBottom">
-
-        <span className="greenText">
-
-          Active
-
-        </span>
-
-        <p>
-
-          Boutique en ligne
-
+        <p className="statMini">
+          Produits
         </p>
+
+        <h2>
+          {products.length}
+        </h2>
+
+      </div>
+
+      <div className="statIcon purple">
+
+        <FaBox />
 
       </div>
 
     </div>
 
-    <div className="statIcon purple">
+    <div className="statFooter">
 
-      <FaBox />
+      <span className="greenText">
+
+        Actif
+
+      </span>
+
+      <p>
+        Produits en boutique
+      </p>
 
     </div>
 
@@ -851,7 +926,7 @@ const addProduct =
 
 </div>
 
-     {/* =========================
+{/* =========================
    ULTRA PREMIUM CHARTS
 ========================= */}
 
@@ -869,14 +944,29 @@ const addProduct =
 
         <p className="chartMini">
 
+          <FaChartLine
+            style={{
+              marginRight: "6px",
+            }}
+          />
+
           ANALYTICS
 
         </p>
 
-        <h3>
+        <h3
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
 
-          Revenus &
-          performances
+          <FaMoneyBillWave
+            color="#16a34a"
+          />
+
+          Revenus & Performances
 
         </h3>
 
@@ -884,7 +974,7 @@ const addProduct =
 
       <button className="chartBtn">
 
-        <FaPlus />
+        <FaFileAlt />
 
         Rapport
 
@@ -897,6 +987,25 @@ const addProduct =
     <div className="chartNumbers">
 
       <div className="numberBox">
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "10px",
+          }}
+        >
+
+          <FaMoneyBillWave
+            color="#16a34a"
+          />
+
+          <span>
+            Revenus
+          </span>
+
+        </div>
 
         <h2>
 
@@ -915,6 +1024,25 @@ const addProduct =
 
       <div className="numberBox purpleBox">
 
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "10px",
+          }}
+        >
+
+          <FaShoppingCart
+            color="#7c3aed"
+          />
+
+          <span>
+            Commandes
+          </span>
+
+        </div>
+
         <h2>
 
           {orders.length}
@@ -923,7 +1051,7 @@ const addProduct =
 
         <p>
 
-          Commandes
+          Commandes enregistrées
 
         </p>
 
@@ -1015,13 +1143,29 @@ const addProduct =
 
         <p className="chartMini">
 
+          <FaChartPie
+            style={{
+              marginRight: "6px",
+            }}
+          />
+
           COMMANDES
 
         </p>
 
-        <h3>
+        <h3
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
 
-          Statistiques
+          <FaChartPie
+            color="#7c3aed"
+          />
+
+          Statistiques des commandes
 
         </h3>
 
@@ -1031,90 +1175,144 @@ const addProduct =
 
     {/* PIE */}
 
-    <div className="smallPie">
+<div className="smallPie">
 
-      <PieChart
-        width={210}
-        height={210}
-      >
+  <PieChart
+    width={260}
+    height={260}
+  >
 
-        <Pie
-          data={pieData}
-          innerRadius={55}
-          outerRadius={82}
-          paddingAngle={5}
-          dataKey="value"
-        >
-
-          {pieData.map(
-            (
-              entry,
-              index
-            ) => (
-
-              <Cell
-                key={index}
-                fill={
-                  entry.color
-                }
-              />
-
-            )
-          )}
-
-        </Pie>
-
-      </PieChart>
-
-    </div>
-
-    {/* LEGEND */}
-
-    <div className="premiumLegend">
+    <Pie
+      data={pieData}
+      innerRadius={70}
+      outerRadius={100}
+      paddingAngle={4}
+      dataKey="value"
+    >
 
       {pieData.map(
         (
-          item,
+          entry,
           index
         ) => (
 
-          <div
+          <Cell
             key={index}
-            className="premiumLegendItem"
-          >
-
-            <div className="legendLeft">
-
-              <span
-                style={{
-                  background:
-                    item.color,
-                }}
-              />
-
-              <p>
-
-                {item.name}
-
-              </p>
-
-            </div>
-
-            <strong>
-
-              {item.value}
-
-            </strong>
-
-          </div>
+            fill={
+              entry.color
+            }
+          />
 
         )
       )}
 
-    </div>
+    </Pie>
+
+  </PieChart>
+
+  {/* CENTRE */}
+
+  <div
+    style={{
+      position: "absolute",
+      textAlign: "center",
+    }}
+  >
+
+    <h2
+      style={{
+        margin: 0,
+        fontSize: "26px",
+        fontWeight: "800",
+        color: "#0f172a",
+      }}
+    >
+      {orders.length}
+    </h2>
+
+    <p
+      style={{
+        margin: 0,
+        color: "#64748b",
+        fontSize: "12px",
+      }}
+    >
+      Commandes
+    </p>
 
   </div>
 
+</div>
+
+{/* LEGEND */}
+
+<div className="premiumLegend">
+
+  {pieData.map(
+    (
+      item,
+      index
+    ) => (
+
+      <div
+        key={index}
+        className="premiumLegendItem"
+      >
+
+        <div
+          className="legendLeft"
+        >
+
+          <span
+            style={{
+              background:
+                item.color,
+            }}
+          />
+
+          <div>
+
+            <h5
+              style={{
+                margin: 0,
+                fontSize: "14px",
+                color: "#0f172a",
+                fontWeight: "700",
+              }}
+            >
+              {item.name}
+            </h5>
+
+            <small
+              style={{
+                color: "#94a3b8",
+                fontSize: "11px",
+              }}
+            >
+              Statut commande
+            </small>
+
+          </div>
+
+        </div>
+
+        <strong
+          style={{
+            color: "#0f172a",
+            fontSize: "16px",
+          }}
+        >
+
+          {item.value}
+
+        </strong>
+
+      </div>
+    )
+  )}
+
+</div>
+</div>
 </div>
 
 {/* =========================
@@ -1127,13 +1325,18 @@ const addProduct =
 
   <div className="ordersTable">
 
-    {/* HEADER */}
-
     <div className="tableTop">
 
       <div>
 
         <p className="tableMini">
+
+          <FaShoppingCart
+            style={{
+              marginRight: "6px",
+              color: "#7c3aed",
+            }}
+          />
 
           COMMANDES
 
@@ -1147,13 +1350,34 @@ const addProduct =
 
       </div>
 
-      <button className="tableBtn">
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+        }}
+      >
 
-        <FaEdit />
+        <button
+          className="tableBtn"
+        >
 
-        Gérer
+          <FaEye />
 
-      </button>
+          Voir tout
+
+        </button>
+
+        <button
+          className="tableBtn"
+        >
+
+          <FaEdit />
+
+          Gérer
+
+        </button>
+
+      </div>
 
     </div>
 
@@ -1168,23 +1392,63 @@ const addProduct =
           <tr>
 
             <th>
+
+              <FaUserCircle
+                style={{
+                  marginRight: "6px",
+                }}
+              />
+
               Client
+
             </th>
 
             <th>
+
+              <FaPhone
+                style={{
+                  marginRight: "6px",
+                }}
+              />
+
               Téléphone
+
             </th>
 
             <th>
+
+              <FaMoneyBillWave
+                style={{
+                  marginRight: "6px",
+                }}
+              />
+
               Total
+
             </th>
 
             <th>
+
+              <FaBox
+                style={{
+                  marginRight: "6px",
+                }}
+              />
+
               Produits
+
             </th>
 
             <th>
-              Status
+
+              <FaClipboardCheck
+                style={{
+                  marginRight: "6px",
+                }}
+              />
+
+              Statut
+
             </th>
 
           </tr>
@@ -1194,123 +1458,106 @@ const addProduct =
         <tbody>
 
           {orders
-            .slice(0,8)
-            .map(
-              (
-                order,
-                index
-              ) => (
+            .slice(0, 8)
+            .map((order, index) => (
 
-                <tr
-                  key={index}
-                >
+              <tr key={index}>
 
-                  {/* CLIENT */}
+                <td>
 
-                  <td>
+                  <div className="clientBox">
 
-                    <div className="clientBox">
+                    <div className="clientAvatar">
 
-                      <div className="clientAvatar">
+                      {
+                        order.customerName?.charAt(0)
+                      }
+
+                    </div>
+
+                    <div>
+
+                      <h4>
 
                         {
-                          order.customerName?.charAt(0)
+                          order.customerName
                         }
 
-                      </div>
+                      </h4>
 
-                      <div>
+                      <p>
 
-                        <h4>
+                        {
+                          order.city ||
+                          "Douala"
+                        }
 
-                          {
-                            order.customerName
-                          }
-
-                        </h4>
-
-                        <p>
-
-                          {
-                            order.city ||
-                            "Douala"
-                          }
-
-                        </p>
-
-                      </div>
+                      </p>
 
                     </div>
 
-                  </td>
+                  </div>
 
-                  {/* PHONE */}
+                </td>
 
-                  <td>
+                <td>
+                  {order.phone}
+                </td>
+
+                <td>
+
+                  <strong>
 
                     {
-                      order.phone
+                      Number(
+                        order.total || 0
+                      ).toLocaleString()
                     }
 
-                  </td>
+                    {" "}
+                    FCFA
 
-                  {/* TOTAL */}
+                  </strong>
 
-                  <td>
+                </td>
 
-                    <strong>
+                <td>
 
-                      {
-                        Number(
-                          order.total || 0
-                        ).toLocaleString()
-                      }
+                  <div className="productCount">
 
-                      {" "}
-                      FCFA
+                    <FaBox
+                      style={{
+                        marginRight: "5px",
+                      }}
+                    />
 
-                    </strong>
-
-                  </td>
-
-                  {/* PRODUCTS */}
-
-                  <td>
-
-                    <div className="productCount">
-
-                      {
-                        order.items
+                    {
+                      order.items
                         ?.length || 0
-                      }
+                    }
 
-                      {" "}
-                      produits
+                    {" "}
+                    produits
 
-                    </div>
+                  </div>
 
-                  </td>
+                </td>
 
-                  {/* STATUS */}
+                <td>
 
-                  <td>
+                  <span
+                    className={`statusBadge ${order.status}`}
+                  >
 
-                    <span
-                      className={`statusBadge ${order.status}`}
-                    >
+                    {order.status}
 
-                      {
-                        order.status
-                      }
+                  </span>
 
-                    </span>
+                </td>
 
-                  </td>
+              </tr>
 
-                </tr>
-
-              )
-            )}
+            ))}
 
         </tbody>
 
@@ -1324,13 +1571,18 @@ const addProduct =
 
   <div className="productsCard">
 
-    {/* HEADER */}
-
     <div className="tableTop">
 
       <div>
 
         <p className="tableMini">
+
+          <FaFire
+            style={{
+              marginRight: "6px",
+              color: "#f97316",
+            }}
+          />
 
           PRODUITS
 
@@ -1344,82 +1596,97 @@ const addProduct =
 
       </div>
 
+      <button
+        className="tableBtn"
+      >
+
+        <FaChartLine />
+
+        Tendances
+
+      </button>
+
     </div>
 
     {/* PRODUCTS */}
 
-    <div className="productsList">
+<div className="productsList">
 
-      {topSellingProducts
-        .slice(0,5)
-        .map(
-          (
-            [name, qty],
-            index
-          ) => {
+  {topSellingProducts
+    .slice(0, 5)
+    .map(([name, qty], index) => {
 
-            const product =
-              products.find(
-                (p) =>
-                  p.name === name
-              );
+      const product =
+        products.find(
+          (p) =>
+            p.name === name
+        );
 
-            return (
+      return (
 
-              <div
-                key={index}
-                className="premiumProduct"
-              >
+        <div
+          key={index}
+          className="premiumProduct"
+        >
 
-                {/* IMAGE */}
+          <div
+            className="productRank"
+          >
+            #{index + 1}
+          </div>
 
-                <img
-                  src={
-                    product?.image
-                  }
-                  alt=""
-                />
+          <img
+            src={product?.image}
+            alt=""
+          />
 
-                {/* INFO */}
+          <div className="productInfo">
 
-                <div className="productInfo">
+            <h4>
 
-                  <h4>
+              <FaBox
+                style={{
+                  marginRight: "6px",
+                  color: "#7c3aed",
+                }}
+              />
 
-                    {name}
+              {name}
 
-                  </h4>
+            </h4>
 
-                  <p>
+            <p>
 
-                    {
-                      product?.price
-                    } FCFA
+              <FaMoneyBillWave
+                style={{
+                  marginRight: "5px",
+                }}
+              />
 
-                  </p>
+              {product?.price}
+              FCFA
 
-                </div>
+            </p>
 
-                {/* SALES */}
+          </div>
 
-                <div className="salesBox">
+          <div className="salesBox">
 
-                  {qty}
+            <strong>
+              {qty}
+            </strong>
 
-                  <span>
+            <span>
+              ventes
+            </span>
 
-                    ventes
+          </div>
 
-                  </span>
+        </div>
 
-                </div>
+      );
 
-              </div>
-
-            );
-
-          }
-        )}
+    })}
 
     </div>
 
@@ -1445,169 +1712,208 @@ const addProduct =
 
     </div>
 
-    {/* AJOUT */}
+   {/* AJOUT */}
 
-    <div className="addProductCard">
+<div className="addProductCard">
 
-      <h3>
+  <div className="cardHeader">
 
-        Ajouter un produit
+    <h3>
 
-      </h3>
-
-      <input
-        type="text"
-        placeholder="Nom produit"
-        value={name}
-        onChange={(e) =>
-          setName(e.target.value)
-        }
+      <FaPlusCircle
+        style={{
+          marginRight: "8px",
+          color: "#7c3aed",
+        }}
       />
 
-      <input
-        type="text"
-        placeholder="Prix"
-        value={price}
-        onChange={(e) =>
-          setPrice(e.target.value)
-        }
-      />
+      Ajouter un produit
 
-      <input
-        type="file"
-        onChange={(e) =>
-          setImage(
-            e.target.files[0]
-          )
-        }
-      />
+    </h3>
 
-      <button
-        className="saveBtn"
-        onClick={addProduct}
+    <span className="cardBadge">
+
+      Catalogue
+
+    </span>
+
+  </div>
+
+  <input
+    type="text"
+    placeholder="Nom du produit"
+    value={name}
+    onChange={(e) =>
+      setName(e.target.value)
+    }
+  />
+
+  <input
+    type="text"
+    placeholder="Prix en FCFA"
+    value={price}
+    onChange={(e) =>
+      setPrice(e.target.value)
+    }
+  />
+
+  <input
+    type="file"
+    onChange={(e) =>
+      setImage(
+        e.target.files[0]
+      )
+    }
+  />
+
+  <button
+    className="saveBtn"
+    onClick={addProduct}
+  >
+
+    <FaPlus />
+
+    Ajouter le produit
+
+  </button>
+
+</div>
+
+{/* LISTE */}
+
+<div className="productsGrid">
+
+  {products.map(
+    (product, index) => (
+
+      <div
+        key={index}
+        className="productManageCard"
       >
 
-        Ajouter Produit
+        <div className="productImageWrapper">
 
-      </button>
+          <img
+            src={product.image}
+            alt=""
+          />
 
-    </div>
+        </div>
 
-    {/* LISTE */}
+        {editingProduct ===
+        product._id ? (
 
-    <div className="productsGrid">
+          <>
 
-      {products.map(
-        (product, index) => (
-
-          <div
-            key={index}
-            className="productManageCard"
-          >
-
-            <img
-              src={product.image}
-              alt=""
+            <input
+              value={editName}
+              onChange={(e) =>
+                setEditName(
+                  e.target.value
+                )
+              }
             />
 
-            {editingProduct ===
-            product._id ? (
+            <input
+              value={editPrice}
+              onChange={(e) =>
+                setEditPrice(
+                  e.target.value
+                )
+              }
+            />
 
-              <>
+            <button
+              className="saveBtn"
+              onClick={() =>
+                saveEdit(
+                  product._id
+                )
+              }
+            >
 
-                <input
-                  value={editName}
-                  onChange={(e) =>
-                    setEditName(
-                      e.target.value
-                    )
-                  }
-                />
+              <FaCheckCircle />
 
-                <input
-                  value={editPrice}
-                  onChange={(e) =>
-                    setEditPrice(
-                      e.target.value
-                    )
-                  }
-                />
+              Sauvegarder
 
-                <button
-                  className="saveBtn"
-                  onClick={() =>
-                    saveEdit(
-                      product._id
-                    )
-                  }
-                >
+            </button>
 
-                  Sauvegarder
+          </>
 
-                </button>
+        ) : (
 
-              </>
+          <>
 
-            ) : (
+            <h4>
 
-              <>
+              <FaBox
+                style={{
+                  marginRight: "6px",
+                  color: "#7c3aed",
+                }}
+              />
 
-                <h4>
+              {product.name}
 
-                  {
-                    product.name
-                  }
+            </h4>
 
-                </h4>
+            <p>
 
-                <p>
+              <FaMoneyBillWave
+                style={{
+                  marginRight: "5px",
+                }}
+              />
 
-                  {
-                    product.price
-                  } FCFA
+              {product.price}
+              FCFA
 
-                </p>
+            </p>
 
-                <div className="manageBtns">
+            <div className="manageBtns">
 
-                  <button
-                    className="editBtn"
-                    onClick={() =>
-                      startEdit(
-                        product
-                      )
-                    }
-                  >
+              <button
+                className="editBtn"
+                onClick={() =>
+                  startEdit(
+                    product
+                  )
+                }
+              >
 
-                    Modifier
+                <FaEdit />
 
-                  </button>
+                Modifier
 
-                  <button
-                    className="deleteBtn"
-                    onClick={() =>
-                      deleteProduct(
-                        product._id
-                      )
-                    }
-                  >
+              </button>
 
-                    Supprimer
+              <button
+                className="deleteBtn"
+                onClick={() =>
+                  deleteProduct(
+                    product._id
+                  )
+                }
+              >
 
-                  </button>
+                <FaTrash />
 
-                </div>
+                Supprimer
 
-              </>
+              </button>
 
-            )}
+            </div>
 
-          </div>
+          </>
 
-        )
-      )}
+        )}
 
-    </div>
+      </div>
+
+    )
+  )}
+
+</div>
 
   </div>
 

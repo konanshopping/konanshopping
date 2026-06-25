@@ -602,11 +602,16 @@ app.post(
 
     catch (err) {
 
-      console.log(err);
+  console.error("===== ERREUR AJOUT PRODUIT =====");
+  console.error(err);
+  console.error(err.message);
+  console.error(err.stack);
 
-      res.status(500).json(err);
+  res.status(500).json({
+    message: err.message
+  });
 
-    }
+}
 
 });
 

@@ -1,300 +1,1200 @@
-.adminClients{
-  padding:30px;
-  background:#f5f7fb;
-  min-height:100vh;
+/* ==========================================
+   RESET + SCROLL
+========================================== */
+
+html,
+body,
+#root{
+
+    margin:0;
+    padding:0;
+
+    width:100%;
+    min-height:100%;
+
+    overflow-x:hidden;
+    overflow-y:auto;
+
+    background:#f5f7fb;
+
 }
 
-/* HEADER */
+/* ==========================================
+   PAGE
+========================================== */
+
+.adminClients{
+
+    width:100%;
+    min-height:100vh;
+
+    padding:24px;
+
+    background:#f5f7fb;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    box-sizing:border-box;
+
+}
+
+/* Scroll Premium */
+
+.adminClients::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.adminClients::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:20px;
+
+}
+
+.adminClients::-webkit-scrollbar-thumb:hover{
+
+    background:#94a3b8;
+
+}
+
+/* ==========================================
+   HEADER
+========================================== */
 
 .clientsTop{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:30px;
-  gap:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:18px;
+
+    margin-bottom:22px;
+
 }
 
 .clientsTop h1{
-  font-size:34px;
-  font-weight:800;
-  color:#111827;
+
+    margin:0;
+
+    font-size:28px;
+
+    font-weight:800;
+
+    color:#111827;
+
 }
 
 .clientsTop p{
-  color:#6b7280;
-  margin-top:8px;
+
+    margin-top:4px;
+
+    color:#64748b;
+
+    font-size:14px;
+
 }
 
-/* SEARCH */
+/* ==========================================
+   RECHERCHE
+========================================== */
 
 .searchBox{
-  background:white;
-  height:55px;
-  width:320px;
-  border-radius:18px;
-  padding:0 18px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
+    display:flex;
+
+    align-items:center;
+
+    width:320px;
+
+    height:50px;
+
+    padding:0 16px;
+
+    background:#fff;
+
+    border-radius:14px;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
+
+}
+
+.searchBox svg{
+
+    color:#7c3aed;
+
+    font-size:16px;
+
+    margin-right:10px;
+
 }
 
 .searchBox input{
-  border:none;
-  outline:none;
-  width:100%;
-  background:none;
-  font-size:15px;
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    background:none;
+
+    font-size:14px;
+
+    color:#111827;
+
 }
 
-/* STATS */
+.searchBox input::placeholder{
+
+    color:#94a3b8;
+
+}
+
+/* ==========================================
+   STATS PREMIUM
+========================================== */
 
 .clientsStats{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:20px;
-  margin-bottom:30px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(220px,1fr));
+
+    gap:16px;
+
+    margin-bottom:22px;
+
 }
 
 .clientCard{
-  background:white;
-  padding:25px;
-  border-radius:24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
+
+    transition:.25s;
+
 }
 
-.clientCard svg{
-  font-size:35px;
-  color:#7c3aed;
+.clientCard:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 16px 35px rgba(15,23,42,.08);
+
 }
 
 .clientCard h2{
-  font-size:32px;
-  font-weight:800;
+
+    margin:8px 0;
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:#111827;
+
 }
 
 .clientCard p{
-  color:#6b7280;
-  margin-top:6px;
+
+    margin:0;
+
+    font-size:13px;
+
+    color:#64748b;
+
+    line-height:1.5;
+
 }
 
-/* TABLE */
+.clientCard svg{
+
+    width:54px;
+
+    height:54px;
+
+    padding:14px;
+
+    border-radius:16px;
+
+    background:#ede9fe;
+
+    color:#7c3aed;
+
+    font-size:22px;
+
+    flex-shrink:0;
+
+}
+
+.clientCard small{
+
+    display:block;
+
+    margin-top:6px;
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+    font-weight:600;
+
+}
+
+/* ==========================================
+   TABLEAUX PREMIUM
+========================================== */
 
 .clientsTable,
 .visitorsTable{
-  background:white;
-  padding:25px;
-  border-radius:24px;
-  margin-bottom:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.05);
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    margin-bottom:22px;
+
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
+
+    overflow:hidden;
+
 }
 
 .clientsTable h2,
 .visitorsTable h2{
-  margin-bottom:20px;
-  font-size:24px;
-  color:#111827;
+
+    margin:0 0 18px;
+
+    font-size:20px;
+
+    font-weight:800;
+
+    color:#111827;
+
+}
+
+.tableWrapper{
+
+    overflow-x:auto;
+
 }
 
 table{
-  width:100%;
-  border-collapse:collapse;
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#f8fafc;
+
 }
 
 th{
-  background:#f8fafc;
-  color:#6b7280;
-  font-size:14px;
-  text-align:left;
-  padding:16px;
+
+    padding:14px 16px;
+
+    text-align:left;
+
+    font-size:12px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    color:#64748b;
+
+    font-weight:700;
+
+    border-bottom:1px solid #e5e7eb;
+
 }
 
 td{
-  padding:18px 16px;
-  border-bottom:1px solid #f1f5f9;
+
+    padding:15px 16px;
+
+    font-size:13px;
+
+    color:#111827;
+
+    border-bottom:1px solid #f1f5f9;
+
+    vertical-align:middle;
+
+}
+
+tbody tr{
+
+    transition:.25s;
+
 }
 
 tbody tr:hover{
-  background:#fafafa;
+
+    background:#fafcff;
+
 }
 
-/* STATUS */
+tbody tr:last-child td{
+
+    border-bottom:none;
+
+}
+
+/* Avatar client */
+
+.clientInfo{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.clientAvatar{
+
+    width:40px;
+
+    height:40px;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #8b5cf6
+    );
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-weight:700;
+
+    font-size:14px;
+
+}
+
+.clientInfo h4{
+
+    margin:0;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+.clientInfo p{
+
+    margin-top:3px;
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+}
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.online,
+.offline{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-width:90px;
+
+    height:34px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
 
 .online{
-  background:#dcfce7;
-  color:#16a34a;
-  padding:8px 14px;
-  border-radius:30px;
-  font-size:13px;
-  font-weight:700;
+
+    background:#dcfce7;
+
+    color:#16a34a;
+
 }
 
 .offline{
-  background:#fee2e2;
-  color:#dc2626;
-  padding:8px 14px;
-  border-radius:30px;
-  font-size:13px;
-  font-weight:700;
-}
 
-/* MOBILE */
+    background:#fee2e2;
 
-@media(max-width:900px){
-
-  .clientsTop{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .searchBox{
-    width:100%;
-  }
-
-  table{
-    display:block;
-    overflow-x:auto;
-  }
+    color:#dc2626;
 
 }
+
+/* ==========================================
+   MAP CARD
+========================================== */
 
 .mapCard{
 
-  margin-top:30px;
+    margin-top:22px;
 
-  background:white;
+    background:#fff;
 
-  border-radius:24px;
+    border-radius:18px;
 
-  padding:25px;
+    padding:20px;
 
-  box-shadow:
-  0 10px 30px rgba(0,0,0,0.05);
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
 
 }
 
 .mapHeader{
 
-  margin-bottom:20px;
+    margin-bottom:18px;
 
 }
 
 .mapHeader h2{
 
-  font-size:24px;
+    margin:0;
 
-  color:#111827;
+    font-size:20px;
 
-  margin-bottom:5px;
+    font-weight:800;
+
+    color:#111827;
 
 }
 
 .mapHeader p{
 
-  color:#6b7280;
+    margin-top:6px;
+
+    font-size:13px;
+
+    color:#64748b;
 
 }
 
+/* ==========================================
+   COUNTRIES
+========================================== */
+
 .countriesCard{
 
-  margin-top:30px;
+    margin-top:22px;
 
-  background:white;
+    background:#fff;
 
-  border-radius:24px;
+    border-radius:18px;
 
-  padding:25px;
+    padding:20px;
 
-  box-shadow:
-  0 10px 30px rgba(0,0,0,0.05);
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
 
 }
 
 .countriesHeader{
 
-  margin-bottom:20px;
+    margin-bottom:18px;
 
 }
 
 .countriesHeader h2{
 
-  font-size:24px;
+    margin:0;
 
-  color:#111827;
+    font-size:20px;
+
+    font-weight:800;
+
+    color:#111827;
 
 }
 
 .countriesHeader p{
 
-  color:#6b7280;
+    margin-top:6px;
 
-  margin-top:5px;
+    font-size:13px;
+
+    color:#64748b;
 
 }
 
 .countriesList{
 
-  display:flex;
+    display:flex;
 
-  flex-direction:column;
+    flex-direction:column;
 
-  gap:15px;
+    gap:12px;
 
 }
 
 .countryItem{
 
-  display:flex;
+    display:flex;
 
-  justify-content:space-between;
+    justify-content:space-between;
 
-  align-items:center;
+    align-items:center;
 
-  padding:18px;
+    padding:16px;
 
-  border-radius:18px;
+    border-radius:14px;
 
-  background:#f9fafb;
+    background:#f8fafc;
+
+    transition:.25s;
+
+}
+
+.countryItem:hover{
+
+    background:#eef2ff;
 
 }
 
 .countryItem h4{
 
-  font-size:18px;
+    margin:0;
 
-  color:#111827;
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#111827;
 
 }
 
 .countryItem p{
 
-  color:#6b7280;
+    margin-top:4px;
 
-  margin-top:4px;
+    font-size:12px;
+
+    color:#64748b;
 
 }
 
 .countryItem span{
 
-  width:40px;
+    width:38px;
 
-  height:40px;
+    height:38px;
 
-  border-radius:12px;
+    border-radius:12px;
 
-  background:#7c3aed;
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #8b5cf6
+    );
 
-  color:white;
+    color:#fff;
 
-  display:flex;
+    display:flex;
 
-  align-items:center;
+    align-items:center;
 
-  justify-content:center;
+    justify-content:center;
 
-  font-weight:700;
+    font-size:13px;
+
+    font-weight:700;
+
+    flex-shrink:0;
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:992px){
+
+    .clientsTop{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .searchBox{
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .adminClients{
+
+        padding:16px;
+
+    }
+
+    .clientsStats{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .tableWrapper{
+
+        overflow-x:auto;
+
+    }
+
+}
+
+/* ==========================================
+   STATUS PREMIUM
+========================================== */
+
+.online,
+.offline{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:7px 14px;
+
+    border-radius:999px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.online{
+
+    background:#dcfce7;
+
+    color:#16a34a;
+
+}
+
+.offline{
+
+    background:#fee2e2;
+
+    color:#dc2626;
+
+}
+
+/* ==========================================
+   MAP CARD
+========================================== */
+
+.mapCard{
+
+    margin-top:22px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
+
+}
+
+.mapHeader{
+
+    margin-bottom:18px;
+
+}
+
+.mapHeader h2{
+
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:800;
+
+    color:#111827;
+
+}
+
+.mapHeader p{
+
+    margin-top:6px;
+
+    font-size:13px;
+
+    color:#64748b;
+
+}
+
+.mapContainer{
+
+    width:100%;
+
+    height:420px;
+
+    overflow:hidden;
+
+    border-radius:16px;
+
+}
+
+/* ==========================================
+   COUNTRIES
+========================================== */
+
+.countriesCard{
+
+    margin-top:22px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    border:1px solid #eef2ff;
+
+    box-shadow:
+        0 8px 20px rgba(15,23,42,.05);
+
+}
+
+.countriesHeader{
+
+    margin-bottom:18px;
+
+}
+
+.countriesHeader h2{
+
+    margin:0;
+
+    font-size:20px;
+
+    font-weight:800;
+
+    color:#111827;
+
+}
+
+.countriesHeader p{
+
+    margin-top:6px;
+
+    font-size:13px;
+
+    color:#64748b;
+
+}
+
+.countriesList{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.countryItem{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:14px 16px;
+
+    background:#f8fafc;
+
+    border-radius:14px;
+
+    transition:.25s;
+
+}
+
+.countryItem:hover{
+
+    background:#f1f5f9;
+
+}
+
+.countryItem h4{
+
+    margin:0;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+.countryItem p{
+
+    margin-top:4px;
+
+    font-size:12px;
+
+    color:#64748b;
+
+}
+
+.countryItem span{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:12px;
+
+    background:linear-gradient(
+        135deg,
+        #7c3aed,
+        #8b5cf6
+    );
+
+    color:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-weight:700;
+
+    flex-shrink:0;
+
+}
+
+/* ==========================================
+   SCROLLBAR PREMIUM
+========================================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+    height:8px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:20px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#94a3b8;
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:992px){
+
+    .clientsTop{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .searchBox{
+
+        width:100%;
+
+    }
+
+    .clientsStats{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .mapContainer{
+
+        height:320px;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .adminClients{
+
+        padding:18px;
+
+    }
+
+    .clientsTable,
+    .visitorsTable,
+    .countriesCard,
+    .mapCard{
+
+        padding:16px;
+
+    }
+
+    table{
+
+        min-width:650px;
+
+    }
+
+}
+
+.clientPhoto{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #ffffff;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+    flex-shrink:0;
+}
+
+.clientPhotoLarge{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #7c3aed;
+    box-shadow:0 8px 25px rgba(124,58,237,.25);
+}
+
+.clientAvatar{
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.clientAvatar img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.clientInfo{
+    display:flex;
+    flex-direction:column;
+}
+
+.clientInfo h3{
+    margin:0;
+    font-size:16px;
+    font-weight:700;
+    color:#111827;
+}
+
+.clientInfo p{
+    margin-top:4px;
+    font-size:13px;
+    color:#6b7280;
+}
+
+.userBox{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+}
+
+.userAvatar{
+
+    width:56px;
+
+    height:56px;
+
+    border-radius:50%;
+
+    overflow:hidden;
+
+    border:3px solid #ede9fe;
+
+    flex-shrink:0;
+
+}
+
+.userAvatar img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+.userInfo h4{
+
+    margin:0;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+.userInfo p{
+
+    margin-top:4px;
+
+    font-size:12px;
+
+    color:#64748b;
+
+}
+
+.tableHeader{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.clientsTable table,
+.visitorsTable table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.clientsTable th,
+.visitorsTable th{
+
+    background:#f8fafc;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:#64748b;
+
+    padding:14px;
+
+}
+
+.clientsTable td,
+.visitorsTable td{
+
+    padding:16px 14px;
+
+    border-bottom:1px solid #eef2ff;
+
+}
+
+.clientsTable tbody tr:hover,
+.visitorsTable tbody tr:hover{
+
+    background:#fafcff;
+
+}
+
+.miniInfo{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    color:#475569;
+
+    font-size:13px;
 
 }
