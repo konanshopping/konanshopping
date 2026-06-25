@@ -580,8 +580,8 @@ app.post(
 
     try {
 
-      console.log("BODY =", JSON.stringify(req.body, null, 2));
-console.log("FILE =", JSON.stringify(req.file, null, 2));
+      console.log("BODY :", req.body);
+      console.log("FILE :", req.file);
 
       if (!req.file) {
         return res.status(400).json({
@@ -590,14 +590,14 @@ console.log("FILE =", JSON.stringify(req.file, null, 2));
       }
 
       const product = new Product({
-
         name: req.body.name,
         price: req.body.price,
         category: req.body.category,
-        description: req.body.description,
+        description: req.body.description || "",
         image: req.file.path,
-
       });
+
+      console.log("PRODUCT :", product);
 
       await product.save();
 
@@ -605,21 +605,13 @@ console.log("FILE =", JSON.stringify(req.file, null, 2));
 
     } catch (err) {
 
-  console.log("========== ERREUR ==========");
+      console.error(err);
 
-  console.log(err.message);
+      res.status(500).json({
+        error: err.message
+      });
 
-  console.log(err.stack);
-
-  if (err.errors) {
-    console.log(JSON.stringify(err.errors, null, 2));
-  }
-
-  res.status(500).json({
-    error: err.message
-  });
-
-}
+    }
 
 });
 
