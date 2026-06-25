@@ -580,8 +580,8 @@ app.post(
 
     try {
 
-      console.log("BODY =", req.body);
-      console.log("FILE =", req.file);
+      console.log("BODY =", JSON.stringify(req.body, null, 2));
+console.log("FILE =", JSON.stringify(req.file, null, 2));
 
       if (!req.file) {
         return res.status(400).json({
@@ -605,13 +605,21 @@ app.post(
 
     } catch (err) {
 
-      console.error(err);
+  console.log("========== ERREUR ==========");
 
-      res.status(500).json({
-        error: err.message
-      });
+  console.log(err.message);
 
-    }
+  console.log(err.stack);
+
+  if (err.errors) {
+    console.log(JSON.stringify(err.errors, null, 2));
+  }
+
+  res.status(500).json({
+    error: err.message
+  });
+
+}
 
 });
 
