@@ -600,15 +600,18 @@ app.post(
 
     }
 
-    catch (err) {
+   catch (err) {
 
-  console.error("===== ERREUR AJOUT PRODUIT =====");
-  console.error(err);
-  console.error(err.message);
-  console.error(err.stack);
+  console.log("ERREUR COMPLETE :");
+
+  console.log(err);
+
+  console.log(err.message);
+
+  console.log(err.stack);
 
   res.status(500).json({
-    message: err.message
+    error: err.message
   });
 
 }
