@@ -580,16 +580,21 @@ app.post(
 
     try {
 
+      console.log("BODY =", req.body);
+      console.log("FILE =", req.file);
+
+      if (!req.file) {
+        return res.status(400).json({
+          error: "Aucune image reçue"
+        });
+      }
+
       const product = new Product({
 
         name: req.body.name,
-
         price: req.body.price,
-
         category: req.body.category,
-
         description: req.body.description,
-
         image: req.file.path,
 
       });
@@ -598,24 +603,15 @@ app.post(
 
       res.json(product);
 
+    } catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+        error: err.message
+      });
+
     }
-
-   catch (err) {
-
-  console.log("========== ERREUR ==========");
-  console.dir(err, { depth: null });
-
-  console.log("MESSAGE :", err.message);
-
-  if (err.stack) {
-    console.log(err.stack);
-  }
-
-  res.status(500).json({
-    error: err.message
-  });
-
-}
 
 });
 
