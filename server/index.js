@@ -590,12 +590,12 @@ app.post(
       }
 
       const product = new Product({
-        name: req.body.name,
-        price: req.body.price,
-        category: req.body.category,
-        description: req.body.description || "",
-        image: req.file.path,
-      });
+  name: req.body.name,
+  price: Number(req.body.price),
+  category: req.body.category,
+  description: req.body.description || "",
+  image: req.file?.path || "",
+});
 
       console.log("PRODUCT :", product);
 
@@ -605,13 +605,25 @@ app.post(
 
     } catch (err) {
 
-      console.error(err);
+  console.log("========== ERREUR ==========");
 
-      res.status(500).json({
-        error: err.message
-      });
+  console.log("Nom :", err.name);
+  console.log("Message :", err.message);
 
-    }
+  if (err.errors) {
+    console.dir(err.errors, { depth: null });
+  }
+
+  if (err.response) {
+    console.dir(err.response.data, { depth: null });
+  }
+
+  console.error(err);
+
+  res.status(500).json({
+    error: err.message
+  });
+}
 
 });
 
