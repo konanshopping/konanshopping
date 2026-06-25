@@ -602,13 +602,14 @@ app.post(
 
    catch (err) {
 
-  console.log("ERREUR COMPLETE :");
+  console.log("========== ERREUR ==========");
+  console.dir(err, { depth: null });
 
-  console.log(err);
+  console.log("MESSAGE :", err.message);
 
-  console.log(err.message);
-
-  console.log(err.stack);
+  if (err.stack) {
+    console.log(err.stack);
+  }
 
   res.status(500).json({
     error: err.message
