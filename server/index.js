@@ -580,52 +580,64 @@ app.post(
 
     try {
 
+      console.log("===== AJOUT PRODUIT =====");
       console.log("BODY :", req.body);
       console.log("FILE :", req.file);
 
       if (!req.file) {
+
         return res.status(400).json({
-          error: "Aucune image reçue"
+          success: false,
+          message: "Aucune image reçue."
         });
+
       }
 
       const product = new Product({
-  name: req.body.name,
-  price: Number(req.body.price),
-  category: req.body.category,
-  description: req.body.description || "",
-  image: req.file?.path || "",
-});
 
-      console.log("PRODUCT :", product);
+        name: req.body.name,
+
+        price: Number(req.body.price),
+
+        category: req.body.category || "",
+
+        description: req.body.description || "",
+
+        image: req.file.path || req.file.secure_url,
+
+      });
 
       await product.save();
 
-      res.json(product);
+      console.log("Produit enregistré :", product);
+
+      res.status(201).json({
+
+        success: true,
+
+        message: "Produit ajouté avec succès",
+
+        product,
+
+      });
 
     } catch (err) {
 
-  console.log("========== ERREUR ==========");
+      console.error("===== ERREUR AJOUT PRODUIT =====");
+      console.error(err);
 
-  console.log("Nom :", err.name);
-  console.log("Message :", err.message);
+      res.status(500).json({
 
-  if (err.errors) {
-    console.dir(err.errors, { depth: null });
+        success: false,
+
+        message: err.message,
+
+      });
+
+    }
+
   }
-
-  if (err.response) {
-    console.dir(err.response.data, { depth: null });
-  }
-
-  console.error(err);
-
-  res.status(500).json({
-    error: err.message
-  });
-}
-
-});
+);
 
 // AJOUTER COMMANDE
 app.post("/orders", async (req, res) => {
