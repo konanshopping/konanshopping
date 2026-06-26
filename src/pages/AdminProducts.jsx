@@ -117,7 +117,7 @@ formData.append("category", category);
 formData.append("image", image);
 
 await axios.post(
-  "https://konanshopping-production.up.railway.app/add-product",
+  "http://localhost:5000/add-product",
   formData,
   {
     headers: {
