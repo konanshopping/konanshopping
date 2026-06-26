@@ -730,34 +730,39 @@ body{
 
     }
 
-}
-
 @media(max-width:768px){
 
     .adminProducts{
-
         padding:16px;
-
     }
 
     .productsStats{
-
         grid-template-columns:1fr;
-
     }
 
     .formGrid{
+        grid-template-columns:repeat(2,1fr);
+    }
 
-    grid-template-columns:repeat(2,1fr);
+    .productsGrid{
+        grid-template-columns:1fr;
+    }
+
+    .productBtns{
+        flex-direction:column;
+    }
+
+    .editBtn,
+    .deleteBtn{
+        width:100%;
+    }
 
 }
 
 @media(max-width:600px){
 
     .formGrid{
-
         grid-template-columns:1fr;
-
     }
 
 }

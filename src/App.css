@@ -393,17 +393,10 @@ p{
 ========================================= */
 
 main{
-
   width:100%;
-
   min-height:100vh;
-
   height:auto;
-
-  overflow-y:auto;
-
-  overflow-x:hidden;
-
+  overflow:visible;
 }
 
 .admin,
@@ -411,15 +404,10 @@ main{
 .adminClients,
 .adminOrders,
 .home{
-
+  width:100%;
   min-height:100vh;
-
   height:auto;
-
-  overflow-y:auto;
-
-  overflow-x:hidden;
-
+  overflow:visible;
 }
 
 /* =========================================

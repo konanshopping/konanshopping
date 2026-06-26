@@ -620,7 +620,7 @@ const randomizedProducts = useMemo(() => {
 }, [products]);
 
 useEffect(() => {
-  const handleScroll = () => {
+const handleScroll = () => {
     if (
       window.innerHeight +
         window.scrollY >=
@@ -632,10 +632,7 @@ useEffect(() => {
     }
   };
 
-  window.addEventListener(
-    "scroll",
-    handleScroll
-  );
+window.addEventListener("scroll", handleScroll);
 
   return () =>
     window.removeEventListener(
@@ -724,6 +721,9 @@ setLoading(false);
 }
 
 };
+
+console.log(document.documentElement.scrollHeight);
+console.log(window.innerHeight);
 
 
   return (
