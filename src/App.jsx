@@ -357,6 +357,42 @@ useState(null);
 const [showAlert, setShowAlert] =
   useState(false);
 
+  const [showBottomNav, setShowBottomNav] = useState(false);
+
+useEffect(() => {
+
+  let timer;
+
+  const showNav = () => {
+
+    setShowBottomNav(true);
+
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+
+      setShowBottomNav(false);
+
+    }, 3000);
+
+  };
+
+  window.addEventListener("touchstart", showNav);
+
+  window.addEventListener("click", showNav);
+
+  return () => {
+
+    window.removeEventListener("touchstart", showNav);
+
+    window.removeEventListener("click", showNav);
+
+    clearTimeout(timer);
+
+  };
+
+}, []);
+
 const [aiProducts,
 setAiProducts] =
 useState([]);
@@ -2838,23 +2874,44 @@ addedProduct === product._id
 
 <div
   style={{
-    position: "fixed",
-    bottom: "8px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "92%",
-    maxWidth: "500px",
-    background: "rgba(255,255,255,0.95)",
-    backdropFilter: "blur(14px)",
-    border: "1px solid rgba(255,255,255,0.4)",
-    borderRadius: "18px",
-    display: "flex",
-    justifyContent: "space-around",
-    alignItems: "center",
-    padding: "4px 0",
-    zIndex: 999,
-    boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
-  }}
+  position: "fixed",
+
+  bottom: showBottomNav ? "8px" : "-120px",
+
+  left: "50%",
+
+  transform: "translateX(-50%)",
+
+  width: "92%",
+
+  maxWidth: "500px",
+
+  background: "rgba(255,255,255,0.95)",
+
+  backdropFilter: "blur(14px)",
+
+  border: "1px solid rgba(255,255,255,0.4)",
+
+  borderRadius: "18px",
+
+  display: "flex",
+
+  justifyContent: "space-around",
+
+  alignItems: "center",
+
+  padding: "4px 0",
+
+  zIndex: 999,
+
+  boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+
+  transition: "all .35s ease",
+
+  opacity: showBottomNav ? 1 : 0,
+
+  pointerEvents: showBottomNav ? "auto" : "none",
+}}
 >
 
   {[
