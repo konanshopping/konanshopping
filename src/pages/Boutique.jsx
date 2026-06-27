@@ -2769,94 +2769,60 @@ className="categoriesSlider"
           }
 
           style={{
+  flexShrink: 0,
 
-flexShrink:0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 
-display:"flex",
+  gap: "6px",
 
-alignItems:"center",
+  whiteSpace: "nowrap",
 
-justifyContent:"center",
+  padding:
+    window.innerWidth < 768
+      ? "8px 14px"
+      : "10px 18px",
 
-gap:"8px",
+  borderRadius: "30px",
 
-whiteSpace:"nowrap",
+  cursor: "pointer",
 
-padding:
-window.innerWidth<768
-?"0 18px"
-:"0 22px",
+  background:
+    selectedCategory === cat
+      ? "#4B2E83"
+      : "#fff",
 
-height:"48px",
+  color:
+    selectedCategory === cat
+      ? "#fff"
+      : "#374151",
 
-borderRadius:"999px",
+  fontWeight: "600",
 
-cursor:"pointer",
+  fontSize:
+    window.innerWidth < 768
+      ? "12px"
+      : "13px",
 
-userSelect:"none",
+  border: "1px solid #ECECEC",
 
-transition:"all .35s ease",
+  boxShadow:
+    selectedCategory === cat
+      ? "0 6px 18px rgba(75,46,131,.18)"
+      : "0 2px 8px rgba(0,0,0,.05)",
 
-background:
-
-selectedCategory===cat
-
-?"linear-gradient(135deg,#2563eb,#4f46e5)"
-
-:"#fff",
-
-color:
-
-selectedCategory===cat
-
-?"#fff"
-
-:"#374151",
-
-fontWeight:"700",
-
-fontSize:
-
-window.innerWidth<768
-
-?"13px"
-
-:"14px",
-
-border:
-
-selectedCategory===cat
-
-?"none"
-
-:"1px solid #E5E7EB",
-
-boxShadow:
-
-selectedCategory===cat
-
-?"0 12px 30px rgba(37,99,235,.20)"
-
-:"0 4px 12px rgba(0,0,0,.05)",
-
-transform:
-
-selectedCategory===cat
-
-?"translateY(-2px)"
-
-:"translateY(0)"
-
+  transition: ".25s"
 }}
         >
 
           <span>{cat}</span>
 
           <FaChevronRight
-style={{
-fontSize:"11px",
-opacity:.65
-}}
+  style={{
+    fontSize: "10px",
+    opacity: 0.5,
+  }}
 />
 
         </div>
