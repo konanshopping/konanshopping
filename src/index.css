@@ -379,3 +379,61 @@ body,
   margin: 0;
   padding: 0;
 }
+
+/* CONTENEUR */
+
+.categoriesContainer{
+    overflow-x:auto;
+    overflow-y:hidden;
+
+    scroll-behavior:smooth;
+
+    -webkit-overflow-scrolling:touch;
+
+    scrollbar-width:none;
+
+    cursor:grab;
+}
+
+.categoriesContainer::-webkit-scrollbar{
+    display:none;
+}
+
+/* SLIDER */
+
+.categoriesSlider{
+
+    display:flex;
+
+    width:max-content;
+
+    gap:12px;
+
+    padding:6px 4px;
+
+    animation:scrollCategories 60s linear infinite;
+
+}
+
+/* Pause automatique */
+
+.categoriesContainer:hover .categoriesSlider,
+.categoriesContainer:active .categoriesSlider{
+
+    animation-play-state:paused;
+
+}
+
+/* Animation lente */
+
+@keyframes scrollCategories{
+
+    from{
+        transform:translateX(0);
+    }
+
+    to{
+        transform:translateX(-50%);
+    }
+
+}

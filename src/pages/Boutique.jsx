@@ -2617,44 +2617,149 @@ const displayedProducts =
   {/* SLIDER */}
 
   <div
-    style={{
-      overflow: "hidden",
+  className="categoriesContainer"
 
-      width: "100%",
-    }}
-  >
+  onWheel={(e)=>{
+      e.currentTarget.scrollLeft += e.deltaY;
+  }}
 
-    <div
-      style={{
-        display: "flex",
+  style={{
+      width:"100%",
+  }}
+>
 
-        gap: "10px",
-
-        width: "max-content",
-
-        animation:
-          "scrollCategories 20s linear infinite",
-      }}
-    >
+<div
+className="categoriesSlider"
+>
 
       {[
-        "Tous",
-        "Chaussures",
-        "T-shirts",
-        "Jeans",
-        "Vestes",
-        "Sacs",
-        "Accessoires",
+  "Tous",
+  "T-shirts",
+  "Chemises",
+  "Blouses",
+  "Polos",
+  "Débardeurs",
+  "Pulls",
+  "Gilets",
+  "Sweats",
+  "Hoodies",
+  "Vestes",
+  "Blousons",
+  "Manteaux",
+  "Costumes",
+  "Blazers",
+  "Robes",
+  "Jupes",
+  "Pantalons",
+  "Jeans",
+  "Leggings",
+  "Shorts",
+  "Combinaisons",
+  "Pyjamas",
+  "Sous-vêtements",
+  "Lingerie",
+  "Chaussettes",
+  "Maillots de bain",
+  "Vêtements de sport",
+  "Tenues de yoga",
+  "Mode homme",
+  "Mode femme",
+  "Mode enfant",
+  "Mode bébé",
+  "Chaussures",
+  "Baskets",
+  "Chaussures de ville",
+  "Bottes",
+  "Bottines",
+  "Sandales",
+  "Mocassins",
+  "Escarpins",
+  "Ballerines",
+  "Claquettes",
+  "Sacs à main",
+  "Sacs à dos",
+  "Sacs de voyage",
+  "Valises",
+  "Portefeuilles",
+  "Ceintures",
+  "Montres",
+  "Bijoux",
+  "Lunettes",
+  "Casquettes",
+  "Chapeaux",
+  "Écharpes",
+  "Foulards",
+  "Gants",
+  "Accessoires",
+  "Accessoires de mode",
+  "Luxe",
+  "Nouveautés",
+  "Promotions",
 
-        // duplication pour boucle fluide
-        "Tous",
-        "Chaussures",
-        "T-shirts",
-        "Jeans",
-        "Vestes",
-        "Sacs",
-        "Accessoires",
-      ].map((cat, index) => (
+  // duplication pour boucle fluide
+  "Tous",
+  "T-shirts",
+  "Chemises",
+  "Blouses",
+  "Polos",
+  "Débardeurs",
+  "Pulls",
+  "Gilets",
+  "Sweats",
+  "Hoodies",
+  "Vestes",
+  "Blousons",
+  "Manteaux",
+  "Costumes",
+  "Blazers",
+  "Robes",
+  "Jupes",
+  "Pantalons",
+  "Jeans",
+  "Leggings",
+  "Shorts",
+  "Combinaisons",
+  "Pyjamas",
+  "Sous-vêtements",
+  "Lingerie",
+  "Chaussettes",
+  "Maillots de bain",
+  "Vêtements de sport",
+  "Tenues de yoga",
+  "Mode homme",
+  "Mode femme",
+  "Mode enfant",
+  "Mode bébé",
+  "Chaussures",
+  "Baskets",
+  "Chaussures de ville",
+  "Bottes",
+  "Bottines",
+  "Sandales",
+  "Mocassins",
+  "Escarpins",
+  "Ballerines",
+  "Claquettes",
+  "Sacs à main",
+  "Sacs à dos",
+  "Sacs de voyage",
+  "Valises",
+  "Portefeuilles",
+  "Ceintures",
+  "Montres",
+  "Bijoux",
+  "Lunettes",
+  "Casquettes",
+  "Chapeaux",
+  "Écharpes",
+  "Foulards",
+  "Gants",
+  "Accessoires",
+  "Accessoires de mode",
+  "Luxe",
+  "Nouveautés",
+  "Promotions",
+].map((cat, index) => (
 
         <div
           key={index}
@@ -2664,64 +2769,95 @@ const displayedProducts =
           }
 
           style={{
-            flexShrink: 0,
 
-            padding:
-  window.innerWidth < 768
-    ? "10px 16px"
-    : "11px 18px",
+flexShrink:0,
 
-            borderRadius: "14px",
+display:"flex",
 
-            cursor: "pointer",
+alignItems:"center",
 
-            display: "flex",
+justifyContent:"center",
 
-            alignItems: "center",
+gap:"8px",
 
-            gap: "10px",
+whiteSpace:"nowrap",
 
-            background:
+padding:
+window.innerWidth<768
+?"0 18px"
+:"0 22px",
 
-              selectedCategory === cat
+height:"48px",
 
-                ? "linear-gradient(135deg,#5b6cff,#7c4dff)"
+borderRadius:"999px",
 
-                : "white",
+cursor:"pointer",
 
-            color:
+userSelect:"none",
 
-              selectedCategory === cat
+transition:"all .35s ease",
 
-                ? "white"
+background:
 
-                : "#111827",
+selectedCategory===cat
 
-            fontWeight: "700",
+?"linear-gradient(135deg,#2563eb,#4f46e5)"
 
-            transition: "0.3s",
+:"#fff",
 
-            border:
+color:
 
-              selectedCategory === cat
+selectedCategory===cat
 
-                ? "none"
+?"#fff"
 
-                : "1px solid #e5e7eb",
+:"#374151",
 
-            boxShadow:
+fontWeight:"700",
 
-              selectedCategory === cat
+fontSize:
 
-                ? "0 10px 25px rgba(91,108,255,0.25)"
+window.innerWidth<768
 
-                : "0 4px 12px rgba(0,0,0,0.05)",
-          }}
+?"13px"
+
+:"14px",
+
+border:
+
+selectedCategory===cat
+
+?"none"
+
+:"1px solid #E5E7EB",
+
+boxShadow:
+
+selectedCategory===cat
+
+?"0 12px 30px rgba(37,99,235,.20)"
+
+:"0 4px 12px rgba(0,0,0,.05)",
+
+transform:
+
+selectedCategory===cat
+
+?"translateY(-2px)"
+
+:"translateY(0)"
+
+}}
         >
 
           <span>{cat}</span>
 
-          <FaChevronRight />
+          <FaChevronRight
+style={{
+fontSize:"11px",
+opacity:.65
+}}
+/>
 
         </div>
 

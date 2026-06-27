@@ -448,36 +448,73 @@ await axios.post(
                 )
               }
             >
+  
+  <option value="">
+    Choisir catégorie
+  </option>
 
-              <option value="">
-                Choisir catégorie
-              </option>
-
-              <option>
-                Chaussures
-              </option>
-
-              <option>
-                T-shirts
-              </option>
-
-              <option>
-                Vestes
-              </option>
-
-              <option>
-                Sacs
-              </option>
-
-              <option>
-                Accessoires
-              </option>
-
-              <option>
-                Jeans
-              </option>
-
-            </select>
+  <option>T-shirts</option>
+  <option>Chemises</option>
+  <option>Blouses</option>
+  <option>Polos</option>
+  <option>Débardeurs</option>
+  <option>Pulls</option>
+  <option>Gilets</option>
+  <option>Sweats</option>
+  <option>Hoodies</option>
+  <option>Vestes</option>
+  <option>Blousons</option>
+  <option>Manteaux</option>
+  <option>Costumes</option>
+  <option>Blazers</option>
+  <option>Robes</option>
+  <option>Jupes</option>
+  <option>Pantalons</option>
+  <option>Jeans</option>
+  <option>Leggings</option>
+  <option>Shorts</option>
+  <option>Combinaisons</option>
+  <option>Pyjamas</option>
+  <option>Sous-vêtements</option>
+  <option>Lingerie</option>
+  <option>Chaussettes</option>
+  <option>Maillots de bain</option>
+  <option>Vêtements de sport</option>
+  <option>Tenues de yoga</option>
+  <option>Mode homme</option>
+  <option>Mode femme</option>
+  <option>Mode enfant</option>
+  <option>Mode bébé</option>
+  <option>Chaussures</option>
+  <option>Baskets</option>
+  <option>Chaussures de ville</option>
+  <option>Bottes</option>
+  <option>Bottines</option>
+  <option>Sandales</option>
+  <option>Mocassins</option>
+  <option>Escarpins</option>
+  <option>Ballerines</option>
+  <option>Claquettes</option>
+  <option>Sacs à main</option>
+  <option>Sacs à dos</option>
+  <option>Sacs de voyage</option>
+  <option>Valises</option>
+  <option>Portefeuilles</option>
+  <option>Ceintures</option>
+  <option>Montres</option>
+  <option>Bijoux</option>
+  <option>Lunettes</option>
+  <option>Casquettes</option>
+  <option>Chapeaux</option>
+  <option>Écharpes</option>
+  <option>Foulards</option>
+  <option>Gants</option>
+  <option>Accessoires</option>
+  <option>Accessoires de mode</option>
+  <option>Luxe</option>
+  <option>Nouveautés</option>
+  <option>Promotions</option>
+</select>
 
           </div>
 
