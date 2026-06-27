@@ -2186,36 +2186,33 @@ window.innerWidth < 768
   {/* IMAGE */}
 
   <div
-    style={{
-      width: "100%",
+  style={{
+    width: window.innerWidth < 768 ? "120px" : "170px",
 
-      height:
-        window.innerWidth < 768
-          ? "135px"
-          : "190px",
+    height: window.innerWidth < 768 ? "120px" : "170px",
 
-      overflow: "hidden",
+    flexShrink: 0,
 
-      borderRadius: "18px",
+    overflow: "hidden",
 
-      background: "#f3f4f6",
-    }}
-  >
+    borderRadius: "18px",
+
+    background: "#f3f4f6",
+  }}
+>
 
     <img
-      src={item.image}
-      alt=""
-
-      style={{
-        width: "100%",
-
-        height: "100%",
-
-        objectFit: "contain",
-
-        display: "block",
-      }}
-    />
+  src={item.image}
+  alt=""
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    objectPosition: "center",
+    display: "block",
+    borderRadius: "18px",
+  }}
+/>
 
   </div>
 
