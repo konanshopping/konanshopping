@@ -2145,24 +2145,51 @@ color:"#111827",
 >
 
 <div
+
+onMouseEnter={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(-8px)";
+
+  e.currentTarget.style.boxShadow =
+    "0 18px 35px rgba(0,0,0,.10)";
+
+  e.currentTarget.querySelector("img").style.transform =
+    "scale(1.06)";
+
+}}
+
+onMouseLeave={(e) => {
+
+  e.currentTarget.style.transform =
+    "translateY(0)";
+
+  e.currentTarget.style.boxShadow =
+    "0 4px 12px rgba(0,0,0,.05)";
+
+  e.currentTarget.querySelector("img").style.transform =
+    "scale(1)";
+
+}}
+
 style={{
+
 background:"#FFFFFF",
 
 borderRadius:"16px",
 
 overflow:"hidden",
 
-border:
-"1px solid #F3F4F6",
+border:"1px solid #F3F4F6",
 
-boxShadow:
-"0 4px 12px rgba(0,0,0,0.05)",
+boxShadow:"0 4px 12px rgba(0,0,0,0.05)",
 
 cursor:"pointer",
 
-transition:"all .25s ease",
+transition:"all .35s ease",
 
 position:"relative",
+
 }}
 >
 
@@ -2170,8 +2197,24 @@ position:"relative",
 
 <div
 style={{
+
+width:"100%",
+
+height:
+window.innerWidth < 768
+? "190px"
+: "230px",
+
 background:"#F9FAFB",
-padding:"10px",
+
+overflow:"hidden",
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center",
+
 }}
 >
 
@@ -2180,20 +2223,20 @@ src={product.image}
 alt={product.name}
 
 style={{
+
 width:"100%",
 
-height:
-window.innerWidth < 768
-? "160px"
-: "200px",
+height:"100%",
 
 objectFit:"cover",
 
-borderRadius:"10px",
-
 display:"block",
+
+transition:"transform .35s ease",
+
 }}
-/>
+
+ />
 
 </div>
 
