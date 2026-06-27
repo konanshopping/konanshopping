@@ -2561,107 +2561,58 @@ const displayedProducts =
 )}
    {/* SHOP */}
 
-<div
+      <div
   style={{
     display: "flex",
     flexDirection: "column",
-    gap: "22px",
+    gap: "25px",
     width: "100%",
   }}
 >
 
-{/* SECTION CATÉGORIES */}
+{/* SIDEBAR CATÉGORIES AUTO */}
 
 <div
   style={{
-    background: "#fff",
-    borderRadius: "24px",
-    padding: window.innerWidth < 768 ? "18px" : "24px",
-    boxShadow: "0 8px 30px rgba(0,0,0,.05)",
-    border: "1px solid #f1f5f9",
+    marginBottom: "35px",
+
+    overflow: "hidden",
+
+    position: "relative",
   }}
 >
 
-  {/* HEADER */}
+  {/* TITRE */}
 
-  <div
+  <h3
     style={{
+      marginBottom: "20px",
+
       display: "flex",
-      justifyContent: "space-between",
+
       alignItems: "center",
-      marginBottom: "18px",
-      flexWrap: "wrap",
+
       gap: "10px",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "20px"
+          : "23px",
+
+      fontWeight: "900",
+
+      color: "#111827",
     }}
   >
-
-    <div
+    <FaTags
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
+        color: "#5b6cff",
       }}
-    >
+    />
 
-      <div
-        style={{
-          width: "42px",
-          height: "42px",
-          borderRadius: "14px",
-          background:
-            "linear-gradient(135deg,#5B6CFF,#7C4DFF)",
+    Catégories
 
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-
-          color: "#fff",
-
-          boxShadow:
-            "0 10px 25px rgba(91,108,255,.25)",
-        }}
-      >
-
-        <FaTags size={18} />
-
-      </div>
-
-      <div>
-
-        <h3
-          style={{
-            margin: 0,
-
-            color: "#111827",
-
-            fontWeight: "800",
-
-            fontSize:
-              window.innerWidth < 768
-                ? "22px"
-                : "26px",
-          }}
-        >
-          Catégories
-        </h3>
-
-        <p
-          style={{
-            margin: "4px 0 0",
-
-            fontSize: "13px",
-
-            color: "#6B7280",
-          }}
-        >
-          Découvrez toutes nos collections
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
+  </h3>
 
   {/* SLIDER */}
 
