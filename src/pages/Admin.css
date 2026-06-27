@@ -1,18 +1,4 @@
-/* =====================================
-   LAYOUT PRINCIPAL
-===================================== */
 
-html,
-body,
-#root{
-    width:100%;
-    min-height:100vh;
-    margin:0;
-    padding:0;
-    overflow:visible;
-    background:#f6f8fc;
-    font-family:Inter,sans-serif;
-}
 
 .admin{
     display:flex;

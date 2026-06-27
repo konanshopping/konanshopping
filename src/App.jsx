@@ -620,25 +620,57 @@ const randomizedProducts = useMemo(() => {
 }, [products]);
 
 useEffect(() => {
-const handleScroll = () => {
+  const handleScroll = () => {
+
+    console.log("scroll déclenché");
+    console.log("visible :", visibleProducts);
+
+    console.log(
+      window.innerHeight +
+      window.scrollY,
+      document.documentElement.scrollHeight
+    );
+
     if (
       window.innerHeight +
-        window.scrollY >=
-      document.body.offsetHeight - 300
+      window.scrollY >=
+      document.documentElement.scrollHeight - 300
     ) {
-      setVisibleProducts((prev) =>
-        prev + 4
-      );
+
+      console.log("AJOUT DE 4 PRODUITS");
+
+      setVisibleProducts(prev => prev + 4);
+
     }
   };
 
-window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll);
 
   return () =>
-    window.removeEventListener(
-      "scroll",
-      handleScroll
-    );
+    window.removeEventListener("scroll", handleScroll);
+
+}, [visibleProducts]);
+
+useEffect(() => {
+
+  const logScroll = () => {
+
+    console.log("window scroll");
+
+    console.log("scrollY :", window.scrollY);
+
+    console.log("innerHeight :", window.innerHeight);
+
+    console.log("body :", document.body.scrollHeight);
+
+    console.log("document :", document.documentElement.scrollHeight);
+
+  };
+
+  window.addEventListener("scroll", logScroll);
+
+  return () => window.removeEventListener("scroll", logScroll);
+
 }, []);
 
 const searchProducts =
@@ -721,10 +753,6 @@ setLoading(false);
 }
 
 };
-
-console.log(document.documentElement.scrollHeight);
-console.log(window.innerHeight);
-
 
   return (
 
