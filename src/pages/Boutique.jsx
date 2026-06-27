@@ -2565,7 +2565,7 @@ const displayedProducts =
   style={{
     display: "flex",
     flexDirection: "column",
-    gap: "25px",
+    gap: "8px",
     width: "100%",
   }}
 >
@@ -2574,7 +2574,7 @@ const displayedProducts =
 
 <div
   style={{
-    marginBottom: "35px",
+    marginBottom: "12px",
 
     overflow: "hidden",
 
@@ -2586,7 +2586,7 @@ const displayedProducts =
 
   <h3
     style={{
-      marginBottom: "20px",
+      marginBottom: "12px",
 
       display: "flex",
 
@@ -2835,19 +2835,27 @@ className="categoriesSlider"
 
 </div>
 
-        {/* PRODUITS */}
+       {/* PRODUITS */}
 
-        <div
-          style={{
-            flex: 1,
-            display: "grid",
-        gridTemplateColumns:
-  window.innerWidth < 768
-    ? "repeat(2, 1fr)"
-    : "repeat(4, 1fr)",
-            gap: window.innerWidth < 768 ? "15px" : "25px",
-          }}
-        >
+<div
+  style={{
+    marginTop: "2px",
+
+    flex: 1,
+
+    display: "grid",
+
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(2,1fr)"
+        : "repeat(4,1fr)",
+
+    gap:
+      window.innerWidth < 768
+        ? "15px"
+        : "25px",
+  }}
+>
 
        {displayedProducts.map((product) => (
 
