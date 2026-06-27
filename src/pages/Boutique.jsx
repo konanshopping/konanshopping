@@ -1698,13 +1698,19 @@ const displayedProducts =
       "linear-gradient(135deg,#ffffff,#f8fbff)",
 
     padding:
-      window.innerWidth < 768
-        ? "18px"
-        : "24px",
+window.innerWidth < 768
+? "14px"
+: "24px",
 
-    borderRadius: "30px",
+borderRadius:
+window.innerWidth < 768
+? "20px"
+: "30px",
 
-    marginBottom: "35px",
+marginBottom:
+window.innerWidth < 768
+? "18px"
+: "35px",
 
     boxShadow:
       "0 12px 35px rgba(0,0,0,0.06)",
@@ -2147,7 +2153,10 @@ const displayedProducts =
     }}
 
     style={{
-      marginTop: "20px",
+      marginTop:
+window.innerWidth < 768
+? "12px"
+: "20px",
 
       background: "white",
 
@@ -2155,7 +2164,7 @@ const displayedProducts =
 
       padding:
         window.innerWidth < 768
-          ? "14px"
+          ? "10px"
           : "18px",
 
       display: "flex",
@@ -2182,8 +2191,8 @@ const displayedProducts =
 
       height:
         window.innerWidth < 768
-          ? "220px"
-          : "260px",
+          ? "135px"
+          : "190px",
 
       overflow: "hidden",
 
@@ -2446,7 +2455,7 @@ const displayedProducts =
 
           fontSize:
             window.innerWidth < 768
-              ? "28px"
+              ? "24px"
               : "36px",
 
           color: "#111827",
@@ -2513,7 +2522,10 @@ const displayedProducts =
         style={{
           width: "100%",
 
-          padding: "18px",
+          padding:
+window.innerWidth < 768
+? "15px"
+: "18px",
 
           border: "none",
 
@@ -2528,7 +2540,10 @@ const displayedProducts =
 
           fontWeight: "900",
 
-          fontSize: "15px",
+          fontSize:
+window.innerWidth < 768
+? "14px"
+: "15px",
 
           display: "flex",
 
@@ -2559,6 +2574,7 @@ const displayedProducts =
 
 </>
 )}
+
    {/* SHOP */}
 
       <div
