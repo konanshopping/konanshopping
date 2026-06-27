@@ -480,6 +480,36 @@ localStorage.setItem(
 
       setLoading(true);
 
+// =====================
+// PAIEMENT MONETBIL
+// =====================
+
+if (
+  paymentMethod === "Orange Money" ||
+  paymentMethod === "MTN Mobile Money"
+) {
+
+  const res = await axios.post(
+    "https://konanshopping-production.up.railway.app/api/payment/create",
+    {
+      amount: finalTotal,
+      phone,
+      name: customerName,
+      email,
+    }
+  );
+
+  if (res.data.payment_url) {
+
+    window.location.href =
+      res.data.payment_url;
+
+    return;
+
+  }
+
+}
+
       // SAVE ORDER
 
 console.log(location);

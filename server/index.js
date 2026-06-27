@@ -34,6 +34,8 @@ const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const aiRoutes =
   require("./ai");
 
+  const paymentRoutes = require("./routes/payment");
+
 const Coupon =
   require("./models/Coupon");
 
@@ -124,6 +126,8 @@ app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
 );
+
+app.use("/api/payment", paymentRoutes);
 
 const cloudinary =
 require("cloudinary").v2;
