@@ -2890,14 +2890,14 @@ className="categoriesSlider"
       }}
 
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform =
-          "translateY(-10px)";
-      }}
+  e.currentTarget.style.transform = "translateY(-8px)";
+  e.currentTarget.querySelector("img").style.transform = "scale(1.06)";
+}}
 
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform =
-          "translateY(0px)";
-      }}
+onMouseLeave={(e) => {
+  e.currentTarget.style.transform = "translateY(0)";
+  e.currentTarget.querySelector("img").style.transform = "scale(1)";
+}}
 
      style={{
   background: "white",
@@ -2986,9 +2986,24 @@ minHeight:
 
   <div
   style={{
+    width: "100%",
+
+    height:
+      window.innerWidth < 768
+        ? "180px"
+        : "240px",
+
     background: "#f8f8fb",
-    padding: "12px",
-    borderRadius: "20px",
+
+    borderRadius: "18px",
+
+    overflow: "hidden",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    justifyContent: "center",
   }}
 >
   <img
@@ -2997,14 +3012,15 @@ minHeight:
     style={{
       width: "100%",
 
-      height:
-        window.innerWidth < 768
-          ? "140px"
-          : "190px",
+      height: "100%",
 
       objectFit: "cover",
 
-      borderRadius: "15px",
+      objectPosition: "center",
+
+      display: "block",
+
+      transition: ".35s",
     }}
   />
 </div>
