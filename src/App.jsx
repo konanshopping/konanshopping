@@ -3424,7 +3424,7 @@ showAlert && (
           }}
         >
 
-          <FaGift color="#5B6CFF" />
+          <FaCrown color="#5B6CFF" />
 
           <span>
             Recevez un bonus de bienvenue de <b>5 000 FCFA.</b>
