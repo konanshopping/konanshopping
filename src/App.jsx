@@ -401,19 +401,50 @@ useEffect(() => {
 
 }, []);
 
-const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+const [showWelcomePopup, setShowWelcomePopup] =
+  useState(false);
 
 useEffect(() => {
-  const alreadySeen = sessionStorage.getItem("welcomePopup");
 
-  if (!alreadySeen) {
-    const timer = setTimeout(() => {
-      setShowWelcomePopup(true);
-      sessionStorage.setItem("welcomePopup", "true");
-    }, 5000);
+  // =====================
+  // CLIENT CONNECTÉ ?
+  // =====================
 
-    return () => clearTimeout(timer);
-  }
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
+  if (user) return;
+
+  // =====================
+  // POPUP DÉJÀ AFFICHÉE ?
+  // =====================
+
+  const alreadySeen =
+    sessionStorage.getItem(
+      "welcomePopup"
+    );
+
+  if (alreadySeen) return;
+
+  // =====================
+  // AFFICHER APRÈS 5 SECONDES
+  // =====================
+
+  const timer = setTimeout(() => {
+
+    setShowWelcomePopup(true);
+
+    sessionStorage.setItem(
+      "welcomePopup",
+      "true"
+    );
+
+  }, 5000);
+
+  return () =>
+    clearTimeout(timer);
+
 }, []);
 
 const [aiProducts,
@@ -3354,33 +3385,27 @@ showAlert && (
       {/* TITRE */}
 
       <h2
-        style={{
-          marginTop: "15px",
-          marginBottom: "12px",
-
-          fontSize: "24px",
-          lineHeight: "30px",
-
-          color: "#111827",
-
-          fontWeight: "900",
-        }}
-      >
-        Recevez
-
-        <br />
-
-        <span
-          style={{
-            color: "#5B6CFF",
-            textShadow:
-              "0 3px 12px rgba(91,108,255,.25)",
-          }}
-        >
-          5 000 FCFA
-        </span>
-
-      </h2>
+  style={{
+    marginTop: "15px",
+    marginBottom: "12px",
+    fontSize: "24px",
+    lineHeight: "30px",
+    color: "#111827",
+    fontWeight: "900",
+    whiteSpace: "nowrap",
+  }}
+>
+  Recevez{" "}
+  <span
+    style={{
+      color: "#5B6CFF",
+      textShadow:
+        "0 3px 12px rgba(91,108,255,.25)",
+    }}
+  >
+    5&nbsp;000&nbsp;FCFA
+  </span>
+</h2>
 
       {/* DESCRIPTION */}
 
@@ -3443,7 +3468,7 @@ showAlert && (
           <FaTruck color="#5B6CFF" />
 
           <span>
-            Livraison rapide partout au Cameroun.
+            Recupere <b>5000 FCFA</b> cash.
           </span>
 
         </div>
@@ -3488,7 +3513,7 @@ showAlert && (
 
         <FaUserPlus />
 
-        Créer mon compte
+        Recupérez
 
       </button>
 
