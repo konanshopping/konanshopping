@@ -3259,34 +3259,35 @@ showAlert && (
       position: "fixed",
       inset: 0,
       background: "rgba(15,23,42,.45)",
-      backdropFilter: "blur(14px)",
-      WebkitBackdropFilter: "blur(14px)",
+      backdropFilter: "blur(16px)",
+      WebkitBackdropFilter: "blur(16px)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      padding: "18px",
       zIndex: 999999,
-      padding: "20px",
-      animation: "fadeIn .35s ease",
     }}
   >
     <div
       style={{
         width: "100%",
-        maxWidth: "390px",
-        borderRadius: "30px",
-        padding: "28px",
-        textAlign: "center",
+        maxWidth: "340px",
+        padding: "22px",
+        borderRadius: "24px",
 
         background:
-          "linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.58))",
+          "linear-gradient(135deg,rgba(255,255,255,.70),rgba(255,255,255,.42))",
 
-        backdropFilter: "blur(30px)",
-        WebkitBackdropFilter: "blur(30px)",
+        backdropFilter: "blur(40px)",
+        WebkitBackdropFilter: "blur(40px)",
 
-        border: "1px solid rgba(255,255,255,.45)",
+        border:
+          "1px solid rgba(255,255,255,.55)",
 
         boxShadow:
-          "0 25px 70px rgba(31,41,55,.18)",
+          "0 20px 45px rgba(15,23,42,.18), inset 0 1px 1px rgba(255,255,255,.45)",
+
+        textAlign: "center",
       }}
     >
 
@@ -3294,12 +3295,10 @@ showAlert && (
 
       <div
         style={{
-          width: "85px",
-          height: "85px",
+          width: "72px",
+          height: "72px",
           margin: "0 auto",
-
           borderRadius: "50%",
-
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -3308,14 +3307,14 @@ showAlert && (
             "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
 
           boxShadow:
-            "0 12px 30px rgba(91,108,255,.18)",
+            "0 10px 25px rgba(91,108,255,.20)",
         }}
       >
 
         <FaCrown
           style={{
-            fontSize: "40px",
-            color: "#5b6cff",
+            fontSize: "32px",
+            color: "#5B6CFF",
           }}
         />
 
@@ -3329,20 +3328,20 @@ showAlert && (
           alignItems: "center",
           gap: "6px",
 
-          marginTop: "18px",
+          marginTop: "14px",
 
-          padding: "7px 15px",
+          padding: "6px 14px",
 
           borderRadius: "50px",
 
           background:
             "rgba(91,108,255,.12)",
 
-          color: "#5b6cff",
+          color: "#5B6CFF",
 
-          fontWeight: "700",
+          fontWeight: "800",
 
-          fontSize: "12px",
+          fontSize: "11px",
         }}
       >
 
@@ -3356,16 +3355,15 @@ showAlert && (
 
       <h2
         style={{
-          marginTop: "18px",
-          marginBottom: "10px",
+          marginTop: "15px",
+          marginBottom: "12px",
+
+          fontSize: "24px",
+          lineHeight: "30px",
 
           color: "#111827",
 
           fontWeight: "900",
-
-          fontSize: "30px",
-
-          lineHeight: "36px",
         }}
       >
         Recevez
@@ -3374,56 +3372,83 @@ showAlert && (
 
         <span
           style={{
-            color: "#5b6cff",
+            color: "#5B6CFF",
+            textShadow:
+              "0 3px 12px rgba(91,108,255,.25)",
           }}
         >
           5 000 FCFA
         </span>
+
       </h2>
 
       {/* DESCRIPTION */}
 
-      <p
+      <div
         style={{
-          color: "#6B7280",
-          fontSize: "15px",
-          lineHeight: "26px",
-          marginBottom: "25px",
+          textAlign: "left",
+
+          color: "#4B5563",
+
+          fontSize: "14px",
+
+          lineHeight: "22px",
+
+          marginBottom: "20px",
         }}
       >
 
-        <FaGem
+        <div
           style={{
-            color: "#5b6cff",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "12px",
           }}
-        />
+        >
 
-        {" "}
-        Créez gratuitement votre compte KONAN SHOPPING.
+          <FaGem color="#5B6CFF" />
 
-        <br /><br />
+          <span>
+            Créez gratuitement votre compte.
+          </span>
 
-        <FaShoppingBag
+        </div>
+
+        <div
           style={{
-            color: "#5b6cff",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "12px",
           }}
-        />
+        >
 
-        {" "}
-        Profitez de votre bonus de bienvenue.
+          <FaGift color="#5B6CFF" />
 
-        <br /><br />
+          <span>
+            Recevez un bonus de bienvenue de <b>5 000 FCFA.</b>
+          </span>
 
-        <FaTruck
+        </div>
+
+        <div
           style={{
-            color: "#5b6cff",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
           }}
-        />
+        >
 
-        {" "}
-        Livraison rapide partout au Cameroun.
+          <FaTruck color="#5B6CFF" />
 
-      </p>
+          <span>
+            Livraison rapide partout au Cameroun.
+          </span>
+
+        </div>
+
+      </div>
 
       {/* BOUTON */}
 
@@ -3434,11 +3459,11 @@ showAlert && (
         }}
         style={{
           width: "100%",
-          height: "56px",
+          height: "50px",
 
           border: "1px solid rgba(255,255,255,.35)",
 
-          borderRadius: "18px",
+          borderRadius: "16px",
 
           background:
             "linear-gradient(135deg,#5B6CFF,#6D28D9)",
@@ -3447,7 +3472,7 @@ showAlert && (
 
           fontWeight: "800",
 
-          fontSize: "16px",
+          fontSize: "15px",
 
           cursor: "pointer",
 
@@ -3457,7 +3482,7 @@ showAlert && (
           gap: "10px",
 
           boxShadow:
-            "0 15px 35px rgba(91,108,255,.28)",
+            "0 10px 28px rgba(91,108,255,.30)",
         }}
       >
 
@@ -3475,19 +3500,24 @@ showAlert && (
         }
         style={{
           width: "100%",
-          height: "52px",
+          height: "46px",
 
-          marginTop: "12px",
+          marginTop: "10px",
 
-          borderRadius: "18px",
+          border: "1px solid rgba(255,255,255,.35)",
 
-          border:
-            "1px solid rgba(255,255,255,.35)",
+          borderRadius: "16px",
 
           background:
-            "rgba(255,255,255,.35)",
+            "rgba(255,255,255,.28)",
 
-          backdropFilter: "blur(20px)",
+          backdropFilter: "blur(30px)",
+
+          WebkitBackdropFilter:
+            "blur(30px)",
+
+          boxShadow:
+            "inset 0 1px 1px rgba(255,255,255,.45)",
 
           color: "#374151",
 
