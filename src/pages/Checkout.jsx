@@ -908,57 +908,49 @@ lineHeight: "1",
 
 </div>
 
-  <div
+<div
   style={{
-    marginBottom: "18px",
-    width: "100%",
+    position: "relative",
+    marginBottom: "20px",
   }}
 >
-  <div
+  <FaPhone
     style={{
+      position: "absolute",
+      top: "18px",
+      left: "15px",
+      color: "#6b7280",
+      fontSize: "15px",
+      zIndex: 10,
+      pointerEvents: "none",
+    }}
+  />
+
+  <PhoneInput
+    international
+    defaultCountry="CM"
+    value={phone}
+    onChange={setPhone}
+    placeholder="Numéro de téléphone"
+
+    style={{
+      ...inputStyle,
+      paddingLeft: "45px",
       display: "flex",
       alignItems: "center",
-      gap: "12px",
-      background: "#fff",
-      border: "1px solid #e5e7eb",
-      borderRadius: "14px",
-      padding: mobile ? "12px 14px" : "14px 18px",
-      boxSizing: "border-box",
-      width: "100%",
-      transition: "0.3s",
     }}
-  >
-    <FaPhone
-      style={{
-        color: "#5b6cff",
-        fontSize: "18px",
-        flexShrink: 0,
-      }}
-    />
 
-    <PhoneInput
-      international
-      defaultCountry="CM"
-      value={phone}
-      onChange={setPhone}
-      placeholder="Numéro de téléphone"
-
-      style={{
+    numberInputProps={{
+      style: {
+        border: "none",
+        outline: "none",
         width: "100%",
-      }}
-
-      numberInputProps={{
-        style: {
-          width: "100%",
-          border: "none",
-          outline: "none",
-          background: "transparent",
-          fontSize: mobile ? "15px" : "16px",
-          color: "#111827",
-        },
-      }}
-    />
-  </div>
+        background: "transparent",
+        fontSize: mobile ? "15px" : "16px",
+        color: "#111827",
+      },
+    }}
+  />
 </div>
 
 
