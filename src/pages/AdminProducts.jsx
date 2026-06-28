@@ -5,6 +5,8 @@ import {
 
 import axios from "axios";
 
+import { toast } from "react-toastify";
+
 import {
   FaPlus,
   FaTrash,
@@ -93,9 +95,13 @@ function AdminProducts() {
           !image
         ) {
 
-          return alert(
-            "Veuillez remplir tous les champs"
-          );
+          return toast.warning(
+  "Veuillez remplir tous les champs ⚠️",
+  {
+    position: "top-right",
+    autoClose: 2500,
+  }
+);
 
         }
 
@@ -138,17 +144,25 @@ await axios.post(
 
         fetchProducts();
 
-        alert(
-          "Produit ajouté dans la boutique ✅"
-        );
+        toast.success(
+  "Produit ajouté dans la boutique ✅",
+  {
+    position: "top-right",
+    autoClose: 2500,
+  }
+);
 
       } catch (err) {
 
         console.log(err);
 
-        alert(
-          "Erreur ajout produit ❌"
-        );
+        toast.error(
+  "Erreur lors de l'ajout du produit ❌",
+  {
+    position: "top-right",
+    autoClose: 3000,
+  }
+);
 
       } finally {
 
@@ -181,9 +195,13 @@ await axios.post(
 
         fetchProducts();
 
-        alert(
-          "Produit supprimé ✅"
-        );
+        toast.success(
+  "Produit supprimé avec succès 🗑️",
+  {
+    position: "top-right",
+    autoClose: 2500,
+  }
+);
 
       } catch (err) {
 
@@ -225,9 +243,13 @@ await axios.post(
 
         fetchProducts();
 
-        alert(
-          "Produit modifié ✅"
-        );
+        toast.success(
+  "Produit modifié avec succès ✏️",
+  {
+    position: "top-right",
+    autoClose: 2500,
+  }
+);
 
       } catch (err) {
 
