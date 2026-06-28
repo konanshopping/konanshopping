@@ -393,6 +393,21 @@ useEffect(() => {
 
 }, []);
 
+const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+
+useEffect(() => {
+  const alreadySeen = sessionStorage.getItem("welcomePopup");
+
+  if (!alreadySeen) {
+    const timer = setTimeout(() => {
+      setShowWelcomePopup(true);
+      sessionStorage.setItem("welcomePopup", "true");
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }
+}, []);
+
 const [aiProducts,
 setAiProducts] =
 useState([]);
@@ -3229,6 +3244,256 @@ showAlert && (
 
 )
 }
+
+{showWelcomePopup && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(15,23,42,.45)",
+      backdropFilter: "blur(14px)",
+      WebkitBackdropFilter: "blur(14px)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 999999,
+      padding: "20px",
+      animation: "fadeIn .35s ease",
+    }}
+  >
+    <div
+      style={{
+        width: "100%",
+        maxWidth: "390px",
+        borderRadius: "30px",
+        padding: "28px",
+        textAlign: "center",
+
+        background:
+          "linear-gradient(135deg,rgba(255,255,255,.78),rgba(255,255,255,.58))",
+
+        backdropFilter: "blur(30px)",
+        WebkitBackdropFilter: "blur(30px)",
+
+        border: "1px solid rgba(255,255,255,.45)",
+
+        boxShadow:
+          "0 25px 70px rgba(31,41,55,.18)",
+      }}
+    >
+
+      {/* ICONE */}
+
+      <div
+        style={{
+          width: "85px",
+          height: "85px",
+          margin: "0 auto",
+
+          borderRadius: "50%",
+
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+
+          background:
+            "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+
+          boxShadow:
+            "0 12px 30px rgba(91,108,255,.18)",
+        }}
+      >
+
+        <FaGift
+          style={{
+            fontSize: "40px",
+            color: "#5b6cff",
+          }}
+        />
+
+      </div>
+
+      {/* BADGE */}
+
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+
+          marginTop: "18px",
+
+          padding: "7px 15px",
+
+          borderRadius: "50px",
+
+          background:
+            "rgba(91,108,255,.12)",
+
+          color: "#5b6cff",
+
+          fontWeight: "700",
+
+          fontSize: "12px",
+        }}
+      >
+
+        <FaStar />
+
+        OFFRE DE BIENVENUE
+
+      </div>
+
+      {/* TITRE */}
+
+      <h2
+        style={{
+          marginTop: "18px",
+          marginBottom: "10px",
+
+          color: "#111827",
+
+          fontWeight: "900",
+
+          fontSize: "30px",
+
+          lineHeight: "36px",
+        }}
+      >
+        Recevez
+
+        <br />
+
+        <span
+          style={{
+            color: "#5b6cff",
+          }}
+        >
+          5 000 FCFA
+        </span>
+      </h2>
+
+      {/* DESCRIPTION */}
+
+      <p
+        style={{
+          color: "#6B7280",
+          fontSize: "15px",
+          lineHeight: "26px",
+          marginBottom: "25px",
+        }}
+      >
+
+        <FaGem
+          style={{
+            color: "#5b6cff",
+          }}
+        />
+
+        {" "}
+        Créez gratuitement votre compte KONAN SHOPPING.
+
+        <br /><br />
+
+        <FaShoppingBag
+          style={{
+            color: "#5b6cff",
+          }}
+        />
+
+        {" "}
+        Profitez de votre bonus de bienvenue.
+
+        <br /><br />
+
+        <FaTruck
+          style={{
+            color: "#5b6cff",
+          }}
+        />
+
+        {" "}
+        Livraison rapide partout au Cameroun.
+
+      </p>
+
+      {/* BOUTON */}
+
+      <button
+        onClick={() => {
+          setShowWelcomePopup(false);
+          window.location.href = "/login";
+        }}
+        style={{
+          width: "100%",
+          height: "56px",
+
+          border: "1px solid rgba(255,255,255,.35)",
+
+          borderRadius: "18px",
+
+          background:
+            "linear-gradient(135deg,#5B6CFF,#6D28D9)",
+
+          color: "#fff",
+
+          fontWeight: "800",
+
+          fontSize: "16px",
+
+          cursor: "pointer",
+
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "10px",
+
+          boxShadow:
+            "0 15px 35px rgba(91,108,255,.28)",
+        }}
+      >
+
+        <FaUserPlus />
+
+        Créer mon compte
+
+      </button>
+
+      {/* PLUS TARD */}
+
+      <button
+        onClick={() =>
+          setShowWelcomePopup(false)
+        }
+        style={{
+          width: "100%",
+          height: "52px",
+
+          marginTop: "12px",
+
+          borderRadius: "18px",
+
+          border:
+            "1px solid rgba(255,255,255,.35)",
+
+          background:
+            "rgba(255,255,255,.35)",
+
+          backdropFilter: "blur(20px)",
+
+          color: "#374151",
+
+          fontWeight: "700",
+
+          cursor: "pointer",
+        }}
+      >
+        Plus tard
+      </button>
+
+    </div>
+  </div>
+)}
 
    </div>
  );
