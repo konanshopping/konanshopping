@@ -58,6 +58,8 @@ import {
 
   FaStar,
 
+  FaTruck,
+
   FaFire,
 
   FaCrown,
@@ -65,6 +67,8 @@ import {
   FaMicrophone,
 
   FaCamera,
+
+  FaGem,
 
   FaCheck,
 
@@ -88,7 +92,11 @@ import {
 
   FaShoppingCart,
 
+  FaShoppingBag,
+
   FaUser,
+
+  FaUserPlus
 
 } from "react-icons/fa";
 
@@ -3304,7 +3312,7 @@ showAlert && (
         }}
       >
 
-        <FaGift
+        <FaCrown
           style={{
             fontSize: "40px",
             color: "#5b6cff",
