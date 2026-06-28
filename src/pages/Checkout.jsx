@@ -5,6 +5,9 @@ import {
   useEffect,
 } from "react";
 
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
 import emailjs from "@emailjs/browser";
 
 import Confetti from "react-confetti";
@@ -489,15 +492,37 @@ if (
   paymentMethod === "MTN Mobile Money"
 ) {
 
+  console.log("Paiement Monetbil...");
+
+  console.log("Téléphone envoyé :", phone);
+
+  const phoneNumber = phone.replace("+", "");
+
   const res = await axios.post(
-    "https://konanshopping-production.up.railway.app/api/payment/create",
-    {
-      amount: finalTotal,
-      phone,
-      name: customerName,
-      email,
-    }
-  );
+  "https://konanshopping-production.up.railway.app/api/payment/create",
+  {
+    amount: finalTotal,
+    phone: phoneNumber,
+    name: customerName,
+    email,
+
+    address,
+    city,
+    district,
+
+    paymentMethod,
+
+    shipping,
+
+    total: finalTotal,
+
+    items: cart,
+
+    userId: user?._id || null
+  }
+);
+
+console.log("Réponse Monetbil :", res.data);
 
   if (res.data.payment_url) {
 
@@ -518,9 +543,6 @@ const driver = JSON.parse(
   localStorage.getItem("driver")
 );
 
-const user = JSON.parse(
-  localStorage.getItem("user")
-);
 
 await axios.post(
 
@@ -665,15 +687,17 @@ console.log(localStorage);
 
     }
 
-    catch (err) {
+   catch (err) {
 
-      console.log(err);
+  console.log("ERREUR COMPLETE :", err);
 
-      toast.error(
-        "Erreur lors de la commande ❌"
-      );
+  console.log("Réponse :", err.response);
 
-    }
+  console.log("Data :", err.response?.data);
+
+  toast.error("Erreur lors de la commande ❌");
+
+}
 
     finally {
 
@@ -884,122 +908,57 @@ lineHeight: "1",
 
 </div>
 
-        <div
+  <div
   style={{
-    ...inputStyle,
-
-    display: "flex",
-
-    alignItems: "center",
-
-    padding: "0",
-
-    overflow: "hidden",
+    marginBottom: "18px",
+    width: "100%",
   }}
 >
-
-  {/* INDICATIF */}
-
   <div
     style={{
       display: "flex",
-
       alignItems: "center",
-
-      gap: "10px",
-
-      padding: "0 15px",
-
-      height: "100%",
-
-      borderRight:
-        "1px solid #eee",
-
-      background: "#fafafa",
-      flexShrink: 0,
-
-      minWidth: mobile ? "110px" : "150px"
+      gap: "12px",
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderRadius: "14px",
+      padding: mobile ? "12px 14px" : "14px 18px",
+      boxSizing: "border-box",
+      width: "100%",
+      transition: "0.3s",
     }}
   >
-
     <FaPhone
       style={{
         color: "#5b6cff",
-        fontSize: "14px",
+        fontSize: "18px",
+        flexShrink: 0,
       }}
     />
 
-    <select
+    <PhoneInput
+      international
+      defaultCountry="CM"
+      value={phone}
+      onChange={setPhone}
+      placeholder="Numéro de téléphone"
+
       style={{
-        border: "none",
-
-        outline: "none",
-
-        background: "transparent",
-
-        fontWeight: "600",
-
-        fontSize: "15px",
-
-        cursor: "pointer",
+        width: "100%",
       }}
-    >
 
-      <option>
-        🇨🇲 +237
-      </option>
-
-      <option>
-        🇫🇷 +33
-      </option>
-
-      <option>
-        🇺🇸 +1
-      </option>
-
-      <option>
-        🇳🇬 +234
-      </option>
-
-    </select>
-
+      numberInputProps={{
+        style: {
+          width: "100%",
+          border: "none",
+          outline: "none",
+          background: "transparent",
+          fontSize: mobile ? "15px" : "16px",
+          color: "#111827",
+        },
+      }}
+    />
   </div>
-
-  {/* INPUT */}
-
-  <input
-    type="text"
-
-    placeholder="Téléphone"
-
-    required
-
-    value={phone}
-
-    onChange={(e) =>
-      setPhone(
-        e.target.value
-      )
-    }
-
-    style={{
-  flex: 1,
-  border: "none",
-  outline: "none",
-  height: "50px",
-  padding: "0 20px",
-  fontSize: "15px",
-
-  background: "#ffffff",
-  color: "#111827",
-
-  WebkitTextFillColor: "#111827",
-
-  WebkitAppearance: "none",
-  appearance: "none",
-}}
-  />
-
 </div>
 
 
