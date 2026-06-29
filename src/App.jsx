@@ -3289,66 +3289,138 @@ showAlert && (
     style={{
       position: "fixed",
       inset: 0,
-      background: "rgba(15,23,42,.45)",
-      backdropFilter: "blur(16px)",
-      WebkitBackdropFilter: "blur(16px)",
+
+      background: "rgba(15,23,42,.28)",
+
+      backdropFilter: "blur(18px) saturate(160%)",
+      WebkitBackdropFilter:
+        "blur(18px) saturate(160%)",
+
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      padding: "18px",
+
+      padding: "20px",
+
       zIndex: 999999,
     }}
   >
     <div
       style={{
+        position: "relative",
+
+        overflow: "hidden",
+
         width: "100%",
-        maxWidth: "340px",
+        maxWidth: "335px",
+
         padding: "22px",
-        borderRadius: "24px",
+
+        borderRadius: "28px",
 
         background:
-          "linear-gradient(135deg,rgba(255,255,255,.70),rgba(255,255,255,.42))",
+          "linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.18))",
 
-        backdropFilter: "blur(40px)",
-        WebkitBackdropFilter: "blur(40px)",
+        backdropFilter:
+          "blur(45px) saturate(190%)",
+
+        WebkitBackdropFilter:
+          "blur(45px) saturate(190%)",
 
         border:
-          "1px solid rgba(255,255,255,.55)",
+          "1px solid rgba(255,255,255,.45)",
 
         boxShadow:
-          "0 20px 45px rgba(15,23,42,.18), inset 0 1px 1px rgba(255,255,255,.45)",
+          "0 30px 80px rgba(15,23,42,.22), inset 0 1px 0 rgba(255,255,255,.75), inset 0 -1px 0 rgba(255,255,255,.18), 0 0 0 1px rgba(255,255,255,.08)",
 
         textAlign: "center",
       }}
     >
 
-      {/* ICONE */}
+      {/* REFLET HAUT */}
 
       <div
         style={{
-          width: "72px",
-          height: "72px",
-          margin: "0 auto",
+          position: "absolute",
+
+          top: "-90px",
+
+          left: "-70px",
+
+          width: "220px",
+
+          height: "220px",
+
           borderRadius: "50%",
+
+          background:
+            "radial-gradient(circle,rgba(255,255,255,.60),transparent 70%)",
+
+          filter: "blur(25px)",
+
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* REFLET BAS */}
+
+      <div
+        style={{
+          position: "absolute",
+
+          bottom: "-120px",
+
+          right: "-90px",
+
+          width: "250px",
+
+          height: "250px",
+
+          borderRadius: "50%",
+
+          background:
+            "radial-gradient(circle,rgba(91,108,255,.18),transparent 75%)",
+
+          filter: "blur(40px)",
+
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ICÔNE */}
+
+      <div
+        style={{
+          width: "68px",
+
+          height: "68px",
+
+          margin: "0 auto",
+
+          borderRadius: "50%",
+
           display: "flex",
+
           justifyContent: "center",
+
           alignItems: "center",
 
           background:
-            "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+            "linear-gradient(135deg,#F5F3FF,#DDD6FE)",
+
+          border:
+            "1px solid rgba(255,255,255,.6)",
 
           boxShadow:
-            "0 10px 25px rgba(91,108,255,.20)",
+            "0 12px 28px rgba(91,108,255,.18)",
         }}
       >
-
         <FaCrown
           style={{
-            fontSize: "32px",
+            fontSize: "30px",
             color: "#5B6CFF",
           }}
         />
-
       </div>
 
       {/* BADGE */}
@@ -3356,70 +3428,77 @@ showAlert && (
       <div
         style={{
           display: "inline-flex",
+
           alignItems: "center",
+
           gap: "6px",
 
           marginTop: "14px",
 
-          padding: "6px 14px",
+          padding: "7px 15px",
 
           borderRadius: "50px",
 
           background:
-            "rgba(91,108,255,.12)",
+            "rgba(255,255,255,.28)",
+
+          border:
+            "1px solid rgba(255,255,255,.35)",
 
           color: "#5B6CFF",
 
           fontWeight: "800",
 
           fontSize: "11px",
+
+          backdropFilter: "blur(18px)",
         }}
       >
-
         <FaStar />
 
         OFFRE DE BIENVENUE
-
       </div>
 
       {/* TITRE */}
 
       <h2
-  style={{
-    marginTop: "15px",
-    marginBottom: "12px",
-    fontSize: "24px",
-    lineHeight: "30px",
-    color: "#111827",
-    fontWeight: "900",
-    whiteSpace: "nowrap",
-  }}
->
-  Recevez{" "}
-  <span
-    style={{
-      color: "#5B6CFF",
-      textShadow:
-        "0 3px 12px rgba(91,108,255,.25)",
-    }}
-  >
-    5&nbsp;000&nbsp;FCFA
-  </span>
-</h2>
+        style={{
+          marginTop: "16px",
+
+          marginBottom: "15px",
+
+          fontSize: "23px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          whiteSpace: "nowrap",
+        }}
+      >
+        Recevez{" "}
+
+        <span
+          style={{
+            color: "#5B6CFF",
+
+            textShadow:
+              "0 4px 14px rgba(91,108,255,.30)",
+          }}
+        >
+          5&nbsp;000&nbsp;FCFA
+        </span>
+      </h2>
 
       {/* DESCRIPTION */}
 
       <div
         style={{
           textAlign: "left",
-
-          color: "#4B5563",
-
+          color: "#374151",
           fontSize: "14px",
-
           lineHeight: "22px",
-
-          marginBottom: "20px",
+          marginBottom: "22px",
         }}
       >
 
@@ -3427,12 +3506,25 @@ showAlert && (
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            marginBottom: "12px",
+            gap: "12px",
+            marginBottom: "14px",
           }}
         >
 
-          <FaGem color="#5B6CFF" />
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "12px",
+              background:
+                "rgba(91,108,255,.10)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FaGem color="#5B6CFF" />
+          </div>
 
           <span>
             Créez gratuitement votre compte.
@@ -3444,15 +3536,29 @@ showAlert && (
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            marginBottom: "12px",
+            gap: "12px",
+            marginBottom: "14px",
           }}
         >
 
-          <FaCrown color="#5B6CFF" />
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "12px",
+              background:
+                "rgba(91,108,255,.10)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FaCrown color="#5B6CFF" />
+          </div>
 
           <span>
-            Recevez un bonus de bienvenue de <b>5 000 FCFA.</b>
+            Recevez immédiatement votre
+            <b> bonus de 5&nbsp;000 FCFA.</b>
           </span>
 
         </div>
@@ -3461,21 +3567,35 @@ showAlert && (
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "10px",
+            gap: "12px",
           }}
         >
 
-          <FaTruck color="#5B6CFF" />
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "12px",
+              background:
+                "rgba(91,108,255,.10)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <FaTruck color="#5B6CFF" />
+          </div>
 
           <span>
-            Recupere <b>5000 FCFA</b> cash.
+            Utilisez votre bonus sur votre
+            premier achat.
           </span>
 
         </div>
 
       </div>
 
-      {/* BOUTON */}
+      {/* BOUTON PRINCIPAL */}
 
       <button
         onClick={() => {
@@ -3484,11 +3604,11 @@ showAlert && (
         }}
         style={{
           width: "100%",
-          height: "50px",
+          height: "52px",
 
-          border: "1px solid rgba(255,255,255,.35)",
+          border: "1px solid rgba(255,255,255,.28)",
 
-          borderRadius: "16px",
+          borderRadius: "18px",
 
           background:
             "linear-gradient(135deg,#5B6CFF,#6D28D9)",
@@ -3507,13 +3627,15 @@ showAlert && (
           gap: "10px",
 
           boxShadow:
-            "0 10px 28px rgba(91,108,255,.30)",
+            "0 14px 32px rgba(91,108,255,.28)",
+
+          transition: ".25s",
         }}
       >
 
         <FaUserPlus />
 
-        Recupérez
+        Récupérer mes 5&nbsp;000 FCFA
 
       </button>
 
@@ -3525,30 +3647,29 @@ showAlert && (
         }
         style={{
           width: "100%",
-          height: "46px",
+          height: "48px",
 
-          marginTop: "10px",
+          marginTop: "12px",
 
-          border: "1px solid rgba(255,255,255,.35)",
+          borderRadius: "18px",
 
-          borderRadius: "16px",
+          border:
+            "1px solid rgba(255,255,255,.35)",
 
           background:
-            "rgba(255,255,255,.28)",
+            "rgba(255,255,255,.22)",
 
-          backdropFilter: "blur(30px)",
-
+          backdropFilter: "blur(25px)",
           WebkitBackdropFilter:
-            "blur(30px)",
-
-          boxShadow:
-            "inset 0 1px 1px rgba(255,255,255,.45)",
+            "blur(25px)",
 
           color: "#374151",
 
           fontWeight: "700",
 
           cursor: "pointer",
+
+          transition: ".25s",
         }}
       >
         Plus tard
