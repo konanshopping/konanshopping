@@ -3536,7 +3536,7 @@ showAlert && (
           }}
         >
 
-          <FaGift
+          <FaCrown
             style={{
               color: "#5B6CFF",
               fontSize: "15px",
