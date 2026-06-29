@@ -3319,23 +3319,16 @@ showAlert && (
 
         textAlign: "center",
 
-        background:
-          "linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.10))",
+       background: "rgba(255,255,255,.72)",
 
-        backdropFilter:
-          "blur(35px) saturate(180%)",
+backdropFilter: "blur(45px)",
 
-        WebkitBackdropFilter:
-          "blur(35px) saturate(180%)",
+WebkitBackdropFilter: "blur(45px)",
 
-        border:
-          "1px solid rgba(255,255,255,.28)",
+border: "1px solid rgba(255,255,255,.65)",
 
-        boxShadow: `
-          inset 0 1px 1px rgba(255,255,255,.60),
-          inset 0 -1px 1px rgba(255,255,255,.10),
-          0 12px 40px rgba(0,0,0,.14)
-        `,
+boxShadow:
+"0 18px 50px rgba(0,0,0,.16), inset 0 1px 1px rgba(255,255,255,.95)"
       }}
     >
 
