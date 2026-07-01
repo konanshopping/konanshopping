@@ -491,8 +491,9 @@ useState([]);
 
   });
 
-  const [search, setSearch] =
-    useState("");
+ const [search, setSearch] = useState("");
+const [searchQuery, setSearchQuery] = useState("");
+const [searchClicked, setSearchClicked] = useState(false);
 
 const SpeechRecognition =
   window.SpeechRecognition ||
@@ -766,6 +767,9 @@ useEffect(() => {
 const searchProducts =
 async()=>{
 
+  setSearchClicked(true);
+setSearchQuery(search);
+
 try{
 
 setLoading(true);
@@ -807,16 +811,8 @@ res.data.products
 
 else if(search.trim() !== ""){
 
-const res =
-await axios.get(
-
-`https://konanshopping-production.up.railway.app/products/search/${search}`
-
-);
-
-setProducts(
-res.data
-);
+setSearchClicked(true);
+setSearchQuery(search);
 
 }
 
@@ -2201,23 +2197,49 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 
 .filter((product) => {
 
-const matchSearch =
-product.name
-.toLowerCase()
-.includes(
-search.toLowerCase()
-);
+  const normalize = (text = "") =>
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s]/g, " ");
 
-const matchCategory =
-selectedCategory === "Tous"
-? true
-: product.category ===
-selectedCategory;
+  const stopWords = [
+    "je","j","veux","voudrais","cherche",
+    "recherche","montre","moi","une","un",
+    "des","de","du","la","le","les","pour",
+    "avec","et","ou","svp","stp","sil","plait"
+  ];
 
-return (
-matchSearch &&
-matchCategory
-);
+  const keywords = normalize(searchQuery)
+    .split(/\s+/)
+    .filter(
+      (word) =>
+        word &&
+        !stopWords.includes(word)
+    );
+
+  const text = normalize(`
+    ${product.name}
+    ${product.category}
+    ${product.description || ""}
+    ${product.brand || ""}
+  `);
+
+ const matchSearch =
+  !searchClicked ||
+  keywords.length === 0
+    ? true
+    : keywords.some((word) =>
+        text.includes(word)
+      );
+
+  const matchCategory =
+    selectedCategory === "Tous"
+      ? true
+      : product.category === selectedCategory;
+
+  return matchSearch && matchCategory;
 
 })
 
