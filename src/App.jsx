@@ -2191,10 +2191,10 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 
 )}
 
-{(aiProducts.length > 0
-? aiProducts
-: randomizedProducts)
-
+{searchClicked &&
+(aiProducts.length > 0
+  ? aiProducts
+  : randomizedProducts)
 .filter((product) => {
 
   const normalize = (text = "") =>
@@ -2214,7 +2214,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
   const keywords = normalize(searchQuery)
     .split(/\s+/)
     .filter(
-      (word) =>
+      word =>
         word &&
         !stopWords.includes(word)
     );
@@ -2226,13 +2226,10 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
     ${product.brand || ""}
   `);
 
- const matchSearch =
-  !searchClicked ||
-  keywords.length === 0
-    ? true
-    : keywords.some((word) =>
-        text.includes(word)
-      );
+  const matchSearch =
+    keywords.length === 0
+      ? true
+      : keywords.some(word => text.includes(word));
 
   const matchCategory =
     selectedCategory === "Tous"
@@ -2241,7 +2238,188 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 
   return matchSearch && matchCategory;
 
-})
+}).length === 0 && (
+
+<div
+  style={{
+    gridColumn: "1 / -1",
+    background: "#FFFFFF",
+    border: "1px solid #ECEFF3",
+    borderRadius: "18px",
+    padding: "18px 16px",
+    marginBottom: "18px",
+    textAlign: "center",
+    boxShadow: "0 4px 14px rgba(0,0,0,.05)",
+  }}
+>
+
+  <div
+    style={{
+      width: "54px",
+      height: "54px",
+      margin: "0 auto 12px",
+      borderRadius: "50%",
+      background: "#F3F4FF",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+
+    <FaSearch
+      style={{
+        fontSize: "22px",
+        color: "#4B2E83",
+      }}
+    />
+
+  </div>
+
+  <h3
+    style={{
+      margin: 0,
+      fontSize: "18px",
+      fontWeight: "800",
+      color: "#111827",
+    }}
+  >
+    Aucun résultat trouvé
+  </h3>
+
+  <p
+    style={{
+      marginTop: "8px",
+      color: "#6B7280",
+      fontSize: "13px",
+      lineHeight: "21px",
+    }}
+  >
+    Aucun produit ne correspond à
+
+    <br />
+
+    <span
+      style={{
+        color: "#4B2E83",
+        fontWeight: "700",
+      }}
+    >
+      "{searchQuery}"
+    </span>
+
+    <br /><br />
+
+    Découvrez nos recommandations ci-dessous.
+  </p>
+
+</div>
+
+)}
+
+{(
+  (
+    searchClicked &&
+    (aiProducts.length > 0
+      ? aiProducts
+      : randomizedProducts)
+      .filter((product) => {
+
+        const normalize = (text = "") =>
+          text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^\w\s]/g, " ");
+
+        const stopWords = [
+          "je","j","veux","voudrais","cherche",
+          "recherche","montre","moi","une","un",
+          "des","de","du","la","le","les","pour",
+          "avec","et","ou","svp","stp","sil","plait"
+        ];
+
+        const keywords = normalize(searchQuery)
+          .split(/\s+/)
+          .filter(
+            word =>
+              word &&
+              !stopWords.includes(word)
+          );
+
+        const text = normalize(`
+          ${product.name}
+          ${product.category}
+          ${product.description || ""}
+          ${product.brand || ""}
+        `);
+
+        const matchSearch =
+          keywords.length === 0
+            ? true
+            : keywords.some(word =>
+                text.includes(word)
+              );
+
+        const matchCategory =
+          selectedCategory === "Tous"
+            ? true
+            : product.category === selectedCategory;
+
+        return matchSearch && matchCategory;
+
+      }).length > 0
+  )
+    ? (aiProducts.length > 0
+        ? aiProducts
+        : randomizedProducts).filter((product) => {
+
+        const normalize = (text = "") =>
+          text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^\w\s]/g, " ");
+
+        const stopWords = [
+          "je","j","veux","voudrais","cherche",
+          "recherche","montre","moi","une","un",
+          "des","de","du","la","le","les","pour",
+          "avec","et","ou","svp","stp","sil","plait"
+        ];
+
+        const keywords = normalize(searchQuery)
+          .split(/\s+/)
+          .filter(
+            word =>
+              word &&
+              !stopWords.includes(word)
+          );
+
+        const text = normalize(`
+          ${product.name}
+          ${product.category}
+          ${product.description || ""}
+          ${product.brand || ""}
+        `);
+
+        const matchSearch =
+          !searchClicked ||
+          keywords.length === 0
+            ? true
+            : keywords.some(word =>
+                text.includes(word)
+              );
+
+        const matchCategory =
+          selectedCategory === "Tous"
+            ? true
+            : product.category === selectedCategory;
+
+        return matchSearch && matchCategory;
+
+      })
+    : randomizedProducts
+)
 
 .slice(0, visibleProducts)
 
