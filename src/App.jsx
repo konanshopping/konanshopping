@@ -2418,7 +2418,11 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
         return matchSearch && matchCategory;
 
       })
-    : randomizedProducts
+    : randomizedProducts.filter(product =>
+  selectedCategory === "Tous"
+    ? true
+    : product.category === selectedCategory
+)
 )
 
 .slice(0, visibleProducts)
