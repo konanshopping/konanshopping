@@ -1269,26 +1269,30 @@ gap: "12px",
       }
 
       style={{
-        width: "100%",
+  width: "100%",
 
-        padding:
-          "15px 15px 15px 45px",
+  padding: "15px 15px 15px 45px",
 
-        borderRadius: "16px",
+  borderRadius: "16px",
 
-        border:
-          "1px solid #e5e7eb",
+  border: "1px solid #e5e7eb",
 
-        background:
-          "linear-gradient(135deg,#ffffff,#f9fafb)",
+  background: "linear-gradient(135deg,#ffffff,#f9fafb)",
 
-        boxShadow:
-          "0 4px 10px rgba(0,0,0,0.03)",
+  boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
 
-        outline: "none",
+  outline: "none",
 
-        fontSize: "15px",
-      }}
+  fontSize: "15px",
+
+  color: "#111827",
+
+  WebkitTextFillColor: "#111827",
+
+  caretColor: "#4B2E83",
+
+  fontWeight: "600",
+}}
     />
 
   </div>
