@@ -830,364 +830,374 @@ const displayedProducts =
   }}
 >
 
-  {/* NAVBAR PREMIUM */}
+ {/* NAVBAR PREMIUM */}
 
-  <div
+<div
+  style={{
+    background: "rgba(255,255,255,.92)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)",
+
+    borderRadius:
+      window.innerWidth < 768
+        ? "18px"
+        : "22px",
+
+    padding:
+      window.innerWidth < 768
+        ? "8px 10px"
+        : "12px 18px",
+
+    display: "flex",
+
+    justifyContent: "space-between",
+
+    alignItems: "center",
+
+    flexWrap: "nowrap",
+
+    gap:
+      window.innerWidth < 768
+        ? "8px"
+        : "18px",
+
+    marginBottom: "20px",
+
+    boxShadow:
+      "0 12px 30px rgba(91,108,255,.08)",
+
+    border:
+      "1px solid rgba(255,255,255,.85)",
+
+    position: "sticky",
+
+    top: "8px",
+
+    zIndex: 1000,
+  }}
+>
+
+  {/* LOGO */}
+
+  <Link
+    to="/"
     style={{
-      background:
-        "rgba(255,255,255,0.88)",
-
-      backdropFilter: "blur(18px)",
-
-      WebkitBackdropFilter:
-        "blur(18px)",
-
-      borderRadius:
-        window.innerWidth < 768
-          ? "16px"
-          : "20px",
-
-      padding:
-        window.innerWidth < 768
-          ? "6px 8px"
-          : "10px 16px",
-
-      display: "flex",
-
-      justifyContent:
-        "space-between",
-
-      alignItems: "center",
-
-      flexWrap: "wrap",
-
-      gap: "12px",
-
-      marginBottom: "20px",
-
-      boxShadow:
-        "0 10px 25px rgba(91,108,255,0.06)",
-
-      border:
-        "1px solid rgba(255,255,255,0.7)",
-
-      position: "sticky",
-
-      top: "8px",
-
-      zIndex: 1000,
+      textDecoration: "none",
+      flexShrink: 0,
     }}
   >
 
-    {/* LOGO */}
-
-    <Link
-      to="/"
-
+    <div
       style={{
-        textDecoration: "none",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
       }}
     >
 
+      {/* IMAGE */}
+
       <div
         style={{
+          width:
+            window.innerWidth < 768
+              ? "38px"
+              : "46px",
+
+          height:
+            window.innerWidth < 768
+              ? "38px"
+              : "46px",
+
+          borderRadius: "12px",
+
+          overflow: "hidden",
+
+          background: "#FFFFFF",
+
           display: "flex",
 
           alignItems: "center",
 
-          gap: "10px",
+          justifyContent: "center",
+
+          border: "1px solid #EEF2FF",
+
+          boxShadow:
+            "0 6px 15px rgba(91,108,255,.12)",
         }}
       >
 
-        {/* LOGO IMAGE */}
-
-        <div
+        <img
+          src="/logo.jpg"
+          alt="Konan Shopping"
           style={{
-            width:
-              window.innerWidth < 768
-                ? "32px"
-                : "42px",
-
-            height:
-              window.innerWidth < 768
-                ? "32px"
-                : "42px",
-
-            borderRadius: "14px",
-
-            overflow: "hidden",
-
-            background: "white",
-
-            display: "flex",
-
-            alignItems: "center",
-
-            justifyContent: "center",
-
-            boxShadow:
-              "0 6px 15px rgba(91,108,255,0.10)",
-
-            border:
-              "1px solid #eef2ff",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
-        >
-
-          <img
-            src="/logo.jpg"
-
-            alt="Konan Shopping"
-
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-
-        </div>
-
-        {/* TEXT */}
-
-        <div>
-
-          <h2
-            style={{
-              margin: 0,
-
-              fontSize:
-                window.innerWidth < 768
-                  ? "15px"
-                  : "20px",
-
-              fontWeight: "700",
-
-              lineHeight: "1",
-
-              background:
-                "linear-gradient(135deg,#111827,#5b6cff)",
-
-              WebkitBackgroundClip:
-                "text",
-
-              WebkitTextFillColor:
-                "transparent",
-            }}
-          >
-            KONAN SHOPPING
-          </h2>
-
-          <p
-            style={{
-              margin: 0,
-
-              marginTop: "3px",
-
-              color: "#6b7280",
-
-              fontSize: "8px",
-
-              fontWeight: "500",
-
-              letterSpacing: "0.4px",
-            }}
-          >
-            habilleur des stars
-          </p>
-
-        </div>
+        />
 
       </div>
 
-    </Link>
+      {/* TEXTE */}
 
-    <div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    flex: 1,
-    gap: "10px",
-  }}
->
- {/* SEARCH */}
+      <div>
 
-<div
-  style={{
-    position: "relative",
-  }}
->
-
-  <FaSearch
-    style={{
-      position: "absolute",
-
-      top: "50%",
-
-      transform: "translateY(-50%)",
-
-      left: "14px",
-
-      color: "#9ca3af",
-
-      fontSize: "13px",
-
-      pointerEvents: "none",
-    }}
-  />
-
-  <input
-    type="text"
-
-    placeholder="Rechercher..."
-
-    value={search}
-
-    onChange={(e) =>
-      setSearch(
-        e.target.value
-      )
-    }
-
-    style={{
-      padding:
-        "8px 14px 8px 34px",
-
-      borderRadius: "30px",
-
-      border:
-        "1px solid #e5e7eb",
-
-      width:
-        window.innerWidth < 768
-          ? "140px"
-          : "220px",
-
-      outline: "none",
-
-      fontSize: "13px",
-
-      fontWeight: "500",
-
-      color: "#111827",
-
-      background:
-        "linear-gradient(135deg,#fff,#f9fafb)",
-
-      boxShadow:
-        "0 5px 15px rgba(0,0,0,0.05)",
-
-      transition:
-        "all 0.3s ease",
-    }}
-
-    onFocus={(e) => {
-
-      e.target.style.boxShadow =
-        "0 8px 20px rgba(91,108,255,0.15)";
-
-      e.target.style.border =
-        "1px solid #5b6cff";
-
-    }}
-
-    onBlur={(e) => {
-
-      e.target.style.boxShadow =
-        "0 5px 15px rgba(0,0,0,0.05)";
-
-      e.target.style.border =
-        "1px solid #e5e7eb";
-
-    }}
-  />
-
-</div>
-
-      </div>
-
-      {/* PANIER */}
-
-      <Link
-        to="/checkout"
-
-        style={{
-          position: "relative",
-
-          textDecoration: "none",
-        }}
-      >
-
-        <div
+        <h2
           style={{
-            width: "36px",
+            margin: 0,
 
-            height: "36px",
+            fontSize:
+              window.innerWidth < 768
+                ? "15px"
+                : "20px",
 
-            borderRadius: "14px",
+            fontWeight: "800",
+
+            lineHeight: "1",
 
             background:
-              "linear-gradient(135deg,#111827,#374151)",
+              "linear-gradient(135deg,#111827,#5B6CFF)",
 
-            display: "flex",
+            WebkitBackgroundClip: "text",
 
-            alignItems: "center",
-
-            justifyContent: "center",
-
-            color: "white",
-
-            fontSize: "15px",
-
-            boxShadow:
-              "0 8px 18px rgba(0,0,0,0.12)",
+            WebkitTextFillColor: "transparent",
           }}
         >
-          <FaShoppingCart />
-        </div>
+          KONAN SHOPPING
+        </h2>
 
-        {cart.length > 0 && (
+        <p
+          style={{
+            margin: 0,
 
-          <div
-            style={{
-              position: "absolute",
+            marginTop: "3px",
 
-              top: "-4px",
+            color: "#6B7280",
 
-              right: "-4px",
+            fontSize:
+              window.innerWidth < 768
+                ? "9px"
+                : "10px",
 
-              width: "20px",
+            fontWeight: "600",
+          }}
+        >
+          Habilleur des stars
+        </p>
 
-              height: "20px",
-
-              borderRadius: "50%",
-
-              background:
-                "linear-gradient(135deg,#ef4444,#dc2626)",
-
-              color: "white",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-
-              fontSize: "10px",
-
-              fontWeight: "700",
-
-              border:
-                "2px solid white",
-            }}
-          >
-            {cart.length}
-          </div>
-
-        )}
-
-      </Link>
+      </div>
 
     </div>
+
+  </Link>
+
+  {/* SEARCH */}
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      flex: 1,
+      justifyContent: "flex-end",
+      minWidth: 0,
+      gap: "8px",
+    }}
+  >
+
+    <div
+      style={{
+        position: "relative",
+        flex: 1,
+        maxWidth:
+          window.innerWidth < 768
+            ? "150px"
+            : "240px",
+      }}
+    >
+
+      <FaSearch
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "12px",
+          transform: "translateY(-50%)",
+          color: "#9CA3AF",
+          fontSize: "13px",
+          pointerEvents: "none",
+        }}
+      />
+
+      <input
+        type="text"
+
+        placeholder="Rechercher..."
+
+        value={search}
+
+        onChange={(e) =>
+          setSearch(e.target.value)
+        }
+
+        style={{
+          width: "100%",
+
+          padding:
+            "9px 14px 9px 34px",
+
+          borderRadius: "30px",
+
+          border:
+            "1px solid #E5E7EB",
+
+          outline: "none",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          fontWeight: "500",
+
+          background:
+            "linear-gradient(135deg,#FFFFFF,#F9FAFB)",
+
+          color: "#111827",
+
+          boxShadow:
+            "0 5px 15px rgba(0,0,0,.05)",
+
+          transition: ".3s",
+        }}
+
+        onFocus={(e) => {
+
+          e.target.style.border =
+            "1px solid #5B6CFF";
+
+          e.target.style.boxShadow =
+            "0 8px 20px rgba(91,108,255,.15)";
+
+        }}
+
+        onBlur={(e) => {
+
+          e.target.style.border =
+            "1px solid #E5E7EB";
+
+          e.target.style.boxShadow =
+            "0 5px 15px rgba(0,0,0,.05)";
+
+        }}
+
+      />
+
+    </div>
+
+  </div>
+
+  {/* PANIER */}
+
+  <Link
+    to="/checkout"
+    style={{
+      position: "relative",
+      textDecoration: "none",
+      flexShrink: 0,
+    }}
+  >
+
+    <div
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "40px"
+            : "46px",
+
+        height:
+          window.innerWidth < 768
+            ? "40px"
+            : "46px",
+
+        borderRadius: "14px",
+
+        background:
+          "linear-gradient(135deg,#111827,#374151)",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        color: "#FFFFFF",
+
+        fontSize:
+          window.innerWidth < 768
+            ? "16px"
+            : "18px",
+
+        boxShadow:
+          "0 8px 20px rgba(0,0,0,.15)",
+      }}
+    >
+
+      <FaShoppingCart />
+
+    </div>
+
+    {cart.length > 0 && (
+
+      <div
+        style={{
+          position: "absolute",
+
+          top: "-5px",
+
+          right: "-5px",
+
+          width:
+            window.innerWidth < 768
+              ? "18px"
+              : "20px",
+
+          height:
+            window.innerWidth < 768
+              ? "18px"
+              : "20px",
+
+          borderRadius: "50%",
+
+          background:
+            "linear-gradient(135deg,#EF4444,#DC2626)",
+
+          color: "#FFFFFF",
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          alignItems: "center",
+
+          fontSize: "9px",
+
+          fontWeight: "800",
+
+          border:
+            "2px solid #FFFFFF",
+        }}
+      >
+
+        {cart.length}
+
+      </div>
+
+    )}
+
+  </Link>
+
+</div>
 
 <div
   style={{
@@ -1371,8 +1381,6 @@ const displayedProducts =
   </div>
 
 </div>
-
-      
 
 {/* HERO */}
 
