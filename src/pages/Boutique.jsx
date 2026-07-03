@@ -66,56 +66,63 @@ const selectedBrand =
     setSelectedProduct
   ] = useState(null);
 
-  const heroSlides = [...products]
-  .sort(() => Math.random() - 0.5)
-  .slice(0, 5)
-  .map((product) => ({
+  const heroSlides = useMemo(() => {
 
-    _id: product._id,
+  return [...products]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5)
+    .map((product) => ({
 
-    image: product.image,
+      _id: product._id,
 
-    title: product.name,
+      image: product.image || "/logo.jpg",
 
-    subtitle:
-      product.description ||
-      `${Number(product.price).toLocaleString()} FCFA`,
+      title: product.name,
 
-    badge: product.category,
+      subtitle:
+        product.description ||
+        `${Number(product.price).toLocaleString()} FCFA`,
 
-    price: product.price,
+      badge: product.category,
 
-    category: product.category,
+      price: product.price,
 
-    brand: product.brand,
+      category: product.category,
 
-    product,
+      brand: product.brand,
 
-    icon: <FaFireAlt />,
+      icon: <FaFireAlt />,
 
-  }));
+    }));
+
+}, [products]);
 
 const [heroIndex, setHeroIndex] =
   useState(0);
 
 useEffect(() => {
 
+  if (heroSlides.length === 0) return;
+
   const interval = setInterval(() => {
 
     setHeroIndex((prev) =>
-
-      prev === heroSlides.length - 1
+      prev >= heroSlides.length - 1
         ? 0
         : prev + 1
-
     );
 
   }, 4500);
 
-  return () =>
-    clearInterval(interval);
+  return () => clearInterval(interval);
 
-}, []);
+}, [heroSlides]);
+
+useEffect(() => {
+
+  setHeroIndex(0);
+
+}, [heroSlides]);
 
 const [wishlist, setWishlist] =
   useState(() => {
