@@ -1194,145 +1194,183 @@ const displayedProducts =
     width: "100%",
     display: "flex",
     justifyContent: "center",
-    gap: "25px",
-    marginTop: "15px",
-    marginBottom: "40px",
+    marginTop: "14px",
+    marginBottom: "30px",
+    padding: "0 12px",
+    boxSizing: "border-box",
   }}
 >
 
-{/* MENU */}
+  {/* MENU */}
+
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      width: "100%",
+      maxWidth: "480px",
+    }}
+  >
+
+    {/* NAVIGATION */}
 
     <div
       style={{
         display: "flex",
-
         alignItems: "center",
-
-        gap:
-          window.innerWidth < 768
-            ? "8px"
-            : "14px",
-
-        flexWrap: "wrap",
+        justifyContent: "space-between",
+        gap: window.innerWidth < 768 ? "10px" : "18px",
+        width: "100%",
       }}
     >
 
-      {/* NAVIGATION */}
+      {/* ACCUEIL */}
 
-      <div
+      <Link
+        to="/"
         style={{
+          ...navStyle,
+
+          flex: 1,
+
           display: "flex",
 
           alignItems: "center",
 
-          gap:
-            window.innerWidth < 768
-              ? "20px"
-              : "30px",
+          justifyContent: "center",
+
+          gap: "6px",
+
+          textDecoration: "none",
+
+          background: "#FFFFFF",
+
+          color: "#374151",
+
+          height: window.innerWidth < 768 ? "46px" : "50px",
+
+          borderRadius: "16px",
+
+          fontWeight: "700",
+
+          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+
+          boxShadow: "0 6px 16px rgba(0,0,0,.05)",
+
+          border: "1px solid #EEF2F7",
         }}
       >
 
-        <Link
-          to="/"
-
+        <FaHome
           style={{
-            ...navStyle,
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "6px",
-
-            background:
-              "#f8fafc",
-
-            padding: "8px 12px",
-
-            borderRadius: "12px",
-
-            color: "#374151",
-
-            fontWeight: "600",
-
-            fontSize: "13px",
+            fontSize: "17px",
           }}
-        >
-          <FaHome />
+        />
 
-          Accueil
-        </Link>
+        Accueil
 
-        <Link
-          to="/boutique"
+      </Link>
 
+      {/* BOUTIQUE */}
+
+      <Link
+        to="/boutique"
+        style={{
+          ...navStyle,
+
+          flex: 1,
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent: "center",
+
+          gap: "6px",
+
+          textDecoration: "none",
+
+          background:
+            "linear-gradient(135deg,#5B6CFF,#7C4DFF)",
+
+          color: "#FFFFFF",
+
+          height: window.innerWidth < 768 ? "46px" : "50px",
+
+          borderRadius: "16px",
+
+          fontWeight: "700",
+
+          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+
+          boxShadow:
+            "0 10px 22px rgba(91,108,255,.28)",
+        }}
+      >
+
+        <FaStore
           style={{
-            ...navStyle,
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "6px",
-
-            background:
-              "linear-gradient(135deg,#5b6cff,#7c4dff)",
-
-            padding: "8px 12px",
-
-            borderRadius: "12px",
-
-            color: "white",
-
-            fontWeight: "600",
-
-            fontSize: "13px",
-
-            boxShadow:
-              "0 8px 18px rgba(91,108,255,0.18)",
+            fontSize: "17px",
           }}
-        >
-          <FaStore />
+        />
 
-          Boutique
-        </Link>
+        Boutique
 
-        <a
-          href="https://wa.me/237694641329"
+      </Link>
 
+      {/* CONTACT */}
+
+      <a
+        href="https://wa.me/237694641329"
+        style={{
+          ...navStyle,
+
+          flex: 1,
+
+          display: "flex",
+
+          alignItems: "center",
+
+          justifyContent: "center",
+
+          gap: "6px",
+
+          textDecoration: "none",
+
+          background: "#F0FDF4",
+
+          color: "#16A34A",
+
+          height: window.innerWidth < 768 ? "46px" : "50px",
+
+          borderRadius: "16px",
+
+          fontWeight: "700",
+
+          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+
+          boxShadow:
+            "0 6px 16px rgba(34,197,94,.12)",
+
+          border: "1px solid #DCFCE7",
+        }}
+      >
+
+        <FaWhatsapp
           style={{
-            ...navStyle,
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: "6px",
-
-            background:
-              "#f0fdf4",
-
-            padding: "8px 12px",
-
-            borderRadius: "12px",
-
-            color: "#16a34a",
-
-            fontWeight: "600",
-
-            fontSize: "13px",
+            fontSize: "18px",
           }}
-        >
-          <FaWhatsapp />
+        />
 
-          Contact
-        </a>
+        Contact
 
-      </div>
+      </a>
 
-      </div>
+    </div>
 
-      </div>
+  </div>
+
+</div>
 
       
 
