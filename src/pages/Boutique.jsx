@@ -945,6 +945,7 @@ const displayedProducts =
       <div>
 
         <h2
+        translate="no"
           style={{
             margin: 0,
 
@@ -2688,6 +2689,7 @@ window.innerWidth < 768
 >
 
 <div
+translate="no"
 className="categoriesSlider"
 >
 

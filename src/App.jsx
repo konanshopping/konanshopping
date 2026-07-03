@@ -1834,6 +1834,7 @@ FCFA
     </h2>
 
     <Link
+    translate="no"
       to="/boutique"
       style={{
         textDecoration: "none",
