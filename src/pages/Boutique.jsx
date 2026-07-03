@@ -25,6 +25,7 @@ import {
   FaHome,
 FaStore,
 FaWhatsapp,
+FaFireAlt
 } from "react-icons/fa";
 
 import {
@@ -34,101 +35,6 @@ import {
 function Boutique() {
 
   // ================= HERO PROMOTIONS =================
-
-const heroSlides = [
-
-  {
-    image:
-      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b",
-
-    title:
-      "Nouvelle Collection",
-
-    subtitle:
-      "Découvrez les tendances premium 2026",
-
-    badge:
-      "Mode Premium",
-
-    icon:
-      <FaCrown />,
-  },
-
-  {
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-
-    title:
-      "Promo Chaussures",
-
-    subtitle:
-      "Jusqu'à -40% sur plusieurs modèles",
-
-    badge:
-      "Offres Flash",
-
-    icon:
-      <FaBolt />,
-  },
-
-  {
-    image:
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c",
-
-    title:
-      "Livraison Express",
-
-    subtitle:
-      "Partout au Cameroun en 24H",
-
-    badge:
-      "Livraison Rapide",
-
-    icon:
-      <FaTruck />,
-  },
-
-  {
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-
-    title:
-      "Produits Exclusifs",
-
-    subtitle:
-      "Accessoires et styles haut de gamme",
-
-    badge:
-      "Konan Shopping",
-
-    icon:
-      <FaGem />,
-  },
-
-];
-
-const [heroIndex, setHeroIndex] =
-  useState(0);
-
-useEffect(() => {
-
-  const interval = setInterval(() => {
-
-    setHeroIndex((prev) =>
-
-      prev === heroSlides.length - 1
-        ? 0
-        : prev + 1
-
-    );
-
-  }, 4500);
-
-  return () =>
-    clearInterval(interval);
-
-}, []);
-
 
 const navigate = useNavigate();
 
@@ -159,6 +65,57 @@ const selectedBrand =
     selectedProduct,
     setSelectedProduct
   ] = useState(null);
+
+  const heroSlides = [...products]
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 5)
+  .map((product) => ({
+
+    _id: product._id,
+
+    image: product.image,
+
+    title: product.name,
+
+    subtitle:
+      product.description ||
+      `${Number(product.price).toLocaleString()} FCFA`,
+
+    badge: product.category,
+
+    price: product.price,
+
+    category: product.category,
+
+    brand: product.brand,
+
+    product,
+
+    icon: <FaFireAlt />,
+
+  }));
+
+const [heroIndex, setHeroIndex] =
+  useState(0);
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+
+    setHeroIndex((prev) =>
+
+      prev === heroSlides.length - 1
+        ? 0
+        : prev + 1
+
+    );
+
+  }, 4500);
+
+  return () =>
+    clearInterval(interval);
+
+}, []);
 
 const [wishlist, setWishlist] =
   useState(() => {
@@ -1574,6 +1531,9 @@ const displayedProducts =
         >
 
           <button
+          onClick={() =>
+  navigate(`/product/${slide._id}`)
+}
             style={{
               padding:
                 window.innerWidth < 768
@@ -1613,6 +1573,9 @@ const displayedProducts =
           </button>
 
           <button
+          onClick={() =>
+  navigate(`/product/${slide._id}`)
+}
             style={{
               padding:
                 window.innerWidth < 768
