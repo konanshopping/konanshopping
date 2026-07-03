@@ -133,13 +133,29 @@ function Coupons() {
 
   // COPY
 
-  const copyCoupon = (
-    code
-  ) => {
+ const copyCoupon = async (code) => {
 
-    navigator.clipboard.writeText(
-      code
-    );
+  try {
+
+    if (navigator.clipboard && window.isSecureContext) {
+
+      await navigator.clipboard.writeText(code);
+
+    } else {
+
+      const input = document.createElement("textarea");
+
+      input.value = code;
+
+      document.body.appendChild(input);
+
+      input.select();
+
+      document.execCommand("copy");
+
+      document.body.removeChild(input);
+
+    }
 
     setCopied(code);
 
@@ -149,7 +165,15 @@ function Coupons() {
 
     }, 2000);
 
-  };
+  } catch (error) {
+
+    console.error(error);
+
+    alert("Impossible de copier le code.");
+
+  }
+
+};
 
   return (
 
