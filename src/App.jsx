@@ -4576,10 +4576,7 @@ function App() {
 
 <Route path="/address" element={<Address />} />
 
-<Route
-  path="/promotions"
-  element={<Promotions />}
-/>
+<Route path="/promotions" element={<Promotions />} />
 
 <Route
   path="/message"
