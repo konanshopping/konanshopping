@@ -193,7 +193,7 @@ function PrivacyPolicy() {
         }}
       >
 
-        Chez <b translate="no">KONAN SHOPPING CAMEROUN</b>,
+        Chez  <b translate="no">KONAN SHOPPING CAMEROUN</b>,
         la protection de vos données personnelles est notre priorité.
 
       </p>
@@ -1478,7 +1478,7 @@ window.innerWidth < 768
 }}
 >
 
-Chez <b translate="no">KONAN SHOPPING CAMEROUN</b>, le paiement s'effectue uniquement à la livraison. Nous invitons chaque client à vérifier soigneusement le produit avant de procéder au paiement.
+Chez  <b translate="no">KONAN SHOPPING CAMEROUN</b>, le paiement s'effectue uniquement à la livraison. Nous invitons chaque client à vérifier soigneusement le produit avant de procéder au paiement.
 
 </p>
 

@@ -24,6 +24,8 @@ import Register from "./pages/Register";
 import UserLogin from "./pages/UserLogin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
+import Conditions from "./pages/Conditions";
+
 import Success from "./pages/Success";
 
 import Favorites from "./pages/Favorites";
@@ -4584,6 +4586,11 @@ function App() {
 <Route
   path="/privacy-policy"
   element={<PrivacyPolicy />}
+/>
+
+<Route
+  path="/conditions"
+  element={<Conditions />}
 />
 
 <Route
