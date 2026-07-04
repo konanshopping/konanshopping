@@ -1412,7 +1412,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
       </a>
 
       <a
-        href="mailto:contact@konanshopping.com"
+        href="mailto: konanshoppingcameroun@gmail.com"
         style={{
           display:"flex",
           alignItems:"center",
