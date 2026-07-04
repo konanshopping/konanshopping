@@ -700,7 +700,6 @@ color:"#6B7280",
         product.price/(1-reduction/100)
       );
 
-      console.log(products);
 
       return(
 
