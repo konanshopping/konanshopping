@@ -25,7 +25,7 @@ import {
   FaRobot,
   FaBullseye,
   FaArrowRight,
-  FaUserCircle
+ FaUserCircle
 } from "react-icons/fa";
 
 import {
