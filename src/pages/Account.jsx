@@ -40,6 +40,17 @@ import {
 } from "react-icons/fa";
 
 import { FaEnvelope } from "react-icons/fa";
+import Conditions from "./Conditions";
+import PrivacyPolicy from "./PrivacyPolicy";
+
+import {
+  FaShieldAlt,
+  FaFileContract,
+  FaLock,
+  FaHeadset,
+  FaWhatsapp
+} from "react-icons/fa";
+
 
 function Account() {
 
@@ -2068,6 +2079,346 @@ return (
   </div>
 
 )}
+
+{/* ================= FOOTER PREMIUM ================= */}
+
+<div
+  style={{
+    marginTop: "30px",
+
+    background: "#FFFFFF",
+
+    borderTop: "1px solid #E5E7EB",
+
+    borderRadius:
+      window.innerWidth < 768
+        ? "18px 18px 0 0"
+        : "24px 24px 0 0",
+
+    padding:
+      window.innerWidth < 768
+        ? "18px 14px"
+        : "30px 28px",
+
+    boxShadow:
+      "0 -4px 20px rgba(0,0,0,.04)",
+  }}
+>
+
+  {/* LOGO */}
+
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "10px",
+      marginBottom: "10px",
+    }}
+  >
+
+    <img
+      src="/logo.jpg"
+      alt="Konan Shopping"
+
+      style={{
+        width:
+          window.innerWidth < 768
+            ? "34px"
+            : "42px",
+
+        height:
+          window.innerWidth < 768
+            ? "34px"
+            : "42px",
+
+        borderRadius: "10px",
+
+        objectFit: "cover",
+
+        boxShadow:
+          "0 4px 12px rgba(0,0,0,.08)",
+      }}
+    />
+
+    <h2
+      translate="no"
+      style={{
+        margin: 0,
+
+        fontSize:
+          window.innerWidth < 768
+            ? "17px"
+            : "21px",
+
+        fontWeight: "900",
+
+        color: "#111827",
+      }}
+    >
+      KONAN SHOPPING
+    </h2>
+
+  </div>
+
+  {/* DESCRIPTION */}
+
+  <p
+    style={{
+      textAlign: "center",
+
+      color: "#6B7280",
+
+      fontSize:
+        window.innerWidth < 768
+          ? "12px"
+          : "13px",
+
+      lineHeight: "20px",
+
+      maxWidth: "500px",
+
+      margin: "0 auto 18px auto",
+    }}
+  >
+    Votre boutique en ligne de confiance au Cameroun.
+    Paiement uniquement à la livraison, produits
+    soigneusement sélectionnés et livraison rapide.
+  </p>
+
+  {/* LIENS */}
+
+  <div
+    style={{
+      display: "flex",
+
+      flexDirection:
+        window.innerWidth < 768
+          ? "column"
+          : "row",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "24px",
+
+      marginBottom: "18px",
+    }}
+  >
+
+    <Link
+      to="/privacy-policy"
+
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "8px",
+
+        textDecoration: "none",
+
+        color: "#4B2E83",
+
+        fontWeight: "700",
+
+        fontSize: "13px",
+      }}
+    >
+
+      <FaShieldAlt />
+
+      Politique de confidentialité
+
+    </Link>
+
+    <Link
+      to="/conditions"
+
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "8px",
+
+        textDecoration: "none",
+
+        color: "#4B2E83",
+
+        fontWeight: "700",
+
+        fontSize: "13px",
+      }}
+    >
+
+      <FaFileContract />
+
+      Conditions d'achat
+
+    </Link>
+
+    <a
+      href="https://wa.me/237694641329"
+
+      target="_blank"
+
+      rel="noreferrer"
+
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "8px",
+
+        textDecoration: "none",
+
+        color: "#16A34A",
+
+        fontWeight: "700",
+
+        fontSize: "13px",
+      }}
+    >
+
+      <FaWhatsapp />
+
+      WhatsApp
+
+    </a>
+
+  </div>
+
+  {/* AVANTAGES */}
+
+  <div
+    style={{
+      display: "flex",
+
+      flexWrap: "wrap",
+
+      justifyContent: "center",
+
+      gap:
+        window.innerWidth < 768
+          ? "12px"
+          : "22px",
+
+      marginBottom: "18px",
+    }}
+  >
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        color: "#374151",
+
+        fontWeight: "600",
+
+        fontSize: "12px",
+      }}
+    >
+
+      <FaTruck color="#4B2E83" />
+
+      Livraison rapide
+
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        color: "#374151",
+
+        fontWeight: "600",
+
+        fontSize: "12px",
+      }}
+    >
+
+      <FaLock color="#4B2E83" />
+
+      Paiement sécurisé
+
+    </div>
+
+    <div
+      style={{
+        display: "flex",
+
+        alignItems: "center",
+
+        gap: "6px",
+
+        color: "#374151",
+
+        fontWeight: "600",
+
+        fontSize: "12px",
+      }}
+    >
+
+      <FaHeadset color="#4B2E83" />
+
+      Assistance 7j/7
+
+    </div>
+
+  </div>
+
+  {/* LIGNE */}
+
+  <div
+    style={{
+      height: "1px",
+
+      background: "#E5E7EB",
+
+      marginBottom: "14px",
+    }}
+  />
+
+  {/* COPYRIGHT */}
+
+  <p
+    style={{
+      margin: 0,
+
+      textAlign: "center",
+
+      color: "#9CA3AF",
+
+      fontSize: "11px",
+
+      lineHeight: "18px",
+    }}
+  >
+    © {new Date().getFullYear()}{" "}
+    <b translate="no">
+      KONAN SHOPPING CAMEROUN
+    </b>
+
+    <br />
+
+    Tous droits réservés.
+  </p>
+
+</div>
 
     </div>
 
