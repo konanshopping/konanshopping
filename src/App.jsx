@@ -25,6 +25,7 @@ import UserLogin from "./pages/UserLogin";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 import Conditions from "./pages/Conditions";
+import Address from "./pages/Address";
 
 import Success from "./pages/Success";
 
@@ -3982,112 +3983,90 @@ boxShadow:
     soigneusement sélectionnés et livraison rapide.
   </p>
 
-  {/* LIENS */}
-
+  {/* ================= LIENS ================= */}
+  
   <div
     style={{
       display: "flex",
-
-      flexDirection:
-        window.innerWidth < 768
-          ? "column"
-          : "row",
-
       justifyContent: "center",
-
       alignItems: "center",
-
-      gap:
-        window.innerWidth < 768
-          ? "10px"
-          : "24px",
-
-      marginBottom: "18px",
+      flexWrap: "wrap",
+      gap: window.innerWidth < 768 ? "16px" : "28px",
+      marginBottom: "20px",
     }}
   >
-
+  
     <Link
       to="/privacy-policy"
-
       style={{
         display: "flex",
-
         alignItems: "center",
-
-        gap: "8px",
-
+        gap: "6px",
         textDecoration: "none",
-
         color: "#4B2E83",
-
         fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        whiteSpace: "nowrap",
+        transition: ".25s",
       }}
     >
-
-      <FaShieldAlt />
-
-      Politique de confidentialité
-
+      <FaShieldAlt
+        style={{
+          fontSize: "15px",
+        }}
+      />
+  
+      Politique
     </Link>
-
+  
     <Link
       to="/conditions"
-
       style={{
         display: "flex",
-
         alignItems: "center",
-
-        gap: "8px",
-
+        gap: "6px",
         textDecoration: "none",
-
         color: "#4B2E83",
-
         fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        whiteSpace: "nowrap",
+        transition: ".25s",
       }}
     >
-
-      <FaFileContract />
-
-      Conditions d'achat
-
+      <FaFileContract
+        style={{
+          fontSize: "15px",
+        }}
+      />
+  
+      Conditions
     </Link>
-
+  
     <a
       href="https://wa.me/237694641329"
-
       target="_blank"
-
       rel="noreferrer"
-
       style={{
         display: "flex",
-
         alignItems: "center",
-
-        gap: "8px",
-
+        gap: "6px",
         textDecoration: "none",
-
         color: "#16A34A",
-
         fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        whiteSpace: "nowrap",
+        transition: ".25s",
       }}
     >
-
-      <FaWhatsapp />
-
+      <FaWhatsapp
+        style={{
+          fontSize: "16px",
+        }}
+      />
+  
       WhatsApp
-
     </a>
-
+  
   </div>
 
   {/* AVANTAGES */}
@@ -4592,6 +4571,8 @@ function App() {
   path="/conditions"
   element={<Conditions />}
 />
+
+<Route path="/address" element={<Address />} />
 
 <Route
   path="/message"
