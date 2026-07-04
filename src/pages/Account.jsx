@@ -2186,113 +2186,91 @@ return (
     soigneusement sélectionnés et livraison rapide.
   </p>
 
-  {/* LIENS */}
+{/* ================= LIENS ================= */}
 
-  <div
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: window.innerWidth < 768 ? "16px" : "28px",
+    marginBottom: "20px",
+  }}
+>
+
+  <Link
+    to="/privacy-policy"
     style={{
       display: "flex",
-
-      flexDirection:
-        window.innerWidth < 768
-          ? "column"
-          : "row",
-
-      justifyContent: "center",
-
       alignItems: "center",
-
-      gap:
-        window.innerWidth < 768
-          ? "10px"
-          : "24px",
-
-      marginBottom: "18px",
+      gap: "6px",
+      textDecoration: "none",
+      color: "#4B2E83",
+      fontWeight: "700",
+      fontSize: window.innerWidth < 768 ? "12px" : "13px",
+      whiteSpace: "nowrap",
+      transition: ".25s",
     }}
   >
-
-    <Link
-      to="/privacy-policy"
-
+    <FaShieldAlt
       style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "8px",
-
-        textDecoration: "none",
-
-        color: "#4B2E83",
-
-        fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: "15px",
       }}
-    >
+    />
 
-      <FaShieldAlt />
+    Politique
+  </Link>
 
-      Politique de confidentialité
-
-    </Link>
-
-    <Link
-      to="/conditions"
-
+  <Link
+    to="/conditions"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      textDecoration: "none",
+      color: "#4B2E83",
+      fontWeight: "700",
+      fontSize: window.innerWidth < 768 ? "12px" : "13px",
+      whiteSpace: "nowrap",
+      transition: ".25s",
+    }}
+  >
+    <FaFileContract
       style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "8px",
-
-        textDecoration: "none",
-
-        color: "#4B2E83",
-
-        fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: "15px",
       }}
-    >
+    />
 
-      <FaFileContract />
+    Conditions
+  </Link>
 
-      Conditions d'achat
-
-    </Link>
-
-    <a
-      href="https://wa.me/237694641329"
-
-      target="_blank"
-
-      rel="noreferrer"
-
+  <a
+    href="https://wa.me/237694641329"
+    target="_blank"
+    rel="noreferrer"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      textDecoration: "none",
+      color: "#16A34A",
+      fontWeight: "700",
+      fontSize: window.innerWidth < 768 ? "12px" : "13px",
+      whiteSpace: "nowrap",
+      transition: ".25s",
+    }}
+  >
+    <FaWhatsapp
       style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "8px",
-
-        textDecoration: "none",
-
-        color: "#16A34A",
-
-        fontWeight: "700",
-
-        fontSize: "13px",
+        fontSize: "16px",
       }}
-    >
+    />
 
-      <FaWhatsapp />
+    WhatsApp
+  </a>
 
-      WhatsApp
-
-    </a>
-
-  </div>
+</div>
 
   {/* AVANTAGES */}
 
