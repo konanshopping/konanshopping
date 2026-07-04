@@ -937,6 +937,7 @@ setLoading(false);
       <div>
 
         <h1
+        translate="no"
           style={{
             margin: 0,
             fontSize: "11px",
@@ -949,6 +950,7 @@ setLoading(false);
         </h1>
 
         <h2
+        translate="no"
           style={{
             margin: 0,
             fontSize: "11px",
@@ -1993,6 +1995,7 @@ FCFA
     </h2>
 
     <Link
+    translate="no"
       to="/boutique"
       style={{
         textDecoration: "none",
@@ -3049,6 +3052,7 @@ onClick={(e) => {
   }, 1500);
 
 }}
+translate="no"
 style={{
   flex:1,
   border:"1px solid #e5e7eb",
@@ -3094,6 +3098,7 @@ addedProduct === product._id
 </button>
 
       <button
+      translate="no"
         style={{
           flex: 1,
 
@@ -3423,6 +3428,7 @@ showAlert && (
     {/* TITRE */}
 
     <h3
+    translate="no"
       style={{
         color: "#111827",
         fontWeight: "800",
