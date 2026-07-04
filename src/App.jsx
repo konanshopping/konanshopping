@@ -44,6 +44,8 @@ import AdminMessages from "./pages/AdminMessages";
 
 import ProductDetails from "./pages/ProductDetails";
 
+import Promotions from "./pages/Promotions";
+
 import MyOrders
 from "./pages/Myorders";
 
@@ -4573,6 +4575,11 @@ function App() {
 />
 
 <Route path="/address" element={<Address />} />
+
+<Route
+  path="/promotions"
+  element={<Promotions />}
+/>
 
 <Route
   path="/message"

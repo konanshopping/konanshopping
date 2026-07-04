@@ -1600,7 +1600,7 @@ fontSize:"18px",
 
 <br/>
 
-+237 694 64 13 29
++237 694 64 13 29 / +237 6 91 01 67 20
 
 </div>
 
@@ -1652,7 +1652,7 @@ fontSize:"18px",
 
 <br/>
 
-contact@konanshopping.cm
+konanshoppingcameroun@gmail.com
 
 </div>
 
