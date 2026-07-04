@@ -337,64 +337,77 @@ function PrivacyPolicy() {
     }}
   >
 
+    {/* ICÔNE + TITRE */}
+
     <div
       style={{
-        width:
-          window.innerWidth < 768
-            ? "42px"
-            : "52px",
-
-        height:
-          window.innerWidth < 768
-            ? "42px"
-            : "52px",
-
-        borderRadius: "12px",
-
-        background:
-          "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
-
         display: "flex",
-
-        justifyContent: "center",
-
         alignItems: "center",
-
-        marginBottom: "12px",
+        gap: "12px",
+        marginBottom: "14px",
       }}
     >
 
-      <FaLock
+      <div
         style={{
-          color: "#2563EB",
+          width:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
+
+          height:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
+
+          borderRadius: "12px",
+
+          background:
+            "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          alignItems: "center",
+
+          flexShrink: 0,
+        }}
+      >
+
+        <FaLock
+          style={{
+            color: "#2563EB",
+
+            fontSize:
+              window.innerWidth < 768
+                ? "18px"
+                : "22px",
+          }}
+        />
+
+      </div>
+
+      <h3
+        style={{
+          margin: 0,
+
+          color: "#111827",
+
+          fontWeight: "800",
+
+          lineHeight: "1.3",
 
           fontSize:
             window.innerWidth < 768
-              ? "18px"
-              : "22px",
+              ? "17px"
+              : "20px",
         }}
-      />
+      >
+        Protection des données
+      </h3>
 
     </div>
-
-    <h3
-      style={{
-        margin: "0 0 8px",
-
-        color: "#111827",
-
-        fontWeight: "800",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "16px"
-            : "20px",
-      }}
-    >
-
-      Protection des données
-
-    </h3>
 
     <p
       style={{
@@ -449,64 +462,77 @@ function PrivacyPolicy() {
     }}
   >
 
+    {/* ICÔNE + TITRE */}
+
     <div
       style={{
-        width:
-          window.innerWidth < 768
-            ? "42px"
-            : "52px",
-
-        height:
-          window.innerWidth < 768
-            ? "42px"
-            : "52px",
-
-        borderRadius: "12px",
-
-        background:
-          "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
-
         display: "flex",
-
-        justifyContent: "center",
-
         alignItems: "center",
-
-        marginBottom: "12px",
+        gap: "12px",
+        marginBottom: "14px",
       }}
     >
 
-      <FaUserShield
+      <div
         style={{
-          color: "#2563EB",
+          width:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
+
+          height:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
+
+          borderRadius: "12px",
+
+          background:
+            "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          alignItems: "center",
+
+          flexShrink: 0,
+        }}
+      >
+
+        <FaUserShield
+          style={{
+            color: "#2563EB",
+
+            fontSize:
+              window.innerWidth < 768
+                ? "18px"
+                : "22px",
+          }}
+        />
+
+      </div>
+
+      <h3
+        style={{
+          margin: 0,
+
+          color: "#111827",
+
+          fontWeight: "800",
+
+          lineHeight: "1.3",
 
           fontSize:
             window.innerWidth < 768
-              ? "18px"
-              : "22px",
+              ? "17px"
+              : "20px",
         }}
-      />
+      >
+        Respect de votre vie privée
+      </h3>
 
     </div>
-
-    <h3
-      style={{
-        margin: "0 0 8px",
-
-        color: "#111827",
-
-        fontWeight: "800",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "16px"
-            : "20px",
-      }}
-    >
-
-      Respect de votre vie privée
-
-    </h3>
 
     <p
       style={{
