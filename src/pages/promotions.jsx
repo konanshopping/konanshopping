@@ -598,13 +598,13 @@ Ne les manquez pas !
   style={{
     position: "absolute",
 
-    top: window.innerWidth < 768 ? "-85px" : "-130px",
+    top: "-120px",
 
-    right: window.innerWidth < 768 ? "-65px" : "-110px",
+    right: "-100px",
 
-    width: window.innerWidth < 768 ? "220px" : "340px",
+    width: "300px",
 
-    height: window.innerWidth < 768 ? "220px" : "340px",
+    height: "300px",
 
     borderRadius: "50%",
 
@@ -626,9 +626,12 @@ Ne les manquez pas !
     src="/logo.jpg"
     alt="Promotion"
     style={{
-      width: "100%",
-      height: "100%",
+      width: "300px",
+
+      height: "300px",
+
       objectFit: "cover",
+
       borderRadius: "50%",
     }}
   />
