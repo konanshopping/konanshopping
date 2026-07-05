@@ -602,10 +602,13 @@ flex:1,
 width:"100%",
 display:"flex",
 justifyContent:"center",
-alignItems:"center",
+alignItems:
+window.innerWidth < 768
+?"flex-start"
+:"center",
 marginTop:
-window.innerWidth<768
-?"28px"
+window.innerWidth < 768
+?"-15px"
 :"0",
 }}
 >
@@ -615,15 +618,13 @@ src="/logo.jpg"
 alt="Promotion"
 style={{
 width:
-window.innerWidth<768
-?"100%"
+window.innerWidth < 768
+?"55%"
 :"90%",
-
 maxWidth:
-window.innerWidth<768
-?"330px"
+window.innerWidth < 768
+?"190px"
 :"470px",
-
 height:"auto",
 objectFit:"contain",
 display:"block",
