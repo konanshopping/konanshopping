@@ -437,6 +437,45 @@ Ne les manquez pas !
 
 </p>
 
+{/* IMAGE */}
+
+<div
+style={{
+flex:1,
+width:"100%",
+display:"flex",
+justifyContent:"center",
+alignItems:
+window.innerWidth < 768
+?"flex-start"
+:"center",
+marginTop:
+window.innerWidth < 768
+?"-15px"
+:"0",
+}}
+>
+
+<img
+src="/logo.jpg"
+alt="Promotion"
+style={{
+width:
+window.innerWidth < 768
+?"55%"
+:"90%",
+maxWidth:
+window.innerWidth < 768
+?"190px"
+:"470px",
+height:"auto",
+objectFit:"contain",
+display:"block",
+}}
+/>
+
+</div>
+
 {/* BADGES */}
 
 <div
@@ -594,44 +633,7 @@ Ne les manquez pas !
 
 </div>
 
-{/* IMAGE */}
 
-<div
-style={{
-flex:1,
-width:"100%",
-display:"flex",
-justifyContent:"center",
-alignItems:
-window.innerWidth < 768
-?"flex-start"
-:"center",
-marginTop:
-window.innerWidth < 768
-?"-15px"
-:"0",
-}}
->
-
-<img
-src="/logo.jpg"
-alt="Promotion"
-style={{
-width:
-window.innerWidth < 768
-?"55%"
-:"90%",
-maxWidth:
-window.innerWidth < 768
-?"190px"
-:"470px",
-height:"auto",
-objectFit:"contain",
-display:"block",
-}}
-/>
-
-</div>
 
 </div>
 
