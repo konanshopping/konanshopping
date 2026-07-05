@@ -12,6 +12,7 @@ import {
   FaBolt,
   FaShieldAlt,
   FaShoppingBag,
+  FaCrown,
 } from "react-icons/fa";
 
 import {
@@ -24,7 +25,6 @@ FaTruck,
 FaMoneyBillWave,
 FaUndoAlt,
 FaHeadset,
-FaGift,
 FaStar,
 FaCheckCircle,
 } from "react-icons/fa";
@@ -319,7 +319,7 @@ flexShrink:0,
 }}
 >
 
-<FaGift
+<FaCrown
 style={{
 fontSize:
 window.innerWidth<768
@@ -698,7 +698,7 @@ color:"#6B7280",
 
       const oldPrice=Math.round(
         product.price/(1-reduction/100)
-        
+
       );
 
 
@@ -1303,7 +1303,7 @@ color:"#0891B2",
 },
 
 {
-icon:<FaGift/>,
+icon:<FaCrown/>,
 title:"Promotions",
 text:"Des offres chaque semaine.",
 color:"#EC4899",
@@ -1496,7 +1496,7 @@ backdropFilter:"blur(12px)",
 }}
 >
 
-<FaGift
+<FaCrown
 style={{
 fontSize:
 window.innerWidth<768
