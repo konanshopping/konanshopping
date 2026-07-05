@@ -44,7 +44,7 @@ import AdminMessages from "./pages/AdminMessages";
 
 import ProductDetails from "./pages/ProductDetails";
 
-import Promotions from "./pages/Promotions";
+import Promotions from "./pages/promotions";
 
 import MyOrders
 from "./pages/Myorders";
