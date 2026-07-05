@@ -598,23 +598,19 @@ Ne les manquez pas !
   style={{
     position: "absolute",
 
-    top: window.innerWidth < 768 ? "-120px" : "-130px",
+    top: window.innerWidth < 768 ? "35px" : "30px",
 
-    right: window.innerWidth < 768 ? "-90px" : "-110px",
+    right: window.innerWidth < 768 ? "15px" : "40px",
 
-    width: window.innerWidth < 768 ? "300px" : "340px",
+    width: window.innerWidth < 768 ? "120px" : "430px",
 
-    height: window.innerWidth < 768 ? "300px" : "340px",
-
-    borderRadius: "50%",
+    height: window.innerWidth < 768 ? "120px" : "430px",
 
     display: "flex",
 
     justifyContent: "center",
 
     alignItems: "center",
-
-    overflow: "hidden",
 
     zIndex: 1,
 
@@ -626,13 +622,17 @@ Ne les manquez pas !
     src="/logo.jpg"
     alt="Promotion"
     style={{
-      width: "100%",
+      width: window.innerWidth < 768 ? "95px" : "280px",
 
-      height: "100%",
+      height: "auto",
 
-      objectFit: "cover",
+      objectFit: "contain",
 
       borderRadius: "50%",
+
+      background: "transparent",
+
+      boxShadow: "none",
     }}
   />
 
