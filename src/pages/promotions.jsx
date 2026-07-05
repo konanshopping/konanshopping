@@ -190,16 +190,15 @@ useEffect(() => {
 },[]);
 
 
-  return (
+ return (
 
 <div
 style={{
 minHeight:"100vh",
-background:"#F5F7FB",
-padding:
-window.innerWidth<768
-?"10px"
-:"24px",
+width:"100%",
+background:"#F8FAFD",
+overflowX:"hidden",
+padding:window.innerWidth<768?"0":"24px",
 }}
 >
 
@@ -208,54 +207,53 @@ window.innerWidth<768
 <div
 style={{
 position:"relative",
-
 overflow:"hidden",
-
-background:
-"linear-gradient(135deg,#4B2E83,#2563EB)",
-
-borderRadius:
-window.innerWidth<768
-?"20px"
-:"30px",
-
+background:"#FFFFFF",
+borderRadius:window.innerWidth<768?"0":"30px",
 padding:
 window.innerWidth<768
-?"18px"
-:"34px",
-
+?"22px 18px 30px"
+:"40px",
 boxShadow:
-"0 18px 45px rgba(37,99,235,.18)",
-
-marginBottom:"18px",
-
-color:"#FFFFFF",
+"0 10px 40px rgba(37,99,235,.08)",
 }}
 >
 
-{/* REFLETS */}
+{/* CERCLES */}
 
 <div
 style={{
 position:"absolute",
-top:"-70px",
-right:"-70px",
-width:"180px",
-height:"180px",
+top:"-130px",
+right:"-110px",
+width:"340px",
+height:"340px",
 borderRadius:"50%",
-background:"rgba(255,255,255,.08)",
+background:"rgba(37,99,235,.05)",
 }}
 />
 
 <div
 style={{
 position:"absolute",
-bottom:"-70px",
-left:"-70px",
-width:"150px",
-height:"150px",
+top:"30px",
+right:"40px",
+width:"8px",
+height:"8px",
 borderRadius:"50%",
-background:"rgba(255,255,255,.05)",
+background:"#7EA8FF",
+}}
+/>
+
+<div
+style={{
+position:"absolute",
+top:"80px",
+right:"140px",
+width:"6px",
+height:"6px",
+borderRadius:"50%",
+background:"#A7C4FF",
 }}
 />
 
@@ -266,16 +264,20 @@ to="/account"
 style={{
 display:"inline-flex",
 alignItems:"center",
-gap:"7px",
+gap:"8px",
 textDecoration:"none",
-color:"#FFFFFF",
-fontWeight:"700",
-fontSize:"12px",
-marginBottom:"18px",
+color:"#0F172A",
+fontWeight:"800",
+fontSize:"17px",
+marginBottom:"28px",
 }}
 >
 
-<FaChevronLeft/>
+<FaChevronLeft
+style={{
+fontSize:"20px",
+}}
+/>
 
 Retour
 
@@ -286,55 +288,22 @@ Retour
 <div
 style={{
 display:"flex",
+flexDirection:
+window.innerWidth<768
+?"column"
+:"row",
 alignItems:"center",
-gap:"14px",
+justifyContent:"space-between",
+gap:"30px",
 }}
 >
 
-<div
-style={{
-width:
-window.innerWidth<768
-?"60px"
-:"76px",
-
-height:
-window.innerWidth<768
-?"60px"
-:"76px",
-
-borderRadius:"18px",
-
-background:"rgba(255,255,255,.16)",
-
-display:"flex",
-
-justifyContent:"center",
-
-alignItems:"center",
-
-backdropFilter:"blur(12px)",
-
-flexShrink:0,
-}}
->
-
-<FaCrown
-style={{
-fontSize:
-window.innerWidth<768
-?"28px"
-:"38px",
-
-color:"#FFD54A",
-}}
-/>
-
-</div>
+{/* TEXTE */}
 
 <div
 style={{
 flex:1,
+maxWidth:"520px",
 }}
 >
 
@@ -342,17 +311,18 @@ flex:1,
 style={{
 display:"inline-flex",
 alignItems:"center",
-gap:"6px",
-padding:"6px 12px",
-borderRadius:"50px",
-background:"rgba(255,255,255,.14)",
-fontSize:"11px",
-fontWeight:"800",
-marginBottom:"10px",
+gap:"8px",
+padding:"10px 18px",
+borderRadius:"40px",
+background:"#EEF4FF",
+color:"#2563EB",
+fontWeight:"900",
+fontSize:"13px",
+marginBottom:"22px",
 }}
 >
 
-<FaFire/>
+<FaBolt/>
 
 OFFRES FLASH
 
@@ -361,79 +331,131 @@ OFFRES FLASH
 <h1
 style={{
 margin:0,
-
-fontWeight:"900",
-
-lineHeight:"1.1",
-
 fontSize:
 window.innerWidth<768
-?"24px"
-:"42px",
+?"48px"
+:"56px",
+fontWeight:"900",
+lineHeight:"1.05",
+color:"#07133B",
 }}
 >
 
-Promotions exclusives
+Offres promotionnelles
+
+<br/>
+
+<span
+style={{
+color:"#2563EB",
+}}
+>
+
+exclusives
+
+</span>
 
 </h1>
 
+<div
+style={{
+width:"55px",
+height:"4px",
+borderRadius:"20px",
+background:"#2563EB",
+margin:"22px 0",
+}}
+/>
+
 <p
 style={{
-marginTop:"8px",
-
-marginBottom:0,
-
-fontSize:
-window.innerWidth<768
-?"13px"
-:"16px",
-
-lineHeight:"22px",
-
-maxWidth:"560px",
-
-opacity:.95,
+margin:0,
+fontSize:"18px",
+lineHeight:"34px",
+color:"#374151",
 }}
 >
 
-Découvrez chaque jour des offres exceptionnelles sur une sélection de produits KONAN SHOPPING. Les promotions sont disponibles pour une durée limitée.
+Découvrez chaque jour des offres exceptionnelles sur une sélection de produits KONAN SHOPPING.
+
+<br/><br/>
+
+Les promotions sont disponibles pour une durée limitée.
+
+<b
+style={{
+color:"#2563EB",
+}}
+>
+
+ Ne les manquez pas !
+
+</b>
 
 </p>
 
-</div>
+{/* BADGES */}
 
-</div>
-
-{/* ================= BADGES ================= */}
+<div
+style={{
+display:"grid",
+gridTemplateColumns:"repeat(3,1fr)",
+gap:"18px",
+marginTop:"35px",
+}}
+>
 
 <div
 style={{
 display:"flex",
-
-flexWrap:"wrap",
-
+alignItems:"center",
 gap:"10px",
-
-marginTop:"18px",
 }}
 >
 
 <div
 style={{
+width:"52px",
+height:"52px",
+borderRadius:"50%",
+background:"#EEF4FF",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
-gap:"6px",
-padding:"8px 12px",
-borderRadius:"50px",
-background:"rgba(255,255,255,.15)",
-fontSize:"12px",
-fontWeight:"700",
+color:"#2563EB",
+fontSize:"20px",
 }}
 >
 
-<FaBolt color="#FFD54A"/>
+<FaTags/>
 
-Réductions jusqu'à 70%
+</div>
+
+<div>
+
+<div
+style={{
+fontWeight:"700",
+color:"#111827",
+}}
+>
+
+Réductions
+
+</div>
+
+<div
+style={{
+fontWeight:"900",
+color:"#2563EB",
+}}
+>
+
+jusqu'à 70%
+
+</div>
+
+</div>
 
 </div>
 
@@ -441,120 +463,301 @@ Réductions jusqu'à 70%
 style={{
 display:"flex",
 alignItems:"center",
-gap:"6px",
-padding:"8px 12px",
-borderRadius:"50px",
-background:"rgba(255,255,255,.15)",
-fontSize:"12px",
-fontWeight:"700",
+gap:"10px",
 }}
 >
 
-<FaShoppingBag/>
-
-Produits sélectionnés
-
-</div>
-
 <div
 style={{
+width:"52px",
+height:"52px",
+borderRadius:"50%",
+background:"#EEF4FF",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
-gap:"6px",
-padding:"8px 12px",
-borderRadius:"50px",
-background:"rgba(255,255,255,.15)",
-fontSize:"12px",
-fontWeight:"700",
+color:"#2563EB",
+fontSize:"20px",
 }}
 >
 
 <FaShieldAlt/>
 
-Paiement à la livraison
-
 </div>
 
-</div>
-
-{/* ================= COMPTE À REBOURS ================= */}
+<div>
 
 <div
 style={{
-marginTop:"22px",
+fontWeight:"700",
+}}
+>
 
+Paiement
+
+</div>
+
+<div
+style={{
+fontWeight:"900",
+color:"#2563EB",
+}}
+>
+
+à la livraison
+
+</div>
+
+</div>
+
+</div>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+}}
+>
+
+<div
+style={{
+width:"52px",
+height:"52px",
+borderRadius:"50%",
+background:"#EEF4FF",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+color:"#2563EB",
+fontSize:"20px",
+}}
+>
+
+<FaShoppingBag/>
+
+</div>
+
+<div>
+
+<div
+style={{
+fontWeight:"700",
+}}
+>
+
+Produits
+
+</div>
+
+<div
+style={{
+fontWeight:"900",
+color:"#2563EB",
+}}
+>
+
+sélectionnés
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{/* IMAGE */}
+
+<div
+style={{
+flex:1,
+display:"flex",
+justifyContent:"center",
+}}
+>
+
+<img
+src="/promotion-hero.png"
+alt="Promotion"
+style={{
+width:"100%",
+maxWidth:"470px",
+objectFit:"contain",
+}}
+/>
+
+</div>
+
+</div>
+
+{/* ================= FIN DES PROMOTIONS ================= */}
+
+<div
+style={{
+marginTop:"34px",
+marginBottom:"30px",
+background:"linear-gradient(135deg,#0D5BFF,#2563EB)",
+borderRadius:"28px",
 padding:
 window.innerWidth<768
-?"15px"
-:"20px",
-
-background:"rgba(255,255,255,.14)",
-
-borderRadius:"18px",
-
-backdropFilter:"blur(10px)",
-
-border:"1px solid rgba(255,255,255,.18)",
+?"22px 18px"
+:"34px",
+position:"relative",
+overflow:"hidden",
+boxShadow:"0 20px 45px rgba(37,99,235,.28)",
 }}
 >
+
+{/* REFLETS */}
+
+<div
+style={{
+position:"absolute",
+right:"-120px",
+top:"-80px",
+width:"280px",
+height:"280px",
+borderRadius:"50%",
+background:"rgba(255,255,255,.08)",
+}}
+/>
+
+<div
+style={{
+position:"absolute",
+right:"60px",
+bottom:"-40px",
+width:"220px",
+height:"220px",
+borderRadius:"50%",
+background:"rgba(255,255,255,.05)",
+}}
+/>
+
+{/* TITRE */}
 
 <div
 style={{
 display:"flex",
-
-justifyContent:"space-between",
-
 alignItems:"center",
-
-flexWrap:"wrap",
-
 gap:"12px",
+marginBottom:"24px",
+color:"#FFFFFF",
+fontWeight:"900",
+fontSize:
+window.innerWidth<768
+?"24px"
+:"30px",
 }}
 >
 
 <div
 style={{
+width:"46px",
+height:"46px",
+borderRadius:"50%",
+background:"rgba(255,255,255,.15)",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
-gap:"8px",
-fontWeight:"800",
 }}
 >
 
-<FaClock/>
+<FaClock
+style={{
+fontSize:"22px",
+}}
+/>
+
+</div>
 
 Fin des promotions
 
 </div>
 
+{/* CONTENU */}
+
 <div
 style={{
 display:"flex",
-gap:"8px",
+justifyContent:"space-between",
+alignItems:"center",
+gap:"20px",
+flexWrap:
+window.innerWidth<768
+?"nowrap"
+:"wrap",
+}}
+>
+
+{/* TIMER */}
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:
+window.innerWidth<768
+?"10px"
+:"18px",
 }}
 >
 
 {[
-{value:hours,label:"H"},
-{value:minutes,label:"M"},
-{value:seconds,label:"S"},
+{
+value:hours,
+label:"HEURES",
+},
+
+{
+value:minutes,
+label:"MINUTES",
+},
+
+{
+value:seconds,
+label:"SECONDES",
+},
+
 ].map((item,index)=>(
 
 <div
 key={index}
 style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+}}
+>
+
+<div
+style={{
 width:
 window.innerWidth<768
-?"65px"
-:"78px",
+?"86px"
+:"110px",
 
-padding:"10px",
+height:
+window.innerWidth<768
+?"110px"
+:"130px",
 
 background:"#FFFFFF",
 
-borderRadius:"14px",
+borderRadius:"22px",
 
-textAlign:"center",
+display:"flex",
+
+flexDirection:"column",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+boxShadow:"0 12px 30px rgba(0,0,0,.18)",
 }}
 >
 
@@ -562,12 +765,14 @@ textAlign:"center",
 style={{
 fontSize:
 window.innerWidth<768
-?"22px"
-:"28px",
+?"52px"
+:"64px",
 
 fontWeight:"900",
 
-color:"#2563EB",
+color:"#0D5BFF",
+
+lineHeight:1,
 }}
 >
 
@@ -577,11 +782,10 @@ color:"#2563EB",
 
 <div
 style={{
-fontSize:"11px",
-
+marginTop:"12px",
 fontWeight:"700",
-
-color:"#6B7280",
+fontSize:"14px",
+color:"#4B5563",
 }}
 >
 
@@ -591,294 +795,70 @@ color:"#6B7280",
 
 </div>
 
+{index<2 && (
+
+<div
+style={{
+fontSize:"48px",
+fontWeight:"900",
+color:"#FFFFFF",
+marginBottom:"24px",
+}}
+>
+
+:
+
+</div>
+
+)}
+
+</div>
+
 ))}
 
 </div>
 
-</div>
-
-</div>
-
-{/* ================= PRODUITS EN PROMOTION ================= */}
+{/* ICÔNE */}
 
 <div
-  style={{
-    marginTop: "22px",
-    marginBottom: "22px",
-  }}
+style={{
+display:
+window.innerWidth<768
+?"none"
+:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+flex:1,
+}}
 >
 
-  {/* TITRE */}
+<div
+style={{
+width:"170px",
+height:"170px",
+borderRadius:"50%",
+background:"rgba(255,255,255,.08)",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+}}
+>
 
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: "16px",
-      flexWrap: "wrap",
-      gap: "10px",
-    }}
-  >
+<FaTags
+style={{
+fontSize:"80px",
+color:"rgba(255,255,255,.18)",
+}}
+/>
 
-    <div>
+</div>
 
-      <h2
-        style={{
-          margin: 0,
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          color: "#111827",
-          fontWeight: "900",
-          fontSize:
-            window.innerWidth < 768
-              ? "20px"
-              : "26px",
-        }}
-      >
+</div>
 
-        <FaFire
-          style={{
-            color: "#EF4444",
-          }}
-        />
-
-        Promotions du jour
-
-      </h2>
-
-      <p
-        style={{
-          margin: "4px 0 0",
-          color: "#6B7280",
-          fontSize: "13px",
-        }}
-      >
-
-        Offres limitées jusqu'à épuisement des stocks.
-
-      </p>
-
-    </div>
-
-    <div
-      style={{
-        background: "#EEF2FF",
-        color: "#2563EB",
-        padding: "8px 14px",
-        borderRadius: "30px",
-        fontWeight: "800",
-        fontSize: "12px",
-      }}
-    >
-
-      Jusqu'à -70%
-
-    </div>
-
-  </div>
-
-  {/* LISTE PRODUITS */}
-
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns:
-        window.innerWidth < 768
-          ? "repeat(2,1fr)"
-          : "repeat(auto-fill,minmax(240px,1fr))",
-      gap: "14px",
-    }}
-  >
-
-    {products.map((product,index)=>{
-
-      const reduction=[20,25,30,35,40,50][index%6];
-
-      const oldPrice=Math.round(
-        product.price/(1-reduction/100)
-
-      );
-
-
-      return(
-
-      <Link
-        key={product._id}
-        to={`/product/${product._id}`}
-        style={{
-          textDecoration:"none",
-        }}
-      >
-
-      <div
-        style={{
-          background:"#FFFFFF",
-          borderRadius:"18px",
-          overflow:"hidden",
-          border:"1px solid #EEF2F7",
-          boxShadow:"0 4px 15px rgba(0,0,0,.05)",
-          transition:".25s",
-        }}
-      >
-
-        {/* IMAGE */}
-
-        <div
-          style={{
-            position:"relative",
-            background:"#F8FAFC",
-          }}
-        >
-
-          <img
-            src={product.image}
-            alt={product.name}
-            style={{
-              width:"100%",
-              height:
-                window.innerWidth<768
-                ?"160px"
-                :"220px",
-              objectFit:"cover",
-            }}
-          />
-
-          {/* BADGE */}
-
-          <div
-            style={{
-              position:"absolute",
-              top:"10px",
-              left:"10px",
-              background:"#EF4444",
-              color:"#FFFFFF",
-              padding:"6px 10px",
-              borderRadius:"30px",
-              fontSize:"11px",
-              fontWeight:"800",
-            }}
-          >
-
-            -{reduction}%
-
-          </div>
-
-          {/* FLASH */}
-
-          <div
-            style={{
-              position:"absolute",
-              top:"10px",
-              right:"10px",
-              width:"34px",
-              height:"34px",
-              borderRadius:"50%",
-              background:"rgba(255,255,255,.92)",
-              display:"flex",
-              justifyContent:"center",
-              alignItems:"center",
-            }}
-          >
-
-            <FaBolt
-              color="#F59E0B"
-            />
-
-          </div>
-
-        </div>
-
-        {/* INFOS */}
-
-        <div
-          style={{
-            padding:"14px",
-          }}
-        >
-
-          <h3
-            style={{
-              margin:0,
-              color:"#111827",
-              fontWeight:"800",
-              fontSize:"14px",
-              overflow:"hidden",
-              whiteSpace:"nowrap",
-              textOverflow:"ellipsis",
-            }}
-          >
-
-            {product.name}
-
-          </h3>
-
-          <div
-            style={{
-              display:"flex",
-              alignItems:"center",
-              gap:"8px",
-              marginTop:"10px",
-            }}
-          >
-
-            <span
-              style={{
-                color:"#2563EB",
-                fontWeight:"900",
-                fontSize:"18px",
-              }}
-            >
-
-              {product.price.toLocaleString()} FCFA
-
-            </span>
-
-            <span
-              style={{
-                textDecoration:"line-through",
-                color:"#9CA3AF",
-                fontSize:"12px",
-              }}
-            >
-
-              {oldPrice.toLocaleString()} FCFA
-
-            </span>
-
-          </div>
-
-          <button
-            style={{
-              marginTop:"14px",
-              width:"100%",
-              height:"42px",
-              border:"none",
-              borderRadius:"12px",
-              background:
-              "linear-gradient(135deg,#2563EB,#4B2E83)",
-              color:"#FFFFFF",
-              fontWeight:"800",
-              cursor:"pointer",
-            }}
-          >
-
-            Voir le produit
-
-          </button>
-
-        </div>
-
-      </div>
-
-      </Link>
-
-      );
-
-    })}
-
-  </div>
+</div>
 
 </div>
 
@@ -888,56 +868,53 @@ color:"#6B7280",
 
 <div
 style={{
-position:"fixed",
-
-bottom:
-window.innerWidth<768
-?"95px"
-:"30px",
-
-left:
-window.innerWidth<768
-?"12px"
-:"30px",
-
-zIndex:99999,
-
-maxWidth:
-window.innerWidth<768
-?"310px"
-:"360px",
-
+marginBottom:"28px",
 background:"#FFFFFF",
-
-borderRadius:"18px",
-
-padding:"12px",
-
+borderRadius:"24px",
+padding:
+window.innerWidth<768
+?"16px"
+:"20px",
 display:"flex",
-
 alignItems:"center",
+justifyContent:"space-between",
+gap:"16px",
+boxShadow:"0 10px 35px rgba(15,23,42,.08)",
+border:"1px solid #EEF2F7",
+}}
+>
 
-gap:"12px",
+{/* IMAGE */}
 
-border:"1px solid #E5E7EB",
-
-boxShadow:
-"0 12px 30px rgba(0,0,0,.15)",
-
-animation:"fadeIn .4s ease",
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"16px",
+flex:1,
 }}
 >
 
 <img
 src={notification.product.image}
-alt=""
+alt={notification.product.name}
 style={{
-width:"54px",
-height:"54px",
-borderRadius:"12px",
+width:
+window.innerWidth<768
+?"74px"
+:"88px",
+height:
+window.innerWidth<768
+?"74px"
+:"88px",
+borderRadius:"18px",
 objectFit:"cover",
+background:"#F8FAFC",
+flexShrink:0,
 }}
 />
+
+{/* TEXTE */}
 
 <div
 style={{
@@ -949,22 +926,39 @@ flex:1,
 style={{
 display:"flex",
 alignItems:"center",
-gap:"6px",
-marginBottom:"4px",
+gap:"8px",
+marginBottom:"6px",
+}}
+>
+
+<div
+style={{
+width:"28px",
+height:"28px",
+borderRadius:"50%",
+background:"#EEF4FF",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
 }}
 >
 
 <FaShoppingBag
 style={{
 color:"#2563EB",
-fontSize:"13px",
+fontSize:"14px",
 }}
 />
 
+</div>
+
 <span
 style={{
-fontWeight:"800",
-fontSize:"12px",
+fontWeight:"900",
+fontSize:
+window.innerWidth<768
+?"18px"
+:"20px",
 color:"#111827",
 }}
 >
@@ -977,64 +971,397 @@ Nouvelle commande
 
 <p
 style={{
-margin:0,
-fontSize:"12px",
-lineHeight:"18px",
-color:"#4B5563",
+margin:"0",
+fontSize:
+window.innerWidth<768
+?"17px"
+:"18px",
+fontWeight:"600",
+lineHeight:"30px",
+color:"#374151",
 }}
 >
 
-<b>{notification.person}</b> à{" "}
+<b>{notification.person}</b>
+
+{" "}à{" "}
 
 <b>{notification.city}</b>
 
 vient d'acheter
 
-<b>
-{" "}
-{notification.product.name}
-</b>
-
 </p>
 
 <div
 style={{
-marginTop:"5px",
+marginTop:"4px",
+fontWeight:"900",
+fontSize:
+window.innerWidth<768
+?"18px"
+:"19px",
+color:"#2563EB",
+}}
+>
+
+{notification.product.name}
+
+</div>
+
+<div
+style={{
 display:"flex",
 alignItems:"center",
-gap:"6px",
-fontSize:"11px",
-color:"#9CA3AF",
+gap:"8px",
+marginTop:"10px",
+color:"#6B7280",
+fontSize:"14px",
 }}
 >
 
 <FaClock/>
 
-Il y a {notification.minutesAgo} min
+Il y a {notification.minutesAgo} minutes
 
 </div>
 
 </div>
+
+</div>
+
+{/* ETAT */}
 
 <div
 style={{
-width:"10px",
-height:"10px",
+display:"flex",
+alignItems:"center",
+justifyContent:"center",
+paddingLeft:"10px",
+}}
+>
+
+<div
+style={{
+width:"16px",
+height:"16px",
 borderRadius:"50%",
 background:"#22C55E",
+boxShadow:"0 0 12px rgba(34,197,94,.5)",
 }}
 />
 
 </div>
 
+</div>
+
 )}
+
+{/* ================= PRODUITS EN PROMOTION ================= */}
+
+<div
+style={{
+marginBottom:"34px",
+}}
+>
+
+{/* HEADER */}
+
+<div
+style={{
+display:"flex",
+justifyContent:"space-between",
+alignItems:"center",
+marginBottom:"18px",
+}}
+>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+}}
+>
+
+<div
+style={{
+width:"40px",
+height:"40px",
+borderRadius:"50%",
+background:"#EEF4FF",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+}}
+>
+
+<FaFire
+style={{
+color:"#2563EB",
+fontSize:"20px",
+}}
+/>
+
+</div>
+
+<h2
+style={{
+margin:0,
+fontSize:
+window.innerWidth<768
+?"28px"
+:"32px",
+fontWeight:"900",
+color:"#111827",
+}}
+>
+
+Promotions du jour
+
+</h2>
+
+</div>
+
+<Link
+to="/boutique"
+style={{
+textDecoration:"none",
+display:"flex",
+alignItems:"center",
+gap:"8px",
+color:"#2563EB",
+fontWeight:"800",
+fontSize:"16px",
+}}
+>
+
+Voir tout
+
+<FaChevronLeft
+style={{
+transform:"rotate(180deg)",
+}}
+/>
+
+</Link>
+
+</div>
+
+{/* LISTE */}
+
+<div
+style={{
+display:"grid",
+gridTemplateColumns:
+window.innerWidth<768
+?"repeat(2,1fr)"
+:"repeat(auto-fill,minmax(280px,1fr))",
+gap:"18px",
+}}
+>
+
+{products.map((product,index)=>{
+
+const reduction=[20,25,30,35,40,50][index%6];
+
+const oldPrice=Math.round(
+product.price/(1-reduction/100)
+);
+
+return(
+
+<Link
+key={product._id}
+to={`/product/${product._id}`}
+style={{
+textDecoration:"none",
+}}
+>
+
+<div
+style={{
+background:"#FFFFFF",
+borderRadius:"24px",
+overflow:"hidden",
+boxShadow:"0 10px 30px rgba(15,23,42,.08)",
+border:"1px solid #EEF2F7",
+transition:".3s",
+}}
+>
+
+{/* IMAGE */}
+
+<div
+style={{
+position:"relative",
+background:"#F8FAFC",
+}}
+>
+
+<img
+src={product.image}
+alt={product.name}
+style={{
+width:"100%",
+height:
+window.innerWidth<768
+?"220px"
+:"280px",
+objectFit:"cover",
+}}
+/>
+
+{/* REDUCTION */}
+
+<div
+style={{
+position:"absolute",
+top:"14px",
+left:"14px",
+background:"#2563EB",
+color:"#FFFFFF",
+padding:"8px 14px",
+borderRadius:"12px",
+fontWeight:"900",
+fontSize:"14px",
+}}
+>
+
+-{reduction}%
+
+</div>
+
+{/* FAVORI */}
+
+<div
+style={{
+position:"absolute",
+top:"14px",
+right:"14px",
+width:"46px",
+height:"46px",
+borderRadius:"50%",
+background:"#FFFFFF",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+boxShadow:"0 8px 20px rgba(0,0,0,.10)",
+}}
+>
+
+<FaTags
+style={{
+fontSize:"18px",
+color:"#6B7280",
+}}
+/>
+
+</div>
+
+</div>
+
+{/* INFOS */}
+
+<div
+style={{
+padding:"18px",
+}}
+>
+
+<h3
+style={{
+margin:"0 0 14px",
+fontSize:"22px",
+fontWeight:"900",
+color:"#111827",
+overflow:"hidden",
+whiteSpace:"nowrap",
+textOverflow:"ellipsis",
+}}
+>
+
+{product.name}
+
+</h3>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+marginBottom:"18px",
+}}
+>
+
+<span
+style={{
+fontSize:"28px",
+fontWeight:"900",
+color:"#2563EB",
+}}
+>
+
+{product.price.toLocaleString()} FCFA
+
+</span>
+
+<span
+style={{
+fontSize:"18px",
+textDecoration:"line-through",
+color:"#9CA3AF",
+}}
+>
+
+{oldPrice.toLocaleString()} FCFA
+
+</span>
+
+</div>
+
+<button
+style={{
+width:"100%",
+height:"52px",
+border:"none",
+borderRadius:"16px",
+background:"linear-gradient(135deg,#2563EB,#1D4ED8)",
+color:"#FFFFFF",
+fontWeight:"900",
+fontSize:"16px",
+cursor:"pointer",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+gap:"10px",
+}}
+>
+
+<FaShoppingBag/>
+
+Voir le produit
+
+</button>
+
+</div>
+
+</div>
+
+</Link>
+
+);
+
+})}
+
+</div>
+
+</div>
 
 {/* ================= STATISTIQUES ================= */}
 
 <div
 style={{
-marginTop:"24px",
-marginBottom:"24px",
+marginBottom:"34px",
 }}
 >
 
@@ -1043,72 +1370,96 @@ style={{
 display:"flex",
 alignItems:"center",
 justifyContent:"space-between",
-marginBottom:"14px",
+marginBottom:"18px",
 }}
 >
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"10px",
+}}
+>
+
+<div
+style={{
+width:"42px",
+height:"42px",
+borderRadius:"50%",
+background:"#EEF4FF",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+}}
+>
+
+<FaUsers
+style={{
+color:"#2563EB",
+fontSize:"18px",
+}}
+/>
+
+</div>
 
 <h2
 style={{
 margin:0,
-display:"flex",
-alignItems:"center",
-gap:"8px",
-fontWeight:"900",
 fontSize:
 window.innerWidth<768
-?"20px"
-:"26px",
+?"28px"
+:"34px",
+fontWeight:"900",
 color:"#111827",
 }}
 >
 
-<FaUsers color="#2563EB"/>
-
-KONAN SHOPPING en chiffres
+KONAN SHOPPING
 
 </h2>
+
+</div>
 
 </div>
 
 <div
 style={{
 display:"grid",
-
 gridTemplateColumns:
 window.innerWidth<768
 ?"repeat(2,1fr)"
 :"repeat(4,1fr)",
-
-gap:"14px",
+gap:"16px",
 }}
 >
 
 {[
 {
 icon:<FaUsers/>,
+title:"Clients",
 value:stats.users.toLocaleString(),
-label:"Utilisateurs",
 color:"#2563EB",
 },
 
 {
-icon:<FaDownload/>,
-value:stats.downloads.toLocaleString(),
-label:"Téléchargements",
-color:"#7C3AED",
-},
-
-{
-icon:<FaCheckCircle/>,
+icon:<FaShoppingBag/>,
+title:"Commandes",
 value:stats.orders.toLocaleString(),
-label:"Commandes",
 color:"#16A34A",
 },
 
 {
+icon:<FaDownload/>,
+title:"Téléchargements",
+value:stats.downloads.toLocaleString(),
+color:"#7C3AED",
+},
+
+{
 icon:<FaStar/>,
+title:"Satisfaction",
 value:`${stats.satisfaction}%`,
-label:"Satisfaction",
 color:"#F59E0B",
 },
 
@@ -1118,33 +1469,25 @@ color:"#F59E0B",
 key={index}
 style={{
 background:"#FFFFFF",
-
-borderRadius:"18px",
-
-padding:
-window.innerWidth<768
-?"16px"
-:"22px",
-
-border:"1px solid #EEF2F7",
-
-boxShadow:"0 4px 15px rgba(0,0,0,.05)",
-
+borderRadius:"24px",
+padding:"22px",
 textAlign:"center",
+border:"1px solid #EEF2F7",
+boxShadow:"0 10px 30px rgba(15,23,42,.06)",
 }}
 >
 
 <div
 style={{
-width:"52px",
-height:"52px",
-margin:"0 auto 12px",
+width:"60px",
+height:"60px",
+margin:"0 auto 16px",
 borderRadius:"50%",
 background:`${item.color}15`,
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-fontSize:"22px",
+fontSize:"24px",
 color:item.color,
 }}
 >
@@ -1156,11 +1499,8 @@ color:item.color,
 <h3
 style={{
 margin:"0",
+fontSize:"28px",
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"22px"
-:"28px",
 color:"#111827",
 }}
 >
@@ -1171,234 +1511,15 @@ color:"#111827",
 
 <p
 style={{
-margin:"6px 0 0",
-fontSize:"13px",
+marginTop:"8px",
+fontSize:"14px",
+fontWeight:"700",
 color:"#6B7280",
-fontWeight:"600",
-}}
->
-
-{item.label}
-
-</p>
-
-</div>
-
-))}
-
-</div>
-
-</div>
-
-{/* ================= POURQUOI CHOISIR KONAN SHOPPING ================= */}
-
-<div
-style={{
-marginTop:"26px",
-marginBottom:"26px",
-}}
->
-
-<div
-style={{
-marginBottom:"16px",
-}}
->
-
-<h2
-style={{
-margin:0,
-display:"flex",
-alignItems:"center",
-gap:"8px",
-fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"20px"
-:"26px",
-color:"#111827",
-}}
->
-
-<FaShieldAlt
-style={{
-color:"#2563EB",
-}}
-/>
-
-Pourquoi choisir KONAN SHOPPING ?
-
-</h2>
-
-<p
-style={{
-marginTop:"6px",
-marginBottom:0,
-fontSize:"13px",
-color:"#6B7280",
-lineHeight:"22px",
-}}
->
-
-Achetez en toute confiance grâce à nos engagements envers chaque client.
-
-</p>
-
-</div>
-
-<div
-style={{
-display:"grid",
-
-gridTemplateColumns:
-window.innerWidth<768
-?"repeat(2,1fr)"
-:"repeat(4,1fr)",
-
-gap:"14px",
-}}
->
-
-{[
-{
-icon:<FaTruck/>,
-title:"Livraison rapide",
-text:"Livraison rapide partout au Cameroun.",
-color:"#2563EB",
-},
-
-{
-icon:<FaMoneyBillWave/>,
-title:"Paiement",
-text:"Paiement uniquement à la livraison.",
-color:"#16A34A",
-},
-
-{
-icon:<FaUndoAlt/>,
-title:"Remboursement",
-text:"Retour possible selon nos conditions.",
-color:"#F59E0B",
-},
-
-{
-icon:<FaHeadset/>,
-title:"Support 7j/7",
-text:"Notre équipe vous accompagne.",
-color:"#7C3AED",
-},
-
-{
-icon:<FaShieldAlt/>,
-title:"Sécurité",
-text:"Vos données sont protégées.",
-color:"#DC2626",
-},
-
-{
-icon:<FaCheckCircle/>,
-title:"Qualité",
-text:"Produits soigneusement sélectionnés.",
-color:"#0891B2",
-},
-
-{
-icon:<FaCrown/>,
-title:"Promotions",
-text:"Des offres chaque semaine.",
-color:"#EC4899",
-},
-
-{
-icon:<FaStar/>,
-title:"Clients satisfaits",
-text:"Des milliers de clients nous font confiance.",
-color:"#FACC15",
-},
-
-].map((item,index)=>(
-
-<div
-key={index}
-style={{
-background:"#FFFFFF",
-
-border:"1px solid #EEF2F7",
-
-borderRadius:"18px",
-
-padding:
-window.innerWidth<768
-?"16px"
-:"22px",
-
-boxShadow:
-"0 5px 16px rgba(0,0,0,.05)",
-
-textAlign:"center",
-
-transition:".25s",
-}}
->
-
-<div
-style={{
-width:"56px",
-
-height:"56px",
-
-margin:"0 auto 14px",
-
-borderRadius:"50%",
-
-background:`${item.color}15`,
-
-display:"flex",
-
-justifyContent:"center",
-
-alignItems:"center",
-
-fontSize:"24px",
-
-color:item.color,
-}}
->
-
-{item.icon}
-
-</div>
-
-<h3
-style={{
-margin:"0 0 8px",
-
-fontSize:"15px",
-
-fontWeight:"800",
-
-color:"#111827",
 }}
 >
 
 {item.title}
 
-</h3>
-
-<p
-style={{
-margin:0,
-
-fontSize:"12px",
-
-lineHeight:"20px",
-
-color:"#6B7280",
-}}
->
-
-{item.text}
-
 </p>
 
 </div>
@@ -1409,263 +1530,38 @@ color:"#6B7280",
 
 </div>
 
-{/* ================= BANNIÈRE FINALE ================= */}
+{/* ================= NOS ENGAGEMENTS ================= */}
 
 <div
 style={{
-marginTop:"26px",
-marginBottom:"28px",
-
-background:"linear-gradient(135deg,#2563EB,#4B2E83)",
-
-borderRadius:
-window.innerWidth<768
-?"20px"
-:"28px",
-
-padding:
-window.innerWidth<768
-?"22px 18px"
-:"38px",
-
-color:"#FFFFFF",
-
-textAlign:"center",
-
-position:"relative",
-
-overflow:"hidden",
-
-boxShadow:"0 18px 45px rgba(37,99,235,.20)",
+marginBottom:"34px",
 }}
 >
-
-{/* REFLETS */}
-
-<div
-style={{
-position:"absolute",
-top:"-70px",
-left:"-70px",
-width:"180px",
-height:"180px",
-borderRadius:"50%",
-background:"rgba(255,255,255,.08)",
-}}
-/>
-
-<div
-style={{
-position:"absolute",
-bottom:"-80px",
-right:"-80px",
-width:"200px",
-height:"200px",
-borderRadius:"50%",
-background:"rgba(255,255,255,.05)",
-}}
-/>
-
-{/* ICÔNE */}
-
-<div
-style={{
-width:
-window.innerWidth<768
-?"70px"
-:"86px",
-
-height:
-window.innerWidth<768
-?"70px"
-:"86px",
-
-margin:"0 auto 18px",
-
-borderRadius:"50%",
-
-background:"rgba(255,255,255,.15)",
-
-display:"flex",
-
-justifyContent:"center",
-
-alignItems:"center",
-
-backdropFilter:"blur(12px)",
-}}
->
-
-<FaCrown
-style={{
-fontSize:
-window.innerWidth<768
-?"34px"
-:"42px",
-
-color:"#FFD54A",
-}}
-/>
-
-</div>
-
-{/* TITRE */}
 
 <h2
 style={{
-margin:0,
-
+marginBottom:"20px",
 fontWeight:"900",
-
 fontSize:
 window.innerWidth<768
-?"24px"
-:"38px",
+?"28px"
+:"34px",
+color:"#111827",
 }}
 >
 
-Profitez des meilleures offres
+Pourquoi choisir KONAN SHOPPING ?
 
 </h2>
 
-<p
-style={{
-margin:"14px auto 22px",
-
-maxWidth:"650px",
-
-fontSize:
-window.innerWidth<768
-?"14px"
-:"17px",
-
-lineHeight:"28px",
-
-opacity:.95,
-}}
->
-
-Des milliers de clients commandent déjà sur
-<b translate="no"> KONAN SHOPPING CAMEROUN</b>.
-Ne manquez pas nos promotions limitées et bénéficiez
-de prix exceptionnels avec un paiement uniquement à la livraison.
-
-</p>
-
-{/* BADGES */}
-
 <div
 style={{
-display:"flex",
-
-justifyContent:"center",
-
-flexWrap:"wrap",
-
-gap:"12px",
-
-marginBottom:"24px",
-}}
->
-
-{[
-{
-icon:<FaUsers/>,
-text:"+12 000 utilisateurs",
-},
-
-{
-icon:<FaShoppingBag/>,
-text:"+2 500 commandes",
-},
-
-{
-icon:<FaStar/>,
-text:"98% satisfaction",
-},
-
-].map((item,index)=>(
-
-<div
-key={index}
-style={{
-display:"flex",
-alignItems:"center",
-gap:"8px",
-padding:"10px 16px",
-borderRadius:"30px",
-background:"rgba(255,255,255,.15)",
-fontWeight:"700",
-fontSize:"13px",
-}}
->
-
-{item.icon}
-
-{item.text}
-
-</div>
-
-))}
-
-</div>
-
-{/* BOUTON */}
-
-<Link
-to="/boutique"
-style={{
-display:"inline-flex",
-
-alignItems:"center",
-
-justifyContent:"center",
-
-gap:"10px",
-
-padding:
-window.innerWidth<768
-?"14px 24px"
-:"16px 30px",
-
-borderRadius:"16px",
-
-background:"#FFFFFF",
-
-color:"#2563EB",
-
-textDecoration:"none",
-
-fontWeight:"900",
-
-fontSize:
-window.innerWidth<768
-?"14px"
-:"16px",
-
-boxShadow:"0 10px 25px rgba(0,0,0,.18)",
-}}
->
-
-<FaShoppingBag />
-
-Découvrir les promotions
-
-</Link>
-
-</div>
-
-{/* ================= BANDEAU DE CONFIANCE ================= */}
-
-<div
-style={{
-marginBottom:"20px",
 display:"grid",
 gridTemplateColumns:
 window.innerWidth<768
 ?"repeat(2,1fr)"
 :"repeat(4,1fr)",
-gap:"12px",
+gap:"16px",
 }}
 >
 
@@ -1694,34 +1590,56 @@ title:"Support 7j/7",
 color:"#F59E0B",
 },
 
+{
+icon:<FaUndoAlt/>,
+title:"Retour facile",
+color:"#EF4444",
+},
+
+{
+icon:<FaCheckCircle/>,
+title:"Produits vérifiés",
+color:"#0EA5E9",
+},
+
+{
+icon:<FaFire/>,
+title:"Promotions",
+color:"#EC4899",
+},
+
+{
+icon:<FaCrown/>,
+title:"Qualité Premium",
+color:"#FACC15",
+},
+
 ].map((item,index)=>(
 
 <div
 key={index}
 style={{
 background:"#FFFFFF",
+borderRadius:"24px",
+padding:"22px",
+textAlign:"center",
 border:"1px solid #EEF2F7",
-borderRadius:"16px",
-padding:"16px",
-display:"flex",
-alignItems:"center",
-gap:"10px",
-boxShadow:"0 4px 12px rgba(0,0,0,.04)",
+boxShadow:"0 10px 25px rgba(15,23,42,.06)",
 }}
 >
 
 <div
 style={{
-width:"42px",
-height:"42px",
+width:"60px",
+height:"60px",
+margin:"0 auto 18px",
 borderRadius:"50%",
 background:`${item.color}15`,
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-fontSize:"18px",
+fontSize:"24px",
 color:item.color,
-flexShrink:0,
 }}
 >
 
@@ -1729,18 +1647,18 @@ flexShrink:0,
 
 </div>
 
-<div
+<h3
 style={{
-fontWeight:"700",
-fontSize:"13px",
+margin:"0",
+fontWeight:"900",
+fontSize:"16px",
 color:"#111827",
-lineHeight:"20px",
 }}
 >
 
 {item.title}
 
-</div>
+</h3>
 
 </div>
 
@@ -1748,29 +1666,130 @@ lineHeight:"20px",
 
 </div>
 
-{/* ================= FOOTER ================= */}
+</div>
+
+{/* ================= BANNIÈRE PREMIUM ================= */}
 
 <div
 style={{
-background:"#FFFFFF",
-borderRadius:"20px",
+background:"linear-gradient(135deg,#2563EB,#1E3A8A)",
+borderRadius:"30px",
 padding:
 window.innerWidth<768
-?"20px 16px"
-:"30px",
-border:"1px solid #EEF2F7",
-boxShadow:"0 4px 15px rgba(0,0,0,.04)",
+?"28px"
+:"48px",
+color:"#FFFFFF",
 textAlign:"center",
+marginBottom:"30px",
+boxShadow:"0 20px 45px rgba(37,99,235,.25)",
 }}
 >
 
 <div
 style={{
+width:"80px",
+height:"80px",
+margin:"0 auto 20px",
+borderRadius:"50%",
+background:"rgba(255,255,255,.18)",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
+}}
+>
+
+<FaCrown
+style={{
+fontSize:"40px",
+color:"#FFD54A",
+}}
+/>
+
+</div>
+
+<h2
+style={{
+margin:"0",
+fontWeight:"900",
+fontSize:
+window.innerWidth<768
+?"30px"
+:"42px",
+}}
+>
+
+Profitez des meilleures offres
+
+</h2>
+
+<p
+style={{
+margin:"16px auto 24px",
+maxWidth:"650px",
+lineHeight:"30px",
+fontSize:"16px",
+opacity:.95,
+}}
+>
+
+Des milliers de clients font confiance à
+<b translate="no"> KONAN SHOPPING CAMEROUN</b>.
+Profitez de nos offres exclusives avec un paiement uniquement à la livraison.
+
+</p>
+
+<Link
+to="/boutique"
+style={{
+display:"inline-flex",
+alignItems:"center",
+justifyContent:"center",
 gap:"10px",
-marginBottom:"12px",
+padding:"16px 30px",
+background:"#FFFFFF",
+color:"#2563EB",
+textDecoration:"none",
+fontWeight:"900",
+fontSize:"16px",
+borderRadius:"18px",
+}}
+>
+
+<FaShoppingBag/>
+
+Découvrir les promotions
+
+</Link>
+
+</div>
+
+{/* ================= FOOTER ================= */}
+
+<footer
+style={{
+marginTop:"32px",
+marginBottom:
+window.innerWidth<768
+?"90px"
+:"20px",
+background:"#FFFFFF",
+borderRadius:"30px",
+padding:
+window.innerWidth<768
+?"28px 20px"
+:"40px",
+boxShadow:"0 10px 35px rgba(15,23,42,.06)",
+border:"1px solid #EEF2F7",
+}}
+>
+
+{/* LOGO */}
+
+<div
+style={{
+display:"flex",
+flexDirection:"column",
+alignItems:"center",
 }}
 >
 
@@ -1778,19 +1797,24 @@ marginBottom:"12px",
 src="/logo.jpg"
 alt="Logo"
 style={{
-width:"42px",
-height:"42px",
-borderRadius:"12px",
+width:"72px",
+height:"72px",
+borderRadius:"22px",
 objectFit:"cover",
+boxShadow:"0 8px 20px rgba(37,99,235,.15)",
 }}
 />
 
 <h2
 translate="no"
 style={{
-margin:0,
+marginTop:"16px",
+marginBottom:"8px",
+fontSize:
+window.innerWidth<768
+?"28px"
+:"34px",
 fontWeight:"900",
-fontSize:"20px",
 color:"#111827",
 }}
 >
@@ -1799,63 +1823,90 @@ KONAN SHOPPING
 
 </h2>
 
-</div>
-
 <p
 style={{
-margin:"0 auto 18px",
-maxWidth:"520px",
-fontSize:"13px",
-lineHeight:"22px",
+margin:0,
+textAlign:"center",
+maxWidth:"600px",
+fontSize:"15px",
+lineHeight:"28px",
 color:"#6B7280",
 }}
 >
 
-Des promotions exclusives chaque semaine, une livraison rapide partout au Cameroun et un paiement uniquement à la livraison.
+Des milliers de Camerounais nous font confiance pour acheter
+leurs produits au meilleur prix avec une livraison rapide
+et un paiement uniquement à la livraison.
 
 </p>
 
+</div>
+
+{/* LIENS */}
+
 <div
 style={{
+marginTop:"30px",
 display:"flex",
 justifyContent:"center",
 flexWrap:"wrap",
-gap:"10px",
-marginBottom:"18px",
+gap:"18px",
 }}
 >
 
 <Link
-to="/privacy-policy"
+to="/boutique"
 style={{
 textDecoration:"none",
+fontWeight:"800",
 color:"#2563EB",
-fontWeight:"700",
-fontSize:"13px",
+display:"flex",
+alignItems:"center",
+gap:"8px",
 }}
 >
 
-Politique de confidentialité
+<FaShoppingBag/>
+
+Boutique
 
 </Link>
-
-<span style={{color:"#D1D5DB"}}>|</span>
 
 <Link
 to="/conditions"
 style={{
 textDecoration:"none",
+fontWeight:"800",
 color:"#2563EB",
-fontWeight:"700",
-fontSize:"13px",
+display:"flex",
+alignItems:"center",
+gap:"8px",
 }}
 >
 
-Conditions d'achat
+<FaCheckCircle/>
+
+Conditions
 
 </Link>
 
-<span style={{color:"#D1D5DB"}}>|</span>
+<Link
+to="/privacy-policy"
+style={{
+textDecoration:"none",
+fontWeight:"800",
+color:"#2563EB",
+display:"flex",
+alignItems:"center",
+gap:"8px",
+}}
+>
+
+<FaShieldAlt/>
+
+Confidentialité
+
+</Link>
 
 <a
 href="https://wa.me/237694641329"
@@ -1863,11 +1914,15 @@ target="_blank"
 rel="noreferrer"
 style={{
 textDecoration:"none",
+fontWeight:"800",
 color:"#16A34A",
-fontWeight:"700",
-fontSize:"13px",
+display:"flex",
+alignItems:"center",
+gap:"8px",
 }}
 >
+
+<FaHeadset/>
 
 WhatsApp
 
@@ -1875,24 +1930,93 @@ WhatsApp
 
 </div>
 
+{/* BANDEAU */}
+
 <div
 style={{
-height:"1px",
-background:"#EEF2F7",
-marginBottom:"14px",
+marginTop:"30px",
+padding:"18px",
+borderRadius:"18px",
+background:"#F8FAFC",
+display:"flex",
+justifyContent:"space-around",
+flexWrap:"wrap",
+gap:"16px",
 }}
-/>
+>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+fontWeight:"800",
+color:"#2563EB",
+}}
+>
+
+<FaTruck/>
+
+Livraison rapide
+
+</div>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+fontWeight:"800",
+color:"#16A34A",
+}}
+>
+
+<FaMoneyBillWave/>
+
+Paiement livraison
+
+</div>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+fontWeight:"800",
+color:"#F59E0B",
+}}
+>
+
+<FaStar/>
+
+Service Premium
+
+</div>
+
+</div>
+
+{/* COPYRIGHT */}
+
+<div
+style={{
+marginTop:"30px",
+paddingTop:"20px",
+borderTop:"1px solid #E5E7EB",
+textAlign:"center",
+}}
+>
 
 <p
 style={{
 margin:0,
-fontSize:"12px",
+fontSize:"13px",
 color:"#9CA3AF",
-lineHeight:"22px",
+lineHeight:"26px",
 }}
 >
 
-© {new Date().getFullYear()} <b translate="no">KONAN SHOPPING CAMEROUN</b>
+© {new Date().getFullYear()}{" "}
+<b translate="no">KONAN SHOPPING CAMEROUN</b>
 
 <br/>
 
@@ -1902,10 +2026,12 @@ Tous droits réservés.
 
 </div>
 
-</div>
+
+</footer>
 
 </div>
 
+</div>
 );
 
 }
