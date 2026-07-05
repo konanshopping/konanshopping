@@ -302,27 +302,37 @@ Retour
 {/* CONTENU */}
 
 <div
-  style={{
-    display: "flex",
-
-    flexDirection: "row",
-
-    alignItems: "flex-start",
-
-    justifyContent: "space-between",
-
-    gap: window.innerWidth < 768 ? "16px" : "40px",
-  }}
+style={{
+display:"flex",
+flexDirection:
+window.innerWidth<768
+?"column"
+:"row",
+alignItems:
+window.innerWidth<768
+?"flex-start"
+:"center",
+justifyContent:"space-between",
+gap:
+window.innerWidth<768
+?"24px"
+:"40px",
+}}
 >
 
 {/* TEXTE */}
 
 <div
-  style={{
-    flex: 1,
-    width: window.innerWidth < 768 ? "58%" : "100%",
-    maxWidth: window.innerWidth < 768 ? "58%" : "520px",
-  }}
+style={{
+flex:1,
+width:"100%",
+maxWidth:
+window.innerWidth<768
+?"100%"
+:"520px",
+zIndex:2,
+position:"relative",
+}}
 >
 
 <div
@@ -586,36 +596,38 @@ Ne les manquez pas !
 
 <div
   style={{
-    flex: "0 0 auto",
+    position: "absolute",
 
-    width: window.innerWidth < 768 ? "38%" : "45%",
+    top: window.innerWidth < 768 ? "90px" : "40px",
+
+    right: window.innerWidth < 768 ? "10px" : "40px",
+
+    width: window.innerWidth < 768 ? "110px" : "420px",
 
     display: "flex",
 
-    justifyContent: "flex-end",
+    justifyContent: "center",
 
-    alignItems: "flex-start",
+    alignItems: "center",
 
-    marginTop: window.innerWidth < 768 ? "20px" : "0",
+    pointerEvents: "none",
+
+    zIndex: 1,
   }}
 >
-
   <img
     src="/logo.jpg"
     alt="Promotion"
     style={{
       width: "100%",
 
-      maxWidth: window.innerWidth < 768 ? "165px" : "470px",
-
       height: "auto",
 
       objectFit: "contain",
 
-      display: "block",
+      opacity: 0.95,
     }}
   />
-
 </div>
 
 </div>
