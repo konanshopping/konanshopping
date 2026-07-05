@@ -591,20 +591,19 @@ Ne les manquez pas !
 </div>
 
 </div>
-
 {/* LOGO HERO */}
 
 <div
   style={{
     position: "absolute",
 
-    top: "-120px",
+    top: window.innerWidth < 768 ? "-85px" : "-130px",
 
-    right: "-100px",
+    right: window.innerWidth < 768 ? "-65px" : "-110px",
 
-    width: "300px",
+    width: window.innerWidth < 768 ? "220px" : "340px",
 
-    height: "300px",
+    height: window.innerWidth < 768 ? "220px" : "340px",
 
     borderRadius: "50%",
 
@@ -626,12 +625,9 @@ Ne les manquez pas !
     src="/logo.jpg"
     alt="Promotion"
     style={{
-      width: "300px",
-
-      height: "300px",
-
+      width: "100%",
+      height: "100%",
       objectFit: "cover",
-
       borderRadius: "50%",
     }}
   />
