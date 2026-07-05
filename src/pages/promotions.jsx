@@ -698,6 +698,7 @@ color:"#6B7280",
 
       const oldPrice=Math.round(
         product.price/(1-reduction/100)
+        
       );
 
 
