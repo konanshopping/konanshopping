@@ -198,7 +198,10 @@ minHeight:"100vh",
 width:"100%",
 background:"#F8FAFD",
 overflowX:"hidden",
-padding:window.innerWidth<768?"0":"24px",
+padding:
+window.innerWidth<768
+?"0"
+:"24px",
 }}
 >
 
@@ -209,13 +212,23 @@ style={{
 position:"relative",
 overflow:"hidden",
 background:"#FFFFFF",
-borderRadius:window.innerWidth<768?"0":"30px",
+
+width:"100%",
+
+borderRadius:
+window.innerWidth<768
+?"0"
+:"32px",
+
 padding:
 window.innerWidth<768
-?"22px 18px 30px"
-:"40px",
+?"18px 16px 28px"
+:"42px",
+
 boxShadow:
-"0 10px 40px rgba(37,99,235,.08)",
+window.innerWidth<768
+?"none"
+:"0 10px 40px rgba(37,99,235,.08)",
 }}
 >
 
@@ -224,10 +237,10 @@ boxShadow:
 <div
 style={{
 position:"absolute",
-top:"-130px",
-right:"-110px",
-width:"340px",
-height:"340px",
+top:"-120px",
+right:"-100px",
+width:"300px",
+height:"300px",
 borderRadius:"50%",
 background:"rgba(37,99,235,.05)",
 }}
@@ -236,7 +249,7 @@ background:"rgba(37,99,235,.05)",
 <div
 style={{
 position:"absolute",
-top:"30px",
+top:"34px",
 right:"40px",
 width:"8px",
 height:"8px",
@@ -248,8 +261,8 @@ background:"#7EA8FF",
 <div
 style={{
 position:"absolute",
-top:"80px",
-right:"140px",
+top:"74px",
+right:"120px",
 width:"6px",
 height:"6px",
 borderRadius:"50%",
@@ -268,14 +281,17 @@ gap:"8px",
 textDecoration:"none",
 color:"#0F172A",
 fontWeight:"800",
-fontSize:"17px",
-marginBottom:"28px",
+fontSize:
+window.innerWidth<768
+?"15px"
+:"17px",
+marginBottom:"24px",
 }}
 >
 
 <FaChevronLeft
 style={{
-fontSize:"20px",
+fontSize:"18px",
 }}
 />
 
@@ -288,13 +304,23 @@ Retour
 <div
 style={{
 display:"flex",
+
 flexDirection:
 window.innerWidth<768
 ?"column"
 :"row",
-alignItems:"center",
+
+alignItems:
+window.innerWidth<768
+?"flex-start"
+:"center",
+
 justifyContent:"space-between",
-gap:"30px",
+
+gap:
+window.innerWidth<768
+?"24px"
+:"40px",
 }}
 >
 
@@ -303,7 +329,11 @@ gap:"30px",
 <div
 style={{
 flex:1,
-maxWidth:"520px",
+width:"100%",
+maxWidth:
+window.innerWidth<768
+?"100%"
+:"520px",
 }}
 >
 
@@ -312,13 +342,13 @@ style={{
 display:"inline-flex",
 alignItems:"center",
 gap:"8px",
-padding:"10px 18px",
+padding:"8px 16px",
 borderRadius:"40px",
 background:"#EEF4FF",
 color:"#2563EB",
 fontWeight:"900",
-fontSize:"13px",
-marginBottom:"22px",
+fontSize:"12px",
+marginBottom:"18px",
 }}
 >
 
@@ -331,12 +361,16 @@ OFFRES FLASH
 <h1
 style={{
 margin:0,
+
 fontSize:
 window.innerWidth<768
-?"48px"
+?"36px"
 :"56px",
+
 fontWeight:"900",
-lineHeight:"1.05",
+
+lineHeight:"1.1",
+
 color:"#07133B",
 }}
 >
@@ -359,20 +393,29 @@ exclusives
 
 <div
 style={{
-width:"55px",
+width:"60px",
 height:"4px",
 borderRadius:"20px",
 background:"#2563EB",
-margin:"22px 0",
+margin:"18px 0",
 }}
 />
 
 <p
 style={{
 margin:0,
-fontSize:"18px",
-lineHeight:"34px",
-color:"#374151",
+
+fontSize:
+window.innerWidth<768
+?"16px"
+:"18px",
+
+lineHeight:
+window.innerWidth<768
+?"29px"
+:"34px",
+
+color:"#4B5563",
 }}
 >
 
@@ -388,7 +431,7 @@ color:"#2563EB",
 }}
 >
 
- Ne les manquez pas !
+Ne les manquez pas !
 
 </b>
 
@@ -399,59 +442,126 @@ color:"#2563EB",
 <div
 style={{
 display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"18px",
-marginTop:"35px",
+
+gridTemplateColumns:
+window.innerWidth<768
+?"repeat(2,minmax(0,1fr))"
+:"repeat(3,1fr)",
+
+gap:
+window.innerWidth<768
+?"12px"
+:"18px",
+
+marginTop:"28px",
+
+width:"100%",
 }}
 >
 
+{[
+{
+icon:<FaTags/>,
+title:"Réductions",
+value:"Jusqu'à 70%",
+},
+
+{
+icon:<FaShieldAlt/>,
+title:"Paiement",
+value:"À la livraison",
+},
+
+{
+icon:<FaShoppingBag/>,
+title:"Produits",
+value:"Sélectionnés",
+},
+
+].map((item,index)=>(
+
 <div
+key={index}
 style={{
+background:"#FFFFFF",
+border:"1px solid #E5E7EB",
+borderRadius:"18px",
+padding:
+window.innerWidth<768
+?"14px"
+:"18px",
 display:"flex",
 alignItems:"center",
-gap:"10px",
+gap:"12px",
+boxShadow:"0 6px 18px rgba(15,23,42,.05)",
 }}
 >
 
 <div
 style={{
-width:"52px",
-height:"52px",
+width:
+window.innerWidth<768
+?"46px"
+:"52px",
+
+height:
+window.innerWidth<768
+?"46px"
+:"52px",
+
 borderRadius:"50%",
 background:"#EEF4FF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 color:"#2563EB",
-fontSize:"20px",
+fontSize:
+window.innerWidth<768
+?"18px"
+:"20px",
+flexShrink:0,
 }}
 >
 
-<FaTags/>
+{item.icon}
 
 </div>
 
-<div>
+<div
+style={{
+minWidth:0,
+}}
+>
 
 <div
 style={{
 fontWeight:"700",
+fontSize:
+window.innerWidth<768
+?"13px"
+:"15px",
 color:"#111827",
 }}
 >
 
-Réductions
+{item.title}
 
 </div>
 
 <div
 style={{
+marginTop:"3px",
 fontWeight:"900",
+fontSize:
+window.innerWidth<768
+?"13px"
+:"15px",
 color:"#2563EB",
+lineHeight:"18px",
 }}
 >
 
-jusqu'à 70%
+{item.value}
 
 </div>
 
@@ -459,111 +569,7 @@ jusqu'à 70%
 
 </div>
 
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"10px",
-}}
->
-
-<div
-style={{
-width:"52px",
-height:"52px",
-borderRadius:"50%",
-background:"#EEF4FF",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"#2563EB",
-fontSize:"20px",
-}}
->
-
-<FaShieldAlt/>
-
-</div>
-
-<div>
-
-<div
-style={{
-fontWeight:"700",
-}}
->
-
-Paiement
-
-</div>
-
-<div
-style={{
-fontWeight:"900",
-color:"#2563EB",
-}}
->
-
-à la livraison
-
-</div>
-
-</div>
-
-</div>
-
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"10px",
-}}
->
-
-<div
-style={{
-width:"52px",
-height:"52px",
-borderRadius:"50%",
-background:"#EEF4FF",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"#2563EB",
-fontSize:"20px",
-}}
->
-
-<FaShoppingBag/>
-
-</div>
-
-<div>
-
-<div
-style={{
-fontWeight:"700",
-}}
->
-
-Produits
-
-</div>
-
-<div
-style={{
-fontWeight:"900",
-color:"#2563EB",
-}}
->
-
-sélectionnés
-
-</div>
-
-</div>
-
-</div>
+))}
 
 </div>
 
@@ -574,8 +580,14 @@ sélectionnés
 <div
 style={{
 flex:1,
+width:"100%",
 display:"flex",
 justifyContent:"center",
+alignItems:"center",
+marginTop:
+window.innerWidth<768
+?"28px"
+:"0",
 }}
 >
 
@@ -583,9 +595,19 @@ justifyContent:"center",
 src="/promotion-hero.png"
 alt="Promotion"
 style={{
-width:"100%",
-maxWidth:"470px",
+width:
+window.innerWidth<768
+?"100%"
+:"90%",
+
+maxWidth:
+window.innerWidth<768
+?"330px"
+:"470px",
+
+height:"auto",
 objectFit:"contain",
+display:"block",
 }}
 />
 
@@ -597,17 +619,14 @@ objectFit:"contain",
 
 <div
 style={{
-marginTop:"34px",
-marginBottom:"30px",
+marginTop:"28px",
+marginBottom:"24px",
 background:"linear-gradient(135deg,#0D5BFF,#2563EB)",
-borderRadius:"28px",
-padding:
-window.innerWidth<768
-?"22px 18px"
-:"34px",
+borderRadius:window.innerWidth<768?"22px":"28px",
+padding:window.innerWidth<768?"20px 14px":"34px",
 position:"relative",
 overflow:"hidden",
-boxShadow:"0 20px 45px rgba(37,99,235,.28)",
+boxShadow:"0 15px 35px rgba(37,99,235,.25)",
 }}
 >
 
@@ -616,10 +635,10 @@ boxShadow:"0 20px 45px rgba(37,99,235,.28)",
 <div
 style={{
 position:"absolute",
-right:"-120px",
+right:"-90px",
 top:"-80px",
-width:"280px",
-height:"280px",
+width:"220px",
+height:"220px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.08)",
 }}
@@ -628,10 +647,10 @@ background:"rgba(255,255,255,.08)",
 <div
 style={{
 position:"absolute",
-right:"60px",
-bottom:"-40px",
-width:"220px",
-height:"220px",
+left:"-70px",
+bottom:"-70px",
+width:"170px",
+height:"170px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.05)",
 }}
@@ -643,21 +662,18 @@ background:"rgba(255,255,255,.05)",
 style={{
 display:"flex",
 alignItems:"center",
-gap:"12px",
-marginBottom:"24px",
-color:"#FFFFFF",
+gap:"10px",
+marginBottom:"18px",
+color:"#FFF",
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"24px"
-:"30px",
+fontSize:window.innerWidth<768?"20px":"30px",
 }}
 >
 
 <div
 style={{
-width:"46px",
-height:"46px",
+width:window.innerWidth<768?"42px":"48px",
+height:window.innerWidth<768?"42px":"48px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.15)",
 display:"flex",
@@ -666,11 +682,7 @@ alignItems:"center",
 }}
 >
 
-<FaClock
-style={{
-fontSize:"22px",
-}}
-/>
+<FaClock size={20}/>
 
 </div>
 
@@ -678,50 +690,30 @@ Fin des promotions
 
 </div>
 
-{/* CONTENU */}
-
-<div
-style={{
-display:"flex",
-justifyContent:"space-between",
-alignItems:"center",
-gap:"20px",
-flexWrap:
-window.innerWidth<768
-?"nowrap"
-:"wrap",
-}}
->
-
 {/* TIMER */}
 
 <div
 style={{
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
-gap:
-window.innerWidth<768
-?"10px"
-:"18px",
+gap:window.innerWidth<768?"6px":"18px",
 }}
 >
 
 {[
 {
 value:hours,
-label:"HEURES",
+label:"H",
 },
-
 {
 value:minutes,
-label:"MINUTES",
+label:"M",
 },
-
 {
 value:seconds,
-label:"SECONDES",
+label:"S",
 },
-
 ].map((item,index)=>(
 
 <div
@@ -729,49 +721,29 @@ key={index}
 style={{
 display:"flex",
 alignItems:"center",
-gap:"10px",
+gap:window.innerWidth<768?"6px":"12px",
 }}
 >
 
 <div
 style={{
-width:
-window.innerWidth<768
-?"86px"
-:"110px",
-
-height:
-window.innerWidth<768
-?"110px"
-:"130px",
-
-background:"#FFFFFF",
-
-borderRadius:"22px",
-
+width:window.innerWidth<768?"82px":"110px",
+height:window.innerWidth<768?"92px":"130px",
+background:"#FFF",
+borderRadius:"18px",
 display:"flex",
-
 flexDirection:"column",
-
 justifyContent:"center",
-
 alignItems:"center",
-
-boxShadow:"0 12px 30px rgba(0,0,0,.18)",
+boxShadow:"0 10px 25px rgba(0,0,0,.18)",
 }}
 >
 
 <div
 style={{
-fontSize:
-window.innerWidth<768
-?"52px"
-:"64px",
-
+fontSize:window.innerWidth<768?"38px":"64px",
 fontWeight:"900",
-
 color:"#0D5BFF",
-
 lineHeight:1,
 }}
 >
@@ -782,10 +754,10 @@ lineHeight:1,
 
 <div
 style={{
-marginTop:"12px",
-fontWeight:"700",
-fontSize:"14px",
-color:"#4B5563",
+marginTop:"8px",
+fontSize:window.innerWidth<768?"11px":"14px",
+fontWeight:"800",
+color:"#6B7280",
 }}
 >
 
@@ -795,14 +767,13 @@ color:"#4B5563",
 
 </div>
 
-{index<2 && (
+{index<2&&(
 
 <div
 style={{
-fontSize:"48px",
+fontSize:window.innerWidth<768?"30px":"48px",
 fontWeight:"900",
-color:"#FFFFFF",
-marginBottom:"24px",
+color:"#FFF",
 }}
 >
 
@@ -818,45 +789,27 @@ marginBottom:"24px",
 
 </div>
 
-{/* ICÔNE */}
+{/* MESSAGE */}
 
 <div
 style={{
-display:
-window.innerWidth<768
-?"none"
-:"flex",
-
-justifyContent:"center",
-
-alignItems:"center",
-
-flex:1,
+marginTop:"20px",
+textAlign:"center",
+color:"#EAF2FF",
+fontSize:window.innerWidth<768?"13px":"15px",
+lineHeight:"24px",
+fontWeight:"600",
 }}
 >
 
-<div
+<FaFire
 style={{
-width:"170px",
-height:"170px",
-borderRadius:"50%",
-background:"rgba(255,255,255,.08)",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-}}
->
-
-<FaTags
-style={{
-fontSize:"80px",
-color:"rgba(255,255,255,.18)",
+marginRight:"8px",
+color:"#FFD54A",
 }}
 />
 
-</div>
-
-</div>
+Profitez des meilleures offres avant la fin du compte à rebours.
 
 </div>
 
@@ -868,30 +821,30 @@ color:"rgba(255,255,255,.18)",
 
 <div
 style={{
-marginBottom:"28px",
+marginBottom:"22px",
 background:"#FFFFFF",
-borderRadius:"24px",
-padding:
-window.innerWidth<768
-?"16px"
-:"20px",
+borderRadius:window.innerWidth<768?"18px":"24px",
+padding:window.innerWidth<768?"14px":"20px",
 display:"flex",
 alignItems:"center",
 justifyContent:"space-between",
-gap:"16px",
-boxShadow:"0 10px 35px rgba(15,23,42,.08)",
+gap:window.innerWidth<768?"12px":"16px",
+boxShadow:"0 8px 25px rgba(15,23,42,.08)",
 border:"1px solid #EEF2F7",
+width:"100%",
+overflow:"hidden",
 }}
 >
 
-{/* IMAGE */}
+{/* IMAGE + TEXTE */}
 
 <div
 style={{
 display:"flex",
 alignItems:"center",
-gap:"16px",
+gap:window.innerWidth<768?"12px":"16px",
 flex:1,
+minWidth:0,
 }}
 >
 
@@ -899,26 +852,19 @@ flex:1,
 src={notification.product.image}
 alt={notification.product.name}
 style={{
-width:
-window.innerWidth<768
-?"74px"
-:"88px",
-height:
-window.innerWidth<768
-?"74px"
-:"88px",
-borderRadius:"18px",
+width:window.innerWidth<768?"60px":"88px",
+height:window.innerWidth<768?"60px":"88px",
+borderRadius:window.innerWidth<768?"14px":"18px",
 objectFit:"cover",
 background:"#F8FAFC",
 flexShrink:0,
 }}
 />
 
-{/* TEXTE */}
-
 <div
 style={{
 flex:1,
+minWidth:0,
 }}
 >
 
@@ -927,14 +873,14 @@ style={{
 display:"flex",
 alignItems:"center",
 gap:"8px",
-marginBottom:"6px",
+marginBottom:"4px",
 }}
 >
 
 <div
 style={{
-width:"28px",
-height:"28px",
+width:window.innerWidth<768?"24px":"28px",
+height:window.innerWidth<768?"24px":"28px",
 borderRadius:"50%",
 background:"#EEF4FF",
 display:"flex",
@@ -946,7 +892,7 @@ alignItems:"center",
 <FaShoppingBag
 style={{
 color:"#2563EB",
-fontSize:"14px",
+fontSize:window.innerWidth<768?"12px":"14px",
 }}
 />
 
@@ -955,10 +901,7 @@ fontSize:"14px",
 <span
 style={{
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"18px"
-:"20px",
+fontSize:window.innerWidth<768?"15px":"20px",
 color:"#111827",
 }}
 >
@@ -971,23 +914,17 @@ Nouvelle commande
 
 <p
 style={{
-margin:"0",
-fontSize:
-window.innerWidth<768
-?"17px"
-:"18px",
+margin:0,
+fontSize:window.innerWidth<768?"13px":"17px",
 fontWeight:"600",
-lineHeight:"30px",
+lineHeight:window.innerWidth<768?"20px":"30px",
 color:"#374151",
 }}
 >
 
-<b>{notification.person}</b>
-
-{" "}à{" "}
-
-<b>{notification.city}</b>
-
+<b>{notification.person}</b>{" "}
+à{" "}
+<b>{notification.city}</b>{" "}
 vient d'acheter
 
 </p>
@@ -996,11 +933,11 @@ vient d'acheter
 style={{
 marginTop:"4px",
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"18px"
-:"19px",
+fontSize:window.innerWidth<768?"14px":"19px",
 color:"#2563EB",
+overflow:"hidden",
+whiteSpace:"nowrap",
+textOverflow:"ellipsis",
 }}
 >
 
@@ -1012,16 +949,16 @@ color:"#2563EB",
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
-marginTop:"10px",
+gap:"6px",
+marginTop:"8px",
 color:"#6B7280",
-fontSize:"14px",
+fontSize:window.innerWidth<768?"11px":"14px",
 }}
 >
 
 <FaClock/>
 
-Il y a {notification.minutesAgo} minutes
+Il y a {notification.minutesAgo} min
 
 </div>
 
@@ -1034,16 +971,17 @@ Il y a {notification.minutesAgo} minutes
 <div
 style={{
 display:"flex",
-alignItems:"center",
 justifyContent:"center",
-paddingLeft:"10px",
+alignItems:"center",
+paddingLeft:window.innerWidth<768?"4px":"10px",
+flexShrink:0,
 }}
 >
 
 <div
 style={{
-width:"16px",
-height:"16px",
+width:window.innerWidth<768?"12px":"16px",
+height:window.innerWidth<768?"12px":"16px",
 borderRadius:"50%",
 background:"#22C55E",
 boxShadow:"0 0 12px rgba(34,197,94,.5)",
@@ -1060,7 +998,8 @@ boxShadow:"0 0 12px rgba(34,197,94,.5)",
 
 <div
 style={{
-marginBottom:"34px",
+marginBottom:"28px",
+width:"100%",
 }}
 >
 
@@ -1072,6 +1011,8 @@ display:"flex",
 justifyContent:"space-between",
 alignItems:"center",
 marginBottom:"18px",
+gap:"10px",
+flexWrap:"wrap",
 }}
 >
 
@@ -1085,20 +1026,21 @@ gap:"10px",
 
 <div
 style={{
-width:"40px",
-height:"40px",
+width:window.innerWidth<768?"34px":"40px",
+height:window.innerWidth<768?"34px":"40px",
 borderRadius:"50%",
 background:"#EEF4FF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
+flexShrink:0,
 }}
 >
 
 <FaFire
 style={{
 color:"#2563EB",
-fontSize:"20px",
+fontSize:window.innerWidth<768?"16px":"20px",
 }}
 />
 
@@ -1107,10 +1049,7 @@ fontSize:"20px",
 <h2
 style={{
 margin:0,
-fontSize:
-window.innerWidth<768
-?"28px"
-:"32px",
+fontSize:window.innerWidth<768?"20px":"32px",
 fontWeight:"900",
 color:"#111827",
 }}
@@ -1128,10 +1067,10 @@ style={{
 textDecoration:"none",
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 color:"#2563EB",
 fontWeight:"800",
-fontSize:"16px",
+fontSize:window.innerWidth<768?"13px":"16px",
 }}
 >
 
@@ -1140,6 +1079,7 @@ Voir tout
 <FaChevronLeft
 style={{
 transform:"rotate(180deg)",
+fontSize:window.innerWidth<768?"12px":"16px",
 }}
 />
 
@@ -1154,9 +1094,9 @@ style={{
 display:"grid",
 gridTemplateColumns:
 window.innerWidth<768
-?"repeat(2,1fr)"
+?"repeat(2,minmax(0,1fr))"
 :"repeat(auto-fill,minmax(280px,1fr))",
-gap:"18px",
+gap:window.innerWidth<768?"12px":"18px",
 }}
 >
 
@@ -1181,11 +1121,11 @@ textDecoration:"none",
 <div
 style={{
 background:"#FFFFFF",
-borderRadius:"24px",
+borderRadius:window.innerWidth<768?"16px":"24px",
 overflow:"hidden",
-boxShadow:"0 10px 30px rgba(15,23,42,.08)",
+boxShadow:"0 8px 24px rgba(15,23,42,.06)",
 border:"1px solid #EEF2F7",
-transition:".3s",
+height:"100%",
 }}
 >
 
@@ -1203,27 +1143,24 @@ src={product.image}
 alt={product.name}
 style={{
 width:"100%",
-height:
-window.innerWidth<768
-?"220px"
-:"280px",
+height:window.innerWidth<768?"145px":"280px",
 objectFit:"cover",
 }}
 />
 
-{/* REDUCTION */}
+{/* BADGE */}
 
 <div
 style={{
 position:"absolute",
-top:"14px",
-left:"14px",
+top:"10px",
+left:"10px",
 background:"#2563EB",
 color:"#FFFFFF",
-padding:"8px 14px",
-borderRadius:"12px",
+padding:window.innerWidth<768?"5px 10px":"8px 14px",
+borderRadius:"10px",
 fontWeight:"900",
-fontSize:"14px",
+fontSize:window.innerWidth<768?"11px":"14px",
 }}
 >
 
@@ -1231,27 +1168,27 @@ fontSize:"14px",
 
 </div>
 
-{/* FAVORI */}
+{/* ICONE */}
 
 <div
 style={{
 position:"absolute",
-top:"14px",
-right:"14px",
-width:"46px",
-height:"46px",
+top:"10px",
+right:"10px",
+width:window.innerWidth<768?"34px":"46px",
+height:window.innerWidth<768?"34px":"46px",
 borderRadius:"50%",
 background:"#FFFFFF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-boxShadow:"0 8px 20px rgba(0,0,0,.10)",
+boxShadow:"0 6px 15px rgba(0,0,0,.10)",
 }}
 >
 
 <FaTags
 style={{
-fontSize:"18px",
+fontSize:window.innerWidth<768?"14px":"18px",
 color:"#6B7280",
 }}
 />
@@ -1264,14 +1201,14 @@ color:"#6B7280",
 
 <div
 style={{
-padding:"18px",
+padding:window.innerWidth<768?"12px":"18px",
 }}
 >
 
 <h3
 style={{
-margin:"0 0 14px",
-fontSize:"22px",
+margin:"0 0 10px",
+fontSize:window.innerWidth<768?"15px":"22px",
 fontWeight:"900",
 color:"#111827",
 overflow:"hidden",
@@ -1287,15 +1224,15 @@ textOverflow:"ellipsis",
 <div
 style={{
 display:"flex",
-alignItems:"center",
-gap:"10px",
-marginBottom:"18px",
+flexDirection:"column",
+gap:"4px",
+marginBottom:"12px",
 }}
 >
 
 <span
 style={{
-fontSize:"28px",
+fontSize:window.innerWidth<768?"18px":"28px",
 fontWeight:"900",
 color:"#2563EB",
 }}
@@ -1307,7 +1244,7 @@ color:"#2563EB",
 
 <span
 style={{
-fontSize:"18px",
+fontSize:window.innerWidth<768?"12px":"18px",
 textDecoration:"line-through",
 color:"#9CA3AF",
 }}
@@ -1322,18 +1259,18 @@ color:"#9CA3AF",
 <button
 style={{
 width:"100%",
-height:"52px",
+height:window.innerWidth<768?"42px":"52px",
 border:"none",
-borderRadius:"16px",
+borderRadius:"12px",
 background:"linear-gradient(135deg,#2563EB,#1D4ED8)",
 color:"#FFFFFF",
 fontWeight:"900",
-fontSize:"16px",
+fontSize:window.innerWidth<768?"13px":"16px",
 cursor:"pointer",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-gap:"10px",
+gap:"8px",
 }}
 >
 
@@ -1361,7 +1298,8 @@ Voir le produit
 
 <div
 style={{
-marginBottom:"34px",
+marginBottom:"28px",
+width:"100%",
 }}
 >
 
@@ -1371,6 +1309,8 @@ display:"flex",
 alignItems:"center",
 justifyContent:"space-between",
 marginBottom:"18px",
+flexWrap:"wrap",
+gap:"10px",
 }}
 >
 
@@ -1384,8 +1324,8 @@ gap:"10px",
 
 <div
 style={{
-width:"42px",
-height:"42px",
+width:window.innerWidth<768?"36px":"42px",
+height:window.innerWidth<768?"36px":"42px",
 borderRadius:"50%",
 background:"#EEF4FF",
 display:"flex",
@@ -1397,7 +1337,7 @@ alignItems:"center",
 <FaUsers
 style={{
 color:"#2563EB",
-fontSize:"18px",
+fontSize:window.innerWidth<768?"16px":"18px",
 }}
 />
 
@@ -1406,10 +1346,7 @@ fontSize:"18px",
 <h2
 style={{
 margin:0,
-fontSize:
-window.innerWidth<768
-?"28px"
-:"34px",
+fontSize:window.innerWidth<768?"22px":"34px",
 fontWeight:"900",
 color:"#111827",
 }}
@@ -1428,9 +1365,9 @@ style={{
 display:"grid",
 gridTemplateColumns:
 window.innerWidth<768
-?"repeat(2,1fr)"
+?"repeat(2,minmax(0,1fr))"
 :"repeat(4,1fr)",
-gap:"16px",
+gap:window.innerWidth<768?"12px":"16px",
 }}
 >
 
@@ -1469,25 +1406,25 @@ color:"#F59E0B",
 key={index}
 style={{
 background:"#FFFFFF",
-borderRadius:"24px",
-padding:"22px",
+borderRadius:window.innerWidth<768?"18px":"24px",
+padding:window.innerWidth<768?"16px":"22px",
 textAlign:"center",
 border:"1px solid #EEF2F7",
-boxShadow:"0 10px 30px rgba(15,23,42,.06)",
+boxShadow:"0 6px 18px rgba(15,23,42,.05)",
 }}
 >
 
 <div
 style={{
-width:"60px",
-height:"60px",
-margin:"0 auto 16px",
+width:window.innerWidth<768?"46px":"60px",
+height:window.innerWidth<768?"46px":"60px",
+margin:"0 auto 12px",
 borderRadius:"50%",
 background:`${item.color}15`,
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-fontSize:"24px",
+fontSize:window.innerWidth<768?"18px":"24px",
 color:item.color,
 }}
 >
@@ -1498,8 +1435,8 @@ color:item.color,
 
 <h3
 style={{
-margin:"0",
-fontSize:"28px",
+margin:0,
+fontSize:window.innerWidth<768?"20px":"28px",
 fontWeight:"900",
 color:"#111827",
 }}
@@ -1511,8 +1448,8 @@ color:"#111827",
 
 <p
 style={{
-marginTop:"8px",
-fontSize:"14px",
+marginTop:"6px",
+fontSize:window.innerWidth<768?"12px":"14px",
 fontWeight:"700",
 color:"#6B7280",
 }}
@@ -1534,18 +1471,15 @@ color:"#6B7280",
 
 <div
 style={{
-marginBottom:"34px",
+marginBottom:"28px",
 }}
 >
 
 <h2
 style={{
-marginBottom:"20px",
+marginBottom:"18px",
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"28px"
-:"34px",
+fontSize:window.innerWidth<768?"22px":"34px",
 color:"#111827",
 }}
 >
@@ -1559,9 +1493,9 @@ style={{
 display:"grid",
 gridTemplateColumns:
 window.innerWidth<768
-?"repeat(2,1fr)"
+?"repeat(2,minmax(0,1fr))"
 :"repeat(4,1fr)",
-gap:"16px",
+gap:window.innerWidth<768?"12px":"16px",
 }}
 >
 
@@ -1620,25 +1554,25 @@ color:"#FACC15",
 key={index}
 style={{
 background:"#FFFFFF",
-borderRadius:"24px",
-padding:"22px",
+borderRadius:window.innerWidth<768?"18px":"24px",
+padding:window.innerWidth<768?"16px":"22px",
 textAlign:"center",
 border:"1px solid #EEF2F7",
-boxShadow:"0 10px 25px rgba(15,23,42,.06)",
+boxShadow:"0 6px 18px rgba(15,23,42,.05)",
 }}
 >
 
 <div
 style={{
-width:"60px",
-height:"60px",
-margin:"0 auto 18px",
+width:window.innerWidth<768?"48px":"60px",
+height:window.innerWidth<768?"48px":"60px",
+margin:"0 auto 14px",
 borderRadius:"50%",
 background:`${item.color}15`,
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
-fontSize:"24px",
+fontSize:window.innerWidth<768?"18px":"24px",
 color:item.color,
 }}
 >
@@ -1649,10 +1583,11 @@ color:item.color,
 
 <h3
 style={{
-margin:"0",
-fontWeight:"900",
-fontSize:"16px",
+margin:0,
+fontWeight:"800",
+fontSize:window.innerWidth<768?"13px":"16px",
 color:"#111827",
+lineHeight:"20px",
 }}
 >
 
@@ -1673,23 +1608,21 @@ color:"#111827",
 <div
 style={{
 background:"linear-gradient(135deg,#2563EB,#1E3A8A)",
-borderRadius:"30px",
-padding:
-window.innerWidth<768
-?"28px"
-:"48px",
+borderRadius:window.innerWidth<768?"20px":"30px",
+padding:window.innerWidth<768?"22px 18px":"48px",
 color:"#FFFFFF",
 textAlign:"center",
-marginBottom:"30px",
-boxShadow:"0 20px 45px rgba(37,99,235,.25)",
+marginBottom:"28px",
+boxShadow:"0 15px 35px rgba(37,99,235,.22)",
+overflow:"hidden",
 }}
 >
 
 <div
 style={{
-width:"80px",
-height:"80px",
-margin:"0 auto 20px",
+width:window.innerWidth<768?"60px":"80px",
+height:window.innerWidth<768?"60px":"80px",
+margin:"0 auto 18px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.18)",
 display:"flex",
@@ -1700,7 +1633,7 @@ alignItems:"center",
 
 <FaCrown
 style={{
-fontSize:"40px",
+fontSize:window.innerWidth<768?"30px":"40px",
 color:"#FFD54A",
 }}
 />
@@ -1709,12 +1642,10 @@ color:"#FFD54A",
 
 <h2
 style={{
-margin:"0",
+margin:0,
 fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"30px"
-:"42px",
+fontSize:window.innerWidth<768?"24px":"42px",
+lineHeight:"1.2",
 }}
 >
 
@@ -1724,10 +1655,10 @@ Profitez des meilleures offres
 
 <p
 style={{
-margin:"16px auto 24px",
-maxWidth:"650px",
-lineHeight:"30px",
-fontSize:"16px",
+margin:"14px auto 22px",
+maxWidth:"600px",
+lineHeight:window.innerWidth<768?"24px":"30px",
+fontSize:window.innerWidth<768?"14px":"16px",
 opacity:.95,
 }}
 >
@@ -1744,14 +1675,16 @@ style={{
 display:"inline-flex",
 alignItems:"center",
 justifyContent:"center",
-gap:"10px",
-padding:"16px 30px",
+gap:"8px",
+padding:window.innerWidth<768?"13px 22px":"16px 30px",
 background:"#FFFFFF",
 color:"#2563EB",
 textDecoration:"none",
 fontWeight:"900",
-fontSize:"16px",
-borderRadius:"18px",
+fontSize:window.innerWidth<768?"14px":"16px",
+borderRadius:"14px",
+width:window.innerWidth<768?"100%":"auto",
+maxWidth:"320px",
 }}
 >
 
@@ -1767,18 +1700,12 @@ Découvrir les promotions
 
 <footer
 style={{
-marginTop:"32px",
-marginBottom:
-window.innerWidth<768
-?"90px"
-:"20px",
+marginTop:"30px",
+marginBottom:window.innerWidth<768?"90px":"20px",
 background:"#FFFFFF",
-borderRadius:"30px",
-padding:
-window.innerWidth<768
-?"28px 20px"
-:"40px",
-boxShadow:"0 10px 35px rgba(15,23,42,.06)",
+borderRadius:window.innerWidth<768?"20px":"30px",
+padding:window.innerWidth<768?"22px 16px":"40px",
+boxShadow:"0 8px 25px rgba(15,23,42,.05)",
 border:"1px solid #EEF2F7",
 }}
 >
@@ -1797,9 +1724,9 @@ alignItems:"center",
 src="/logo.jpg"
 alt="Logo"
 style={{
-width:"72px",
-height:"72px",
-borderRadius:"22px",
+width:window.innerWidth<768?"60px":"72px",
+height:window.innerWidth<768?"60px":"72px",
+borderRadius:window.innerWidth<768?"18px":"22px",
 objectFit:"cover",
 boxShadow:"0 8px 20px rgba(37,99,235,.15)",
 }}
@@ -1808,14 +1735,12 @@ boxShadow:"0 8px 20px rgba(37,99,235,.15)",
 <h2
 translate="no"
 style={{
-marginTop:"16px",
+marginTop:"14px",
 marginBottom:"8px",
-fontSize:
-window.innerWidth<768
-?"28px"
-:"34px",
+fontSize:window.innerWidth<768?"22px":"34px",
 fontWeight:"900",
 color:"#111827",
+textAlign:"center",
 }}
 >
 
@@ -1827,16 +1752,14 @@ KONAN SHOPPING
 style={{
 margin:0,
 textAlign:"center",
-maxWidth:"600px",
-fontSize:"15px",
-lineHeight:"28px",
+maxWidth:"520px",
+fontSize:window.innerWidth<768?"13px":"15px",
+lineHeight:window.innerWidth<768?"22px":"28px",
 color:"#6B7280",
 }}
 >
 
-Des milliers de Camerounais nous font confiance pour acheter
-leurs produits au meilleur prix avec une livraison rapide
-et un paiement uniquement à la livraison.
+Des milliers de Camerounais nous font confiance pour acheter leurs produits au meilleur prix avec une livraison rapide et un paiement uniquement à la livraison.
 
 </p>
 
@@ -1846,11 +1769,14 @@ et un paiement uniquement à la livraison.
 
 <div
 style={{
-marginTop:"30px",
-display:"flex",
+marginTop:"24px",
+display:"grid",
+gridTemplateColumns:
+window.innerWidth<768
+?"repeat(2,minmax(0,1fr))"
+:"repeat(4,auto)",
 justifyContent:"center",
-flexWrap:"wrap",
-gap:"18px",
+gap:"14px",
 }}
 >
 
@@ -1861,8 +1787,10 @@ textDecoration:"none",
 fontWeight:"800",
 color:"#2563EB",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
+fontSize:window.innerWidth<768?"13px":"15px",
 }}
 >
 
@@ -1879,8 +1807,10 @@ textDecoration:"none",
 fontWeight:"800",
 color:"#2563EB",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
+fontSize:window.innerWidth<768?"13px":"15px",
 }}
 >
 
@@ -1897,8 +1827,10 @@ textDecoration:"none",
 fontWeight:"800",
 color:"#2563EB",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
+fontSize:window.innerWidth<768?"13px":"15px",
 }}
 >
 
@@ -1917,8 +1849,10 @@ textDecoration:"none",
 fontWeight:"800",
 color:"#16A34A",
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
+fontSize:window.innerWidth<768?"13px":"15px",
 }}
 >
 
@@ -1930,32 +1864,41 @@ WhatsApp
 
 </div>
 
-{/* BANDEAU */}
+{/* ================= BANDEAU ================= */}
 
 <div
 style={{
-marginTop:"30px",
-padding:"18px",
-borderRadius:"18px",
+marginTop:"24px",
+padding:window.innerWidth<768?"16px":"18px",
+borderRadius:window.innerWidth<768?"16px":"18px",
 background:"#F8FAFC",
-display:"flex",
-justifyContent:"space-around",
-flexWrap:"wrap",
-gap:"16px",
+display:"grid",
+gridTemplateColumns:
+window.innerWidth<768
+?"repeat(1,1fr)"
+:"repeat(3,1fr)",
+gap:"14px",
+border:"1px solid #EEF2F7",
 }}
 >
 
 <div
 style={{
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
 fontWeight:"800",
 color:"#2563EB",
+fontSize:window.innerWidth<768?"14px":"16px",
 }}
 >
 
-<FaTruck/>
+<FaTruck
+style={{
+fontSize:window.innerWidth<768?"18px":"20px",
+}}
+/>
 
 Livraison rapide
 
@@ -1964,30 +1907,42 @@ Livraison rapide
 <div
 style={{
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
 fontWeight:"800",
 color:"#16A34A",
+fontSize:window.innerWidth<768?"14px":"16px",
 }}
 >
 
-<FaMoneyBillWave/>
+<FaMoneyBillWave
+style={{
+fontSize:window.innerWidth<768?"18px":"20px",
+}}
+/>
 
-Paiement livraison
+Paiement à la livraison
 
 </div>
 
 <div
 style={{
 display:"flex",
+justifyContent:"center",
 alignItems:"center",
 gap:"8px",
 fontWeight:"800",
 color:"#F59E0B",
+fontSize:window.innerWidth<768?"14px":"16px",
 }}
 >
 
-<FaStar/>
+<FaStar
+style={{
+fontSize:window.innerWidth<768?"18px":"20px",
+}}
+/>
 
 Service Premium
 
@@ -1995,11 +1950,11 @@ Service Premium
 
 </div>
 
-{/* COPYRIGHT */}
+{/* ================= COPYRIGHT ================= */}
 
 <div
 style={{
-marginTop:"30px",
+marginTop:"24px",
 paddingTop:"20px",
 borderTop:"1px solid #E5E7EB",
 textAlign:"center",
@@ -2009,9 +1964,9 @@ textAlign:"center",
 <p
 style={{
 margin:0,
-fontSize:"13px",
+fontSize:window.innerWidth<768?"12px":"13px",
 color:"#9CA3AF",
-lineHeight:"26px",
+lineHeight:window.innerWidth<768?"22px":"26px",
 }}
 >
 
@@ -2025,7 +1980,6 @@ Tous droits réservés.
 </p>
 
 </div>
-
 
 </footer>
 
