@@ -592,17 +592,21 @@ Ne les manquez pas !
 
 </div>
 
-{/* IMAGE */}
+{/* LOGO HERO */}
 
 <div
   style={{
     position: "absolute",
 
-    top: window.innerWidth < 768 ? "90px" : "40px",
+    top: window.innerWidth < 768 ? "-120px" : "-130px",
 
-    right: window.innerWidth < 768 ? "10px" : "40px",
+    right: window.innerWidth < 768 ? "-90px" : "-110px",
 
-    width: window.innerWidth < 768 ? "110px" : "420px",
+    width: window.innerWidth < 768 ? "300px" : "340px",
+
+    height: window.innerWidth < 768 ? "300px" : "340px",
+
+    borderRadius: "50%",
 
     display: "flex",
 
@@ -610,24 +614,28 @@ Ne les manquez pas !
 
     alignItems: "center",
 
-    pointerEvents: "none",
+    overflow: "hidden",
 
     zIndex: 1,
+
+    pointerEvents: "none",
   }}
 >
+
   <img
     src="/logo.jpg"
     alt="Promotion"
     style={{
       width: "100%",
 
-      height: "auto",
+      height: "100%",
 
-      objectFit: "contain",
+      objectFit: "cover",
 
-      opacity: 0.95,
+      borderRadius: "50%",
     }}
   />
+
 </div>
 
 </div>
