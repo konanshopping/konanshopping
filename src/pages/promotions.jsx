@@ -440,137 +440,156 @@ Ne les manquez pas !
 {/* BADGES */}
 
 <div
-style={{
-display:"grid",
+  style={{
+    display: "grid",
 
-gridTemplateColumns:
-window.innerWidth<768
-?"repeat(2,minmax(0,1fr))"
-:"repeat(3,1fr)",
+    gridTemplateColumns:
+      window.innerWidth < 768
+        ? "repeat(3,1fr)"
+        : "repeat(3,1fr)",
 
-gap:
-window.innerWidth<768
-?"12px"
-:"18px",
+    gap:
+      window.innerWidth < 768
+        ? "8px"
+        : "18px",
 
-marginTop:"28px",
+    marginTop: "28px",
 
-width:"100%",
-}}
+    width: "100%",
+  }}
 >
+  {[
+    {
+      icon: <FaTags />,
+      title: "Réductions",
+      value: "Jusqu'à 70%",
+    },
 
-{[
-{
-icon:<FaTags/>,
-title:"Réductions",
-value:"Jusqu'à 70%",
-},
+    {
+      icon: <FaShieldAlt />,
+      title: "Paiement",
+      value: "À la livraison",
+    },
 
-{
-icon:<FaShieldAlt/>,
-title:"Paiement",
-value:"À la livraison",
-},
+    {
+      icon: <FaShoppingBag />,
+      title: "Produits",
+      value: "Sélectionnés",
+    },
+  ].map((item, index) => (
+    <div
+      key={index}
+      style={{
+        background: "#FFFFFF",
+        border: "1px solid #E5E7EB",
+        borderRadius: "16px",
 
-{
-icon:<FaShoppingBag/>,
-title:"Produits",
-value:"Sélectionnés",
-},
+        padding:
+          window.innerWidth < 768
+            ? "10px 6px"
+            : "18px",
 
-].map((item,index)=>(
+        display: "flex",
 
-<div
-key={index}
-style={{
-background:"#FFFFFF",
-border:"1px solid #E5E7EB",
-borderRadius:"18px",
-padding:
-window.innerWidth<768
-?"14px"
-:"18px",
-display:"flex",
-alignItems:"center",
-gap:"12px",
-boxShadow:"0 6px 18px rgba(15,23,42,.05)",
-}}
->
+        flexDirection:
+          window.innerWidth < 768
+            ? "column"
+            : "row",
 
-<div
-style={{
-width:
-window.innerWidth<768
-?"46px"
-:"52px",
+        alignItems: "center",
 
-height:
-window.innerWidth<768
-?"46px"
-:"52px",
+        justifyContent: "center",
 
-borderRadius:"50%",
-background:"#EEF4FF",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"#2563EB",
-fontSize:
-window.innerWidth<768
-?"18px"
-:"20px",
-flexShrink:0,
-}}
->
+        gap:
+          window.innerWidth < 768
+            ? "8px"
+            : "12px",
 
-{item.icon}
+        textAlign: "center",
 
-</div>
+        boxShadow:
+          "0 6px 18px rgba(15,23,42,.05)",
 
-<div
-style={{
-minWidth:0,
-}}
->
+        minHeight:
+          window.innerWidth < 768
+            ? "120px"
+            : "auto",
+      }}
+    >
+      <div
+        style={{
+          width:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
 
-<div
-style={{
-fontWeight:"700",
-fontSize:
-window.innerWidth<768
-?"13px"
-:"15px",
-color:"#111827",
-}}
->
+          height:
+            window.innerWidth < 768
+              ? "42px"
+              : "52px",
 
-{item.title}
+          borderRadius: "50%",
 
-</div>
+          background: "#EEF4FF",
 
-<div
-style={{
-marginTop:"3px",
-fontWeight:"900",
-fontSize:
-window.innerWidth<768
-?"13px"
-:"15px",
-color:"#2563EB",
-lineHeight:"18px",
-}}
->
+          display: "flex",
 
-{item.value}
+          justifyContent: "center",
 
-</div>
+          alignItems: "center",
 
-</div>
+          color: "#2563EB",
 
-</div>
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "20px",
 
-))}
+          flexShrink: 0,
+        }}
+      >
+        {item.icon}
+      </div>
 
+      <div>
+        <div
+          style={{
+            fontWeight: "700",
+
+            fontSize:
+              window.innerWidth < 768
+                ? "12px"
+                : "15px",
+
+            color: "#111827",
+
+            lineHeight: "16px",
+          }}
+        >
+          {item.title}
+        </div>
+
+        <div
+          style={{
+            marginTop: "4px",
+
+            fontWeight: "900",
+
+            fontSize:
+              window.innerWidth < 768
+                ? "12px"
+                : "15px",
+
+            color: "#2563EB",
+
+            lineHeight: "16px",
+          }}
+        >
+          {item.value}
+        </div>
+      </div>
+    </div>
+  ))}
 </div>
 
 </div>
@@ -592,7 +611,7 @@ window.innerWidth<768
 >
 
 <img
-src="/promotion-hero.png"
+src="/logo.jpg"
 alt="Promotion"
 style={{
 width:
