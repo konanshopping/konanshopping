@@ -302,39 +302,27 @@ Retour
 {/* CONTENU */}
 
 <div
-style={{
-display:"flex",
+  style={{
+    display: "flex",
 
-flexDirection:
-window.innerWidth<768
-?"column"
-:"row",
+    flexDirection: "row",
 
-alignItems:
-window.innerWidth<768
-?"flex-start"
-:"center",
+    alignItems: "flex-start",
 
-justifyContent:"space-between",
+    justifyContent: "space-between",
 
-gap:
-window.innerWidth<768
-?"24px"
-:"40px",
-}}
+    gap: window.innerWidth < 768 ? "16px" : "40px",
+  }}
 >
 
 {/* TEXTE */}
 
 <div
-style={{
-flex:1,
-width:"100%",
-maxWidth:
-window.innerWidth<768
-?"100%"
-:"520px",
-}}
+  style={{
+    flex: 1,
+    width: window.innerWidth < 768 ? "58%" : "100%",
+    maxWidth: window.innerWidth < 768 ? "58%" : "520px",
+  }}
 >
 
 <div
@@ -436,45 +424,6 @@ Ne les manquez pas !
 </b>
 
 </p>
-
-{/* IMAGE */}
-
-<div
-style={{
-flex:1,
-width:"100%",
-display:"flex",
-justifyContent:"center",
-alignItems:
-window.innerWidth < 768
-?"flex-start"
-:"center",
-marginTop:
-window.innerWidth < 768
-?"-15px"
-:"0",
-}}
->
-
-<img
-src="/logo.jpg"
-alt="Promotion"
-style={{
-width:
-window.innerWidth < 768
-?"55%"
-:"90%",
-maxWidth:
-window.innerWidth < 768
-?"190px"
-:"470px",
-height:"auto",
-objectFit:"contain",
-display:"block",
-}}
-/>
-
-</div>
 
 {/* BADGES */}
 
@@ -633,7 +582,41 @@ display:"block",
 
 </div>
 
+{/* IMAGE */}
 
+<div
+  style={{
+    flex: "0 0 auto",
+
+    width: window.innerWidth < 768 ? "38%" : "45%",
+
+    display: "flex",
+
+    justifyContent: "flex-end",
+
+    alignItems: "flex-start",
+
+    marginTop: window.innerWidth < 768 ? "20px" : "0",
+  }}
+>
+
+  <img
+    src="/logo.jpg"
+    alt="Promotion"
+    style={{
+      width: "100%",
+
+      maxWidth: window.innerWidth < 768 ? "165px" : "470px",
+
+      height: "auto",
+
+      objectFit: "contain",
+
+      display: "block",
+    }}
+  />
+
+</div>
 
 </div>
 
