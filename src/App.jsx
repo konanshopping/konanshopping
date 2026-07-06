@@ -46,6 +46,8 @@ import ProductDetails from "./pages/ProductDetails";
 
 import Promotions from "./pages/promotions";
 
+import Paiement from "./pages/Paiement";
+
 import MyOrders
 from "./pages/Myorders";
 
@@ -4577,6 +4579,11 @@ function App() {
 <Route path="/address" element={<Address />} />
 
 <Route path="/promotions" element={<Promotions />} />
+
+<Route
+  path="/payment"
+  element={<Paiement />}
+/>
 
 <Route
   path="/message"
