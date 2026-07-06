@@ -48,6 +48,8 @@ import Promotions from "./pages/promotions";
 
 import Paiement from "./pages/Paiement";
 
+import Community from "./pages/Community";
+
 import MyOrders
 from "./pages/Myorders";
 
@@ -4584,6 +4586,8 @@ function App() {
   path="/payment"
   element={<Paiement />}
 />
+
+<Route path="/community" element={<Community />} />
 
 <Route
   path="/message"

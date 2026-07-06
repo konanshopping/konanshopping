@@ -315,10 +315,10 @@ const features = [
   },
 
   {
-    icon: <FaRobot />,
-    title: "IA Shopping",
-    path: "/ai",
-  },
+    icon: <FaComments />,
+    title: "Communauté",
+    path: "/community",
+},
 
   {
     icon: <FaBullseye />,

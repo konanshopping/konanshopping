@@ -1,4 +1,6 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const Product = require("./models/product")
 const Order = require("./models/Order");
 const cors = require("cors");
@@ -111,6 +113,15 @@ const Chat = require("./models/Chat");
 
 
 const app = express();
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(cors());
 app.use(express.json({
