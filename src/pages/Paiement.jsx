@@ -78,43 +78,41 @@ return (
 <div
 style={{
 minHeight:"100vh",
-
 width:"100%",
-
 background:"#F6F9FF",
-
 overflowX:"hidden",
-
-padding:
-isMobile
-?"0"
-:"24px",
+padding:isMobile?"0":"24px",
 }}
 >
 
-{/* ================= HEADER + HERO ================= */}
+{/* ================= HERO ================= */}
 
 <div
 style={{
 position:"relative",
 overflow:"hidden",
-background:"linear-gradient(135deg,#2563EB,#1E3A8A)",
-borderRadius:isMobile?"0":"34px",
-padding:isMobile?"24px 20px 36px":"50px",
-color:"#FFFFFF",
-boxShadow:"0 20px 45px rgba(37,99,235,.22)",
+
+background:"linear-gradient(135deg,#2563EB,#1E40AF)",
+
+borderRadius:isMobile?"0":"32px",
+
+padding:isMobile?"18px 18px 28px":"46px",
+
+color:"#FFF",
+
+boxShadow:"0 14px 40px rgba(37,99,235,.18)",
 }}
 >
 
-{/* CERCLES */}
+{/* BULLES */}
 
 <div
 style={{
 position:"absolute",
-top:"-150px",
-right:"-120px",
-width:"320px",
-height:"320px",
+top:"-140px",
+right:"-110px",
+width:"260px",
+height:"260px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.08)",
 }}
@@ -123,10 +121,10 @@ background:"rgba(255,255,255,.08)",
 <div
 style={{
 position:"absolute",
-bottom:"-90px",
-left:"-80px",
-width:"220px",
-height:"220px",
+bottom:"-80px",
+left:"-70px",
+width:"180px",
+height:"180px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.05)",
 }}
@@ -139,12 +137,12 @@ to="/account"
 style={{
 display:"inline-flex",
 alignItems:"center",
-gap:"10px",
+gap:"8px",
+color:"#FFF",
 textDecoration:"none",
-color:"#FFFFFF",
-fontWeight:"900",
-fontSize:"16px",
-marginBottom:"35px",
+fontWeight:"800",
+fontSize:"15px",
+marginBottom:"22px",
 position:"relative",
 zIndex:2,
 }}
@@ -161,11 +159,17 @@ Retour
 <div
 style={{
 display:"flex",
+
 flexDirection:isMobile?"column":"row",
+
 justifyContent:"space-between",
+
 alignItems:"center",
-gap:isMobile?"28px":"50px",
+
+gap:isMobile?"20px":"40px",
+
 position:"relative",
+
 zIndex:2,
 }}
 >
@@ -175,21 +179,28 @@ zIndex:2,
 <div
 style={{
 flex:1,
-width:"100%",
 }}
 >
 
 <div
 style={{
 display:"inline-flex",
+
 alignItems:"center",
-gap:"10px",
-padding:"10px 18px",
+
+gap:"8px",
+
+padding:"8px 15px",
+
 borderRadius:"50px",
+
 background:"rgba(255,255,255,.12)",
-fontWeight:"900",
-fontSize:"13px",
-marginBottom:"20px",
+
+fontWeight:"800",
+
+fontSize:"12px",
+
+marginBottom:"18px",
 }}
 >
 
@@ -202,9 +213,14 @@ PAIEMENT SÉCURISÉ
 <h1
 style={{
 margin:0,
+
+fontSize:isMobile?"30px":"54px",
+
 fontWeight:"900",
-fontSize:isMobile?"34px":"56px",
-lineHeight:"1.1",
+
+lineHeight:"1.12",
+
+letterSpacing:"-.5px",
 }}
 >
 
@@ -226,39 +242,109 @@ et sécurisé
 
 <p
 style={{
-marginTop:"22px",
-fontSize:"16px",
-lineHeight:"30px",
-opacity:.96,
-maxWidth:"620px",
+marginTop:"18px",
+
+fontSize:"15px",
+
+lineHeight:"28px",
+
+maxWidth:"520px",
+
+opacity:.95,
 }}
 >
 
-Chez <b>KONAN SHOPPING CAMEROUN</b>, vous payez uniquement après réception de votre commande. Vérifiez votre colis avant de remettre votre paiement.
+Chez <b>KONAN SHOPPING CAMEROUN</b>, payez uniquement après réception de votre commande.
+
+Vérifiez votre colis avant de remettre votre paiement.
 
 </p>
+
+<div
+style={{
+display:"flex",
+flexWrap:"wrap",
+gap:"10px",
+marginTop:"20px",
+}}
+>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+padding:"8px 14px",
+borderRadius:"40px",
+background:"rgba(255,255,255,.14)",
+fontWeight:"700",
+fontSize:"12px",
+}}
+>
+
+<FaTruck/>
+
+Livraison rapide
+
+</div>
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+padding:"8px 14px",
+borderRadius:"40px",
+background:"rgba(255,255,255,.14)",
+fontWeight:"700",
+fontSize:"12px",
+}}
+>
+
+<FaCheckCircle/>
+
+100% Vérifiable
+
+</div>
+
+</div>
 
 <Link
 to="/boutique"
 style={{
-marginTop:"30px",
+marginTop:"24px",
+
 display:"inline-flex",
+
 alignItems:"center",
+
 justifyContent:"center",
+
 gap:"10px",
-padding:"16px 28px",
-background:"#FFFFFF",
+
+padding:"14px 22px",
+
+background:"#FFF",
+
 color:"#2563EB",
+
 fontWeight:"900",
+
+fontSize:"15px",
+
 textDecoration:"none",
-borderRadius:"18px",
-boxShadow:"0 10px 25px rgba(0,0,0,.12)",
+
+borderRadius:"16px",
+
+boxShadow:"0 8px 24px rgba(0,0,0,.15)",
 }}
 >
 
 <FaStore/>
 
 Découvrir la boutique
+
+<FaChevronRight/>
 
 </Link>
 
@@ -268,20 +354,29 @@ Découvrir la boutique
 
 <div
 style={{
-width:isMobile?"120px":"170px",
-height:isMobile?"120px":"170px",
-borderRadius:"35px",
+width:isMobile?"92px":"145px",
+
+height:isMobile?"92px":"145px",
+
+borderRadius:isMobile?"24px":"32px",
+
 background:"rgba(255,255,255,.12)",
+
 display:"flex",
+
 justifyContent:"center",
+
 alignItems:"center",
+
 backdropFilter:"blur(12px)",
+
+boxShadow:"0 10px 25px rgba(0,0,0,.12)",
 }}
 >
 
 <FaMoneyBillWave
 style={{
-fontSize:isMobile?"58px":"82px",
+fontSize:isMobile?"42px":"70px",
 color:"#FFD54A",
 }}
 />
@@ -295,718 +390,609 @@ color:"#FFD54A",
 {/* ================= PAIEMENT PRINCIPAL ================= */}
 
 <div
-style={{
-marginTop:"30px",
-marginBottom:"34px",
-}}
+  style={{
+    marginTop: "22px",
+    marginBottom: "28px",
+  }}
 >
+  <div
+    style={{
+      background: "#FFFFFF",
 
-<div
-style={{
-background:"#FFFFFF",
+      borderRadius: isMobile ? "20px" : "28px",
 
-borderRadius:isMobile?"24px":"30px",
+      padding: isMobile ? "18px" : "30px",
 
-padding:isMobile?"22px":"34px",
+      border: "1px solid #E8EEF9",
 
-border:"1px solid #E8EEF9",
+      boxShadow: "0 8px 24px rgba(15,23,42,.05)",
+    }}
+  >
+    {/* HEADER */}
 
-boxShadow:"0 12px 35px rgba(15,23,42,.06)",
-}}
->
+    <div
+      style={{
+        display: "flex",
 
-{/* HEADER */}
+        justifyContent: "space-between",
 
-<div
-style={{
-display:"flex",
+        alignItems: isMobile ? "flex-start" : "center",
 
-justifyContent:"space-between",
+        flexDirection: isMobile ? "column" : "row",
 
-alignItems:isMobile?"flex-start":"center",
+        gap: "14px",
 
-flexDirection:isMobile?"column":"row",
+        marginBottom: "20px",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
 
-gap:"18px",
+          alignItems: "center",
 
-marginBottom:"26px",
-}}
->
+          gap: "14px",
+        }}
+      >
+        <div
+          style={{
+            width: isMobile ? "56px" : "72px",
 
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"16px",
-}}
->
+            height: isMobile ? "56px" : "72px",
 
-<div
-style={{
-width:isMobile?"68px":"80px",
+            borderRadius: "18px",
 
-height:isMobile?"68px":"80px",
+            background: "#EEF4FF",
 
-borderRadius:"22px",
+            display: "flex",
 
-background:"#EEF4FF",
+            justifyContent: "center",
 
-display:"flex",
+            alignItems: "center",
 
-justifyContent:"center",
+            color: "#2563EB",
 
-alignItems:"center",
+            fontSize: isMobile ? "24px" : "34px",
+          }}
+        >
+          <FaTruck />
+        </div>
 
-color:"#2563EB",
+        <div>
+          <h2
+            style={{
+              margin: 0,
 
-fontSize:isMobile?"30px":"38px",
-}}
->
+              fontSize: isMobile ? "21px" : "30px",
 
-<FaTruck/>
+              fontWeight: "900",
 
-</div>
+              color: "#111827",
+            }}
+          >
+            Paiement à la livraison
+          </h2>
 
-<div>
+          <p
+            style={{
+              marginTop: "6px",
 
-<h2
-style={{
-margin:0,
+              marginBottom: 0,
 
-fontSize:isMobile?"24px":"34px",
+              fontSize: "14px",
 
-fontWeight:"900",
+              lineHeight: "25px",
 
-color:"#111827",
-}}
->
+              color: "#6B7280",
+            }}
+          >
+            Payez uniquement lorsque votre commande vous est remise.
+          </p>
+        </div>
+      </div>
 
-Paiement à la livraison
+      <div
+        style={{
+          padding: "8px 14px",
 
-</h2>
+          borderRadius: "40px",
 
-<p
-style={{
-marginTop:"8px",
+          background: "#DCFCE7",
 
-marginBottom:0,
+          display: "flex",
 
-fontSize:"15px",
+          alignItems: "center",
 
-lineHeight:"28px",
+          gap: "6px",
 
-color:"#6B7280",
-}}
->
+          fontWeight: "800",
 
-Payez uniquement lorsque votre commande
-vous est remise.
+          color: "#15803D",
 
-</p>
+          fontSize: "12px",
+        }}
+      >
+        <FaCheckCircle />
 
-</div>
+        Disponible
+      </div>
+    </div>
 
-</div>
+    {/* CONTENU */}
 
-<div
-style={{
-padding:"10px 18px",
+    <div
+      style={{
+        display: "grid",
 
-borderRadius:"40px",
+        gridTemplateColumns: isMobile
+          ? "1fr"
+          : "repeat(2,1fr)",
 
-background:"#DCFCE7",
+        gap: "14px",
+      }}
+    >
+      {[
+        {
+          icon: <FaBoxOpen />,
+          title: "Vérifiez votre colis",
+          text: "Contrôlez votre commande avant de payer.",
+          color: "#2563EB",
+        },
 
-display:"flex",
+        {
+          icon: <FaMoneyBillWave />,
+          title: "Paiement après réception",
+          text: "Aucun paiement avant la livraison.",
+          color: "#16A34A",
+        },
 
-alignItems:"center",
+        {
+          icon: <FaShieldAlt />,
+          title: "Paiement sécurisé",
+          text: "Une solution simple et fiable.",
+          color: "#7C3AED",
+        },
 
-gap:"8px",
+        {
+          icon: <FaHeadset />,
+          title: "Assistance 7j/7",
+          text: "Notre équipe reste disponible.",
+          color: "#F59E0B",
+        },
+      ].map((item, index) => (
+        <div
+          key={index}
+          style={{
+            display: "flex",
 
-fontWeight:"900",
+            alignItems: "flex-start",
 
-color:"#15803D",
+            gap: "12px",
 
-fontSize:"14px",
-}}
->
+            padding: "14px",
 
-<FaCheckCircle/>
+            background: "#F8FAFD",
 
-Disponible
+            borderRadius: "16px",
 
-</div>
+            border: "1px solid #EEF2F7",
 
-</div>
+            transition: ".3s",
+          }}
+        >
+          <div
+            style={{
+              width: "44px",
 
-{/* CONTENU */}
+              height: "44px",
 
-<div
-style={{
-display:"grid",
+              borderRadius: "14px",
 
-gridTemplateColumns:
-isMobile
-?"1fr"
-:"repeat(2,1fr)",
+              background: `${item.color}15`,
 
-gap:"18px",
-}}
->
+              display: "flex",
 
-{[
-{
-icon:<FaBoxOpen/>,
-title:"Vérifiez votre colis",
-text:"Contrôlez votre commande avant de payer.",
-color:"#2563EB",
-},
+              justifyContent: "center",
 
-{
-icon:<FaMoneyBillWave/>,
-title:"Paiement après réception",
-text:"Aucun paiement n'est demandé avant la livraison.",
-color:"#16A34A",
-},
+              alignItems: "center",
 
-{
-icon:<FaShieldAlt/>,
-title:"Paiement sécurisé",
-text:"Une solution simple et fiable pour tous nos clients.",
-color:"#7C3AED",
-},
+              color: item.color,
 
-{
-icon:<FaHeadset/>,
-title:"Assistance",
-text:"Notre équipe reste disponible avant et après votre commande.",
-color:"#F59E0B",
-},
+              fontSize: "18px",
 
-].map((item,index)=>(
+              flexShrink: 0,
+            }}
+          >
+            {item.icon}
+          </div>
 
-<div
-key={index}
-style={{
-display:"flex",
+          <div>
+            <h3
+              style={{
+                margin: "0 0 4px",
 
-alignItems:"flex-start",
+                fontWeight: "800",
 
-gap:"14px",
+                fontSize: "15px",
 
-padding:"18px",
+                color: "#111827",
+              }}
+            >
+              {item.title}
+            </h3>
 
-background:"#F8FAFD",
+            <p
+              style={{
+                margin: 0,
 
-borderRadius:"18px",
+                fontSize: "13px",
 
-border:"1px solid #EEF2F7",
-}}
->
+                lineHeight: "22px",
 
-<div
-style={{
-width:"52px",
-
-height:"52px",
-
-borderRadius:"16px",
-
-background:`${item.color}15`,
-
-display:"flex",
-
-justifyContent:"center",
-
-alignItems:"center",
-
-color:item.color,
-
-fontSize:"22px",
-
-flexShrink:0,
-}}
->
-
-{item.icon}
-
-</div>
-
-<div>
-
-<h3
-style={{
-margin:"0 0 6px",
-
-fontWeight:"900",
-
-fontSize:"16px",
-
-color:"#111827",
-}}
->
-
-{item.title}
-
-</h3>
-
-<p
-style={{
-margin:0,
-
-fontSize:"14px",
-
-lineHeight:"24px",
-
-color:"#6B7280",
-}}
->
-
-{item.text}
-
-</p>
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
-</div>
-
+                color: "#6B7280",
+              }}
+            >
+              {item.text}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
 </div>
 
 {/* ================= AUTRES MOYENS DE PAIEMENT ================= */}
 
 <div
-style={{
-marginBottom:"36px",
-}}
+  style={{
+    marginBottom: "28px",
+  }}
 >
-
-{/* TITRE */}
-
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"12px",
-marginBottom:"22px",
-}}
->
-
-<div
-style={{
-width:"52px",
-height:"52px",
-borderRadius:"16px",
-background:"#EEF4FF",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"#2563EB",
-fontSize:"22px",
-}}
->
-
-<FaWallet/>
-
-</div>
-
-<div>
-
-<h2
-style={{
-margin:0,
-fontWeight:"900",
-fontSize:isMobile?"26px":"34px",
-color:"#111827",
-}}
->
-
-Autres moyens de paiement
-
-</h2>
-
-<p
-style={{
-margin:"6px 0 0",
-fontSize:"14px",
-color:"#6B7280",
-}}
->
-
-De nouvelles solutions seront bientôt disponibles.
-
-</p>
-
-</div>
-
-</div>
-
-{/* CARTES */}
-
-<div
-style={{
-display:"grid",
-
-gridTemplateColumns:
-isMobile
-?"1fr"
-:"repeat(3,1fr)",
-
-gap:"18px",
-}}
->
-
-{[
-
-{
-
-icon:<FaMobileAlt/>,
-
-title:"Orange Money",
-
-status:"Bientôt disponible",
-
-color:"#F97316",
-
-bg:"#FFF7ED",
-
-},
-
-{
-
-icon:<FaMobileAlt/>,
-
-title:"MTN Mobile Money",
-
-status:"Bientôt disponible",
-
-color:"#FACC15",
-
-bg:"#FEFCE8",
-
-},
-
-{
-
-icon:<FaCreditCard/>,
-
-title:"Carte bancaire",
-
-status:"Bientôt disponible",
-
-color:"#2563EB",
-
-bg:"#EEF4FF",
-
-},
-
-].map((item,index)=>(
-
-<div
-key={index}
-style={{
-background:"#FFFFFF",
-
-borderRadius:"24px",
-
-padding:"24px",
-
-border:"1px solid #E5E7EB",
-
-boxShadow:"0 8px 25px rgba(15,23,42,.05)",
-
-transition:".3s",
-}}
->
-
-<div
-style={{
-width:"70px",
-height:"70px",
-borderRadius:"20px",
-background:item.bg,
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-fontSize:"30px",
-color:item.color,
-marginBottom:"18px",
-}}
->
-
-{item.icon}
-
-</div>
-
-<h3
-style={{
-margin:"0 0 10px",
-fontWeight:"900",
-fontSize:"20px",
-color:"#111827",
-}}
->
-
-{item.title}
-
-</h3>
-
-<p
-style={{
-margin:"0 0 20px",
-fontSize:"14px",
-lineHeight:"24px",
-color:"#6B7280",
-}}
->
-
-Ce moyen de paiement sera bientôt disponible sur KONAN SHOPPING.
-
-</p>
-
-<div
-style={{
-display:"inline-flex",
-alignItems:"center",
-gap:"8px",
-padding:"10px 16px",
-borderRadius:"40px",
-background:"#FEF3C7",
-color:"#92400E",
-fontWeight:"800",
-fontSize:"13px",
-}}
->
-
-<FaClock/>
-
-{item.status}
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
+  {/* TITRE */}
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      marginBottom: "18px",
+    }}
+  >
+    <div
+      style={{
+        width: isMobile ? "46px" : "52px",
+        height: isMobile ? "46px" : "52px",
+        borderRadius: "14px",
+        background: "#EEF4FF",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "#2563EB",
+        fontSize: isMobile ? "20px" : "22px",
+      }}
+    >
+      <FaWallet />
+    </div>
+
+    <div>
+      <h2
+        style={{
+          margin: 0,
+          fontWeight: "900",
+          fontSize: isMobile ? "22px" : "30px",
+          color: "#111827",
+        }}
+      >
+        Autres moyens de paiement
+      </h2>
+
+      <p
+        style={{
+          margin: "4px 0 0",
+          fontSize: "13px",
+          color: "#6B7280",
+        }}
+      >
+        Disponibles prochainement.
+      </p>
+    </div>
+  </div>
+
+  {/* CARTES */}
+
+  <div
+    style={{
+      display: "grid",
+
+      gridTemplateColumns: isMobile
+        ? "1fr"
+        : "repeat(3,1fr)",
+
+      gap: "14px",
+    }}
+  >
+    {[
+      {
+        icon: <FaMobileAlt />,
+        title: "Orange Money",
+        status: "Bientôt disponible",
+        color: "#F97316",
+        bg: "#FFF7ED",
+      },
+
+      {
+        icon: <FaMobileAlt />,
+        title: "MTN Mobile Money",
+        status: "Bientôt disponible",
+        color: "#FACC15",
+        bg: "#FEFCE8",
+      },
+
+      {
+        icon: <FaCreditCard />,
+        title: "Carte bancaire",
+        status: "Bientôt disponible",
+        color: "#2563EB",
+        bg: "#EEF4FF",
+      },
+    ].map((item, index) => (
+      <div
+        key={index}
+        style={{
+          background: "#FFFFFF",
+
+          borderRadius: "18px",
+
+          padding: "18px",
+
+          border: "1px solid #E5E7EB",
+
+          boxShadow: "0 8px 22px rgba(15,23,42,.05)",
+        }}
+      >
+        <div
+          style={{
+            width: "58px",
+            height: "58px",
+            borderRadius: "16px",
+            background: item.bg,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "24px",
+            color: item.color,
+            marginBottom: "14px",
+          }}
+        >
+          {item.icon}
+        </div>
+
+        <h3
+          style={{
+            margin: "0 0 8px",
+            fontWeight: "900",
+            fontSize: "17px",
+            color: "#111827",
+          }}
+        >
+          {item.title}
+        </h3>
+
+        <p
+          style={{
+            margin: "0 0 16px",
+            fontSize: "13px",
+            lineHeight: "22px",
+            color: "#6B7280",
+          }}
+        >
+          Disponible prochainement sur KONAN SHOPPING.
+        </p>
+
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "8px 14px",
+            borderRadius: "40px",
+            background: "#FEF3C7",
+            color: "#92400E",
+            fontWeight: "800",
+            fontSize: "12px",
+          }}
+        >
+          <FaClock />
+
+          {item.status}
+        </div>
+      </div>
+    ))}
+  </div>
 </div>
 
 {/* ================= COMMENT ÇA FONCTIONNE ? ================= */}
 
 <div
-style={{
-marginBottom:"38px",
-}}
+  style={{
+    marginBottom: "32px",
+  }}
 >
+  {/* TITRE */}
 
-{/* TITRE */}
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      marginBottom: "18px",
+    }}
+  >
+    <div
+      style={{
+        width: isMobile ? "46px" : "52px",
+        height: isMobile ? "46px" : "52px",
+        borderRadius: "14px",
+        background: "#EEF4FF",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "#2563EB",
+        fontSize: isMobile ? "20px" : "22px",
+      }}
+    >
+      <FaInfoCircle />
+    </div>
 
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"12px",
-marginBottom:"24px",
-}}
->
+    <div>
+      <h2
+        style={{
+          margin: 0,
+          fontWeight: "900",
+          fontSize: isMobile ? "22px" : "30px",
+          color: "#111827",
+        }}
+      >
+        Comment ça fonctionne ?
+      </h2>
 
-<div
-style={{
-width:"52px",
-height:"52px",
-borderRadius:"16px",
-background:"#EEF4FF",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"#2563EB",
-fontSize:"22px",
-}}
->
+      <p
+        style={{
+          margin: "4px 0 0",
+          fontSize: "13px",
+          color: "#6B7280",
+        }}
+      >
+        Commandez en seulement 4 étapes.
+      </p>
+    </div>
+  </div>
 
-<FaInfoCircle/>
+  {/* ÉTAPES */}
 
-</div>
+  <div
+    style={{
+      display: "grid",
 
-<div>
+      gridTemplateColumns: isMobile
+        ? "1fr"
+        : "repeat(4,1fr)",
 
-<h2
-style={{
-margin:0,
-fontWeight:"900",
-fontSize:isMobile?"26px":"34px",
-color:"#111827",
-}}
->
+      gap: "14px",
+    }}
+  >
+    {[
+      {
+        icon: <FaStore />,
+        step: "01",
+        title: "Commande",
+        text: "Choisissez vos produits.",
+        color: "#2563EB",
+      },
 
-Comment ça fonctionne ?
+      {
+        icon: <FaBoxOpen />,
+        step: "02",
+        title: "Préparation",
+        text: "Nous préparons votre colis.",
+        color: "#7C3AED",
+      },
 
-</h2>
+      {
+        icon: <FaTruck />,
+        step: "03",
+        title: "Livraison",
+        text: "Recevez votre commande.",
+        color: "#16A34A",
+      },
 
-<p
-style={{
-margin:"6px 0 0",
-fontSize:"14px",
-color:"#6B7280",
-}}
->
+      {
+        icon: <FaMoneyBillWave />,
+        step: "04",
+        title: "Paiement",
+        text: "Payez après vérification.",
+        color: "#F59E0B",
+      },
+    ].map((item, index) => (
+      <div
+        key={index}
+        style={{
+          background: "#FFFFFF",
 
-Achetez en quelques étapes simples.
+          borderRadius: "18px",
 
-</p>
+          padding: "18px",
 
-</div>
+          border: "1px solid #EEF2F7",
 
-</div>
+          boxShadow: "0 8px 22px rgba(15,23,42,.05)",
 
-{/* ÉTAPES */}
+          position: "relative",
 
-<div
-style={{
-display:"grid",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "14px",
+            fontSize: "28px",
+            fontWeight: "900",
+            color: "#EEF2F7",
+          }}
+        >
+          {item.step}
+        </div>
 
-gridTemplateColumns:
-isMobile
-?"1fr"
-:"repeat(4,1fr)",
+        <div
+          style={{
+            width: "54px",
+            height: "54px",
+            borderRadius: "16px",
+            background: `${item.color}15`,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            fontSize: "22px",
+            color: item.color,
+            marginBottom: "14px",
+          }}
+        >
+          {item.icon}
+        </div>
 
-gap:"18px",
-}}
->
+        <h3
+          style={{
+            margin: "0 0 8px",
+            fontSize: "16px",
+            fontWeight: "900",
+            color: "#111827",
+          }}
+        >
+          {item.title}
+        </h3>
 
-{[
-
-{
-icon:<FaStore/>,
-step:"01",
-title:"Passez votre commande",
-text:"Choisissez vos produits et confirmez votre commande.",
-color:"#2563EB",
-},
-
-{
-icon:<FaBoxOpen/>,
-step:"02",
-title:"Préparation",
-text:"Notre équipe prépare soigneusement votre colis.",
-color:"#7C3AED",
-},
-
-{
-icon:<FaTruck/>,
-step:"03",
-title:"Livraison",
-text:"Le livreur vous contacte puis vous remet votre colis.",
-color:"#16A34A",
-},
-
-{
-icon:<FaMoneyBillWave/>,
-step:"04",
-title:"Paiement",
-text:"Vérifiez votre commande puis payez le livreur.",
-color:"#F59E0B",
-},
-
-].map((item,index)=>(
-
-<div
-key={index}
-style={{
-background:"#FFFFFF",
-
-borderRadius:"24px",
-
-padding:"24px",
-
-border:"1px solid #EEF2F7",
-
-boxShadow:"0 8px 25px rgba(15,23,42,.05)",
-
-position:"relative",
-
-overflow:"hidden",
-}}
->
-
-<div
-style={{
-position:"absolute",
-top:"16px",
-right:"18px",
-fontSize:"38px",
-fontWeight:"900",
-color:"#EEF2F7",
-}}
->
-
-{item.step}
-
-</div>
-
-<div
-style={{
-width:"64px",
-height:"64px",
-borderRadius:"18px",
-background:`${item.color}15`,
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-fontSize:"28px",
-color:item.color,
-marginBottom:"18px",
-}}
->
-
-{item.icon}
-
-</div>
-
-<h3
-style={{
-margin:"0 0 10px",
-fontSize:"18px",
-fontWeight:"900",
-color:"#111827",
-}}
->
-
-{item.title}
-
-</h3>
-
-<p
-style={{
-margin:0,
-fontSize:"14px",
-lineHeight:"24px",
-color:"#6B7280",
-}}
->
-
-{item.text}
-
-</p>
-
-</div>
-
-))}
-
-</div>
-
+        <p
+          style={{
+            margin: 0,
+            fontSize: "13px",
+            lineHeight: "22px",
+            color: "#6B7280",
+          }}
+        >
+          {item.text}
+        </p>
+      </div>
+    ))}
+  </div>
 </div>
 
 {/* ================= POURQUOI CHOISIR KONAN SHOPPING ================= */}
 
 <div
 style={{
-marginBottom:"40px",
+marginBottom:"32px",
 }}
 >
 
@@ -1016,22 +1002,22 @@ marginBottom:"40px",
 style={{
 display:"flex",
 alignItems:"center",
-gap:"12px",
-marginBottom:"24px",
+gap:"10px",
+marginBottom:"18px",
 }}
 >
 
 <div
 style={{
-width:"52px",
-height:"52px",
-borderRadius:"16px",
+width:isMobile?"46px":"52px",
+height:isMobile?"46px":"52px",
+borderRadius:"14px",
 background:"#EEF4FF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 color:"#2563EB",
-fontSize:"22px",
+fontSize:isMobile?"20px":"22px",
 }}
 >
 
@@ -1045,7 +1031,7 @@ fontSize:"22px",
 style={{
 margin:0,
 fontWeight:"900",
-fontSize:isMobile?"26px":"34px",
+fontSize:isMobile?"22px":"30px",
 color:"#111827",
 }}
 >
@@ -1056,8 +1042,8 @@ Pourquoi choisir KONAN SHOPPING ?
 
 <p
 style={{
-margin:"6px 0 0",
-fontSize:"14px",
+margin:"4px 0 0",
+fontSize:"13px",
 color:"#6B7280",
 }}
 >
@@ -1078,10 +1064,10 @@ display:"grid",
 
 gridTemplateColumns:
 isMobile
-?"repeat(2,1fr)"
+?"repeat(2,minmax(0,1fr))"
 :"repeat(4,1fr)",
 
-gap:"18px",
+gap:"14px",
 }}
 >
 
@@ -1119,7 +1105,7 @@ color:"#DC2626",
 
 {
 icon:<FaMoneyBillWave/>,
-title:"Paiement à la livraison",
+title:"Paiement livraison",
 color:"#0891B2",
 },
 
@@ -1142,16 +1128,13 @@ key={index}
 style={{
 background:"#FFFFFF",
 
-borderRadius:"22px",
+borderRadius:"18px",
 
-padding:
-isMobile
-?"18px"
-:"24px",
+padding:isMobile?"16px 12px":"20px",
 
 border:"1px solid #EEF2F7",
 
-boxShadow:"0 8px 22px rgba(15,23,42,.05)",
+boxShadow:"0 6px 18px rgba(15,23,42,.05)",
 
 textAlign:"center",
 
@@ -1161,19 +1144,13 @@ transition:".3s",
 
 <div
 style={{
-width:
-isMobile
-?"56px"
-:"64px",
+width:isMobile?"48px":"56px",
 
-height:
-isMobile
-?"56px"
-:"64px",
+height:isMobile?"48px":"56px",
 
-margin:"0 auto 16px",
+margin:"0 auto 12px",
 
-borderRadius:"18px",
+borderRadius:"16px",
 
 background:`${item.color}15`,
 
@@ -1183,10 +1160,7 @@ justifyContent:"center",
 
 alignItems:"center",
 
-fontSize:
-isMobile
-?"24px"
-:"28px",
+fontSize:isMobile?"20px":"24px",
 
 color:item.color,
 }}
@@ -1199,13 +1173,14 @@ color:item.color,
 <h3
 style={{
 margin:0,
+
 fontWeight:"800",
-fontSize:
-isMobile
-?"14px"
-:"16px",
+
+fontSize:isMobile?"13px":"15px",
+
+lineHeight:isMobile?"20px":"22px",
+
 color:"#111827",
-lineHeight:"24px",
 }}
 >
 
@@ -1225,7 +1200,7 @@ lineHeight:"24px",
 
 <div
 style={{
-marginBottom:"40px",
+marginBottom:"32px",
 }}
 >
 
@@ -1235,22 +1210,22 @@ marginBottom:"40px",
 style={{
 display:"flex",
 alignItems:"center",
-gap:"12px",
-marginBottom:"24px",
+gap:"10px",
+marginBottom:"18px",
 }}
 >
 
 <div
 style={{
-width:"52px",
-height:"52px",
-borderRadius:"16px",
+width:isMobile?"46px":"52px",
+height:isMobile?"46px":"52px",
+borderRadius:"14px",
 background:"#EEF4FF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 color:"#2563EB",
-fontSize:"22px",
+fontSize:isMobile?"20px":"22px",
 }}
 >
 
@@ -1264,7 +1239,7 @@ fontSize:"22px",
 style={{
 margin:0,
 fontWeight:"900",
-fontSize:isMobile?"26px":"34px",
+fontSize:isMobile?"22px":"30px",
 color:"#111827",
 }}
 >
@@ -1275,8 +1250,8 @@ Questions fréquentes
 
 <p
 style={{
-margin:"6px 0 0",
-fontSize:"14px",
+margin:"4px 0 0",
+fontSize:"13px",
 color:"#6B7280",
 }}
 >
@@ -1295,7 +1270,7 @@ Tout ce que vous devez savoir avant de payer.
 style={{
 display:"flex",
 flexDirection:"column",
-gap:"18px",
+gap:"14px",
 }}
 >
 
@@ -1305,7 +1280,7 @@ gap:"18px",
 
 question:"Quand dois-je payer ma commande ?",
 
-answer:"Le paiement s'effectue uniquement lors de la livraison, après vérification de votre colis.",
+answer:"Le paiement s'effectue uniquement lors de la livraison après vérification de votre colis.",
 
 icon:<FaMoneyBillWave/>,
 
@@ -1313,9 +1288,9 @@ icon:<FaMoneyBillWave/>,
 
 {
 
-question:"Puis-je vérifier mon colis avant de payer ?",
+question:"Puis-je vérifier mon colis ?",
 
-answer:"Oui. Vous pouvez contrôler votre commande avant de remettre votre paiement au livreur.",
+answer:"Oui, vérifiez votre commande avant de payer le livreur.",
 
 icon:<FaBoxOpen/>,
 
@@ -1325,7 +1300,7 @@ icon:<FaBoxOpen/>,
 
 question:"Quels moyens de paiement acceptez-vous ?",
 
-answer:"Actuellement, le paiement à la livraison est disponible. Orange Money, MTN Mobile Money et les cartes bancaires seront bientôt disponibles.",
+answer:"Le paiement à la livraison est disponible. Orange Money, MTN MoMo et Carte bancaire arrivent bientôt.",
 
 icon:<FaCreditCard/>,
 
@@ -1333,9 +1308,9 @@ icon:<FaCreditCard/>,
 
 {
 
-question:"Mes informations sont-elles sécurisées ?",
+question:"Mes données sont-elles sécurisées ?",
 
-answer:"Oui. Vos données personnelles sont protégées et utilisées uniquement pour le traitement de votre commande.",
+answer:"Oui, toutes vos informations sont protégées.",
 
 icon:<FaLock/>,
 
@@ -1347,10 +1322,10 @@ icon:<FaLock/>,
 key={index}
 style={{
 background:"#FFFFFF",
-borderRadius:"22px",
-padding:isMobile?"20px":"26px",
+borderRadius:"18px",
+padding:isMobile?"16px":"22px",
 border:"1px solid #EEF2F7",
-boxShadow:"0 8px 22px rgba(15,23,42,.05)",
+boxShadow:"0 6px 18px rgba(15,23,42,.05)",
 }}
 >
 
@@ -1358,22 +1333,22 @@ boxShadow:"0 8px 22px rgba(15,23,42,.05)",
 style={{
 display:"flex",
 alignItems:"center",
-gap:"14px",
-marginBottom:"14px",
+gap:"12px",
+marginBottom:"10px",
 }}
 >
 
 <div
 style={{
-width:"50px",
-height:"50px",
-borderRadius:"16px",
+width:"44px",
+height:"44px",
+borderRadius:"14px",
 background:"#EEF4FF",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 color:"#2563EB",
-fontSize:"22px",
+fontSize:"18px",
 flexShrink:0,
 }}
 >
@@ -1385,10 +1360,10 @@ flexShrink:0,
 <h3
 style={{
 margin:0,
-fontWeight:"900",
-fontSize:isMobile?"16px":"18px",
+fontWeight:"800",
+fontSize:isMobile?"15px":"17px",
+lineHeight:"24px",
 color:"#111827",
-lineHeight:"26px",
 }}
 >
 
@@ -1401,9 +1376,9 @@ lineHeight:"26px",
 <p
 style={{
 margin:0,
-paddingLeft:isMobile?"0":"64px",
-fontSize:"15px",
-lineHeight:"28px",
+paddingLeft:isMobile?"0":"56px",
+fontSize:"13px",
+lineHeight:"23px",
 color:"#6B7280",
 }}
 >
@@ -1424,16 +1399,13 @@ color:"#6B7280",
 
 <div
 style={{
-marginBottom:"36px",
+marginBottom:"30px",
 
-background:"linear-gradient(135deg,#2563EB,#1E3A8A)",
+background:"linear-gradient(135deg,#2563EB,#1E40AF)",
 
-borderRadius:isMobile?"28px":"34px",
+borderRadius:isMobile?"22px":"30px",
 
-padding:
-isMobile
-?"28px 22px"
-:"50px",
+padding:isMobile?"22px 18px":"40px",
 
 textAlign:"center",
 
@@ -1443,19 +1415,19 @@ overflow:"hidden",
 
 color:"#FFFFFF",
 
-boxShadow:"0 20px 50px rgba(37,99,235,.25)",
+boxShadow:"0 14px 35px rgba(37,99,235,.22)",
 }}
 >
 
-{/* REFLETS */}
+{/* BULLES */}
 
 <div
 style={{
 position:"absolute",
-top:"-120px",
-left:"-120px",
-width:"260px",
-height:"260px",
+top:"-110px",
+left:"-110px",
+width:"220px",
+height:"220px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.08)",
 }}
@@ -1464,10 +1436,10 @@ background:"rgba(255,255,255,.08)",
 <div
 style={{
 position:"absolute",
-bottom:"-100px",
-right:"-90px",
-width:"220px",
-height:"220px",
+bottom:"-80px",
+right:"-80px",
+width:"180px",
+height:"180px",
 borderRadius:"50%",
 background:"rgba(255,255,255,.05)",
 }}
@@ -1477,19 +1449,13 @@ background:"rgba(255,255,255,.05)",
 
 <div
 style={{
-width:
-isMobile
-?"82px"
-:"100px",
+width:isMobile?"70px":"90px",
 
-height:
-isMobile
-?"82px"
-:"100px",
+height:isMobile?"70px":"90px",
 
-margin:"0 auto 22px",
+margin:"0 auto 18px",
 
-borderRadius:"24px",
+borderRadius:"22px",
 
 background:"rgba(255,255,255,.15)",
 
@@ -1499,7 +1465,7 @@ justifyContent:"center",
 
 alignItems:"center",
 
-backdropFilter:"blur(12px)",
+backdropFilter:"blur(10px)",
 
 position:"relative",
 
@@ -1509,11 +1475,7 @@ zIndex:2,
 
 <FaStore
 style={{
-fontSize:
-isMobile
-?"40px"
-:"50px",
-
+fontSize:isMobile?"34px":"46px",
 color:"#FFD54A",
 }}
 />
@@ -1528,10 +1490,7 @@ margin:0,
 
 fontWeight:"900",
 
-fontSize:
-isMobile
-?"30px"
-:"46px",
+fontSize:isMobile?"26px":"40px",
 
 position:"relative",
 
@@ -1543,20 +1502,15 @@ Achetez en toute confiance
 
 </h2>
 
-{/* TEXTE */}
-
 <p
 style={{
-margin:"18px auto 28px",
+margin:"16px auto 22px",
 
-maxWidth:"700px",
+maxWidth:"620px",
 
-fontSize:
-isMobile
-?"16px"
-:"18px",
+fontSize:isMobile?"15px":"17px",
 
-lineHeight:"30px",
+lineHeight:"28px",
 
 opacity:.95,
 
@@ -1566,23 +1520,13 @@ zIndex:2,
 }}
 >
 
-Des milliers de Camerounais font déjà confiance à
+Des milliers de Camerounais font confiance à
 
-<b translate="no">
-{" "}KONAN SHOPPING CAMEROUN
-</b>
+<b translate="no"> KONAN SHOPPING CAMEROUN</b>.
 
-pour leurs achats.
-
-Profitez d'une livraison rapide,
-
-d'un paiement uniquement à la livraison
-
-et d'un service client toujours disponible.
+Profitez d'une livraison rapide et d'un paiement uniquement à la livraison.
 
 </p>
-
-{/* BADGES */}
 
 <div
 style={{
@@ -1592,9 +1536,9 @@ justifyContent:"center",
 
 flexWrap:"wrap",
 
-gap:"12px",
+gap:"10px",
 
-marginBottom:"30px",
+marginBottom:"22px",
 
 position:"relative",
 
@@ -1625,12 +1569,12 @@ key={index}
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
-padding:"10px 18px",
+gap:"6px",
+padding:"8px 14px",
 borderRadius:"40px",
-background:"rgba(255,255,255,.15)",
-fontWeight:"800",
-fontSize:"13px",
+background:"rgba(255,255,255,.14)",
+fontWeight:"700",
+fontSize:"12px",
 }}
 >
 
@@ -1650,17 +1594,14 @@ fontSize:"13px",
 to="/boutique"
 style={{
 display:"inline-flex",
-
 alignItems:"center",
-
 justifyContent:"center",
-
-gap:"10px",
+gap:"8px",
 
 padding:
 isMobile
-?"16px 28px"
-:"18px 34px",
+?"14px 22px"
+:"16px 30px",
 
 background:"#FFFFFF",
 
@@ -1670,14 +1611,14 @@ fontWeight:"900",
 
 fontSize:
 isMobile
-?"15px"
-:"17px",
+?"14px"
+:"16px",
 
 textDecoration:"none",
 
-borderRadius:"18px",
+borderRadius:"16px",
 
-boxShadow:"0 10px 30px rgba(0,0,0,.18)",
+boxShadow:"0 8px 24px rgba(0,0,0,.15)",
 
 position:"relative",
 
@@ -1699,28 +1640,28 @@ Découvrir la boutique
 
 <footer
 style={{
-marginTop:"20px",
+marginTop:"16px",
 
 marginBottom:
 isMobile
-?"90px"
+?"88px"
 :"20px",
 
 background:"#FFFFFF",
 
 borderRadius:
 isMobile
-?"28px 28px 0 0"
-:"32px",
+?"24px 24px 0 0"
+:"30px",
 
 padding:
 isMobile
-?"30px 22px"
-:"45px",
+?"24px 18px"
+:"40px",
 
 border:"1px solid #EEF2F7",
 
-boxShadow:"0 10px 35px rgba(15,23,42,.06)",
+boxShadow:"0 8px 24px rgba(15,23,42,.05)",
 }}
 >
 
@@ -1740,34 +1681,34 @@ alt="Logo"
 style={{
 width:
 isMobile
-?"78px"
-:"90px",
+?"64px"
+:"82px",
 
 height:
 isMobile
-?"78px"
-:"90px",
+?"64px"
+:"82px",
 
-borderRadius:"22px",
+borderRadius:"18px",
 
 objectFit:"cover",
 
-boxShadow:"0 10px 25px rgba(37,99,235,.15)",
+boxShadow:"0 8px 18px rgba(37,99,235,.15)",
 }}
 />
 
 <h2
 translate="no"
 style={{
-marginTop:"18px",
-marginBottom:"8px",
+marginTop:"14px",
+marginBottom:"6px",
 
 fontWeight:"900",
 
 fontSize:
 isMobile
-?"28px"
-:"36px",
+?"22px"
+:"32px",
 
 color:"#111827",
 }}
@@ -1781,13 +1722,13 @@ KONAN SHOPPING
 style={{
 margin:0,
 
-maxWidth:"650px",
+maxWidth:"560px",
 
 textAlign:"center",
 
-fontSize:"15px",
+fontSize:"14px",
 
-lineHeight:"28px",
+lineHeight:"24px",
 
 color:"#6B7280",
 }}
@@ -1795,11 +1736,7 @@ color:"#6B7280",
 
 Votre boutique en ligne de confiance au Cameroun.
 
-Profitez d'une livraison rapide,
-
-d'un paiement uniquement à la livraison
-
-et d'un service client disponible 7j/7.
+Paiement à la livraison • Livraison rapide • Support 7j/7
 
 </p>
 
@@ -1809,7 +1746,7 @@ et d'un service client disponible 7j/7.
 
 <div
 style={{
-marginTop:"34px",
+marginTop:"26px",
 
 display:"flex",
 
@@ -1817,7 +1754,7 @@ justifyContent:"center",
 
 flexWrap:"wrap",
 
-gap:"18px",
+gap:"14px",
 }}
 >
 
@@ -1826,9 +1763,10 @@ to="/boutique"
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 textDecoration:"none",
 fontWeight:"800",
+fontSize:"14px",
 color:"#2563EB",
 }}
 >
@@ -1844,9 +1782,10 @@ to="/promotions"
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 textDecoration:"none",
 fontWeight:"800",
+fontSize:"14px",
 color:"#2563EB",
 }}
 >
@@ -1862,9 +1801,10 @@ to="/conditions"
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 textDecoration:"none",
 fontWeight:"800",
+fontSize:"14px",
 color:"#2563EB",
 }}
 >
@@ -1880,9 +1820,10 @@ to="/privacy-policy"
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 textDecoration:"none",
 fontWeight:"800",
+fontSize:"14px",
 color:"#2563EB",
 }}
 >
@@ -1900,9 +1841,10 @@ rel="noreferrer"
 style={{
 display:"flex",
 alignItems:"center",
-gap:"8px",
+gap:"6px",
 textDecoration:"none",
 fontWeight:"800",
+fontSize:"14px",
 color:"#16A34A",
 }}
 >
@@ -1919,11 +1861,11 @@ WhatsApp
 
 <div
 style={{
-marginTop:"34px",
+marginTop:"26px",
 
-padding:"20px",
+padding:"16px",
 
-borderRadius:"20px",
+borderRadius:"18px",
 
 background:"#F8FAFC",
 
@@ -1931,10 +1873,10 @@ display:"grid",
 
 gridTemplateColumns:
 isMobile
-?"repeat(2,1fr)"
+?"repeat(2,minmax(0,1fr))"
 :"repeat(4,1fr)",
 
-gap:"16px",
+gap:"14px",
 }}
 >
 
@@ -1969,17 +1911,30 @@ color:"#F59E0B",
 key={index}
 style={{
 display:"flex",
+flexDirection:"column",
 alignItems:"center",
 justifyContent:"center",
-gap:"8px",
-fontWeight:"800",
-fontSize:"14px",
+gap:"6px",
+
+fontWeight:"700",
+
+fontSize:"12px",
+
 color:item.color,
+
 textAlign:"center",
 }}
 >
 
+<div
+style={{
+fontSize:"20px",
+}}
+>
+
 {item.icon}
+
+</div>
 
 {item.text}
 
@@ -1993,9 +1948,9 @@ textAlign:"center",
 
 <div
 style={{
-marginTop:"30px",
+marginTop:"24px",
 
-paddingTop:"20px",
+paddingTop:"18px",
 
 borderTop:"1px solid #E5E7EB",
 
@@ -2007,9 +1962,9 @@ textAlign:"center",
 style={{
 margin:0,
 
-fontSize:"13px",
+fontSize:"12px",
 
-lineHeight:"26px",
+lineHeight:"22px",
 
 color:"#9CA3AF",
 }}
