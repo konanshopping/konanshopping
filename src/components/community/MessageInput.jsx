@@ -1,18 +1,39 @@
-import { useState } from "react";
+import {
+  useState,
+  useRef,
+  useEffect
+} from "react";
 
 import {
+
   FaPlus,
+
   FaSmile,
+
   FaPaperPlane,
+
   FaMicrophone,
+
+  FaTimes,
+
   FaImage,
+
   FaCamera,
+
   FaVideo,
+
   FaFileAlt,
+
   FaMapMarkerAlt,
+
   FaPoll,
+
   FaGift,
-  FaHeadphones
+
+  FaHeadphones,
+
+  FaUser
+
 } from "react-icons/fa";
 
 function MessageInput({
@@ -21,13 +42,13 @@ function MessageInput({
 
   onImage,
 
-  onCamera,
-
   onVideo,
 
   onFile,
 
   onVoice,
+
+  onCamera,
 
   onLocation,
 
@@ -35,16 +56,53 @@ function MessageInput({
 
   onGift,
 
-  onAudio
+  onContact
 
 }) {
 
   const [text, setText] =
     useState("");
 
-  const [showMenu,
-    setShowMenu] =
+  const [menuOpen,
+    setMenuOpen] =
     useState(false);
+
+  const [recording,
+    setRecording] =
+    useState(false);
+
+  const [emojiOpen,
+    setEmojiOpen] =
+    useState(false);
+
+  const imageRef =
+    useRef(null);
+
+  const videoRef =
+    useRef(null);
+
+  const fileRef =
+    useRef(null);
+
+  const mediaRecorder =
+    useRef(null);
+
+  const chunks =
+    useRef([]);
+
+  const emojis = [
+
+    "😀","😁","😂","🤣","😊",
+
+    "😍","😘","😎","🤩","😭",
+
+    "😡","😮","👍","👏","🙏",
+
+    "🔥","❤️","💙","🎉","💯",
+
+    "😇","🤝","😅","🥳"
+
+  ];
 
   const sendMessage = () => {
 
@@ -54,7 +112,81 @@ function MessageInput({
 
     setText("");
 
-    setShowMenu(false);
+    setEmojiOpen(false);
+
+    setMenuOpen(false);
+
+  };
+
+  useEffect(() => {
+
+    if (!recording) return;
+
+    navigator.mediaDevices
+
+      .getUserMedia({
+
+        audio: true
+
+      })
+
+      .then((stream) => {
+
+        const recorder =
+          new MediaRecorder(stream);
+
+        mediaRecorder.current =
+          recorder;
+
+        chunks.current = [];
+
+        recorder.ondataavailable =
+          (e) => {
+
+            chunks.current.push(
+              e.data
+            );
+
+          };
+
+        recorder.onstop = () => {
+
+          const blob =
+            new Blob(
+              chunks.current,
+              {
+                type:
+                  "audio/webm"
+              }
+            );
+
+          onVoice?.(blob);
+
+          stream
+            .getTracks()
+            .forEach(track =>
+              track.stop()
+            );
+
+        };
+
+        recorder.start();
+
+      });
+
+  }, [recording]);
+
+  const stopRecording = () => {
+
+    if (
+      mediaRecorder.current
+    ) {
+
+      mediaRecorder.current.stop();
+
+    }
+
+    setRecording(false);
 
   };
 
@@ -62,190 +194,434 @@ function MessageInput({
 
     <>
 
-      {/* MENU D'ACTIONS */}
+      <input
 
-      {showMenu && (
+        ref={imageRef}
+
+        hidden
+
+        type="file"
+
+        accept="image/*"
+
+        onChange={(e)=>{
+
+          const file =
+            e.target.files?.[0];
+
+          if(file){
+
+            onImage?.(file);
+
+          }
+
+        }}
+
+      />
+
+      <input
+
+        ref={videoRef}
+
+        hidden
+
+        type="file"
+
+        accept="video/*"
+
+        onChange={(e)=>{
+
+          const file =
+            e.target.files?.[0];
+
+          if(file){
+
+            onVideo?.(file);
+
+          }
+
+        }}
+
+      />
+
+      <input
+
+        ref={fileRef}
+
+        hidden
+
+        type="file"
+
+        onChange={(e)=>{
+
+          const file =
+            e.target.files?.[0];
+
+          if(file){
+
+            onFile?.(file);
+
+          }
+
+        }}
+
+      />
+
+      {/* ==========================
+          OVERLAY
+      ========================== */}
+
+      {menuOpen && (
 
         <div
+
+          onClick={() => setMenuOpen(false)}
+
           style={{
 
-            margin: "0 14px 12px",
+            position: "fixed",
 
-            background: "#FFFFFF",
+            inset: 0,
 
-            borderRadius: "28px",
+            background: "rgba(0,0,0,.28)",
 
-            padding: "22px",
+            backdropFilter: "blur(3px)",
 
-            boxShadow:
-              "0 15px 40px rgba(0,0,0,.12)",
-
-            animation:
-              "menuUp .25s ease"
+            zIndex: 998
 
           }}
-        >
 
-          <div
-            style={{
-
-              display: "grid",
-
-              gridTemplateColumns:
-                "repeat(5,1fr)",
-
-              gap: "22px"
-
-            }}
-          >
-
-            {/* PHOTO */}
-
-          <ActionButton
-            icon={<FaImage />}
-            label="Photo"
-            color="#6366F1"
-            onClick={onImage}
-          />
-
-          {/* CAMÉRA */}
-
-          <ActionButton
-            icon={<FaCamera />}
-            label="Caméra"
-            color="#EC4899"
-            onClick={onCamera}
-          />
-
-          {/* VIDÉO */}
-
-          <ActionButton
-            icon={<FaVideo />}
-            label="Vidéo"
-            color="#F97316"
-            onClick={onVideo}
-          />
-
-          {/* DOCUMENT */}
-
-          <ActionButton
-            icon={<FaFileAlt />}
-            label="Document"
-            color="#22C55E"
-            onClick={onFile}
-          />
-
-          {/* LOCALISATION */}
-
-          <ActionButton
-            icon={<FaMapMarkerAlt />}
-            label="Position"
-            color="#F59E0B"
-            onClick={onLocation}
-          />
-
-          {/* SONDAGE */}
-
-          <ActionButton
-            icon={<FaPoll />}
-            label="Sondage"
-            color="#8B5CF6"
-            onClick={onPoll}
-          />
-
-          {/* AUDIO */}
-
-          <ActionButton
-            icon={<FaHeadphones />}
-            label="Audio"
-            color="#2563EB"
-            onClick={onAudio}
-          />
-
-          {/* CADEAU */}
-
-          <ActionButton
-            icon={<FaGift />}
-            label="Cadeau"
-            color="#EC4899"
-            onClick={onGift}
-          />
-
-        </div>
-
-      </div>
+        />
 
       )}
 
-            {/* BARRE FLOTTANTE */}
+      {/* ==========================
+          BOTTOM SHEET
+      ========================== */}
 
       <div
+
         style={{
-          margin: "0 12px 12px",
+
+          position: "fixed",
+
+          left: 0,
+
+          right: 0,
+
+          bottom: menuOpen ? 0 : "-420px",
+
           background: "#FFFFFF",
-          borderRadius: 35,
-          boxShadow:
-            "0 10px 35px rgba(0,0,0,.12)",
-          display: "flex",
-          alignItems: "center",
-          padding: "8px",
-          gap: 8
+
+          borderTopLeftRadius: 28,
+
+          borderTopRightRadius: 28,
+
+          transition: ".35s",
+
+          boxShadow: "0 -10px 35px rgba(0,0,0,.18)",
+
+          zIndex: 999,
+
+          padding: "18px"
+
         }}
+
+      >
+
+        <div
+
+          style={{
+
+            width: 50,
+
+            height: 5,
+
+            background: "#D1D5DB",
+
+            borderRadius: 20,
+
+            margin: "0 auto 18px"
+
+          }}
+
+        />
+
+        <div
+
+          style={{
+
+            display: "grid",
+
+            gridTemplateColumns: "repeat(4,1fr)",
+
+            gap: 20
+
+          }}
+
+        >
+
+          <ActionButton
+  icon={<FaImage />}
+  label="Photo"
+  color="#4F46E5"
+  onClick={() => {
+    imageRef.current?.click();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaCamera />}
+  label="Caméra"
+  color="#EC4899"
+  onClick={() => {
+    onCamera?.();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaVideo />}
+  label="Vidéo"
+  color="#F97316"
+  onClick={() => {
+    videoRef.current?.click();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaFileAlt />}
+  label="Document"
+  color="#22C55E"
+  onClick={() => {
+    fileRef.current?.click();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaMapMarkerAlt />}
+  label="Position"
+  color="#F59E0B"
+  onClick={() => {
+    onLocation?.();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaPoll />}
+  label="Sondage"
+  color="#8B5CF6"
+  onClick={() => {
+    onPoll?.();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaHeadphones />}
+  label="Audio"
+  color="#2563EB"
+  onClick={() => {
+    setRecording(true);
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaGift />}
+  label="Cadeau"
+  color="#DB2777"
+  onClick={() => {
+    onGift?.();
+    setMenuOpen(false);
+  }}
+/>
+
+<ActionButton
+  icon={<FaUser />}
+  label="Contact"
+  color="#0EA5E9"
+  onClick={() => {
+    onContact?.();
+    setMenuOpen(false);
+  }}
+/>
+
+        </div>
+        </div>
+
+    
+      {/* ==========================
+          BARRE FLOTTANTE
+      ========================== */}
+
+      <div
+
+        style={{
+
+          position: "sticky",
+
+          bottom: 10,
+
+          margin: "0 10px calc(env(safe-area-inset-bottom) + 8px)",
+
+          background: "#FFFFFF",
+
+          borderRadius: 32,
+
+          boxShadow: "0 10px 30px rgba(0,0,0,.12)",
+
+          display: "flex",
+
+          alignItems: "center",
+
+          padding: "6px",
+
+          gap: 6,
+
+          zIndex: 1000
+
+        }}
+
       >
 
         {/* PLUS */}
 
         <button
-          onClick={() =>
-            setShowMenu(!showMenu)
-          }
+
+          onClick={() => setMenuOpen(!menuOpen)}
+
           style={{
-            width: 46,
-            height: 46,
+
+            width: 42,
+
+            height: 42,
+
             borderRadius: "50%",
+
             border: "none",
-            background: "#F3F4F6",
+
+            background: "#EEF2FF",
+
             color: "#2563EB",
-            fontSize: 20,
-            cursor: "pointer"
+
+            cursor: "pointer",
+
+            display: "flex",
+
+            justifyContent: "center",
+
+            alignItems: "center",
+
+            fontSize: 18
+
           }}
+
         >
-          <FaPlus />
+
+          {menuOpen ? <FaTimes /> : <FaPlus />}
+
         </button>
 
         {/* CHAMP */}
 
         <input
-          type="text"
+
           value={text}
-          onChange={(e) =>
-            setText(e.target.value)
-          }
+
+          onChange={(e)=>setText(e.target.value)}
+
           placeholder="Écrivez un message..."
+
           style={{
+
             flex: 1,
+
             border: "none",
+
             outline: "none",
-            fontSize: 15,
+
             background: "transparent",
-            padding: "0 10px"
+
+            fontSize: 15,
+
+            padding: "0 8px"
+
           }}
+
         />
 
         {/* EMOJI */}
 
         <button
+
+          onClick={()=>setEmojiOpen(!emojiOpen)}
+
           style={{
+
             border: "none",
+
             background: "transparent",
+
             color: "#6B7280",
-            fontSize: 22,
+
+            fontSize: 20,
+
             cursor: "pointer"
+
           }}
+
         >
+
           <FaSmile />
+
         </button>
 
+        {emojiOpen && (
+
+  <div
+    style={{
+      position: "absolute",
+      bottom: 70,
+      right: 16,
+      width: 290,
+      background: "#FFFFFF",
+      borderRadius: 20,
+      padding: 12,
+      boxShadow: "0 10px 30px rgba(0,0,0,.18)",
+      display: "grid",
+      gridTemplateColumns: "repeat(6,1fr)",
+      gap: 10
+    }}
+  >
+
+    {emojis.map((emoji) => (
+
+      <button
+        key={emoji}
+        onClick={() => {
+          setText((prev) => prev + emoji);
+          setEmojiOpen(false);
+        }}
+        style={{
+          border: "none",
+          background: "transparent",
+          fontSize: 24,
+          cursor: "pointer"
+        }}
+      >
+        {emoji}
+      </button>
+
+    ))}
+
+  </div>
+
+)}
 
 {/* MICRO OU ENVOYER */}
 
@@ -254,17 +630,18 @@ function MessageInput({
           <button
             onClick={sendMessage}
             style={{
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               borderRadius: "50%",
               border: "none",
-              background: "#2563EB",
+              background: "linear-gradient(135deg,#2563EB,#5B2E91)",
               color: "#FFFFFF",
+              cursor: "pointer",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              cursor: "pointer",
-              fontSize: 18
+              fontSize: 17,
+              boxShadow: "0 8px 20px rgba(37,99,235,.35)"
             }}
           >
             <FaPaperPlane />
@@ -273,19 +650,25 @@ function MessageInput({
         ) : (
 
           <button
-            onClick={onVoice}
+            onMouseDown={() => setRecording(true)}
+            onMouseUp={stopRecording}
+            onTouchStart={() => setRecording(true)}
+            onTouchEnd={stopRecording}
             style={{
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               borderRadius: "50%",
               border: "none",
-              background: "#10B981",
+              background: recording
+                ? "#EF4444"
+                : "#10B981",
               color: "#FFFFFF",
+              cursor: "pointer",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              cursor: "pointer",
-              fontSize: 18
+              fontSize: 17,
+              boxShadow: "0 8px 20px rgba(16,185,129,.35)"
             }}
           >
             <FaMicrophone />
@@ -300,6 +683,10 @@ function MessageInput({
   );
 
 }
+
+/* ==========================
+   ACTION BUTTON
+========================== */
 
 function ActionButton({
 
@@ -330,15 +717,16 @@ function ActionButton({
 
       <div
         style={{
-          width: 58,
-          height: 58,
+          width: 52,
+          height: 52,
           borderRadius: "50%",
           background: color,
-          color: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          fontSize: 22
+          color: "#FFFFFF",
+          fontSize: 20,
+          boxShadow: "0 8px 18px rgba(0,0,0,.15)"
         }}
       >
         {icon}
@@ -347,8 +735,9 @@ function ActionButton({
       <span
         style={{
           fontSize: 12,
+          color: "#374151",
           fontWeight: 600,
-          color: "#374151"
+          textAlign: "center"
         }}
       >
         {label}
