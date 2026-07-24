@@ -957,7 +957,7 @@ function Community() {
 
           {announcement?.message ||
 
-            "Aucun message épinglé."}
+            "Bienvenue dans la communauté officielle KONAN SHOPPING. Respectez les règles et échangez avec les autres clients."}
 
         </div>
 
