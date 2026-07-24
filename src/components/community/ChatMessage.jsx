@@ -8,6 +8,11 @@ import {
   FaReply
 } from "react-icons/fa";
 
+import {
+  FaCheck,
+  FaCheckDouble
+} from "react-icons/fa";
+
 function ChatMessage({
 
   message,

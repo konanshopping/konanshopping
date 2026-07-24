@@ -484,8 +484,8 @@ function Community() {
         <>
 
           <PinnedMessage
-            announcement={announcement}
-          />
+  announcement={announcement}
+/>
 
           <ChatList
             messages={messages}

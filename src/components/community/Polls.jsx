@@ -13,11 +13,15 @@ import {
 
 function Polls({
 
-  polls = [],
+  polls,
 
   onVote
 
 }) {
+
+  const safePolls = Array.isArray(polls)
+    ? polls
+    : [];
 
   const [search, setSearch] =
     useState("");
@@ -25,15 +29,15 @@ function Polls({
   const filteredPolls =
     useMemo(() => {
 
-      return polls.filter((poll) =>
+      return safePolls.filter((poll) =>
 
-        poll.question
+        poll?.question
           ?.toLowerCase()
           .includes(search.toLowerCase())
 
       );
 
-    }, [polls, search]);
+    }, [safePolls, search]);
 
   return (
 
@@ -106,7 +110,7 @@ function Polls({
 
           <div
 
-            key={poll._id}
+            key={poll._id || poll.id || poll.question}
 
             style={{
 
@@ -207,7 +211,7 @@ function Polls({
 
             </div>
 
-            {poll.options.map((option,index)=>{
+            {(poll.options || []).map((option, index) => {
 
               const percent =
                 poll.totalVotes === 0
@@ -232,12 +236,12 @@ function Polls({
 
                   disabled={poll.closed}
 
-                  onClick={()=>
-                    onVote(
-                      poll._id,
-                      index
-                    )
-                  }
+                  onClick={() =>
+  onVote?.(
+    poll._id || poll.id,
+    index
+  )
+}
 
                   style={{
 

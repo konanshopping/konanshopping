@@ -158,7 +158,7 @@ function ChatList({
         return (
 
           <div
-            key={message._id}
+            key={message._id || message.id || `${message.createdAt}-${message.sender}`}
             style={{
               animation:
                 "fadeMessage .25s ease"

@@ -12,9 +12,13 @@ import {
 
 function Media({
 
-  media = []
+  media
 
 }) {
+
+  const safeMedia = Array.isArray(media)
+    ? media
+    : [];
 
   const [search, setSearch] =
     useState("");
@@ -25,15 +29,15 @@ function Media({
   const filteredMedia =
     useMemo(() => {
 
-      return media.filter((item) =>
+      return safeMedia.filter((item) =>
 
-        item.user
+        item?.user
           ?.toLowerCase()
           .includes(search.toLowerCase())
 
       );
 
-    }, [media, search]);
+    }, [safeMedia, search]);
 
   return (
 
@@ -108,7 +112,7 @@ function Media({
 
           <div
 
-            key={item._id}
+            key={item._id || item.id || item.url}
 
             onClick={()=>
               setSelected(item)

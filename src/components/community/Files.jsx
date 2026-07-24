@@ -16,7 +16,7 @@ import {
 
 function Files({
 
-  files = [],
+  files,
 
   onPreview,
 
@@ -24,19 +24,25 @@ function Files({
 
 }) {
 
+  const safeFiles = Array.isArray(files)
+    ? files
+    : [];
+
   const [search, setSearch] =
     useState("");
 
   const filteredFiles =
     useMemo(() => {
 
-      return files.filter(file =>
-        file.name
+      return safeFiles.filter(file =>
+
+        file?.name
           ?.toLowerCase()
           .includes(search.toLowerCase())
+
       );
 
-    }, [files, search]);
+    }, [safeFiles, search]);
 
   const getIcon = (type) => {
 
@@ -130,7 +136,7 @@ function Files({
 
           <div
 
-            key={file._id}
+           key={file._id || file.id || file.name}
 
             style={{
 
@@ -236,9 +242,7 @@ function Files({
 
               <button
 
-                onClick={()=>
-                  onPreview(file)
-                }
+                onClick={() => onPreview?.(file)}
 
                 style={{
 
@@ -278,9 +282,7 @@ function Files({
 
               <button
 
-                onClick={()=>
-                  onDownload(file)
-                }
+                onClick={() => onDownload?.(file)}
 
                 style={{
 
