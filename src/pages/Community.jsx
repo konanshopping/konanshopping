@@ -4,6 +4,13 @@ import {
   useRef
 } from "react";
 
+import {
+  FaBullhorn,
+  FaThumbtack,
+  FaCheckCircle,
+  FaTimes
+} from "react-icons/fa";
+
 import axios from "axios";
 
 import { io } from "socket.io-client";
@@ -37,6 +44,7 @@ function Community() {
   const [announcement, setAnnouncement] =
     useState(null);
 
+    const [showPinned, setShowPinned] = useState(false);
   /* ==========================
      USER
   ========================== */
@@ -483,8 +491,9 @@ function Community() {
 
         <>
 
-          <PinnedMessage
+   <PinnedMessage
   announcement={announcement}
+  onClick={() => setShowPinned(true)}
 />
 
           <ChatList
@@ -675,10 +684,324 @@ function Community() {
 
       />
 
+{showPinned && (
+
+  <div
+
+    onClick={() => setShowPinned(false)}
+
+    style={{
+
+      position: "fixed",
+
+      inset: 0,
+
+      background: "rgba(15,23,42,.72)",
+
+      backdropFilter: "blur(8px)",
+
+      display: "flex",
+
+      alignItems: "flex-end",
+
+      justifyContent: "center",
+
+      zIndex: 99999
+
+    }}
+
+  >
+
+    <div
+
+      onClick={(e) => e.stopPropagation()}
+
+      style={{
+
+        width: "100%",
+
+        maxWidth: 600,
+
+        maxHeight: "88vh",
+
+        overflowY: "auto",
+
+        background: "#FFFFFF",
+
+        borderTopLeftRadius: 28,
+
+        borderTopRightRadius: 28,
+
+        boxShadow: "0 -15px 40px rgba(0,0,0,.25)",
+
+        animation: "slideUp .25s ease",
+
+        padding: 24
+
+      }}
+
+    >
+
+      <div
+
+        style={{
+
+          width: 60,
+
+          height: 6,
+
+          background: "#D1D5DB",
+
+          borderRadius: 20,
+
+          margin: "0 auto 20px"
+
+        }}
+
+      />
+
+      <div
+
+        style={{
+
+          display: "flex",
+
+          justifyContent: "space-between",
+
+          alignItems: "center",
+
+          marginBottom: 20
+
+        }}
+
+      >
+
+        <div
+
+          style={{
+
+            display: "flex",
+
+            alignItems: "center",
+
+            gap: 14
+
+          }}
+
+        >
+
+          <div
+
+            style={{
+
+              width: 58,
+
+              height: 58,
+
+              borderRadius: 18,
+
+              background:
+                "linear-gradient(135deg,#2563EB,#5B2E91)",
+
+              display: "flex",
+
+              justifyContent: "center",
+
+              alignItems: "center",
+
+              color: "#FFFFFF",
+
+              fontSize: 24
+
+            }}
+
+          >
+
+            <FaBullhorn />
+
+          </div>
+
+          <div>
+
+            <div
+
+              style={{
+
+                display: "flex",
+
+                alignItems: "center",
+
+                gap: 8
+
+              }}
+
+            >
+
+              <FaThumbtack color="#2563EB" />
+
+              <span
+
+                style={{
+
+                  fontSize: 20,
+
+                  fontWeight: 800,
+
+                  color: "#111827"
+
+                }}
+
+              >
+
+                Message épinglé
+
+              </span>
+
+              <FaCheckCircle color="#22C55E" />
+
+            </div>
+
+            <div
+
+              style={{
+
+                marginTop: 6,
+
+                color: "#6B7280",
+
+                fontSize: 13
+
+              }}
+
+            >
+
+              {announcement?.author || "Administration"}
+
+              {" • "}
+
+              {announcement?.date || ""}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <button
+
+          onClick={() => setShowPinned(false)}
+
+          style={{
+
+            border: "none",
+
+            background: "#F3F4F6",
+
+            width: 42,
+
+            height: 42,
+
+            borderRadius: "50%",
+
+            cursor: "pointer",
+
+            display: "flex",
+
+            justifyContent: "center",
+
+            alignItems: "center"
+
+          }}
+
+        >
+
+          <FaTimes color="#374151" />
+
+        </button>
+
+      </div>
+
+      <div
+
+        style={{
+
+          background: "#F8FAFC",
+
+          border: "1px solid #E5E7EB",
+
+          borderRadius: 20,
+
+          padding: 20
+
+        }}
+
+      >
+
+        <div
+
+          style={{
+
+            fontSize: 16,
+
+            color: "#374151",
+
+            lineHeight: "30px",
+
+            whiteSpace: "pre-wrap",
+
+            wordBreak: "break-word"
+
+          }}
+
+        >
+
+          {announcement?.message ||
+
+            "Aucun message épinglé."}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <style>
+
+      {`
+
+      @keyframes slideUp{
+
+        from{
+
+          transform:translateY(100%);
+
+          opacity:0;
+
+        }
+
+        to{
+
+          transform:translateY(0);
+
+          opacity:1;
+
+        }
+
+      }
+
+      `}
+
+    </style>
+
+  </div>
+
+)}
+
     </div>
 
   );
 
 }
+
 
 export default Community;
