@@ -1,16 +1,11 @@
+import { useState } from "react";
+
 import {
   FaUserShield,
   FaStore,
-  FaCheck,
-  FaCheckDouble,
-  FaEllipsisV
-} from "react-icons/fa";
-
-import {
-  FaReply,
-  FaImage,
-  FaVideo,
-  FaFileAlt
+  FaCheckCircle,
+  FaEllipsisV,
+  FaReply
 } from "react-icons/fa";
 
 function ChatMessage({
@@ -19,45 +14,145 @@ function ChatMessage({
 
   currentUser,
 
+  onReply,
+
   onMenu,
 
-  onReply
+  onReaction
 
 }) {
 
   const isMine =
     message.senderId === currentUser?._id;
 
+  const [showReactions,
+    setShowReactions] =
+    useState(false);
+
+  const reactions = [
+    "👍",
+    "❤️",
+    "😂",
+    "😮",
+    "😢",
+    "🔥"
+  ];
+
   return (
 
     <div
       style={{
         display: "flex",
-
         justifyContent:
           isMine
             ? "flex-end"
             : "flex-start",
-
-        padding: "8px 14px"
+        padding: "10px 14px",
+        position: "relative"
       }}
+
+      onContextMenu={(e) => {
+
+        e.preventDefault();
+
+        setShowReactions(
+          !showReactions
+        );
+
+      }}
+
+      onTouchStart={() => {
+
+        const timer =
+          setTimeout(() => {
+
+            setShowReactions(
+              true
+            );
+
+          }, 500);
+
+        return () =>
+          clearTimeout(timer);
+
+      }}
+
     >
+
+      {/* Barre des réactions */}
+
+      {showReactions && (
+
+        <div
+          style={{
+            position: "absolute",
+            top: -12,
+            left: isMine ? "auto" : 60,
+            right: isMine ? 20 : "auto",
+            background: "#FFFFFF",
+            borderRadius: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "8px 12px",
+            boxShadow:
+              "0 10px 25px rgba(0,0,0,.15)",
+            zIndex: 100
+          }}
+        >
+
+          {reactions.map((emoji) => (
+
+            <button
+
+              key={emoji}
+
+              onClick={() => {
+
+                onReaction?.(
+                  message,
+                  emoji
+                );
+
+                setShowReactions(
+                  false
+                );
+
+              }}
+
+              style={{
+
+                border: "none",
+
+                background: "transparent",
+
+                fontSize: 24,
+
+                cursor: "pointer"
+
+              }}
+
+            >
+
+              {emoji}
+
+            </button>
+
+          ))}
+
+        </div>
+
+      )}
 
       <div
         style={{
           display: "flex",
-
           flexDirection:
             isMine
               ? "row-reverse"
               : "row",
-
           alignItems: "flex-end",
-
-          gap: "10px",
-
-          width: "100%",
-
+          gap: 12,
           maxWidth: "100%"
         }}
       >
@@ -77,15 +172,19 @@ function ChatMessage({
 
             style={{
 
-              width: 42,
+              width: 46,
 
-              height: 42,
+              height: 46,
 
               borderRadius: "50%",
 
               objectFit: "cover",
 
-              flexShrink: 0
+              border:
+                "3px solid #FFFFFF",
+
+              boxShadow:
+                "0 6px 18px rgba(91,46,145,.18)"
 
             }}
 
@@ -93,58 +192,42 @@ function ChatMessage({
 
         )}
 
-        {/* Contenu */}
-
         <div
           style={{
-            maxWidth: "78%",
-
             display: "flex",
-
-            flexDirection: "column"
+            flexDirection: "column",
+            maxWidth: "80%"
           }}
         >
-
-          {/* En-tête */}
 
           {!isMine && (
 
             <div
               style={{
                 display: "flex",
-
                 alignItems: "center",
-
                 gap: 6,
-
-                marginBottom: 5,
-
+                marginBottom: 6,
                 flexWrap: "wrap"
               }}
             >
 
-              <span
+              <strong
                 style={{
-                  fontWeight: 700,
-
-                  fontSize: 14,
-
-                  color: "#111827"
+                  color: "#5B2E91",
+                  fontSize: 15
                 }}
               >
 
                 {message.senderName}
 
-              </span>
+              </strong>
 
               {message.role ===
                 "admin" && (
 
                 <FaUserShield
-                  style={{
-                    color: "#2563EB",
-                    fontSize: 13
-                  }}
+                  color="#5B2E91"
                 />
 
               )}
@@ -153,328 +236,414 @@ function ChatMessage({
                 "seller" && (
 
                 <FaStore
-                  style={{
-                    color: "#10B981",
-                    fontSize: 13
-                  }}
+                  color="#F97316"
                 />
 
               )}
 
-              <span
-                style={{
-                  fontSize: 11,
+              {message.verified && (
 
-                  color: "#9CA3AF"
-                }}
-              >
+                <FaCheckCircle
+                  color="#22C55E"
+                />
 
-                {message.time}
-
-              </span>
+              )}
 
             </div>
 
           )}
 
-          {/* Message répondu */}
+          {/* ==========================
+              MESSAGE RÉPONDU
+          ========================== */}
 
-{message.replyTo && (
+          {message.replyTo && (
 
-  <div
-    style={{
-      background: "#F8FAFC",
-      borderLeft: "4px solid #2563EB",
-      borderRadius: "14px",
-      padding: "12px",
-      marginBottom: "10px"
-    }}
-  >
+            <div
+              style={{
+                background: "#F3E8FF",
+                borderLeft: "4px solid #5B2E91",
+                borderRadius: 16,
+                padding: "10px 12px",
+                marginBottom: 8
+              }}
+            >
 
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 6
-      }}
-    >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  marginBottom: 4
+                }}
+              >
 
-      <FaReply
-        style={{
-          color: "#2563EB",
-          fontSize: 12
-        }}
-      />
+                <FaReply
+                  color="#5B2E91"
+                  size={12}
+                />
 
-      <span
-        style={{
-          fontWeight: 700,
-          color: "#2563EB",
-          fontSize: 13
-        }}
-      >
-        {message.replyTo.senderName}
-      </span>
+                <strong
+                  style={{
+                    color: "#5B2E91",
+                    fontSize: 13
+                  }}
+                >
+                  {message.replyTo.senderName}
+                </strong>
 
-    </div>
+              </div>
 
-    <div
-      style={{
-        color: "#6B7280",
-        fontSize: 13,
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap"
-      }}
-    >
-      {message.replyTo.text}
-    </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "#6B7280",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap"
+                }}
+              >
+                {message.replyTo.text}
+              </div>
 
-  </div>
+            </div>
 
-)}
+          )}
 
-{/* Bulle */}
+          {/* ==========================
+              BULLE
+          ========================== */}
 
-<div
-  style={{
-    background: isMine ? "#2563EB" : "#FFFFFF",
-    color: isMine ? "#FFFFFF" : "#111827",
-    borderRadius: isMine
-      ? "20px 20px 6px 20px"
-      : "20px 20px 20px 6px",
-    padding: "14px",
-    boxShadow: "0 8px 20px rgba(0,0,0,.08)",
-    border: isMine ? "none" : "1px solid #E5E7EB",
-    wordBreak: "break-word"
-  }}
->
+          <div
+            style={{
 
-  {message.text && (
+              background: isMine
+                ? "linear-gradient(135deg,#5B2E91,#7C3AED)"
+                : "#FFFFFF",
 
-    <div
-      style={{
-        fontSize: 15,
-        lineHeight: "24px",
-        whiteSpace: "pre-wrap"
-      }}
-    >
-      {message.text}
-    </div>
+              color: isMine
+                ? "#FFFFFF"
+                : "#111827",
 
-  )}
+              borderRadius: isMine
+                ? "22px 22px 8px 22px"
+                : "22px 22px 22px 8px",
 
-  {message.image && (
+              padding: 16,
 
-    <div style={{ marginTop: 12 }}>
+              border: isMine
+                ? "none"
+                : "1px solid #ECECEC",
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          marginBottom: 8,
-          fontSize: 13,
-          fontWeight: 600,
-          color: isMine ? "#fff" : "#374151"
-        }}
-      >
-        <FaImage />
-        Image
-      </div>
+              boxShadow:
+                "0 8px 25px rgba(91,46,145,.12)",
 
-      <img
-        src={message.image}
-        alt="message"
-        style={{
-          width: "100%",
-          borderRadius: 14,
-          objectFit: "cover",
-          maxHeight: 320
-        }}
-      />
+              wordBreak: "break-word",
 
-    </div>
+              overflow: "hidden"
 
-  )}
+            }}
+          >
 
-  {message.video && (
+            {message.text && (
 
-    <div style={{ marginTop: 12 }}>
+              <div
+                style={{
+                  fontSize: 15,
+                  lineHeight: "24px",
+                  whiteSpace: "pre-wrap"
+                }}
+              >
+                {message.text}
+              </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          marginBottom: 8,
-          fontSize: 13,
-          fontWeight: 600,
-          color: isMine ? "#fff" : "#374151"
-        }}
-      >
-        <FaVideo />
-        Vidéo
-      </div>
+            )}
 
-      <video
-        controls
-        style={{
-          width: "100%",
-          borderRadius: 14
-        }}
-      >
-        <source src={message.video} />
-      </video>
+            {/* IMAGE */}
 
-    </div>
+            {message.image && (
 
-  )}
+              <img
 
-  {message.file && (
+                src={message.image}
 
-    <a
-      href={message.file.url}
-      target="_blank"
-      rel="noreferrer"
-      style={{
-        marginTop: 12,
-        padding: "12px",
-        borderRadius: 14,
-        background: isMine
-          ? "rgba(255,255,255,.15)"
-          : "#F3F4F6",
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        color: isMine ? "#fff" : "#111827",
-        textDecoration: "none",
-        fontWeight: 600
-      }}
-    >
+                alt="message"
 
-      <FaFileAlt
-        style={{
-          fontSize: 18,
-          flexShrink: 0
-        }}
-      />
+                style={{
 
-      <span
-        style={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap"
-        }}
-      >
-        {message.file.name}
-      </span>
+                  width: "100%",
 
-    </a>
+                  marginTop: 12,
 
-  )}
+                  borderRadius: 18,
 
-</div>
+                  maxHeight: 320,
 
-{/* Bas du message */}
+                  objectFit: "cover",
+
+                  cursor: "pointer"
+
+                }}
+
+              />
+
+            )}
+
+            {/* VIDEO */}
+
+            {message.video && (
+
+              <video
+
+                controls
+
+                style={{
+
+                  width: "100%",
+
+                  marginTop: 12,
+
+                  borderRadius: 18
+
+                }}
+
+              >
+
+                <source
+                  src={message.video}
+                />
+
+              </video>
+
+            )}
+
+            {/* DOCUMENT */}
+
+            {message.file && (
+
+              <a
+
+                href={message.file.url}
+
+                target="_blank"
+
+                rel="noreferrer"
+
+                style={{
+
+                  marginTop: 12,
+
+                  padding: 14,
+
+                  borderRadius: 16,
+
+                  background: isMine
+                    ? "rgba(255,255,255,.18)"
+                    : "#F3F4F6",
+
+                  display: "flex",
+
+                  alignItems: "center",
+
+                  gap: 12,
+
+                  color: isMine
+                    ? "#FFFFFF"
+                    : "#111827",
+
+                  textDecoration: "none",
+
+                  fontWeight: 700
+
+                }}
+
+              >
+
+                <FaFileAlt
+                  size={18}
+                />
+
+                <span>
+
+                  {message.file.name}
+
+                </span>
+
+              </a>
+
+            )}
+
+          </div>
+
+          {/* ==========================
+              RÉACTIONS DU MESSAGE
+          ========================== */}
+
+          {message.reactions &&
+            message.reactions.length > 0 && (
+
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 8,
+                marginTop: 10
+              }}
+            >
+
+              {message.reactions.map((reaction, index) => (
+
+                <div
+
+                  key={index}
+
+                  style={{
+
+                    display: "flex",
+
+                    alignItems: "center",
+
+                    gap: 5,
+
+                    background: "#FFFFFF",
+
+                    border: "1px solid #E5E7EB",
+
+                    borderRadius: 20,
+
+                    padding: "4px 10px",
+
+                    boxShadow:
+                      "0 2px 8px rgba(0,0,0,.08)"
+
+                  }}
+
+                >
+
+                  <span
+                    style={{
+                      fontSize: 16
+                    }}
+                  >
+                    {reaction.emoji}
+                  </span>
+
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: "#6B7280"
+                    }}
+                  >
+                    {reaction.count}
+                  </span>
+
+                </div>
+
+              ))}
+
+            </div>
+
+          )}
+
+          {/* ==========================
+              ACTIONS
+          ========================== */}
 
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginTop: 10,
-              gap: 10,
-              flexWrap: "wrap"
+              marginTop: 10
             }}
           >
 
-            {/* Réactions */}
+            <button
 
-            <div
+              onClick={() =>
+                onReply?.(message)
+              }
+
               style={{
+
+                border: "none",
+
+                background: "transparent",
+
+                color: "#5B2E91",
+
+                fontWeight: 700,
+
                 display: "flex",
+
                 alignItems: "center",
+
                 gap: 6,
-                flexWrap: "wrap"
+
+                cursor: "pointer"
+
               }}
+
             >
 
-              {["👍", "❤️", "😂", "😮", "😢", "🔥"].map(
-                (emoji) => (
+              <FaReply />
 
-                  <button
-                    key={emoji}
-                    style={{
-                      border: "none",
-                      background: "#F3F4F6",
-                      borderRadius: "50%",
-                      width: 34,
-                      height: 34,
-                      cursor: "pointer",
-                      fontSize: 17,
-                      transition: ".2s"
-                    }}
-                  >
-                    {emoji}
-                  </button>
+              Répondre
 
+            </button>
+
+            <button
+
+              onClick={(e) =>
+                onMenu?.(
+                  e,
+                  message
                 )
-              )}
+              }
 
-            </div>
-
-            {/* Actions */}
-
-            <div
               style={{
+
+                width: 38,
+
+                height: 38,
+
+                borderRadius: "50%",
+
+                border: "none",
+
+                background: "#F3F4F6",
+
+                color: "#6B7280",
+
+                cursor: "pointer",
+
                 display: "flex",
-                alignItems: "center",
-                gap: 8
+
+                justifyContent: "center",
+
+                alignItems: "center"
+
               }}
+
             >
 
-              <button
-                onClick={() => onReply(message)}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  cursor: "pointer",
-                  color: isMine ? "#fff" : "#2563EB",
-                  fontWeight: 700,
-                  fontSize: 13
-                }}
-              >
-                Répondre
-              </button>
+              <FaEllipsisV />
 
-              <button
-                onClick={(e) => onMenu(e, message)}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  cursor: "pointer",
-                  color: isMine ? "#fff" : "#6B7280",
-                  display: "flex",
-                  alignItems: "center"
-                }}
-              >
-                <FaEllipsisV />
-              </button>
-
-            </div>
+            </button>
 
           </div>
 
-          {/* Heure + Statut */}
+          {/* ==========================
+              HEURE + STATUT
+          ========================== */}
 
           <div
             style={{
               display: "flex",
               justifyContent: "flex-end",
               alignItems: "center",
-              gap: 5,
+              gap: 6,
               marginTop: 8,
               fontSize: 11,
               color: isMine
@@ -489,22 +658,24 @@ function ChatMessage({
 
             {isMine && (
 
-              message.seen ?
+              message.seen ? (
 
                 <FaCheckDouble
                   style={{
                     color: "#22C55E",
-                    fontSize: 11
+                    fontSize: 12
                   }}
                 />
 
-              :
+              ) : (
 
                 <FaCheck
                   style={{
-                    fontSize: 11
+                    fontSize: 12
                   }}
                 />
+
+              )
 
             )}
 

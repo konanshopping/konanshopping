@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-
 import {
   FaSearch,
   FaUserShield,
@@ -11,7 +10,7 @@ import {
 
 function Members({
 
-  members = [],
+  members,
 
   currentUser,
 
@@ -21,21 +20,21 @@ function Members({
 
 }) {
 
-  const [search, setSearch] =
-    useState("");
+  const [search, setSearch] = useState("");
 
-  const filteredMembers =
-    useMemo(() => {
+  const safeMembers = Array.isArray(members)
+    ? members
+    : [];
 
-      return members.filter((member) =>
-        member.name
-          ?.toLowerCase()
-          .includes(
-            search.toLowerCase()
-          )
-      );
+  const filteredMembers = useMemo(() => {
 
-    }, [members, search]);
+    return safeMembers.filter((member) =>
+      (member.name || "")
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
+
+  }, [safeMembers, search]);
 
   return (
 
@@ -43,7 +42,7 @@ function Members({
       style={{
         width: "100%",
         minHeight: "100%",
-        background: "#F4F7FB",
+        background: "#F6F7FB",
         display: "flex",
         flexDirection: "column"
       }}
@@ -51,11 +50,7 @@ function Members({
 
       {/* Recherche */}
 
-      <div
-        style={{
-          padding: "16px"
-        }}
-      >
+      <div style={{ padding: 16 }}>
 
         <div
           style={{
@@ -63,28 +58,21 @@ function Members({
             alignItems: "center",
             gap: 10,
             background: "#fff",
-            borderRadius: 18,
-            padding: "0 14px",
+            borderRadius: 20,
+            padding: "0 16px",
             height: 52,
-            boxShadow:
-              "0 4px 12px rgba(0,0,0,.06)"
+            boxShadow: "0 4px 15px rgba(91,46,145,.08)"
           }}
         >
 
-          <FaSearch
-            color="#9CA3AF"
-          />
+          <FaSearch color="#8B5CF6" />
 
           <input
-
             value={search}
-
-            onChange={(e)=>
+            onChange={(e) =>
               setSearch(e.target.value)
             }
-
             placeholder="Rechercher un membre..."
-
             style={{
               flex: 1,
               border: "none",
@@ -92,229 +80,151 @@ function Members({
               background: "transparent",
               fontSize: 15
             }}
-
           />
 
         </div>
 
       </div>
 
-      {/* Liste */}
+      {filteredMembers.length === 0 && (
+
+        <div
+          style={{
+            textAlign: "center",
+            color: "#6B7280",
+            padding: 40,
+            fontWeight: 600
+          }}
+        >
+          Aucun membre trouvé.
+        </div>
+
+      )}
 
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 10,
+          gap: 12,
           padding: "0 12px 20px"
         }}
       >
 
-        {filteredMembers.map((member)=>(
+        {filteredMembers.map((member) => (
 
           <div
-
-            key={member._id}
-
-            onClick={()=>
-              onOpenProfile(member)
-            }
-
+            key={member._id || member.id || member.name}
+            onClick={() => onOpenProfile?.(member)}
             style={{
-
-              background:"#fff",
-
-              borderRadius:18,
-
-              padding:"14px",
-
-              display:"flex",
-
-              alignItems:"center",
-
-              gap:12,
-
-              boxShadow:
-                "0 6px 15px rgba(0,0,0,.05)",
-
-              cursor:"pointer"
-
+              background: "#fff",
+              borderRadius: 18,
+              padding: 14,
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              boxShadow: "0 5px 15px rgba(91,46,145,.08)",
+              cursor: "pointer"
             }}
-
           >
-
-            {/* Avatar */}
 
             <div
               style={{
-                position:"relative"
+                position: "relative"
               }}
             >
 
               <img
-
-                src={
-                  member.avatar ||
-                  "/avatar.png"
-                }
-
-                alt={member.name}
-
+                src={member.avatar || "/avatar.png"}
+                alt={member.name || "Membre"}
                 style={{
-
-                  width:58,
-
-                  height:58,
-
-                  borderRadius:"50%",
-
-                  objectFit:"cover"
-
+                  width: 58,
+                  height: 58,
+                  borderRadius: "50%",
+                  objectFit: "cover"
                 }}
-
               />
 
               <FaCircle
-
                 style={{
-
-                  position:"absolute",
-
-                  right:2,
-
-                  bottom:2,
-
-                  color:
-                    member.online
-                      ? "#22C55E"
-                      : "#9CA3AF",
-
-                  background:"#fff",
-
-                  borderRadius:"50%",
-
-                  fontSize:12
-
+                  position: "absolute",
+                  right: 2,
+                  bottom: 2,
+                  color: member.online ? "#22C55E" : "#D1D5DB",
+                  background: "#fff",
+                  borderRadius: "50%",
+                  fontSize: 12
                 }}
-
               />
 
             </div>
 
-            {/* Infos */}
-
             <div
               style={{
-                flex:1,
-                overflow:"hidden"
+                flex: 1
               }}
             >
 
               <div
                 style={{
-                  display:"flex",
-                  alignItems:"center",
-                  gap:6,
-                  flexWrap:"wrap"
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  flexWrap: "wrap"
                 }}
               >
 
-                <span
-                  style={{
-                    fontWeight:700,
-                    color:"#111827",
-                    fontSize:15
-                  }}
-                >
-                  {member.name}
-                </span>
+                <strong>
+                  {member.name || "Utilisateur"}
+                </strong>
 
-                {member.role==="admin" &&
+                {member.role === "admin" && (
+                  <FaUserShield color="#8B5CF6" />
+                )}
 
-                  <FaUserShield
-                    color="#2563EB"
-                  />
+                {member.role === "seller" && (
+                  <FaStore color="#F97316" />
+                )}
 
-                }
-
-                {member.role==="seller" &&
-
-                  <FaStore
-                    color="#10B981"
-                  />
-
-                }
-
-                {member.verified &&
-
-                  <FaCheckCircle
-                    color="#3B82F6"
-                  />
-
-                }
+                {member.verified && (
+                  <FaCheckCircle color="#22C55E" />
+                )}
 
               </div>
 
               <div
                 style={{
-                  marginTop:4,
-                  color:"#6B7280",
-                  fontSize:13
+                  fontSize: 13,
+                  color: "#6B7280",
+                  marginTop: 4
                 }}
               >
-
-                {member.online
-                  ? "En ligne"
-                  : "Hors ligne"}
-
+                {member.online ? "En ligne" : "Hors ligne"}
               </div>
 
             </div>
 
-            {/* Bouton message */}
-
-            {member._id !==
-              currentUser?._id && (
+            {member._id !== currentUser?._id && (
 
               <button
-
-                onClick={(e)=>{
+                onClick={(e) => {
 
                   e.stopPropagation();
 
-                  onMessage(member);
+                  onMessage?.(member);
 
                 }}
-
                 style={{
-
-                  width:46,
-
-                  height:46,
-
-                  border:"none",
-
-                  borderRadius:"50%",
-
-                  background:"#2563EB",
-
-                  color:"#fff",
-
-                  display:"flex",
-
-                  justifyContent:"center",
-
-                  alignItems:"center",
-
-                  cursor:"pointer",
-
-                  fontSize:18
-
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  border: "none",
+                  background: "#5B2E91",
+                  color: "#fff",
+                  cursor: "pointer"
                 }}
-
               >
 
-                <FaCommentDots/>
+                <FaCommentDots />
 
               </button>
 

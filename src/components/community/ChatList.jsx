@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useMemo,
   useRef
 } from "react";
 
@@ -7,18 +8,19 @@ import ChatMessage from "./ChatMessage";
 
 function ChatList({
 
-  messages,
+  messages = [],
 
   currentUser,
 
   onMenu,
 
-  onReply
+  onReply,
+
+  onReaction
 
 }) {
 
-  const bottomRef =
-    useRef(null);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
 
@@ -30,30 +32,66 @@ function ChatList({
 
   }, [messages]);
 
-  const safeMessages = Array.isArray(messages)
-  ? messages
-  : [];
+  const safeMessages = useMemo(() => {
+
+    return Array.isArray(messages)
+      ? messages
+      : [];
+
+  }, [messages]);
+
+  const formatDate = (date) => {
+
+    const d = new Date(date);
+
+    const today = new Date();
+
+    const yesterday = new Date();
+
+    yesterday.setDate(
+      yesterday.getDate() - 1
+    );
+
+    if (
+      d.toDateString() ===
+      today.toDateString()
+    ) {
+
+      return "Aujourd'hui";
+
+    }
+
+    if (
+      d.toDateString() ===
+      yesterday.toDateString()
+    ) {
+
+      return "Hier";
+
+    }
+
+    return d.toLocaleDateString(
+      "fr-FR",
+      {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  };
+
+  let lastDate = "";
 
   return (
 
     <div
       style={{
-
         flex: 1,
-
-        display: "flex",
-
-        flexDirection: "column",
-
-        paddingBottom: "20px",
-
         overflowY: "auto",
-
-        WebkitOverflowScrolling:
-          "touch",
-
-        background: "#F4F7FB"
-
+        background: "#F5F7FB",
+        padding: "12px 0 20px",
+        WebkitOverflowScrolling: "touch"
       }}
     >
 
@@ -61,71 +99,148 @@ function ChatList({
 
         <div
           style={{
-
+            height: "100%",
             display: "flex",
-
             flexDirection: "column",
-
             justifyContent: "center",
-
             alignItems: "center",
-
-            padding: "70px 20px",
-
+            padding: 30,
             color: "#6B7280"
-
           }}
         >
 
           <div
             style={{
-              fontSize: 60
+              fontSize: 70
             }}
           >
             💬
           </div>
 
-          <h3
+          <h2
             style={{
-              marginTop: 18
+              marginTop: 15,
+              color: "#5B2E91"
             }}
           >
             Aucun message
-          </h3>
+          </h2>
 
           <p
             style={{
+              maxWidth: 320,
               textAlign: "center",
-              lineHeight: "24px",
-              maxWidth: 320
+              lineHeight: "24px"
             }}
           >
-            Soyez le premier à lancer la discussion dans la communauté.
+            Soyez le premier à envoyer un message
+            dans la communauté KONAN SHOPPING.
           </p>
 
         </div>
 
       )}
 
-      {safeMessages.map((message) => (
+      {safeMessages.map((message) => {
 
-        <ChatMessage
+        const currentDate =
+          formatDate(
+            message.createdAt ||
+            message.date ||
+            new Date()
+          );
 
-          key={message._id}
+        const showDate =
+          currentDate !== lastDate;
 
-          message={message}
+        lastDate = currentDate;
 
-          currentUser={currentUser}
+        return (
 
-          onMenu={onMenu}
+          <div
+            key={message._id}
+            style={{
+              animation:
+                "fadeMessage .25s ease"
+            }}
+          >
 
-          onReply={onReply}
+            {showDate && (
 
-        />
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  margin: "16px 0"
+                }}
+              >
 
-      ))}
+                <div
+                  style={{
+                    background: "#E5E7EB",
+                    color: "#374151",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    padding: "6px 14px",
+                    borderRadius: 30
+                  }}
+                >
+                  {currentDate}
+                </div>
+
+              </div>
+
+            )}
+
+            <ChatMessage
+
+              message={message}
+
+              currentUser={currentUser}
+
+              onMenu={onMenu}
+
+              onReply={onReply}
+
+              onReaction={onReaction}
+
+            />
+
+          </div>
+
+        );
+
+      })}
 
       <div ref={bottomRef} />
+
+      <style>
+
+        {`
+
+          @keyframes fadeMessage{
+
+            from{
+
+              opacity:0;
+
+              transform:translateY(15px);
+
+            }
+
+            to{
+
+              opacity:1;
+
+              transform:translateY(0);
+
+            }
+
+          }
+
+        `}
+
+      </style>
 
     </div>
 

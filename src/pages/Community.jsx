@@ -353,11 +353,29 @@ function Community() {
      ACTIONS
   ========================== */
 
-  function sendMessage(text) {
+  async function sendMessage(text) {
 
-    console.log(text);
+  if (!text.trim()) return;
 
-  }
+  const message = {
+
+    _id: Date.now().toString(),
+
+    senderName: currentUser?.name || "Client",
+
+    text,
+
+    time: new Date().toLocaleTimeString(),
+
+  };
+
+  // Affichage immédiat
+  setMessages((prev) => [...prev, message]);
+
+  // Envoi aux autres utilisateurs via Socket.IO
+  socket.current.emit("sendMessage", message);
+
+}
 
   function replyMessageHandler(message) {
 

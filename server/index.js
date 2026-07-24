@@ -3447,6 +3447,54 @@ app.get(
   }
 );
 
+// =====================================
+// CHAT MONDIAL SOCKET.IO
+// =====================================
+
+let onlineUsers = 0;
+
+io.on("connection", (socket) => {
+
+  console.log("🟢 Utilisateur connecté :", socket.id);
+
+  onlineUsers++;
+
+  io.emit("onlineUsers", onlineUsers);
+
+  socket.on("joinCommunity", (user) => {
+
+    socket.user = user;
+
+    io.emit("userJoined", user);
+
+  });
+
+  socket.on("sendMessage", (message) => {
+
+    io.emit("newMessage", message);
+
+  });
+
+  socket.on("typing", (user) => {
+
+    socket.broadcast.emit("typing", user);
+
+  });
+
+  socket.on("disconnect", () => {
+
+    console.log("🔴 Déconnexion :", socket.id);
+
+    onlineUsers--;
+
+    if (onlineUsers < 0) onlineUsers = 0;
+
+    io.emit("onlineUsers", onlineUsers);
+
+  });
+
+});
+
 // =========================
 // START SERVER
 // =========================
@@ -3478,13 +3526,9 @@ mongoose
     const PORT =
       process.env.PORT || 5000;
 
-    app.listen(PORT, () => {
-
-      console.log(
-        `Serveur démarré sur le port ${PORT} 🚀`
-      );
-
-    });
+    server.listen(PORT, () => {
+  console.log(`Serveur démarré sur le port ${PORT} 🚀`);
+});
 
   })
 
