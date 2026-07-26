@@ -3351,38 +3351,45 @@ app.post(
 
 app.get("/fix-images", async (req, res) => {
   try {
-    const Product = require("./models/product");
+    const products = await Product.find();
 
-    const products = await Product.find({
-      $or: [
-        { image: { $regex: "localhost:5000" } },
-        { image: { $regex: "onrender.com" } },
-      ],
-    });
+    let count = 0;
 
     for (const product of products) {
+      if (!product.image) continue;
 
-      product.image = product.image
-        .replace(
-          "http://localhost:5000",
-          "https://konanshopping.com/api"
-        )
-        .replace(
-          "https://konanshopping.onrender.com",
-          "https://konanshopping.com/api"
-        );
+      let newImage = product.image;
 
-      await product.save();
+      // localhost
+      newImage = newImage.replace(
+        "http://localhost:5000",
+        "https://konanshopping.com"
+      );
+
+      // Render
+      newImage = newImage.replace(
+        "https://konanshopping.onrender.com",
+        "https://konanshopping.com"
+      );
+
+      // Railway
+      newImage = newImage.replace(
+        "https://konanshopping-production.up.railway.app",
+        "https://konanshopping.com"
+      );
+
+      if (newImage !== product.image) {
+        product.image = newImage;
+        await product.save();
+        count++;
+      }
     }
 
-    res.send(`✅ ${products.length} produits corrigés`);
+    res.send(`✅ ${count} produits corrigés avec succès`);
 
   } catch (err) {
-
-    console.log(err);
-
-    res.status(500).send("Erreur");
-
+    console.error(err);
+    res.status(500).send("❌ Erreur lors de la correction");
   }
 });
 
