@@ -3365,11 +3365,11 @@ app.get("/fix-images", async (req, res) => {
       product.image = product.image
         .replace(
           "http://localhost:5000",
-          "https://konanshopping.com/"
+          "https://konanshopping.com/api"
         )
         .replace(
           "https://konanshopping.onrender.com",
-          "https://konanshopping.com/"
+          "https://konanshopping.com/api"
         );
 
       await product.save();

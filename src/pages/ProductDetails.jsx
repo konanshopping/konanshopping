@@ -195,7 +195,7 @@ const getProduct = async () => {
 
     const response =
       await axios.get(
-        "https://konanshopping.com/products"
+        "https://konanshopping.com/api/products"
       );
 
     const similar =

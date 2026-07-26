@@ -461,7 +461,7 @@ export default function OrderDetails() {
                 item.productImage
               ).replace(
                 "http://localhost:5000",
-                "https://konanshopping.com/"
+                "https://konanshopping.com/api"
               )
 
             : (

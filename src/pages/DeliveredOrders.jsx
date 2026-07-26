@@ -566,7 +566,7 @@ export default function DeliveredOrders() {
               item.image?.includes("localhost:5000")
                 ? item.image.replace(
                     "http://localhost:5000",
-                    "https://konanshopping.com/"
+                    "https://konanshopping.com/api"
                   )
                 : item.image || "/logo.jpg"
             }
