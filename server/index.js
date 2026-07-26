@@ -3363,15 +3363,15 @@ app.get("/api/fix-images", async (req, res) => {
       product.image = oldImage
         .replace(
           "https://konanshopping-production.up.railway.app/uploads/",
-          "https://konanshopping.com/api/uploads/"
+          "https://konanshopping.com/uploads/"
         )
         .replace(
           "http://localhost:5000/uploads/",
-          "https://konanshopping.com/api/uploads/"
+          "https://konanshopping.com/uploads/"
         )
         .replace(
           "https://konanshopping.onrender.com/uploads/",
-          "https://konanshopping.com/api/uploads/"
+          "https://konanshopping.com/uploads/"
         );
 
       if (product.image !== oldImage) {
