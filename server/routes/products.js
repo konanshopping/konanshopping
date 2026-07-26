@@ -106,6 +106,25 @@ error:
 
 );
 
+router.get("/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        message: "Produit introuvable",
+      });
+    }
+
+    res.json(product);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Erreur serveur",
+    });
+  }
+});
+
 // ======================
 // RECHERCHE NOM
 // ======================
