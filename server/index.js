@@ -3353,6 +3353,9 @@ app.get("/api/fix-images", async (req, res) => {
   try {
     const products = await Product.find();
 
+    console.log("Nombre de produits :", products.length);
+    console.log("Première image :", products[0]?.image);
+
     let count = 0;
 
     for (const product of products) {
@@ -3363,18 +3366,21 @@ app.get("/api/fix-images", async (req, res) => {
       product.image = oldImage
         .replace(
           "https://konanshopping-production.up.railway.app/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         )
         .replace(
           "http://localhost:5000/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         )
         .replace(
           "https://konanshopping.onrender.com/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         );
 
       if (product.image !== oldImage) {
+        console.log("Corrigé :", oldImage);
+        console.log("→", product.image);
+
         await product.save();
         count++;
       }
