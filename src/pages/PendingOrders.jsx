@@ -28,7 +28,7 @@ export default function PendingOrders() {
 
       const res = await axios.get(
 
-        `https://konanshopping-production.up.railway.app/my-orders/${user._id}`
+        `https://konanshopping.com/my-orders/${user._id}`
 
       );
 
@@ -650,7 +650,7 @@ return (
               item.image?.includes("localhost:5000")
                 ? item.image.replace(
                     "http://localhost:5000",
-                    "https://konanshopping-production.up.railway.app"
+                    "https://konanshopping.com/"
                   )
                 : item.image || "/logo.jpg"
             }

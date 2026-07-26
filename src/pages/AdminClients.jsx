@@ -60,7 +60,7 @@ function AdminClients() {
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/users"
+            "https://konanshopping.com/users"
           );
 
         setUsers(res.data);
@@ -84,7 +84,7 @@ function AdminClients() {
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/visitors"
+            "https://konanshopping.com/visitors"
           );
 
         setVisitors(res.data);

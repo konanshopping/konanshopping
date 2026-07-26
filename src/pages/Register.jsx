@@ -39,7 +39,7 @@ function Register() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://konanshopping-production.up.railway.app/register",
+        "https://konanshopping.com/register",
         {
           name,
           email,

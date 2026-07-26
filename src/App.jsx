@@ -333,7 +333,7 @@ console.log(geo);
 
       await axios.post(
 
-        "https://konanshopping-production.up.railway.app/track-visitor",
+        "https://konanshopping.com/track-visitor",
 
         {
 
@@ -551,7 +551,7 @@ const startVoice = () => {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping-production.up.railway.app/products")
+      .get("https://konanshopping.com/products")
 
       .then((res) => {
 
@@ -808,7 +808,7 @@ image
 const res =
 await axios.post(
 
-"https://konanshopping-production.up.railway.app/products/ai-search",
+"https://konanshopping.com/products/ai-search",
 
 formData
 
@@ -2636,7 +2636,7 @@ transition:"transform .35s ease",
 
       await axios.delete(
 
-        `https://konanshopping-production.up.railway.app/favorites/${user._id}/${product._id}`
+        `https://konanshopping.com/favorites/${user._id}/${product._id}`
 
       );
 
@@ -2667,7 +2667,7 @@ transition:"transform .35s ease",
         try {
 
           await axios.post(
-            "https://konanshopping-production.up.railway.app/favorites",
+            "https://konanshopping.com/favorites",
             {
 
               userId: user._id,

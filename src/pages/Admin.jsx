@@ -75,7 +75,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/orders"
+            "https://konanshopping.com/orders"
           );
 
         setOrders(res.data);
@@ -95,7 +95,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/products"
+            "https://konanshopping.com/products"
           );
 
         setProducts(res.data);
@@ -291,7 +291,7 @@ const deleteProduct =
     try {
 
       await axios.delete(
-        `https://konanshopping-production.up.railway.app/delete-product/${id}`
+        `https://konanshopping.com/delete-product/${id}`
       );
 
       fetchProducts();
@@ -321,7 +321,7 @@ const saveEdit =
     try {
 
       await axios.put(
-        `https://konanshopping-production.up.railway.app/update-product/${id}`,
+        `https://konanshopping.com/update-product/${id}`,
         {
           name: editName,
           price: editPrice,
@@ -355,7 +355,7 @@ const addProduct =
 
       const uploadRes =
         await axios.post(
-          "https://konanshopping-production.up.railway.app/upload",
+          "https://konanshopping.com/upload",
           formData
         );
 
@@ -363,7 +363,7 @@ const addProduct =
         uploadRes.data.imageUrl;
 
       await axios.post(
-        "https://konanshopping-production.up.railway.app/add-product",
+        "https://konanshopping.com/add-product",
         {
           name,
           price,

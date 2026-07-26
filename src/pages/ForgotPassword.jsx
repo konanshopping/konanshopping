@@ -28,7 +28,7 @@ function ForgotPassword() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://konanshopping-production.up.railway.app/forgot-password",
+        "https://konanshopping.com/forgot-password",
         {
           email,
         }

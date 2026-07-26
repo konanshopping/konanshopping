@@ -54,7 +54,7 @@ router.post("/create", async (req, res) => {
           // ==========================
 
           notify_url:
-            "https://konanshopping-production.up.railway.app/api/payment/notify",
+            "https://konanshopping.com/api/payment/notify",
 
           return_url:
             "https://konanshopping.vercel.app/payment-success",

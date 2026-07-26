@@ -60,7 +60,7 @@ function ResetPassword() {
         const res =
           await axios.post(
 
-            `https://konanshopping-production.up.railway.app/reset-password/${token}`,
+            `https://konanshopping.com/reset-password/${token}`,
 
             {
               password,

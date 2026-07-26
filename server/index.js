@@ -569,7 +569,7 @@ app.post(
     res.json({
   imageUrl:
     req.file.secure_url ||
-    "https://konanshopping-production.up.railway.app/" +
+    "https://konanshopping.com/" +
     req.file.path,
 });
 
@@ -3365,11 +3365,11 @@ app.get("/fix-images", async (req, res) => {
       product.image = product.image
         .replace(
           "http://localhost:5000",
-          "https://konanshopping-production.up.railway.app"
+          "https://konanshopping.com/"
         )
         .replace(
           "https://konanshopping.onrender.com",
-          "https://konanshopping-production.up.railway.app"
+          "https://konanshopping.com/"
         );
 
       await product.save();

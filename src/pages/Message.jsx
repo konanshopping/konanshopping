@@ -36,7 +36,7 @@ function Message() {
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/api/messages"
+            "https://konanshopping.com/api/messages"
           );
 
         setMessages(
@@ -61,7 +61,7 @@ function Message() {
     try {
 
       await axios.put(
-        `https://konanshopping-production.up.railway.app/api/messages/${messageId}/read`,
+        `https://konanshopping.com/api/messages/${messageId}/read`,
         {
           userId:
             user._id,
@@ -100,7 +100,7 @@ function Message() {
     try {
 
       await axios.put(
-        `https://konanshopping-production.up.railway.app/api/messages/${messageId}/delete`,
+        `https://konanshopping.com/api/messages/${messageId}/delete`,
         {
           userId:
             user._id,

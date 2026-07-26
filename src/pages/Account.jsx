@@ -128,7 +128,7 @@ const [cancelledOrders, setCancelledOrders] =
         const res =
           await axios.get(
 
-            `https://konanshopping-production.up.railway.app/users/${user._id}`
+            `https://konanshopping.com/users/${user._id}`
 
           );
 
@@ -161,7 +161,7 @@ const [cancelledOrders, setCancelledOrders] =
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/api/messages"
+            "https://konanshopping.com/api/messages"
           );
 
         const user =
@@ -204,7 +204,7 @@ const [cancelledOrders, setCancelledOrders] =
     );
 
     const res = await axios.get(
-      `https://konanshopping-production.up.railway.app/my-orders/${user._id}`
+      `https://konanshopping.com/my-orders/${user._id}`
     );
 
     const orders = res.data;
@@ -494,7 +494,7 @@ return (
 
         await axios.put(
 
-          `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+          `https://konanshopping.com/users/${user._id}/avatar`,
 
           {
             avatar:
@@ -1762,7 +1762,7 @@ return (
     setProfileImage("");
 
     await axios.put(
-      `https://konanshopping-production.up.railway.app/users/${user._id}/avatar`,
+      `https://konanshopping.com/users/${user._id}/avatar`,
       {
         avatar: "",
       }

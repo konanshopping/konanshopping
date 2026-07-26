@@ -243,7 +243,7 @@ const [location, setLocation] =
 
           const res =
             await axios.get(
-              `https://konanshopping-production.up.railway.app/order/${id}`
+              `https://konanshopping.com/order/${id}`
             );
 
           setOrder(
@@ -451,7 +451,7 @@ useEffect(() => {
   console.log("AUTO LIVRAISON");
 
   await axios.put(
-    `https://konanshopping-production.up.railway.app/orders/${order._id}`,
+    `https://konanshopping.com/orders/${order._id}`,
     {
       status: "Livrée",
     }
@@ -1460,10 +1460,10 @@ height: "auto",
     ? item.image.includes("localhost:5000")
       ? item.image.replace(
           "http://localhost:5000",
-          "https://konanshopping-production.up.railway.app"
+          "https://konanshopping.com/"
         )
       : item.image.startsWith("/uploads")
-      ? `https://konanshopping-production.up.railway.app${item.image}`
+      ? `https://konanshopping.com/${item.image}`
       : item.image
     : "/logo.jpg"
 }

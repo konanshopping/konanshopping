@@ -20,7 +20,7 @@ function Orders() {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping-production.up.railway.app/orders")
+      .get("https://konanshopping.com/orders")
       .then((res) => {
 
         setOrders(res.data);
@@ -42,7 +42,7 @@ const updateStatus = async (
   try {
 
     await axios.put(
-      `https://konanshopping-production.up.railway.app/orders/${id}`,
+      `https://konanshopping.com/orders/${id}`,
       {
         status,
       }

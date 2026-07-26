@@ -30,7 +30,7 @@ const [messages, setMessages] =
 
     const response =
       await axios.post(
-        "https://konanshopping-production.up.railway.app/api/messages",
+        "https://konanshopping.com/api/messages",
         {
           title,
           content: message,
@@ -81,7 +81,7 @@ const fetchMessages = async () => {
 
     const res =
       await axios.get(
-        "https://konanshopping-production.up.railway.app/api/messages"
+        "https://konanshopping.com/api/messages"
       );
 
     setMessagesCount(
@@ -111,7 +111,7 @@ const fetchUsers = async () => {
 
     const res =
       await axios.get(
-  "https://konanshopping-production.up.railway.app/users"
+  "https://konanshopping.com/users"
 );
 
     setClientsCount(

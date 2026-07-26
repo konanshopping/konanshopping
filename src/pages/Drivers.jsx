@@ -23,7 +23,7 @@ const admin = JSON.parse(
     try {
 
       const res = await axios.get(
-        "https://konanshopping-production.up.railway.app/drivers"
+        "https://konanshopping.com/drivers"
       );
 
       setDrivers(res.data);
@@ -47,7 +47,7 @@ const admin = JSON.parse(
     try {
 
       await axios.delete(
-        `https://konanshopping-production.up.railway.app/drivers/${id}`
+        `https://konanshopping.com/drivers/${id}`
       );
 
       setDrivers(

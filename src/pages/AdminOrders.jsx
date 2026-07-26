@@ -40,7 +40,7 @@ function AdminOrders() {
 
         const res =
           await axios.get(
-            "https://konanshopping-production.up.railway.app/orders"
+            "https://konanshopping.com/orders"
           );
 
         setOrders(res.data);
@@ -66,7 +66,7 @@ function AdminOrders() {
       try {
 
         await axios.put(
-          `https://konanshopping-production.up.railway.app/orders/${id}`,
+          `https://konanshopping.com/orders/${id}`,
           {
             status,
           }
