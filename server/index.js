@@ -3388,6 +3388,35 @@ app.get("/api/fix-images", async (req, res) => {
   }
 });
 
+app.get("/fix-images", async (req, res) => {
+  const products = await Product.find();
+
+  let count = 0;
+
+  for (const p of products) {
+    if (!p.image) continue;
+
+    const old = p.image;
+
+    p.image = old
+      .replace(
+        /https:\/\/konanshopping-production\.up\.railway\.app\/uploads\//g,
+        "https://konanshopping.com/api/uploads/"
+      )
+      .replace(
+        /http:\/\/localhost:5000\/uploads\//g,
+        "https://konanshopping.com/api/uploads/"
+      );
+
+    if (old !== p.image) {
+      await p.save();
+      count++;
+    }
+  }
+
+  res.send(`Produits corrigés : ${count}`);
+});
+
 // =========================
 // PHOTO PROFIL UTILISATEUR
 // =========================
