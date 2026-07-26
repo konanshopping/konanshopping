@@ -3363,15 +3363,15 @@ app.get("/api/fix-images", async (req, res) => {
       product.image = oldImage
         .replace(
           "https://konanshopping-production.up.railway.app/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         )
         .replace(
           "http://localhost:5000/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         )
         .replace(
           "https://konanshopping.onrender.com/uploads/",
-          "https://konanshopping.com/uploads/"
+          "https://konanshopping.com/api/uploads/"
         );
 
       if (product.image !== oldImage) {
@@ -3506,9 +3506,9 @@ mongoose
 
   .then(async () => {
 
-    console.log(
-      "MongoDB Atlas connecté ✅"
-    );
+    console.log("MongoDB Atlas connecté ✅");
+console.log("Base utilisée :", mongoose.connection.name);
+console.log("URI :", process.env.MONGO_URI);
 
     await Order.updateMany(
       {
