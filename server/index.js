@@ -3353,9 +3353,6 @@ app.get("/api/fix-images", async (req, res) => {
   try {
     const products = await Product.find();
 
-    console.log("Nombre de produits :", products.length);
-    console.log("Première image :", products[0]?.image);
-
     let count = 0;
 
     for (const product of products) {
@@ -3378,9 +3375,6 @@ app.get("/api/fix-images", async (req, res) => {
         );
 
       if (product.image !== oldImage) {
-        console.log("Corrigé :", oldImage);
-        console.log("→", product.image);
-
         await product.save();
         count++;
       }
