@@ -3349,7 +3349,7 @@ app.post(
   }
 );
 
-app.get("/fix-images", async (req, res) => {
+app.get("/api/fix-images", async (req, res) => {
   try {
     const products = await Product.find();
 
@@ -3358,38 +3358,33 @@ app.get("/fix-images", async (req, res) => {
     for (const product of products) {
       if (!product.image) continue;
 
-      let newImage = product.image;
+      const oldImage = product.image;
 
-      // localhost
-      newImage = newImage.replace(
-        "http://localhost:5000",
-        "https://konanshopping.com"
-      );
+      product.image = oldImage
+        .replace(
+          "https://konanshopping-production.up.railway.app/uploads/",
+          "https://konanshopping.com/uploads/"
+        )
+        .replace(
+          "http://localhost:5000/uploads/",
+          "https://konanshopping.com/uploads/"
+        )
+        .replace(
+          "https://konanshopping.onrender.com/uploads/",
+          "https://konanshopping.com/uploads/"
+        );
 
-      // Render
-      newImage = newImage.replace(
-        "https://konanshopping.onrender.com",
-        "https://konanshopping.com"
-      );
-
-      // Railway
-      newImage = newImage.replace(
-        "https://konanshopping-production.up.railway.app",
-        "https://konanshopping.com"
-      );
-
-      if (newImage !== product.image) {
-        product.image = newImage;
+      if (product.image !== oldImage) {
         await product.save();
         count++;
       }
     }
 
-    res.send(`✅ ${count} produits corrigés avec succès`);
+    res.send(`✅ ${count} produits corrigés`);
 
   } catch (err) {
     console.error(err);
-    res.status(500).send("❌ Erreur lors de la correction");
+    res.status(500).send(err.message);
   }
 });
 
