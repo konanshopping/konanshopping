@@ -3465,7 +3465,6 @@ app.get(
       res.json(user);
 
     } catch (err) {
-
       console.log(err);
 
       res.status(500).json({
