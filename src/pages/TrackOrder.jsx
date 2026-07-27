@@ -1460,10 +1460,10 @@ height: "auto",
     ? item.image.includes("localhost:5000")
       ? item.image.replace(
           "http://localhost:5000",
-          "https://konanshopping.com/api"
+          "https://konanshopping.com/"
         )
       : item.image.startsWith("/uploads")
-      ? `https://konanshopping.com/api${item.image}`
+      ? `https://konanshopping.com/${item.image}`
       : item.image
     : "/logo.jpg"
 }

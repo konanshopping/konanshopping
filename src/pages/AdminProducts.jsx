@@ -65,7 +65,7 @@ function AdminProducts() {
       try {
 
         const res = await axios.get(
-  "https://konanshopping.com/api/products"
+  "https://konanshopping.com//products"
 );
 
         setProducts(res.data);
@@ -122,7 +122,7 @@ formData.append("category", category);
 formData.append("image", image);
 
 await axios.post(
-  "https://konanshopping.com/api/add-product",
+  "https://konanshopping.com//add-product",
   formData,
   {
     headers: {
@@ -189,7 +189,7 @@ await axios.post(
       try {
 
         await axios.delete(
-  `https://konanshopping.com/api/delete-product/${id}`
+  `https://konanshopping.com//delete-product/${id}`
 );
 
         fetchProducts();
@@ -222,7 +222,7 @@ await axios.post(
         setLoading(true);
 
         await axios.put(
-  `https://konanshopping.com/api/update-product/${editId}`,
+  `https://konanshopping.com//update-product/${editId}`,
   {
     name,
     price,

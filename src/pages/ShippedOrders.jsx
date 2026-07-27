@@ -643,7 +643,7 @@ export default function ShippedOrders() {
               item.image?.includes("localhost:5000")
                 ? item.image.replace(
                     "http://localhost:5000",
-                    "https://konanshopping.com/api"
+                    "https://konanshopping.com/"
                   )
                 : item.image || "/logo.jpg"
             }

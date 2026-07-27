@@ -126,7 +126,7 @@ try {
 
 const res =
 await axios.get(
-"https://konanshopping.com/api/products"
+"https://konanshopping.com//products"
 );
 
 setFeaturedProducts(

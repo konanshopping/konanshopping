@@ -161,7 +161,7 @@ const [cancelledOrders, setCancelledOrders] =
 
         const res =
           await axios.get(
-            "https://konanshopping.com/api/messages"
+            "https://konanshopping.com//messages"
           );
 
         const user =

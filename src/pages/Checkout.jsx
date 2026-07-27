@@ -499,7 +499,7 @@ if (
   const phoneNumber = phone.replace("+", "");
 
   const res = await axios.post(
-  "https://konanshopping.com/api/payment/create",
+  "https://konanshopping.com//payment/create",
   {
     amount: finalTotal,
     phone: phoneNumber,

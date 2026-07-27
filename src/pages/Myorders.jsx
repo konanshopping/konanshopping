@@ -77,7 +77,7 @@ function MyOrders() {
     axios
 
       .get(
-        "https://konanshopping.com/api/products"
+        "https://konanshopping.com//products"
       )
 
       .then((res) => {
@@ -1182,7 +1182,7 @@ function MyOrders() {
               item.image?.includes("localhost:5000")
                 ? item.image.replace(
                     "http://localhost:5000",
-                    "https://konanshopping.com/api"
+                    "https://konanshopping.com/"
                   )
                 : item.image || "/logo.jpg"
             }

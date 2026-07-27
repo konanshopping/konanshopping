@@ -333,7 +333,7 @@ console.log(geo);
 
       await axios.post(
 
-        "https://konanshopping.com/api/track-visitor",
+        "https://konanshopping.com//track-visitor",
 
         {
 
@@ -551,7 +551,7 @@ const startVoice = () => {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping.com/api/products")
+      .get("https://konanshopping.com//products")
 
       .then((res) => {
 
@@ -808,7 +808,7 @@ image
 const res =
 await axios.post(
 
-"https://konanshopping.com/api/products/ai-search",
+"https://konanshopping.com//products/ai-search",
 
 formData
 

@@ -30,7 +30,7 @@ const [messages, setMessages] =
 
     const response =
       await axios.post(
-        "https://konanshopping.com/api/messages",
+        "https://konanshopping.com//messages",
         {
           title,
           content: message,
@@ -81,7 +81,7 @@ const fetchMessages = async () => {
 
     const res =
       await axios.get(
-        "https://konanshopping.com/api/messages"
+        "https://konanshopping.com//messages"
       );
 
     setMessagesCount(
