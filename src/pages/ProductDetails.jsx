@@ -188,14 +188,14 @@ const getProduct = async () => {
   try {
 
     const res = await axios.get(
-  `https://konanshopping.com//product/${id}`
+  `https://konanshopping.com/product/${id}`
 );
 
     setProduct(res.data);
 
     const response =
       await axios.get(
-        "https://konanshopping.com//products"
+        "https://konanshopping.com/products"
       );
 
     const similar =
@@ -444,7 +444,7 @@ reviewImages.forEach(
 );
 
 await axios.post(
-  `https://konanshopping.com//product/${id}/review`,
+  `https://konanshopping.com/product/${id}/review`,
 
   formData,
 
@@ -1916,7 +1916,7 @@ try{
 
 await axios.put(
 
-`https://konanshopping.com//product/${product._id}/review/${review._id}/like`,
+`https://konanshopping.com/product/${product._id}/review/${review._id}/like`,
 
 {
 
@@ -1983,7 +1983,7 @@ try{
 
 await axios.put(
 
-`https://konanshopping.com//product/${product._id}/review/${review._id}/dislike`,
+`https://konanshopping.com/product/${product._id}/review/${review._id}/dislike`,
 
 {
 
@@ -2127,7 +2127,7 @@ try{
 
 await axios.post(
 
-`https://konanshopping.com//product/${product._id}/review/${review._id}/reply`,
+`https://konanshopping.com/product/${product._id}/review/${review._id}/reply`,
 
 {
 

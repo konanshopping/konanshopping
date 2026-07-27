@@ -77,7 +77,7 @@ function MyOrders() {
     axios
 
       .get(
-        "https://konanshopping.com//products"
+        "https://konanshopping.com/products"
       )
 
       .then((res) => {

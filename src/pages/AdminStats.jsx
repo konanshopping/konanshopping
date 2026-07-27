@@ -68,7 +68,7 @@ function AdminStats() {
 
         const productsRes =
           await axios.get(
-            "https://konanshopping.com//products"
+            "https://konanshopping.com/products"
           );
 
         setProducts(

@@ -603,7 +603,7 @@ if (!alreadyAdded) {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping.com//products")
+      .get("https://konanshopping.com/products")
       .then((res) => {
 
         setProducts(res.data);
