@@ -518,12 +518,33 @@ return (
 
 <Helmet>
   <title>
-    {product.name} | Konan Shopping Cameroun
+    {product.name} - Acheter au Cameroun | KONAN SHOPPING
   </title>
 
   <meta
     name="description"
-    content={product.description}
+    content={`${product.name} disponible chez KONAN SHOPPING Cameroun. Livraison rapide, paiement à la livraison, meilleur prix au Cameroun.`}
+  />
+
+  <meta
+    name="keywords"
+    content={`${product.name}, Cameroun, Yaoundé, Douala, boutique en ligne, KONAN SHOPPING, livraison, achat`}
+  />
+
+  <meta
+    name="robots"
+    content="index, follow"
+  />
+
+  <link
+    rel="canonical"
+    href={productUrl}
+  />
+
+  {/* Open Graph */}
+  <meta
+    property="og:type"
+    content="product"
   />
 
   <meta
@@ -533,7 +554,7 @@ return (
 
   <meta
     property="og:description"
-    content={product.description}
+    content={`${product.name} disponible chez KONAN SHOPPING Cameroun. Paiement à la livraison.`}
   />
 
   <meta
@@ -546,6 +567,38 @@ return (
     content={productUrl}
   />
 
+  <meta
+    property="og:site_name"
+    content="KONAN SHOPPING"
+  />
+
+  <meta
+    property="og:locale"
+    content="fr_CM"
+  />
+
+  {/* Twitter */}
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
+
+  <meta
+    name="twitter:title"
+    content={product.name}
+  />
+
+  <meta
+    name="twitter:description"
+    content={`${product.name} disponible chez KONAN SHOPPING Cameroun.`}
+  />
+
+  <meta
+    name="twitter:image"
+    content={productImage}
+  />
+
+  {/* Données structurées */}
   <script type="application/ld+json">
     {JSON.stringify({
       "@context": "https://schema.org",
@@ -553,18 +606,24 @@ return (
       name: product.name,
       image: [productImage],
       description: product.description,
+      sku: product._id,
+      brand: {
+        "@type": "Brand",
+        name: "KONAN SHOPPING",
+      },
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: averageRating,
-        reviewCount:
-          product.reviews?.length || 0,
+        reviewCount: product.reviews?.length || 0,
       },
       offers: {
         "@type": "Offer",
+        url: productUrl,
         price: product.price,
         priceCurrency: "XAF",
-        availability:
-          "https://schema.org/InStock",
+        availability: "https://schema.org/InStock",
+        itemCondition:
+          "https://schema.org/NewCondition",
       },
     })}
   </script>

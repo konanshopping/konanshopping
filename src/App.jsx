@@ -162,6 +162,8 @@ import AdminSettings from "./pages/AdminSettings";
 
 import Deliveries from "./pages/Deliveries";
 
+import SeoOrganization from "./components/SeoOrganization";
+
 function Home() {
 
 const [favoritesCount,
@@ -858,6 +860,8 @@ setLoading(false);
 };
 
   return (
+  <>
+    <SeoOrganization />
 
     <div
       style={{
@@ -4201,8 +4205,9 @@ boxShadow:
 
 </div>
 
-   </div>
- );
+ </div>
+</>
+);
 
 }
 
