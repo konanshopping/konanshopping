@@ -38,7 +38,7 @@ const mobile =
       setLoading(true);
 
       const res = await axios.post(
-        "https://konanshopping.com/login",
+        "https://konanshopping.com/api/login",
         {
           email,
           password,

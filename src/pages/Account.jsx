@@ -128,7 +128,7 @@ const [cancelledOrders, setCancelledOrders] =
         const res =
           await axios.get(
 
-            `https://konanshopping.com/users/${user._id}`
+            `https://konanshopping.com/api/users/${user._id}`
 
           );
 
@@ -494,7 +494,7 @@ return (
 
         await axios.put(
 
-          `https://konanshopping.com/users/${user._id}/avatar`,
+          `https://konanshopping.com/api/users/${user._id}/avatar`,
 
           {
             avatar:
@@ -1762,7 +1762,7 @@ return (
     setProfileImage("");
 
     await axios.put(
-      `https://konanshopping.com/users/${user._id}/avatar`,
+      `https://konanshopping.com/api/users/${user._id}/avatar`,
       {
         avatar: "",
       }

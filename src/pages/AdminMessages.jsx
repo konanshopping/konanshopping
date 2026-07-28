@@ -111,7 +111,7 @@ const fetchUsers = async () => {
 
     const res =
       await axios.get(
-  "https://konanshopping.com/users"
+  "https://konanshopping.com/api/users"
 );
 
     setClientsCount(

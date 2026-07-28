@@ -75,7 +75,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "https://konanshopping.com/orders"
+            "https://konanshopping.com/api/orders"
           );
 
         setOrders(res.data);
@@ -95,7 +95,7 @@ const navigate = useNavigate();
 
         const res =
           await axios.get(
-            "https://konanshopping.com/products"
+            "https://konanshopping.com/api/products"
           );
 
         setProducts(res.data);

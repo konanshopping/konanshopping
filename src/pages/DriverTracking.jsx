@@ -34,7 +34,7 @@ const [eta, setEta] =
 
         const res =
           await axios.get(
-            "https://konanshopping.com/orders"
+            "https://konanshopping.com/api/orders"
           );
 
         // NOUVELLE COMMANDE

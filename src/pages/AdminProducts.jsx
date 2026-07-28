@@ -65,7 +65,7 @@ function AdminProducts() {
       try {
 
         const res = await axios.get(
-  "https://konanshopping.com/products"
+  "https://konanshopping.com/api/products"
 );
 
         setProducts(res.data);

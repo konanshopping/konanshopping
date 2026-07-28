@@ -48,7 +48,7 @@ function Favorites() {
 
       axios
         .get(
-          `https://konanshopping.com/favorites/${user._id}`
+          `https://konanshopping.com/api/favorites/${user._id}`
         )
 
         .then((res) => {
@@ -312,7 +312,7 @@ console.log("user =", user);
     if (user?._id) {
 
       await axios.delete(
-        `https://konanshopping.com/favorites/${user._id}/${productId}`
+        `https://konanshopping.com/api/favorites/${user._id}/${productId}`
       );
 
     }

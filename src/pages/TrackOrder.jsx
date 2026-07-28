@@ -451,7 +451,7 @@ useEffect(() => {
   console.log("AUTO LIVRAISON");
 
   await axios.put(
-    `https://konanshopping.com/orders/${order._id}`,
+    `https://konanshopping.com/api/orders/${order._id}`,
     {
       status: "Livrée",
     }

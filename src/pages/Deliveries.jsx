@@ -64,7 +64,7 @@ export default function Deliveries() {
   useEffect(() => {
 
     fetch(
-      "https://konanshopping.com/orders"
+      "https://konanshopping.com/api/orders"
     )
       .then((res) =>
         res.json()
@@ -128,7 +128,7 @@ export default function Deliveries() {
         const res =
           await fetch(
 
-            `https://konanshopping.com/orders/${orderId}/assign-driver`,
+            `https://konanshopping.com/api/orders/${orderId}/assign-driver`,
 
             {
               method: "PUT",
@@ -619,7 +619,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `https://konanshopping.com/orders/${order._id}`,
+                        `https://konanshopping.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -686,7 +686,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `https://konanshopping.com/orders/${order._id}`,
+                        `https://konanshopping.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -753,7 +753,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `https://konanshopping.com/orders/${order._id}`,
+                        `https://konanshopping.com/api/orders/${order._id}`,
 
                         {
                           method:
@@ -803,7 +803,7 @@ export default function Deliveries() {
 
                       await fetch(
 
-                        `https://konanshopping.com/orders/${order._id}`,
+                        `https://konanshopping.com/api/orders/${order._id}`,
 
                         {
                           method:

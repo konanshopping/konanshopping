@@ -310,7 +310,7 @@ const [placeholderIndex, setPlaceholderIndex] =
 
 useEffect(()=>{
 
-  trackVisitor();
+ trackVisitor();
 
 },[]);
 
@@ -333,7 +333,7 @@ console.log(geo);
 
       await axios.post(
 
-        "https://konanshopping.com/track-visitor",
+        "https://konanshopping.com/api/track-visitor",
 
         {
 
@@ -551,7 +551,7 @@ const startVoice = () => {
   useEffect(() => {
 
     axios
-      .get("https://konanshopping.com/products")
+      .get("https://konanshopping.com/api/products")
 
       .then((res) => {
 
@@ -808,7 +808,7 @@ image
 const res =
 await axios.post(
 
-"https://konanshopping.com/products/ai-search",
+"https://konanshopping.com/api/products/ai-search",
 
 formData
 
@@ -2636,7 +2636,7 @@ transition:"transform .35s ease",
 
       await axios.delete(
 
-        `https://konanshopping.com/favorites/${user._id}/${product._id}`
+        `https://konanshopping.com/api/favorites/${user._id}/${product._id}`
 
       );
 
@@ -2667,7 +2667,7 @@ transition:"transform .35s ease",
         try {
 
           await axios.post(
-            "https://konanshopping.com/favorites",
+            "https://konanshopping.com/api/favorites",
             {
 
               userId: user._id,

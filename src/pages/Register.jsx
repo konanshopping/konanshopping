@@ -39,7 +39,7 @@ function Register() {
       setLoading(true);
 
       const res = await axios.post(
-        "https://konanshopping.com/register",
+        "https://konanshopping.com/api/register",
         {
           name,
           email,
