@@ -549,12 +549,13 @@ const startVoice = () => {
 
 };
 
+
   const [
     selectedCategory,
     setSelectedCategory
   ] = useState("Tous");
 
-  useEffect(() => {
+useEffect(() => {
 
     axios
       .get("https://konanshopping.com/api/products")
@@ -2554,6 +2555,9 @@ justifyContent:"center",
 <img
 src={product.image}
 alt={product.name}
+
+loading="lazy"
+decoding="async"
 
 style={{
 
