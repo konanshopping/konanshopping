@@ -10,6 +10,8 @@ import {
 
 import axios from "axios";
 
+import { Helmet } from "react-helmet-async";
+
 import { toast } from "react-toastify";
 
 import {
@@ -238,7 +240,6 @@ useEffect(() => {
 if (!product)
 
   return (
-
     <div
       style={{
         minHeight: "100vh",
@@ -262,6 +263,20 @@ if (!product)
     </div>
 
   );
+
+    const productUrl = `https://konanshopping.com/product/${product._id}`;
+
+const productImage = product.image;
+
+const averageRating =
+  product.reviews?.length > 0
+    ? (
+        product.reviews.reduce(
+          (t, r) => t + r.rating,
+          0
+        ) / product.reviews.length
+      ).toFixed(1)
+    : "5";
 
 // =========================
 // ADD TO CART
@@ -498,6 +513,62 @@ await axios.post(
 };
 
 return (
+
+<>
+
+<Helmet>
+  <title>
+    {product.name} | Konan Shopping Cameroun
+  </title>
+
+  <meta
+    name="description"
+    content={product.description}
+  />
+
+  <meta
+    property="og:title"
+    content={product.name}
+  />
+
+  <meta
+    property="og:description"
+    content={product.description}
+  />
+
+  <meta
+    property="og:image"
+    content={productImage}
+  />
+
+  <meta
+    property="og:url"
+    content={productUrl}
+  />
+
+  <script type="application/ld+json">
+    {JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.name,
+      image: [productImage],
+      description: product.description,
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: averageRating,
+        reviewCount:
+          product.reviews?.length || 0,
+      },
+      offers: {
+        "@type": "Offer",
+        price: product.price,
+        priceCurrency: "XAF",
+        availability:
+          "https://schema.org/InStock",
+      },
+    })}
+  </script>
+</Helmet>
 
 <div
   style={{
@@ -2847,8 +2918,6 @@ Ajouter
 
 </div>
 
-);
-
 {/* IMAGE MODAL */}
 
 {selectedImage && (
@@ -2913,7 +2982,12 @@ style={{
 
 )}
 
+</>
+
+);
+
 }
+
 const badgeStyle = {
 
   background: "#eef2ff",
