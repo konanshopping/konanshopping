@@ -55,6 +55,10 @@ import { FaClock } from "react-icons/fa";
 
 import { FaTrophy } from "react-icons/fa";
 
+import SeoProduct from "../components/SeoProduct";
+
+import SeoMeta from "../components/SeoMeta";
+
 function ProductDetails() {
 
 const navigate = useNavigate();
@@ -516,118 +520,22 @@ return (
 
 <>
 
-<Helmet>
-  <title>
-    {product.name} - Acheter au Cameroun | KONAN SHOPPING
-  </title>
+<SeoProduct
+  product={product}
+  productUrl={productUrl}
+  productImage={productImage}
+  averageRating={averageRating}
+/>
 
-  <meta
-    name="description"
-    content={`${product.name} disponible chez KONAN SHOPPING Cameroun. Livraison rapide, paiement à la livraison, meilleur prix au Cameroun.`}
-  />
+<SeoMeta
+  title={`${product.name} - Acheter au Cameroun | KONAN SHOPPING`}
+  description={`${product.name} disponible chez KONAN SHOPPING Cameroun. Livraison rapide, paiement à la livraison, meilleur prix au Cameroun.`}
+  image={productImage}
+  url={productUrl}
+  type="product"
+  keywords={`${product.name}, Cameroun, Yaoundé, Douala, boutique en ligne, KONAN SHOPPING, livraison, achat`}
+/>
 
-  <meta
-    name="keywords"
-    content={`${product.name}, Cameroun, Yaoundé, Douala, boutique en ligne, KONAN SHOPPING, livraison, achat`}
-  />
-
-  <meta
-    name="robots"
-    content="index, follow"
-  />
-
-  <link
-    rel="canonical"
-    href={productUrl}
-  />
-
-  {/* Open Graph */}
-  <meta
-    property="og:type"
-    content="product"
-  />
-
-  <meta
-    property="og:title"
-    content={product.name}
-  />
-
-  <meta
-    property="og:description"
-    content={`${product.name} disponible chez KONAN SHOPPING Cameroun. Paiement à la livraison.`}
-  />
-
-  <meta
-    property="og:image"
-    content={productImage}
-  />
-
-  <meta
-    property="og:url"
-    content={productUrl}
-  />
-
-  <meta
-    property="og:site_name"
-    content="KONAN SHOPPING"
-  />
-
-  <meta
-    property="og:locale"
-    content="fr_CM"
-  />
-
-  {/* Twitter */}
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
-  />
-
-  <meta
-    name="twitter:title"
-    content={product.name}
-  />
-
-  <meta
-    name="twitter:description"
-    content={`${product.name} disponible chez KONAN SHOPPING Cameroun.`}
-  />
-
-  <meta
-    name="twitter:image"
-    content={productImage}
-  />
-
-  {/* Données structurées */}
-  <script type="application/ld+json">
-    {JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: product.name,
-      image: [productImage],
-      description: product.description,
-      sku: product._id,
-      brand: {
-        "@type": "Brand",
-        name: "KONAN SHOPPING",
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: averageRating,
-        reviewCount: product.reviews?.length || 0,
-      },
-      offers: {
-        "@type": "Offer",
-        url: productUrl,
-        price: product.price,
-        priceCurrency: "XAF",
-        availability: "https://schema.org/InStock",
-        itemCondition:
-          "https://schema.org/NewCondition",
-      },
-    })}
-  </script>
-</Helmet>
 
 <div
   style={{

@@ -164,6 +164,10 @@ import Deliveries from "./pages/Deliveries";
 
 import SeoOrganization from "./components/SeoOrganization";
 
+import SeoWebsite from "./components/SeoWebsite";
+import SeoBreadcrumb from "./components/SeoBreadcrumb";
+import SeoProduct from "./components/SeoProduct";
+
 function Home() {
 
 const [favoritesCount,
@@ -861,9 +865,19 @@ setLoading(false);
 
   return (
   <>
-    <SeoOrganization />
+  <SeoOrganization />
+  <SeoWebsite />
 
-    <div
+  <SeoBreadcrumb
+    items={[
+      {
+        name: "Accueil",
+        url: "https://konanshopping.com",
+      },
+    ]}
+  />
+
+  <div
       style={{
         minHeight: "100vh",
         background: "#f5f5f7",
