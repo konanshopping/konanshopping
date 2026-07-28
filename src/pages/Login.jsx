@@ -13,7 +13,7 @@ function Login() {
     try {
 
       const res = await axios.post(
-        "https://konanshopping.com/admin-login",
+        "https://konanshopping.com/api/admin-login",
         {
           email: email.trim(),
           password: password.trim(),

@@ -408,7 +408,7 @@ localStorage.setItem(
       const res =
         await axios.post(
 
-          "https://konanshopping.com/apply-coupon",
+          "https://konanshopping.com/api/apply-coupon",
 
           {
 
@@ -499,7 +499,7 @@ if (
   const phoneNumber = phone.replace("+", "");
 
   const res = await axios.post(
-  "https://konanshopping.com/payment/create",
+  "https://konanshopping.com/api/payment/create",
   {
     amount: finalTotal,
     phone: phoneNumber,

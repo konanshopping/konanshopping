@@ -28,7 +28,7 @@ export default function OrderDetails() {
     axios
 
       .get(
-        `https://konanshopping.com/order/${id}`
+        `https://konanshopping.com/api/order/${id}`
       )
 
       .then((res) => {
@@ -461,7 +461,7 @@ export default function OrderDetails() {
                 item.productImage
               ).replace(
                 "http://localhost:5000",
-                "https://konanshopping.com/"
+                "https://konanshopping.com/api/"
               )
 
             : (

@@ -103,7 +103,7 @@ const [loading, setLoading] = useState(true);
 useEffect(() => {
 
   axios
-    .get("https://konanshopping-production.up.railway.app/products")
+    .get("https://konanshopping.com/api/products")
     .then((res) => {
 
       setProducts(res.data);

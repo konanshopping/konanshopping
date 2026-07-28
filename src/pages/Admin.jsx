@@ -291,7 +291,7 @@ const deleteProduct =
     try {
 
       await axios.delete(
-        `https://konanshopping.com/delete-product/${id}`
+        `https://konanshopping.com/api/delete-product/${id}`
       );
 
       fetchProducts();
@@ -321,7 +321,7 @@ const saveEdit =
     try {
 
       await axios.put(
-        `https://konanshopping.com/update-product/${id}`,
+        `https://konanshopping.com/api/update-product/${id}`,
         {
           name: editName,
           price: editPrice,
@@ -355,7 +355,7 @@ const addProduct =
 
       const uploadRes =
         await axios.post(
-          "https://konanshopping.com/upload",
+          "https://konanshopping.com/api/upload",
           formData
         );
 
@@ -363,7 +363,7 @@ const addProduct =
         uploadRes.data.imageUrl;
 
       await axios.post(
-        "https://konanshopping.com/add-product",
+        "https://konanshopping.com/api/add-product",
         {
           name,
           price,

@@ -340,7 +340,7 @@ try{
 
 const res =
 await axios.post(
-"https://konanshopping.com/ai-chat",
+"https://konanshopping.com/api/ai-chat",
 {
 message,
 

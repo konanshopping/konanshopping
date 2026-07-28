@@ -207,7 +207,7 @@ if (!driver) {
 
 await axios.put(
 
-  `https://konanshopping.com/accept-order/${orderId}`,
+  `https://konanshopping.com/api/accept-order/${orderId}`,
 
   {
 
@@ -267,7 +267,7 @@ await axios.put(
 
             await axios.put(
 
-              `https://konanshopping.com/order-location/${orderId}`,
+              `https://konanshopping.com/api/order-location/${orderId}`,
 
               {
 
@@ -331,7 +331,7 @@ await axios.put(
       try {
 
         await axios.put(
-  `https://konanshopping.com/update-order-status/${orderId}`,
+  `https://konanshopping.com/api/update-order-status/${orderId}`,
   {
     status: "Livrée",
   }
@@ -370,7 +370,7 @@ const deleteOrder =
     try {
 
       await axios.delete(
-        `https://konanshopping.com/delete-order/${id}`
+        `https://konanshopping.com/api/delete-order/${id}`
       );
 
       setOrders(
@@ -393,7 +393,7 @@ const deleteOrder =
     try {
 
       await axios.put(
-        `https://konanshopping.com/update-order-status/${orderId}`,
+        `https://konanshopping.com/api/update-order-status/${orderId}`,
         {
           status: "Annulée",
         }

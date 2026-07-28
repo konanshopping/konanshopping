@@ -95,7 +95,7 @@ export default function Deliveries() {
   useEffect(() => {
 
     fetch(
-      "https://konanshopping.com/drivers"
+      "https://konanshopping.com/api/drivers"
     )
       .then((res) =>
         res.json()

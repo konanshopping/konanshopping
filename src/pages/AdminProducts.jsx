@@ -122,7 +122,7 @@ formData.append("category", category);
 formData.append("image", image);
 
 await axios.post(
-  "https://konanshopping.com/add-product",
+  "https://konanshopping.com/api/add-product",
   formData,
   {
     headers: {
@@ -189,7 +189,7 @@ await axios.post(
       try {
 
         await axios.delete(
-  `https://konanshopping.com/delete-product/${id}`
+  `https://konanshopping.com/api/delete-product/${id}`
 );
 
         fetchProducts();
@@ -222,7 +222,7 @@ await axios.post(
         setLoading(true);
 
         await axios.put(
-  `https://konanshopping.com/update-product/${editId}`,
+  `https://konanshopping.com/api/update-product/${editId}`,
   {
     name,
     price,
@@ -622,7 +622,7 @@ await axios.post(
   src={
     product.image.startsWith("http")
       ? product.image
-      : `https://konanshopping.com/${product.image}`
+      : `https://konanshopping.com/api/${product.image}`
   }
   alt=""
 />

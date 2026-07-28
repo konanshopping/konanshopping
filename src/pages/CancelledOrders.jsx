@@ -28,7 +28,7 @@ export default function CancelledOrders() {
 
       const res = await axios.get(
 
-        `https://konanshopping.com/my-orders/${user._id}`
+        `https://konanshopping.com/api/my-orders/${user._id}`
 
       );
 
@@ -673,7 +673,7 @@ export default function CancelledOrders() {
               item.image?.includes("localhost:5000")
                 ? item.image.replace(
                     "http://localhost:5000",
-                    "https://konanshopping.com/"
+                    "https://konanshopping.com/api/"
                   )
                 : item.image || "/logo.jpg"
             }
