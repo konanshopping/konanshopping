@@ -28,7 +28,9 @@ require("./routes/orders");
 
 const axios = require("axios");
 
-require("dotenv").config();
+require("dotenv").config({
+  path: __dirname + "/.env",
+});
 
 const BOT_TOKEN = process.env.TELEGRAM_TOKEN;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
