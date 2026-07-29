@@ -594,6 +594,16 @@ app.get("/feed.xml", async (req, res) => {
   try {
     const products = await Product.find();
 
+const filteredProducts = products.filter((product) => {
+  const text = `${product.name} ${product.description || ""} ${product.category || ""}`.toLowerCase();
+
+  return (
+    !text.includes("louis vuitton") &&
+    !text.includes("louis vuiton") &&
+    !text.includes("lv")
+  );
+});
+
     const feed = [
       {
         _attr: {
@@ -610,7 +620,7 @@ app.get("/feed.xml", async (req, res) => {
               "Boutique en ligne KONAN SHOPPING Cameroun",
           },
 
-          ...products.map((product) => ({
+          ...filteredProducts.map((product) => ({
             item: [
               { "g:id": product._id.toString() },
               { title: product.name },
