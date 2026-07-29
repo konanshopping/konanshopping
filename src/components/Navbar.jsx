@@ -44,7 +44,7 @@ function Navbar() {
         <img
           src="/logo.jpg"
 
-          alt=""
+           alt=""
 
           style={{
             width: "42px",

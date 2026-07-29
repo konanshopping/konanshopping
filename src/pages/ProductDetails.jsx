@@ -629,7 +629,10 @@ return (
 <img
   src={product.image}
 
-  alt=""
+   alt=""
+
+  fetchPriority="high"
+  decoding="async"
 
   style={{
     width: "100%",
@@ -1875,7 +1878,10 @@ review.images.length > 0 && (
 
   src={img}
 
-  alt=""
+   alt=""
+
+loading="lazy"
+decoding="async"
 
   onClick={()=>
     setSelectedImage(img)
@@ -2561,7 +2567,10 @@ Produits similaires
 <img
   src={item.image}
 
-  alt=""
+   alt=""
+
+  loading="lazy"
+  decoding="async"
 
   style={{
     width: "100%",
@@ -2929,7 +2938,9 @@ style={{
 <img
   src={selectedImage}
 
-  alt=""
+   alt=""
+
+decoding="async"
 
   style={{
     maxWidth: "95%",

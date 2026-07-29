@@ -1210,7 +1210,7 @@ href={`https://www.google.com/maps/dir/?api=1&destination=${order.location?.lat}
         <img
           src={item.image}
 
-          alt=""
+           alt=""
 
           style={{
             width: "52px",

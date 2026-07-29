@@ -2220,7 +2220,7 @@ window.innerWidth < 768
 
     <img
   src={item.image}
-  alt=""
+   alt=""
   style={{
     width: "100%",
     height: "100%",
@@ -3026,7 +3026,7 @@ minHeight:
 >
   <img
     src={product.image}
-    alt=""
+     alt=""
     style={{
       width: "100%",
 
@@ -3485,7 +3485,7 @@ fontSize:
 
               <img
                 src={selectedProduct.image}
-                alt=""
+                 alt=""
                 style={{
                   width: "400px",
                   height: "400px",
@@ -3653,7 +3653,7 @@ fontSize:
 
                       <img
                         src={item.image}
-                        alt=""
+                         alt=""
                         style={{
                           width: "100%",
                           height: "120px",

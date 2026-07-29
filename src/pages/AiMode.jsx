@@ -1212,7 +1212,7 @@ transition:"all .25s ease",
 
 <img
 src={product.image}
-alt=""
+ alt=""
 style={{
 width:"48px",
 

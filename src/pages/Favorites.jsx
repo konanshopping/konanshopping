@@ -750,7 +750,7 @@ console.log("user =", user);
                 <img
   src={product.image}
 
-  alt=""
+   alt=""
 
   onClick={() =>
     navigate(

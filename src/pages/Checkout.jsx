@@ -1494,7 +1494,7 @@ alignItems: "flex-start",
     <img
       src={item.image}
 
-      alt=""
+       alt=""
 
       style={{
         width: "90px",

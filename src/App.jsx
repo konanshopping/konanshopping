@@ -957,7 +957,7 @@ setLoading(false);
 
       <img
         src="/logo.jpg"
-        alt=""
+         alt=""
 
         style={{
           width: "35px",
@@ -1152,7 +1152,7 @@ borderBottom:
 
 <img
 src={product.image}
-alt=""
+ alt=""
 style={{
 width:"40px",
 height:"40px",
@@ -1610,7 +1610,7 @@ FCFA
 
       <img
         src={URL.createObjectURL(image)}
-        alt=""
+         alt=""
         style={{
           width: "45px",
           height: "45px",

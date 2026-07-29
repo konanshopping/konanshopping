@@ -1637,7 +1637,7 @@ return (
 
           <img
             src={product?.image}
-            alt=""
+             alt=""
           />
 
           <div className="productInfo">
@@ -1795,7 +1795,7 @@ return (
 
           <img
             src={product.image}
-            alt=""
+             alt=""
           />
 
         </div>

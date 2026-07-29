@@ -339,7 +339,7 @@ export default function Deliveries() {
                   order.items?.[0]
                     ?.image
                 }
-                alt=""
+                 alt=""
                 className="deliveryImage"
               />
 
@@ -472,7 +472,7 @@ export default function Deliveries() {
                         order.driver
                           ?.photo
                       }
-                      alt=""
+                       alt=""
                       className="driverPhoto"
                     />
 

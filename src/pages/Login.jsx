@@ -102,7 +102,7 @@ setTimeout(() => {
 
           <img
             src="/logo.png"
-            alt=""
+             alt=""
             style={{
               width: "85px",
               marginBottom: "15px",

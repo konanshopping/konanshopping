@@ -118,7 +118,7 @@ function Hero() {
       >
         <img
           src="/hero.png"
-          alt=""
+           alt=""
           style={{
             width: "100%",
             maxWidth: "650px",

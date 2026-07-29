@@ -624,7 +624,7 @@ await axios.post(
       ? product.image
       : `https://konanshopping.com/api/${product.image}`
   }
-  alt=""
+   alt=""
 />
 
               </div>

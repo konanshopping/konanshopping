@@ -719,7 +719,7 @@ function AdminStats() {
                     src={
                       product.image
                     }
-                    alt=""
+                     alt=""
                   />
 
                   <h3>
