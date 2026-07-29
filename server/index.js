@@ -590,6 +590,34 @@ app.get("/products", async (req, res) => {
   }
 })
 
+app.get("/product-sitemap.xml", async (req, res) => {
+  try {
+    const products = await Product.find();
+
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
+
+    products.forEach((product) => {
+      sitemap += `
+  <url>
+    <loc>https://konanshopping.com/product/${product._id}</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+
+    sitemap += `
+</urlset>`;
+
+    res.set("Content-Type", "application/xml");
+    res.send(sitemap);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur");
+  }
+});
+
 app.get("/feed.xml", async (req, res) => {
   try {
     const products = await Product.find();
