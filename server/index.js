@@ -590,7 +590,7 @@ app.get("/products", async (req, res) => {
   }
 })
 
-app.get("/feed.xml", async (req, res) => {
+app.get("/api/feed.xml", async (req, res) => {
   try {
     const products = await Product.find();
 
