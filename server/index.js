@@ -617,7 +617,7 @@ app.get("/feed.xml", async (req, res) => {
               { description: product.description || "" },
               {
                 link:
-                  `https://konanshopping.com/product/${product._id}`,
+                  `https://konanshopping.com/api/product/${product._id}`,
               },
               { "g:image_link": product.image },
               {
