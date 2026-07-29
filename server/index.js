@@ -15,6 +15,8 @@ require("./routes/products");
 const ordersRoutes =
   require("./routes/orders");
 
+const xml = require("xml");
+
   const crypto = require("crypto");
 
 const Driver =
@@ -587,6 +589,71 @@ app.get("/products", async (req, res) => {
     console.log(err)
   }
 })
+
+app.get("/feed.xml", async (req, res) => {
+  try {
+    const products = await Product.find();
+
+    const feed = [
+      {
+        _attr: {
+          version: "2.0",
+          "xmlns:g": "http://base.google.com/ns/1.0",
+        },
+      },
+      {
+        channel: [
+          { title: "KONAN SHOPPING CAMEROUN" },
+          { link: "https://konanshopping.com" },
+          {
+            description:
+              "Boutique en ligne KONAN SHOPPING Cameroun",
+          },
+
+          ...products.map((product) => ({
+            item: [
+              { "g:id": product._id.toString() },
+              { title: product.name },
+              { description: product.description || "" },
+              {
+                link:
+                  `https://konanshopping.com/product/${product._id}`,
+              },
+              { "g:image_link": product.image },
+              {
+                "g:availability": "in stock",
+              },
+              {
+                "g:price":
+                  `${product.price} XAF`,
+              },
+              {
+                "g:condition": "new",
+              },
+              {
+                "g:brand":
+                  "KONAN SHOPPING",
+              },
+              {
+                "g:product_type":
+                  product.category || "Divers",
+              },
+            ],
+          })),
+        ],
+      },
+    ];
+
+    res.set("Content-Type", "application/xml");
+    res.send(
+      '<?xml version="1.0" encoding="UTF-8"?>' +
+      xml({ rss: feed })
+    );
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Erreur");
+  }
+});
 
 app.post(
   "/add-product",
