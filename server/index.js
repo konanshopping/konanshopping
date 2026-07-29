@@ -2444,15 +2444,14 @@ app.post(
 
       }
 
-      const hasPurchased =
-  await Order.findOne({
+  const hasPurchased =
+await Order.findOne({
 
-    userId: req.body.clientId,
+  userId: req.body.clientId,
 
-    "items.productId":
-      req.params.id,
+  "items.productId": req.params.id,
 
-  });
+});
 
 console.log(req.body);
 
