@@ -3,3 +3,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://konanshopping.com/sitemap.xml
+Sitemap: https://konanshopping.com/api/product-sitemap.xml
