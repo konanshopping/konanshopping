@@ -23,7 +23,7 @@ return (
 <div
 style={{
 
-minHeight: "100vh",
+minHeight: "100dvh",
 
 background:
 "linear-gradient(135deg,#EEF2FF,#F8FAFC)",
@@ -32,9 +32,12 @@ display: "flex",
 
 justifyContent: "center",
 
-alignItems: "center",
+alignItems: "stretch",
 
-padding: "25px",
+padding:
+window.innerWidth <= 768
+? "0"
+: "25px",
 
 fontFamily: "Arial",
 
@@ -50,13 +53,27 @@ style={{
 
 width: "100%",
 
-maxWidth: "620px",
+maxWidth:
+window.innerWidth <= 768
+? "100%"
+: "620px",
+
+minHeight:
+window.innerWidth <= 768
+? "100dvh"
+: "auto",
 
 background: "white",
 
-borderRadius: "38px",
+borderRadius:
+window.innerWidth <= 768
+? "0"
+: "38px",
 
-padding: "55px 40px",
+padding:
+window.innerWidth <= 768
+? "35px 20px"
+: "55px 40px",
 
 position: "relative",
 
@@ -65,7 +82,9 @@ overflow: "hidden",
 textAlign: "center",
 
 boxShadow:
-"0 25px 70px rgba(91,61,245,0.15)",
+window.innerWidth <= 768
+? "none"
+: "0 25px 70px rgba(91,61,245,0.15)",
 
 }}
 
@@ -104,9 +123,15 @@ filter: "blur(10px)",
 
 style={{
 
-width: "130px",
+width:
+window.innerWidth <= 768
+? "110px"
+: "130px",
 
-height: "130px",
+height:
+window.innerWidth <= 768
+? "110px"
+: "130px",
 
 borderRadius: "50%",
 
@@ -136,7 +161,10 @@ style={{
 
 color: "white",
 
-fontSize: "60px",
+fontSize:
+window.innerWidth <= 768
+? "50px"
+: "60px",
 
 }}
 
@@ -152,13 +180,19 @@ style={{
 
 marginTop: "35px",
 
-fontSize: "46px",
+fontSize:
+window.innerWidth <= 768
+? "36px"
+: "46px",
 
 fontWeight: "900",
 
 color: "#111827",
 
-lineHeight: "55px",
+lineHeight:
+window.innerWidth <= 768
+? "42px"
+: "55px",
 
 marginBottom: "15px",
 
@@ -178,9 +212,15 @@ style={{
 
 color: "#6B7280",
 
-fontSize: "17px",
+fontSize:
+window.innerWidth <= 768
+? "16px"
+: "17px",
 
-lineHeight: "32px",
+lineHeight:
+window.innerWidth <= 768
+? "30px"
+: "32px",
 
 marginTop: "20px",
 
@@ -237,7 +277,10 @@ background: "#F9FAFB",
 
 borderRadius: "24px",
 
-padding: "25px",
+padding:
+window.innerWidth <= 768
+? "20px"
+: "25px",
 
 }}
 
@@ -553,12 +596,17 @@ background:
 
 borderRadius: "24px",
 
-padding: "24px",
+padding:
+window.innerWidth <= 768
+? "20px"
+: "24px",
 
 display: "grid",
 
 gridTemplateColumns:
-"1fr 1fr",
+window.innerWidth <= 768
+? "1fr"
+: "1fr 1fr",
 
 gap: "20px",
 
@@ -608,7 +656,10 @@ marginTop: "10px",
 
 color: "#16A34A",
 
-fontSize: "20px",
+fontSize:
+window.innerWidth <= 768
+? "18px"
+: "20px",
 
 }}
 
@@ -662,7 +713,10 @@ marginTop: "10px",
 
 color: "#5B3DF5",
 
-fontSize: "20px",
+fontSize:
+window.innerWidth <= 768
+? "18px"
+: "20px",
 
 }}
 
@@ -684,11 +738,14 @@ style={{
 
 display: "flex",
 
+flexDirection:
+window.innerWidth <= 768
+? "column"
+: "row",
+
 gap: "16px",
 
 marginTop: "40px",
-
-flexWrap: "wrap",
 
 }}
 
@@ -704,7 +761,10 @@ style={{
 
 flex: 1,
 
-minWidth: "220px",
+minWidth:
+window.innerWidth <= 768
+? "100%"
+: "220px",
 
 textDecoration: "none",
 
@@ -774,7 +834,10 @@ style={{
 
 flex: 1,
 
-minWidth: "220px",
+minWidth:
+window.innerWidth <= 768
+? "100%"
+: "220px",
 
 textDecoration: "none",
 
