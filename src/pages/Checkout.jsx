@@ -757,126 +757,129 @@ console.log(
   )
 );
 
-  return (
+return (
 
-    <>
+  <>
 
-   {showConfetti && (
-  <Confetti
-    numberOfPieces={500}
-    recycle={false}
-  />
-)}
+    {showConfetti && (
+      <Confetti
+        numberOfPieces={500}
+        recycle={false}
+      />
+    )}
+
+    <div
+      style={{
+        minHeight: "100dvh",
+
+        background:
+          "linear-gradient(135deg,#f9fafb,#eef2ff)",
+
+        padding: mobile ? "0" : "50px",
+
+        maxWidth: mobile ? "100%" : "1600px",
+
+        margin: mobile ? "0" : "0 auto",
+
+        overflowX: "hidden",
+
+        width: "100%",
+
+        boxSizing: "border-box",
+
+        fontFamily: "Arial",
+      }}
+    >
+
+      {/* TITLE */}
 
       <div
         style={{
-          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          gap: "15px",
+          flexWrap: "wrap",
 
-          background:
-            "linear-gradient(135deg,#f9fafb,#eef2ff)",
+          marginBottom: mobile ? "0" : "35px",
 
-         padding: mobile ? "16px" : "50px",
-maxWidth: "1600px",
-margin: "0 auto",
-
-overflowX: "hidden",
-
-width: "100%",
-
-boxSizing: "border-box",
-
-          fontFamily: "Arial",
+          padding: mobile ? "20px" : "0",
         }}
       >
 
-        {/* TITLE */}
+        <FaShoppingCart
+          style={{
+            fontSize: mobile ? "32px" : "58px",
+            lineHeight: "1",
+            color: "#5b6cff",
+          }}
+        />
+
+        <h1
+          style={{
+            fontSize:
+              mobile ? "28px" : "58px",
+
+            margin: 0,
+
+            color: "#111827",
+
+            fontWeight: "900",
+
+            lineHeight: "1",
+
+            maxWidth: "100%",
+
+            wordBreak: "break-word",
+          }}
+        >
+          Validation Commande
+        </h1>
+
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+
+          gridTemplateColumns:
+            mobile
+              ? "1fr"
+              : "minmax(0,1.2fr) minmax(0,0.8fr)",
+
+          gap: mobile ? "0" : "30px",
+
+          width: "100%",
+        }}
+      >
+
+        {/* LEFT */}
 
         <div
-  style={{
-    display: "flex",
-alignItems: "center",
-gap: "15px",
-flexWrap: "wrap",
-    marginBottom: "35px",
-  }}
->
+          style={cardStyle}
+        >
 
-  <FaShoppingCart
-    style={{
-     fontSize: mobile ? "32px" : "58px",
-lineHeight: "1",
-
-      color: "#5b6cff",
-    }}
-  />
-
-  <h1
-  style={{
-    fontSize:
-      window.innerWidth < 768
-        ? "28px"
-        : "58px",
-
-    margin: 0,
-
-    color: "#111827",
-
-    fontWeight: "900",
-
-    lineHeight: "1",
-
-    maxWidth: "100%",
-
-    wordBreak: "break-word",
-  }}
->
-    Validation Commande
-  </h1>
-
-</div>
-
-        <div
-  style={{
-    display: "grid",
-
-    gridTemplateColumns:
-      mobile
-        ? "1fr"
-        : "minmax(0,1.2fr) minmax(0,0.8fr)",
-
-    gap: mobile ? "20px" : "30px",
-
-    width: "100%",
-  }}
->
-
-          {/* LEFT */}
-
-          <div
-            style={cardStyle}
+          <h2
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              marginBottom: "25px",
+              color: "#111827",
+            }}
           >
+            <FaUser
+              style={{
+                color: "#5b6cff",
+              }}
+            />
 
-            <h2
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginBottom: "25px",
-    color: "#111827",
-  }}
->
-  <FaUser
-    style={{
-      color: "#5b6cff",
-    }}
-  />
+            Informations client
+          </h2>
 
-  Informations client
-</h2>
-
-            <div
+<div
   style={{
     position: "relative",
+    width: "100%",
   }}
 >
 
@@ -887,6 +890,7 @@ lineHeight: "1",
       left: "15px",
       color: "#6b7280",
       fontSize: "15px",
+      zIndex: 1,
     }}
   />
 
@@ -903,6 +907,8 @@ lineHeight: "1",
     style={{
       ...inputStyle,
       paddingLeft: "45px",
+      width: "100%",
+      boxSizing: "border-box",
     }}
   />
 
@@ -912,6 +918,7 @@ lineHeight: "1",
   style={{
     position: "relative",
     marginBottom: "20px",
+    width: "100%",
   }}
 >
   <FaPhone
@@ -938,6 +945,8 @@ lineHeight: "1",
       paddingLeft: "45px",
       display: "flex",
       alignItems: "center",
+      width: "100%",
+      boxSizing: "border-box",
     }}
 
     numberInputProps={{
@@ -953,10 +962,10 @@ lineHeight: "1",
   />
 </div>
 
-
-           <div
+<div
   style={{
     position: "relative",
+    width: "100%",
   }}
 >
 
@@ -966,6 +975,7 @@ lineHeight: "1",
       top: "18px",
       left: "15px",
       color: "#6b7280",
+      zIndex: 1,
     }}
   />
 
@@ -982,14 +992,17 @@ lineHeight: "1",
     style={{
       ...inputStyle,
       paddingLeft: "45px",
+      width: "100%",
+      boxSizing: "border-box",
     }}
   />
 
 </div>
 
-            <div
+<div
   style={{
     position: "relative",
+    width: "100%",
   }}
 >
 
@@ -999,6 +1012,7 @@ lineHeight: "1",
       top: "18px",
       left: "15px",
       color: "#6b7280",
+      zIndex: 1,
     }}
   />
 
@@ -1015,15 +1029,18 @@ lineHeight: "1",
     style={{
       ...inputStyle,
       paddingLeft: "45px",
+      width: "100%",
+      boxSizing: "border-box",
     }}
   />
 
 </div>
 
-           <div
+<div
   style={{
     position: "relative",
     marginBottom: "20px",
+    width: "100%",
   }}
 >
 
@@ -1040,9 +1057,7 @@ lineHeight: "1",
 
   <select
     required
-
     value={city}
-
     onChange={(e) =>
       setCity(
         e.target.value
@@ -1051,6 +1066,10 @@ lineHeight: "1",
 
     style={{
       ...inputStyle,
+
+      width: "100%",
+
+      boxSizing: "border-box",
 
       paddingLeft: "45px",
 
@@ -1097,9 +1116,10 @@ lineHeight: "1",
 
 </div>
 
-            <div
+<div
   style={{
     position: "relative",
+    width: "100%",
   }}
 >
 
@@ -1110,6 +1130,7 @@ lineHeight: "1",
       left: "15px",
       color: "#6b7280",
       fontSize: "15px",
+      zIndex: 1,
     }}
   />
 
@@ -1131,6 +1152,10 @@ lineHeight: "1",
     style={{
       ...inputStyle,
 
+      width: "100%",
+
+      boxSizing: "border-box",
+
       paddingLeft: "45px",
 
       background:
@@ -1150,12 +1175,13 @@ lineHeight: "1",
 
 </div>
 
-            {/* PAYMENT */}
+           {/* PAYMENT */}
 
 <div
   style={{
     position: "relative",
     marginBottom: "20px",
+    width: "100%",
   }}
 >
 
@@ -1181,6 +1207,10 @@ lineHeight: "1",
 
     style={{
       ...inputStyle,
+
+      width: "100%",
+
+      boxSizing: "border-box",
 
       paddingLeft: "45px",
 
@@ -1223,27 +1253,27 @@ lineHeight: "1",
   style={{
     display: "flex",
 
-flexDirection:
-  window.innerWidth < 768
-    ? "column"
-    : "row",
+    flexDirection: mobile ? "column" : "row",
 
-gap: "12px",
+    gap: "12px",
+
     marginTop: "10px",
+
+    width: "100%",
   }}
 >
 
   <div
-  style={{
-    position: "relative",
+    style={{
+      position: "relative",
 
-    flex: 1,
+      flex: 1,
 
-    width: "100%",
+      width: "100%",
 
-    boxSizing: "border-box",
-  }}
->
+      boxSizing: "border-box",
+    }}
+  >
 
     <FaTag
       style={{
@@ -1252,6 +1282,7 @@ gap: "12px",
         left: "15px",
         color: "#6b7280",
         fontSize: "15px",
+        zIndex: 1,
       }}
     />
 
@@ -1269,30 +1300,34 @@ gap: "12px",
       }
 
       style={{
-  width: "100%",
+        width: "100%",
 
-  padding: "15px 15px 15px 45px",
+        boxSizing: "border-box",
 
-  borderRadius: "16px",
+        padding: "15px 15px 15px 45px",
 
-  border: "1px solid #e5e7eb",
+        borderRadius: "16px",
 
-  background: "linear-gradient(135deg,#ffffff,#f9fafb)",
+        border: "1px solid #e5e7eb",
 
-  boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
+        background:
+          "linear-gradient(135deg,#ffffff,#f9fafb)",
 
-  outline: "none",
+        boxShadow:
+          "0 4px 10px rgba(0,0,0,0.03)",
 
-  fontSize: "15px",
+        outline: "none",
 
-  color: "#111827",
+        fontSize: "15px",
 
-  WebkitTextFillColor: "#111827",
+        color: "#111827",
 
-  caretColor: "#4B2E83",
+        WebkitTextFillColor: "#111827",
 
-  fontWeight: "600",
-}}
+        caretColor: "#4B2E83",
+
+        fontWeight: "600",
+      }}
     />
 
   </div>
@@ -1313,10 +1348,7 @@ gap: "12px",
 
       color: "white",
 
-      width:
-  window.innerWidth < 768
-    ? "100%"
-    : "auto",
+      width: mobile ? "100%" : "auto",
 
       fontWeight: "800",
 
@@ -1328,6 +1360,8 @@ gap: "12px",
       transition: "0.3s",
 
       whiteSpace: "nowrap",
+
+      boxSizing: "border-box",
     }}
 
     onMouseEnter={(e) => {
@@ -1349,358 +1383,372 @@ gap: "12px",
 
 </div>
 
-          </div>
+         </div>
 
-          {/* RIGHT */}
+{/* RIGHT */}
 
-          <div
-            style={cardStyle}
-          >
-
-            <h2
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginBottom: "25px",
-    color: "#111827",
-    fontSize: "28px",
-    fontWeight: "800",
-  }}
+<div
+  style={cardStyle}
 >
-  <FaBoxOpen
+
+  <h2
     style={{
-      color: "#5b6cff",
-      fontSize: "28px",
-    }}
-  />
-
-  Votre commande
-</h2>
-
-{cart.length === 0 ? (
-
-  <div
-    style={{
-      marginTop: "25px",
-      padding: "40px 25px",
-      borderRadius: "24px",
-      background:
-        "linear-gradient(135deg,#ffffff,#f8fafc)",
-      border: "1px solid #e5e7eb",
-      textAlign: "center",
-      boxShadow:
-        "0 10px 25px rgba(0,0,0,0.05)",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      marginBottom: "25px",
+      color: "#111827",
+      fontSize: mobile ? "22px" : "28px",
+      fontWeight: "800",
+      flexWrap: "wrap",
     }}
   >
-
-    <FaShoppingCart
+    <FaBoxOpen
       style={{
-        fontSize: "60px",
-        color: "#cbd5e1",
-        marginBottom: "15px",
+        color: "#5b6cff",
+        fontSize: mobile ? "24px" : "28px",
+        flexShrink: 0,
       }}
     />
 
-    <h2
+    Votre commande
+  </h2>
+
+  {cart.length === 0 ? (
+
+    <div
       style={{
-        margin: 0,
-        color: "#111827",
-        fontSize: "24px",
-        fontWeight: "800",
-      }}
-    >
-      Votre panier est vide
-    </h2>
-
-    <p
-      style={{
-        marginTop: "12px",
-        color: "#6b7280",
-        fontSize: "15px",
-        lineHeight: "1.6",
-        maxWidth: "100%",
-
-wordBreak: "break-word",
-
-overflowWrap: "break-word",
-      }}
-    >
-      Aucun produit n'est actuellement dans votre panier.
-      Découvrez nos meilleures offres et ajoutez vos articles préférés.
-    </p>
-
-    <button
-      onClick={() => navigate("/")}
-      style={{
-        marginTop: "20px",
-        padding: "14px 25px",
-        border: "none",
-        borderRadius: "14px",
+        marginTop: "25px",
+        padding: mobile ? "30px 20px" : "40px 25px",
+        borderRadius: mobile ? "20px" : "24px",
         background:
-          "linear-gradient(135deg,#5b6cff,#7c4dff)",
-        color: "white",
-        fontWeight: "700",
-        cursor: "pointer",
+          "linear-gradient(135deg,#ffffff,#f8fafc)",
+        border: "1px solid #e5e7eb",
+        textAlign: "center",
+        boxShadow:
+          "0 10px 25px rgba(0,0,0,0.05)",
+
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
-      Continuer mes achats
-    </button>
 
-  </div>
+      <FaShoppingCart
+        style={{
+          fontSize: mobile ? "50px" : "60px",
+          color: "#cbd5e1",
+          marginBottom: "15px",
+        }}
+      />
+
+      <h2
+        style={{
+          margin: 0,
+          color: "#111827",
+          fontSize: mobile ? "22px" : "24px",
+          fontWeight: "800",
+          wordBreak: "break-word",
+        }}
+      >
+        Votre panier est vide
+      </h2>
+
+      <p
+        style={{
+          marginTop: "12px",
+          color: "#6b7280",
+          fontSize: mobile ? "14px" : "15px",
+          lineHeight: "1.6",
+          maxWidth: "100%",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
+        }}
+      >
+        Aucun produit n'est actuellement dans votre panier.
+        Découvrez nos meilleures offres et ajoutez vos articles préférés.
+      </p>
+
+      <button
+        onClick={() => navigate("/")}
+        style={{
+          marginTop: "20px",
+          padding: "14px 25px",
+          border: "none",
+          borderRadius: "14px",
+          background:
+            "linear-gradient(135deg,#5b6cff,#7c4dff)",
+          color: "white",
+          fontWeight: "700",
+          cursor: "pointer",
+
+          width: mobile ? "100%" : "auto",
+          boxSizing: "border-box",
+        }}
+      >
+        Continuer mes achats
+      </button>
+
+    </div>
 
 ) : (
 
   <>
 
-{cart.map((item, index) => (
-  <div
-    key={item._id}
-
-    style={{
-
-      width: "100%",
-boxSizing: "border-box",
-overflow: "hidden",
-maxWidth: "100%",
-position: "relative",
-
-      display: "flex",
-
-flexDirection: "row",
-alignItems: "flex-start",
-
-      gap: "18px",
-
-      marginTop: "20px",
-
-      background:
-        "linear-gradient(135deg,#ffffff,#f8faff)",
-
-      padding: "18px",
-
-      borderRadius: "22px",
-
-      boxShadow:
-        "0 8px 20px rgba(0,0,0,0.04)",
-
-      border:
-        "1px solid #eef2ff",
-    }}
-  >
-
-    {/* IMAGE */}
-
-    <img
-      src={item.image}
-
-       alt=""
-
-      style={{
-        width: "90px",
-
-        height: "90px",
-
-        flexShrink: 0,
-
-        objectFit: "cover",
-
-        borderRadius: "18px",
-
-        background: "#f3f4f6",
-
-        padding: "5px",
-      }}
-    />
-
-    {/* CONTENT */}
-
-    <div
-  style={{
-    flex: 1,
-    minWidth: 0,
-    paddingRight: "60px",
-  }}
->
-
-      <h3
-        style={{
-          margin: 0,
-          fontSize: "18px",
-          color: "#111827",
-        }}
-      >
-        {item.name}
-      </h3>
-
-      <p
-        style={{
-          color: "#6b7280",
-          marginTop: "8px",
-          fontSize: "15px",
-        }}
-      >
-        {item.price} FCFA
-      </p>
-
-      {/* BADGE */}
-
+    {cart.map((item, index) => (
       <div
+        key={item._id}
+
         style={{
-          background:
-            "linear-gradient(135deg,#eef2ff,#f5f3ff)",
 
-          padding: "6px 12px",
+          width: "100%",
+          boxSizing: "border-box",
+          overflow: "hidden",
+          maxWidth: "100%",
+          position: "relative",
 
-          borderRadius: "10px",
-
-          display: "inline-block",
-
-          marginTop: "10px",
-
-          color: "#5b6cff",
-
-          fontWeight: "700",
-
-          fontSize: "12px",
-        }}
-      >
-        Produit premium
-      </div>
-
-      {/* QUANTITY */}
-
-      <div
-        style={{
           display: "flex",
 
-          gap: "12px",
+          flexDirection: mobile ? "column" : "row",
 
-          alignItems: "center",
+          alignItems: mobile ? "center" : "flex-start",
 
-          marginTop: "15px",
+          gap: mobile ? "15px" : "18px",
+
+          marginTop: "20px",
+
+          background:
+            "linear-gradient(135deg,#ffffff,#f8faff)",
+
+          padding: mobile ? "15px" : "18px",
+
+          borderRadius: "22px",
+
+          boxShadow:
+            "0 8px 20px rgba(0,0,0,0.04)",
+
+          border:
+            "1px solid #eef2ff",
         }}
       >
 
+        {/* IMAGE */}
+
+        <img
+          src={item.image}
+
+          alt=""
+
+          style={{
+            width: mobile ? "120px" : "90px",
+
+            height: mobile ? "120px" : "90px",
+
+            flexShrink: 0,
+
+            objectFit: "cover",
+
+            borderRadius: "18px",
+
+            background: "#f3f4f6",
+
+            padding: "5px",
+          }}
+        />
+
+        {/* CONTENT */}
+
+        <div
+          style={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
+            paddingRight: mobile ? "0" : "60px",
+            textAlign: mobile ? "center" : "left",
+          }}
+        >
+
+          <h3
+            style={{
+              margin: 0,
+              fontSize: mobile ? "17px" : "18px",
+              color: "#111827",
+              wordBreak: "break-word",
+            }}
+          >
+            {item.name}
+          </h3>
+
+          <p
+            style={{
+              color: "#6b7280",
+              marginTop: "8px",
+              fontSize: "15px",
+            }}
+          >
+            {item.price} FCFA
+          </p>
+
+          {/* BADGE */}
+
+          <div
+            style={{
+              background:
+                "linear-gradient(135deg,#eef2ff,#f5f3ff)",
+
+              padding: "6px 12px",
+
+              borderRadius: "10px",
+
+              display: "inline-block",
+
+              marginTop: "10px",
+
+              color: "#5b6cff",
+
+              fontWeight: "700",
+
+              fontSize: "12px",
+            }}
+          >
+            Produit premium
+          </div>
+
+          {/* QUANTITY */}
+
+          <div
+            style={{
+              display: "flex",
+
+              gap: "12px",
+
+              alignItems: "center",
+
+              justifyContent: mobile ? "center" : "flex-start",
+
+              marginTop: "15px",
+
+              flexWrap: "wrap",
+            }}
+          >
+
+            <button
+              onClick={() =>
+                updateQuantity(
+                  item._id,
+                  "minus"
+                )
+              }
+
+              style={{
+                width: "35px",
+
+                height: "35px",
+
+                borderRadius: "50%",
+
+                border: "none",
+
+                background: "#eef2ff",
+
+                color: "#5b6cff",
+
+                fontSize: "18px",
+
+                fontWeight: "bold",
+
+                cursor: "pointer",
+              }}
+            >
+              -
+            </button>
+
+            <span
+              style={{
+                fontWeight: "700",
+                fontSize: "16px",
+              }}
+            >
+              {item.quantity}
+            </span>
+
+            <button
+              onClick={() =>
+                updateQuantity(
+                  item._id,
+                  "plus"
+                )
+              }
+
+              style={{
+                width: "35px",
+
+                height: "35px",
+
+                borderRadius: "50%",
+
+                border: "none",
+
+                background:
+                  "linear-gradient(135deg,#5b6cff,#7c4dff)",
+
+                color: "white",
+
+                fontSize: "18px",
+
+                fontWeight: "bold",
+
+                cursor: "pointer",
+              }}
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* REMOVE */}
+
         <button
           onClick={() =>
-            updateQuantity(
-              item._id,
-              "minus"
+            removeItem(
+              item._id
             )
           }
 
           style={{
-            width: "35px",
+            position: "absolute",
 
-            height: "35px",
+            top: "18px",
 
-            borderRadius: "50%",
-
-            border: "none",
-
-            background: "#eef2ff",
-
-            color: "#5b6cff",
-
-            fontSize: "18px",
-
-            fontWeight: "bold",
-
-            cursor: "pointer",
-          }}
-        >
-          -
-        </button>
-
-        <span
-          style={{
-            fontWeight: "700",
-            fontSize: "16px",
-          }}
-        >
-          {item.quantity}
-        </span>
-
-        <button
-          onClick={() =>
-            updateQuantity(
-              item._id,
-              "plus"
-            )
-          }
-
-          style={{
-            width: "35px",
-
-            height: "35px",
-
-            borderRadius: "50%",
+            right: "18px",
 
             border: "none",
 
             background:
-              "linear-gradient(135deg,#5b6cff,#7c4dff)",
+              "linear-gradient(135deg,#ef4444,#dc2626)",
 
             color: "white",
 
-            fontSize: "18px",
+            width: "38px",
+
+            height: "38px",
+
+            borderRadius: "12px",
+
+            cursor: "pointer",
 
             fontWeight: "bold",
 
-            cursor: "pointer",
+            fontSize: "16px",
           }}
         >
-          +
+          ✕
         </button>
 
       </div>
 
-    </div>
-
-    {/* REMOVE */}
-
-    <button
-      onClick={() =>
-        removeItem(
-          item._id
-        )
-      }
-
-      style={{
-  position: "absolute",
-
-  top: "18px",
-
-  right: "18px",
-
-  border: "none",
-
-  background:
-    "linear-gradient(135deg,#ef4444,#dc2626)",
-
-  color: "white",
-
-  width: "38px",
-
-  height: "38px",
-
-  borderRadius: "12px",
-
-  cursor: "pointer",
-
-  fontWeight: "bold",
-
-  fontSize: "16px",
-}}
->
-      ✕
-    </button>
-
-  </div>
- 
-
-))}
+    ))}
 
 {/* TOTAL */}
 
@@ -1711,12 +1759,9 @@ alignItems: "flex-start",
     background:
       "linear-gradient(135deg,#ffffff,#eef2ff)",
 
-    padding:
-      window.innerWidth < 768
-        ? "22px"
-        : "30px",
+    padding: mobile ? "22px" : "30px",
 
-    borderRadius: "28px",
+    borderRadius: mobile ? "22px" : "28px",
 
     boxShadow:
       "0 15px 35px rgba(91,108,255,0.10)",
@@ -1729,6 +1774,10 @@ alignItems: "flex-start",
     position: "relative",
 
     overflow: "hidden",
+
+    width: "100%",
+
+    boxSizing: "border-box",
   }}
 >
 
@@ -1742,9 +1791,9 @@ alignItems: "flex-start",
 
       right: "-60px",
 
-      width: "180px",
+      width: mobile ? "140px" : "180px",
 
-      height: "180px",
+      height: mobile ? "140px" : "180px",
 
       borderRadius: "50%",
 
@@ -1763,14 +1812,22 @@ alignItems: "flex-start",
 
       alignItems: "center",
 
-      justifyContent:
-        "space-between",
+      justifyContent: "space-between",
+
+      gap: "15px",
 
       marginBottom: "25px",
+
+      flexWrap: mobile ? "wrap" : "nowrap",
     }}
   >
 
-    <div>
+    <div
+      style={{
+        flex: 1,
+        minWidth: 0,
+      }}
+    >
 
       <p
         style={{
@@ -1778,7 +1835,7 @@ alignItems: "flex-start",
 
           color: "#6b7280",
 
-          fontSize: "13px",
+          fontSize: mobile ? "12px" : "13px",
 
           fontWeight: "600",
         }}
@@ -1794,12 +1851,11 @@ alignItems: "flex-start",
 
           color: "#111827",
 
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "30px",
+          fontSize: mobile ? "24px" : "30px",
 
           fontWeight: "900",
+
+          wordBreak: "break-word",
         }}
       >
         Paiement sécurisé
@@ -1812,15 +1868,9 @@ alignItems: "flex-start",
         background:
           "linear-gradient(135deg,#5b6cff,#7c4dff)",
 
-        width:
-          window.innerWidth < 768
-            ? "55px"
-            : "65px",
+        width: mobile ? "55px" : "65px",
 
-        height:
-          window.innerWidth < 768
-            ? "55px"
-            : "65px",
+        height: mobile ? "55px" : "65px",
 
         borderRadius: "20px",
 
@@ -1829,6 +1879,8 @@ alignItems: "flex-start",
         alignItems: "center",
 
         justifyContent: "center",
+
+        flexShrink: 0,
 
         boxShadow:
           "0 10px 25px rgba(91,108,255,0.25)",
@@ -1839,10 +1891,7 @@ alignItems: "flex-start",
         style={{
           color: "white",
 
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "28px",
+          fontSize: mobile ? "24px" : "28px",
         }}
       />
 
@@ -1852,217 +1901,192 @@ alignItems: "flex-start",
 
   {/* SOUS TOTAL */}
 
-  <div
-    style={{
-      display: "flex",
-
-flexDirection:
-  window.innerWidth < 768
-    ? "column"
-    : "row",
-
-gap: "15px",
-
-justifyContent: "space-between",
-
-alignItems:
-  window.innerWidth < 768
-    ? "flex-start"
-    : "center",
-
-      padding: "14px 0",
-
-      borderBottom:
-        "1px solid #dbeafe",
-    }}
-  >
-
-    <div>
-
-      <h3
-        style={{
-          margin: 0,
-
-          color: "#374151",
-
-          fontSize: "16px",
-
-          fontWeight: "700",
-        }}
-      >
-        Sous-total
-      </h3>
-
-      <p
-        style={{
-          margin: 0,
-
-          marginTop: "3px",
-
-          fontSize: "12px",
-
-          color: "#9ca3af",
-        }}
-      >
-        Articles sélectionnés
-      </p>
-
-    </div>
-
-    <h3
-      style={{
-        margin: 0,
-
-        color: "#111827",
-
-        fontWeight: "900",
-      }}
-    >
-      {total} FCFA
-    </h3>
-
-  </div>
-
-  {/* LIVRAISON */}
-
-  <div
+<div
   style={{
     display: "flex",
 
-    flexDirection:
-      window.innerWidth < 768
-        ? "column"
-        : "row",
+    flexDirection: mobile ? "column" : "row",
 
     gap: "15px",
 
     justifyContent: "space-between",
 
-    alignItems:
-      window.innerWidth < 768
-        ? "flex-start"
-        : "center",
+    alignItems: mobile ? "flex-start" : "center",
 
     padding: "14px 0",
 
-    borderBottom:
-      "1px solid #dbeafe",
+    borderBottom: "1px solid #dbeafe",
+
+    width: "100%",
   }}
 >
 
-    <div>
-
-      <h3
-        style={{
-          margin: 0,
-
-          color: "#374151",
-
-          fontSize: "16px",
-
-          fontWeight: "700",
-        }}
-      >
-        Livraison
-      </h3>
-
-    <p
-        style={{
-          margin: 0,
-
-          marginTop: "3px",
-
-          fontSize: "12px",
-
-          color: "#9ca3af",
-        }}
-      >
-        Expédition rapide Cameroun 🚚
-      </p>
-
-    </div>
+  <div
+    style={{
+      minWidth: 0,
+    }}
+  >
 
     <h3
       style={{
         margin: 0,
 
-        fontWeight: "900",
+        color: "#374151",
 
-        color:
-          shipping === 0
-            ? "#16a34a"
-            : "#111827",
+        fontSize: "16px",
+
+        fontWeight: "700",
+
+        wordBreak: "break-word",
       }}
     >
+      Sous-total
+    </h3>
+
+    <p
+      style={{
+        margin: 0,
+
+        marginTop: "3px",
+
+        fontSize: "12px",
+
+        color: "#9ca3af",
+      }}
+    >
+      Articles sélectionnés
+    </p>
+
+  </div>
+
+  <h3
+    style={{
+      margin: 0,
+
+      color: "#111827",
+
+      fontWeight: "900",
+
+      wordBreak: "break-word",
+    }}
+  >
+    {total} FCFA
+  </h3>
+
+</div>
+
+{/* LIVRAISON */}
+
+<div
+  style={{
+    display: "flex",
+
+    flexDirection: mobile ? "column" : "row",
+
+    gap: "15px",
+
+    justifyContent: "space-between",
+
+    alignItems: mobile ? "flex-start" : "center",
+
+    padding: "14px 0",
+
+    borderBottom: "1px solid #dbeafe",
+
+    width: "100%",
+  }}
+>
+
+  <div
+    style={{
+      minWidth: 0,
+    }}
+  >
+
+    <h3
+      style={{
+        margin: 0,
+
+        color: "#374151",
+
+        fontSize: "16px",
+
+        fontWeight: "700",
+
+        wordBreak: "break-word",
+      }}
+    >
+      Livraison
+    </h3>
+
+    <p
+      style={{
+        margin: 0,
+
+        marginTop: "3px",
+
+        fontSize: "12px",
+
+        color: "#9ca3af",
+      }}
+    >
+      Expédition rapide Cameroun 🚚
+    </p>
+
+  </div>
+
+  <h3
+    style={{
+      margin: 0,
+
+      fontWeight: "900",
+
+      color:
+        shipping === 0
+          ? "#16a34a"
+          : "#111827",
+
+      wordBreak: "break-word",
+    }}
+  >
 
       {shipping === 0
         ? "Gratuite 🎉"
         : `${shipping} FCFA`}
 
-    </h3>
+  </h3>
 
-  </div>
+</div>
 
   {/* RÉDUCTION */}
 
-  {discount > 0 && (
+{discount > 0 && (
+
+  <div
+    style={{
+      display: "flex",
+
+      flexDirection: mobile ? "column" : "row",
+
+      gap: "15px",
+
+      justifyContent: "space-between",
+
+      alignItems: mobile ? "flex-start" : "center",
+
+      padding: "14px 0",
+
+      borderBottom: "1px solid #dbeafe",
+
+      width: "100%",
+    }}
+  >
 
     <div
-  style={{
-    display: "flex",
-
-    flexDirection:
-      window.innerWidth < 768
-        ? "column"
-        : "row",
-
-    gap: "15px",
-
-    justifyContent: "space-between",
-
-    alignItems:
-      window.innerWidth < 768
-        ? "flex-start"
-        : "center",
-
-    padding: "14px 0",
-
-    borderBottom:
-      "1px solid #dbeafe",
-  }}
->
-
-      <div>
-
-        <h3
-          style={{
-            margin: 0,
-
-            color: "#16a34a",
-
-            fontSize: "16px",
-
-            fontWeight: "700",
-          }}
-        >
-          Réduction
-        </h3>
-
-        <p
-          style={{
-            margin: 0,
-
-            marginTop: "3px",
-
-            fontSize: "12px",
-
-            color: "#86efac",
-          }}
-        >
-          Coupon appliqué ✅
-        </p>
-
-      </div>
+      style={{
+        minWidth: 0,
+      }}
+    >
 
       <h3
         style={{
@@ -2070,130 +2094,155 @@ alignItems:
 
           color: "#16a34a",
 
-          fontWeight: "900",
+          fontSize: "16px",
+
+          fontWeight: "700",
+
+          wordBreak: "break-word",
         }}
       >
-        -{discount} FCFA
+        Réduction
       </h3>
-
-    </div>
-
-  )}
-
-  {/* TOTAL FINAL */}
-
-  <div
-    style={{
-      marginTop: "25px",
-
-      padding:
-        window.innerWidth < 768
-          ? "18px"
-          : "22px",
-
-      borderRadius: "22px",
-
-      background:
-        "linear-gradient(135deg,#5b6cff,#7c4dff)",
-
-      display: "flex",
-
-flexDirection:
-  window.innerWidth < 768
-    ? "column"
-    : "row",
-
-gap: "15px",
-
-justifyContent: "space-between",
-
-alignItems:
-  window.innerWidth < 768
-    ? "flex-start"
-    : "center",
-
-      boxShadow:
-        "0 15px 30px rgba(91,108,255,0.25)",
-    }}
-  >
-
-    <div>
 
       <p
         style={{
           margin: 0,
 
-          color:
-            "rgba(255,255,255,0.75)",
+          marginTop: "3px",
 
-          fontSize: "13px",
+          fontSize: "12px",
+
+          color: "#86efac",
         }}
       >
-        Montant total
+        Coupon appliqué ✅
       </p>
 
-      <h2
-        style={{
-          margin: 0,
-
-          marginTop: "4px",
-
-          color: "white",
-
-          fontSize:
-            window.innerWidth < 768
-              ? "26px"
-              : "34px",
-
-          fontWeight: "900",
-        }}
-      >
-        {finalTotal} FCFA
-      </h2>
-
     </div>
 
-    <div
+    <h3
       style={{
-        width:
-          window.innerWidth < 768
-            ? "55px"
-            : "65px",
+        margin: 0,
 
-        height:
-          window.innerWidth < 768
-            ? "55px"
-            : "65px",
+        color: "#16a34a",
 
-        borderRadius: "18px",
+        fontWeight: "900",
 
-        background:
-          "rgba(255,255,255,0.15)",
-
-        display: "flex",
-
-        alignItems: "center",
-
-        justifyContent: "center",
-
-        backdropFilter: "blur(10px)",
+        wordBreak: "break-word",
       }}
     >
-
-      <FaShieldAlt
-        style={{
-          color: "white",
-
-          fontSize:
-            window.innerWidth < 768
-              ? "24px"
-              : "28px",
-        }}
-      />
-
-    </div>
+      -{discount} FCFA
+    </h3>
 
   </div>
+
+)}
+
+{/* TOTAL FINAL */}
+
+<div
+  style={{
+    marginTop: "25px",
+
+    padding: mobile ? "18px" : "22px",
+
+    borderRadius: mobile ? "18px" : "22px",
+
+    background:
+      "linear-gradient(135deg,#5b6cff,#7c4dff)",
+
+    display: "flex",
+
+    flexDirection: mobile ? "column" : "row",
+
+    gap: "15px",
+
+    justifyContent: "space-between",
+
+    alignItems: mobile ? "flex-start" : "center",
+
+    boxShadow:
+      "0 15px 30px rgba(91,108,255,0.25)",
+
+    width: "100%",
+
+    boxSizing: "border-box",
+  }}
+>
+
+  <div
+    style={{
+      minWidth: 0,
+    }}
+  >
+
+    <p
+      style={{
+        margin: 0,
+
+        color:
+          "rgba(255,255,255,0.75)",
+
+        fontSize: "13px",
+      }}
+    >
+      Montant total
+    </p>
+
+    <h2
+      style={{
+        margin: 0,
+
+        marginTop: "4px",
+
+        color: "white",
+
+        fontSize: mobile ? "26px" : "34px",
+
+        fontWeight: "900",
+
+        wordBreak: "break-word",
+      }}
+    >
+      {finalTotal} FCFA
+    </h2>
+
+  </div>
+
+  <div
+    style={{
+      width: mobile ? "55px" : "65px",
+
+      height: mobile ? "55px" : "65px",
+
+      borderRadius: "18px",
+
+      background:
+        "rgba(255,255,255,0.15)",
+
+      display: "flex",
+
+      alignItems: "center",
+
+      justifyContent: "center",
+
+      flexShrink: 0,
+
+      backdropFilter: "blur(10px)",
+    }}
+  >
+
+    <FaShieldAlt
+      style={{
+        color: "white",
+
+        fontSize: mobile ? "24px" : "28px",
+      }}
+    />
+
+  </div>
+
+</div>
 
 </div>
 
@@ -2208,7 +2257,7 @@ alignItems:
 
       color: "#166534",
 
-      padding: "20px",
+      padding: mobile ? "18px" : "20px",
 
       borderRadius: "18px",
 
@@ -2216,7 +2265,7 @@ alignItems:
 
       display: "flex",
 
-      alignItems: "center",
+      alignItems: mobile ? "flex-start" : "center",
 
       gap: "12px",
 
@@ -2224,15 +2273,26 @@ alignItems:
 
       boxShadow:
         "0 8px 20px rgba(34,197,94,0.15)",
+
+      width: "100%",
+
+      boxSizing: "border-box",
     }}
   >
     <FaCheckCircle
       style={{
-        fontSize: "22px",
+        fontSize: mobile ? "20px" : "22px",
+        flexShrink: 0,
       }}
     />
 
-    Commande envoyée avec succès
+    <span
+      style={{
+        wordBreak: "break-word",
+      }}
+    >
+      Commande envoyée avec succès
+    </span>
   </div>
 
 )}
@@ -2242,7 +2302,7 @@ alignItems:
     background:
       "linear-gradient(135deg,#eef2ff,#f5f3ff)",
 
-    padding: "18px",
+    padding: mobile ? "16px" : "18px",
 
     borderRadius: "18px",
 
@@ -2250,24 +2310,34 @@ alignItems:
 
     display: "flex",
 
-    alignItems: "center",
+    alignItems: mobile ? "flex-start" : "center",
 
     gap: "15px",
+
+    width: "100%",
+
+    boxSizing: "border-box",
   }}
 >
 
   <FaLock
     style={{
-      fontSize: "24px",
+      fontSize: mobile ? "22px" : "24px",
       color: "#5b6cff",
+      flexShrink: 0,
     }}
   />
 
-  <div>
+  <div
+    style={{
+      minWidth: 0,
+    }}
+  >
 
     <h4
       style={{
         margin: 0,
+        wordBreak: "break-word",
       }}
     >
       Paiement sécurisé
@@ -2278,6 +2348,7 @@ alignItems:
         margin: 0,
         color: "#6b7280",
         fontSize: "14px",
+        wordBreak: "break-word",
       }}
     >
       Vos données sont protégées
@@ -2287,7 +2358,7 @@ alignItems:
 
 </div>
 
-       {/* BUTTON */}
+{/* BUTTON */}
 
 <button
 
@@ -2302,7 +2373,7 @@ alignItems:
 
     width: "100%",
 
-    padding: "17px",
+    padding: mobile ? "16px" : "17px",
 
     background:
 
@@ -2318,7 +2389,7 @@ alignItems:
 
     borderRadius: "18px",
 
-    fontSize: "16px",
+    fontSize: mobile ? "15px" : "16px",
 
     fontWeight: "800",
 
@@ -2337,6 +2408,10 @@ alignItems:
     justifyContent: "center",
 
     gap: "12px",
+
+    flexWrap: "wrap",
+
+    boxSizing: "border-box",
 
     boxShadow:
 
@@ -2408,25 +2483,25 @@ alignItems:
     <>
       <FaCreditCard />
       Commander maintenant
-
       <FaRocket />
     </>
 
   )}
 
 </button>
+
 </>
 )}
 
-          </div>
+</div>
 
-        </div>
+</div>
 
-      </div>
+</div>
 
-    </>
+</>
 
-  );
+);
 
 }
 
@@ -2438,7 +2513,8 @@ const inputStyle = {
   width: "100%",
 
   maxWidth: "100%",
-overflow: "hidden",
+
+  overflow: "hidden",
 
   padding: "14px 16px",
 
@@ -2448,7 +2524,7 @@ overflow: "hidden",
 
   border: "1px solid #e5e7eb",
 
-  fontSize: window.innerWidth <= 768 ? "16px" : "15px",
+  fontSize: mobile ? "16px" : "15px",
 
   minHeight: "56px",
 
@@ -2462,6 +2538,10 @@ overflow: "hidden",
 
   boxShadow:
     "0 2px 8px rgba(0,0,0,0.03)",
+
+  appearance: "none",
+
+  WebkitAppearance: "none",
 };
 
 export default Checkout;
