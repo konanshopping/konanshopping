@@ -63,6 +63,27 @@ function ProductDetails() {
 
 const navigate = useNavigate();
 
+   const [mobile, setMobile] = useState(
+  window.innerWidth <= 768
+);
+
+useEffect(() => {
+  const handleResize = () => {
+    setMobile(window.innerWidth <= 768);
+  };
+
+  window.addEventListener(
+    "resize",
+    handleResize
+  );
+
+  return () =>
+    window.removeEventListener(
+      "resize",
+      handleResize
+    );
+}, []);
+
 const getTimeAgo = (date) => {
   const seconds = Math.floor(
     (new Date() - new Date(date)) / 1000
@@ -97,26 +118,6 @@ const user =
     localStorage.getItem("user")
   );
 
-      const [mobile, setMobile] = useState(
-    window.innerWidth <= 768
-  );
-  
-  useEffect(() => {
-    const handleResize = () => {
-      setMobile(window.innerWidth <= 768);
-    };
-  
-    window.addEventListener(
-      "resize",
-      handleResize
-    );
-  
-    return () =>
-      window.removeEventListener(
-        "resize",
-        handleResize
-      );
-  }, []);
 
 const clientId =
 
@@ -3135,7 +3136,7 @@ const badgeStyle = {
 
 background: "#eef2ff",
 
-padding: mobile ? "7px 10px" : "8px 12px",
+padding: window.innerWidth <= 768 ? "7px 10px" : "8px 12px",
 
 borderRadius: "12px",
 
@@ -3163,7 +3164,7 @@ width: "100%",
 
 boxSizing: "border-box",
 
-padding: mobile ? "14px 16px" : "15px 18px",
+padding: window.innerWidth <= 768 ? "14px 16px" : "15px 18px",
 
 borderRadius: "18px",
 
