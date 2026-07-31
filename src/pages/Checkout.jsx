@@ -55,7 +55,7 @@ const clientId =
 
 const navigate = useNavigate();
 
-const [mobile, setMobile] = useState(
+    const [mobile, setMobile] = useState(
   window.innerWidth <= 768
 );
 
@@ -128,6 +128,7 @@ const [location, setLocation] = useState(null);
   const [coupon,
     setCoupon] =
     useState("");
+
 
   const [discount,
     setDiscount] =
@@ -2525,7 +2526,7 @@ const inputStyle = {
 
   border: "1px solid #e5e7eb",
 
-  fontSize: mobile ? "16px" : "15px",
+  fontSize: window.innerWidth <= 768 ? "16px" : "15px",
 
   minHeight: "56px",
 
