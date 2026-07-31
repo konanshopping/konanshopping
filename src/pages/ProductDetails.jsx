@@ -97,6 +97,27 @@ const user =
     localStorage.getItem("user")
   );
 
+      const [mobile, setMobile] = useState(
+    window.innerWidth <= 768
+  );
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setMobile(window.innerWidth <= 768);
+    };
+  
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+  
+    return () =>
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+  }, []);
+
 const clientId =
 
   user?._id ||
@@ -536,7 +557,6 @@ return (
   keywords={`${product.name}, Cameroun, Yaoundé, Douala, boutique en ligne, KONAN SHOPPING, livraison, achat`}
 />
 
-
 <div
   style={{
     minHeight: "100vh",
@@ -544,13 +564,19 @@ return (
     background:
       "linear-gradient(135deg,#f8fafc,#eef2ff)",
 
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "26px",
+    padding: mobile ? "12px" : "26px",
 
-    fontFamily:
-      "Arial",
+    width: "100%",
+
+    maxWidth: "1600px",
+
+    margin: "0 auto",
+
+    overflowX: "hidden",
+
+    boxSizing: "border-box",
+
+    fontFamily: "Arial",
   }}
 >
 
@@ -558,46 +584,45 @@ return (
 
 <Link
   to="/boutique"
-
   style={{
     textDecoration: "none",
-
     color: "#4f46e5",
-
     fontWeight: "700",
-
-    fontSize: "14px",
+    fontSize: mobile ? "15px" : "14px",
+    display: "inline-flex",
+    alignItems: "center",
+    marginBottom: mobile ? "8px" : "0",
   }}
 >
-← Retour boutique
+  ← Retour boutique
 </Link>
 
 {/* PRODUCT CARD */}
 
 <div
   style={{
-    marginTop: "20px",
+    marginTop: "18px",
 
-    background: "white",
+    background: "#fff",
 
-    borderRadius: "24px",
+    borderRadius: mobile ? "20px" : "24px",
 
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "22px",
+    padding: mobile ? "12px" : "22px",
 
     display: "grid",
 
     gridTemplateColumns:
-      window.innerWidth < 768
+      mobile
         ? "1fr"
         : "1fr 1fr",
 
-    gap:
-      window.innerWidth < 768
-        ? "18px"
-        : "24px",
+    gap: mobile ? "16px" : "24px",
+
+    width: "100%",
+
+    boxSizing: "border-box",
+
+    overflow: "hidden",
 
     boxShadow:
       "0 10px 30px rgba(0,0,0,0.05)",
@@ -610,14 +635,11 @@ return (
   style={{
     width: "100%",
 
-    height:
-      window.innerWidth < 768
-        ? "340px"
-        : "520px",
+    height: mobile ? "320px" : "520px",
 
     overflow: "hidden",
 
-    borderRadius: "22px",
+    borderRadius: mobile ? "18px" : "22px",
 
     background:
       "linear-gradient(135deg,#f9fafb,#eef2ff)",
@@ -628,36 +650,28 @@ return (
 
 <img
   src={product.image}
-
-   alt=""
-
+  alt=""
   fetchPriority="high"
   decoding="async"
 
   style={{
     width: "100%",
-
     height: "100%",
-
     objectFit: "cover",
-
     display: "block",
-
     transition: "0.4s",
   }}
 
   onMouseEnter={(e) => {
-
-    e.currentTarget.style.transform =
-      "scale(1.05)";
-
+    if (!mobile) {
+      e.currentTarget.style.transform =
+        "scale(1.05)";
+    }
   }}
 
   onMouseLeave={(e) => {
-
     e.currentTarget.style.transform =
       "scale(1)";
-
   }}
 />
 
@@ -665,17 +679,30 @@ return (
 
 {/* CONTENT */}
 
-<div>
+<div
+  style={{
+    width: "100%",
+    minWidth: 0,
+    overflow: "hidden",
+    boxSizing: "border-box",
+  }}
+>
 
 <p
   style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+
     color: "#6b7280",
 
-    fontSize: "13px",
+    fontSize: mobile ? "14px" : "13px",
 
-    marginBottom: "8px",
+    marginBottom: "10px",
 
     fontWeight: "600",
+
+    flexWrap: "wrap",
   }}
 >
 <FaGem /> {product.category}
@@ -683,18 +710,17 @@ return (
 
 <h1
   style={{
-    fontSize:
-      window.innerWidth < 768
-        ? "28px"
-        : "38px",
+    fontSize: mobile ? "30px" : "38px",
 
-    marginBottom: "14px",
+    marginBottom: "16px",
 
     color: "#111827",
 
     fontWeight: "900",
 
     lineHeight: "1.2",
+
+    wordBreak: "break-word",
   }}
 >
   {product.name}
@@ -704,16 +730,17 @@ return (
   style={{
     display: "flex",
 
-    alignItems: "center",
+    alignItems: mobile ? "flex-start" : "center",
 
-    justifyContent:
-      "space-between",
+    justifyContent: "space-between",
 
-    flexWrap: "wrap",
+    flexDirection: mobile ? "column" : "row",
 
-    gap: "12px",
+    gap: mobile ? "15px" : "12px",
 
-    marginBottom: "18px",
+    marginBottom: "20px",
+
+    width: "100%",
   }}
 >
 
@@ -725,7 +752,9 @@ return (
 
     alignItems: "center",
 
-    gap: "10px",
+    gap: "12px",
+
+    flexWrap: "wrap",
   }}
 >
 
@@ -742,7 +771,7 @@ return (
     background:
       "linear-gradient(135deg,#fff7ed,#fffbeb)",
 
-    padding: "8px 12px",
+    padding: mobile ? "7px 10px" : "8px 12px",
 
     borderRadius: "999px",
 
@@ -754,8 +783,7 @@ return (
   }}
 >
 
-{[...Array(5)].map(
-(_, index) => {
+{[...Array(5)].map((_, index) => {
 
 const averageRating =
 
@@ -785,7 +813,7 @@ return (
   key={index}
 
   style={{
-    fontSize: "13px",
+    fontSize: mobile ? "14px" : "13px",
 
     color:
       index <
@@ -811,8 +839,7 @@ return (
 
 );
 
-}
-)}
+})}
 
 </div>
 
@@ -832,7 +859,7 @@ return (
 
 <span
   style={{
-    fontSize: "16px",
+    fontSize: mobile ? "18px" : "16px",
 
     fontWeight: "900",
 
@@ -893,17 +920,12 @@ product.reviews.length
     fontWeight: "500",
   }}
 >
-Basé sur{" "}
-
-{product.reviews?.length || 0}
-
-avis
+Basé sur {product.reviews?.length || 0} avis
 </p>
 
 </div>
 
 </div>
-
 
 </div>
 
@@ -911,14 +933,13 @@ avis
   style={{
     color: "#4f46e5",
 
-    fontSize:
-      window.innerWidth < 768
-        ? "30px"
-        : "40px",
+    fontSize: mobile ? "32px" : "40px",
 
     marginBottom: "18px",
 
     fontWeight: "900",
+
+    wordBreak: "break-word",
   }}
 >
   {product.price} FCFA
@@ -928,15 +949,16 @@ avis
   style={{
     color: "#4b5563",
 
-    lineHeight: "1.7",
+    lineHeight: "1.8",
 
     marginBottom: "24px",
 
-    fontSize: "14px",
+    fontSize: mobile ? "15px" : "14px",
+
+    wordBreak: "break-word",
   }}
 >
   {product.description ||
-
     "Produit premium disponible sur Konan Shopping Cameroun."}
 </p>
 
@@ -948,23 +970,46 @@ avis
 
     flexWrap: "wrap",
 
-    gap: "10px",
+    gap: mobile ? "8px" : "10px",
 
     marginBottom: "22px",
+
+    width: "100%",
   }}
 >
 
-<div style={badgeStyle}>
+<div
+  style={{
+    ...badgeStyle,
+    flex: mobile ? "1 1 calc(50% - 8px)" : "unset",
+    justifyContent: "center",
+    boxSizing: "border-box",
+  }}
+>
   <FaTruck />
   Livraison rapide
 </div>
 
-<div style={badgeStyle}>
+<div
+  style={{
+    ...badgeStyle,
+    flex: mobile ? "1 1 calc(50% - 8px)" : "unset",
+    justifyContent: "center",
+    boxSizing: "border-box",
+  }}
+>
   <FaShieldAlt />
   Paiement sécurisé
 </div>
 
-<div style={badgeStyle}>
+<div
+  style={{
+    ...badgeStyle,
+    flex: mobile ? "1 1 100%" : "unset",
+    justifyContent: "center",
+    boxSizing: "border-box",
+  }}
+>
   <FaGem />
   Premium
 </div>
@@ -977,11 +1022,13 @@ avis
   style={{
     display: "flex",
 
+    flexDirection: mobile ? "column" : "row",
+
     gap: "12px",
 
-    flexWrap: "wrap",
+    alignItems: "stretch",
 
-    alignItems: "center",
+    width: "100%",
   }}
 >
 
@@ -991,21 +1038,21 @@ avis
   onClick={addToCart}
 
   onMouseEnter={(e) => {
-
-    e.currentTarget.style.transform =
-      "translateY(-3px)";
-
+    if (!mobile) {
+      e.currentTarget.style.transform =
+        "translateY(-3px)";
+    }
   }}
 
   onMouseLeave={(e) => {
-
     e.currentTarget.style.transform =
       "translateY(0px)";
-
   }}
 
   style={{
     flex: 1,
+
+    width: "100%",
 
     border: "none",
 
@@ -1014,16 +1061,13 @@ avis
 
     color: "white",
 
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "16px",
+    padding: mobile ? "16px" : "16px",
 
     borderRadius: "16px",
 
     fontWeight: "800",
 
-    fontSize: "14px",
+    fontSize: mobile ? "15px" : "14px",
 
     cursor: "pointer",
 
@@ -1042,7 +1086,7 @@ avis
   }}
 >
   <FaShoppingCart />
-  Ajouter
+  Ajouter au panier
 </div>
 </button>
 
@@ -1110,8 +1154,12 @@ navigate("/checkout");
 
 onMouseEnter={(e) => {
 
+if (!mobile) {
+
   e.currentTarget.style.transform =
     "translateY(-3px)";
+
+}
 
 }}
 
@@ -1125,6 +1173,8 @@ onMouseLeave={(e) => {
 style={{
   flex: 1,
 
+  width: "100%",
+
   border: "none",
 
   background:
@@ -1132,16 +1182,13 @@ style={{
 
   color: "white",
 
-  padding:
-    window.innerWidth < 768
-      ? "14px"
-      : "16px",
+  padding: mobile ? "16px" : "16px",
 
   borderRadius: "16px",
 
   fontWeight: "800",
 
-  fontSize: "14px",
+  fontSize: mobile ? "15px" : "14px",
 
   cursor: "pointer",
 
@@ -1151,7 +1198,7 @@ style={{
     "0 10px 25px rgba(0,0,0,0.12)",
 }}
 >
-  <div
+<div
   style={{
     display: "flex",
     alignItems: "center",
@@ -1160,12 +1207,14 @@ style={{
   }}
 >
   <FaBolt />
-  Acheter
+  Acheter maintenant
 </div>
 </button>
 
 </div>
+
 </div>
+
 </div>
 
 {/* AVIS PREMIUM */}
@@ -1177,12 +1226,9 @@ style={{
     background:
       "linear-gradient(135deg,#ffffff,#f8fafc)",
 
-    padding:
-      window.innerWidth < 768
-        ? "10px"
-        : "12px",
+    padding: mobile ? "16px" : "20px",
 
-    borderRadius: "20px",
+    borderRadius: mobile ? "18px" : "20px",
 
     border:
       "1px solid rgba(99,102,241,0.08)",
@@ -1191,6 +1237,12 @@ style={{
       "0 10px 25px rgba(0,0,0,0.04)",
 
     position: "relative",
+
+    width: "100%",
+
+    boxSizing: "border-box",
+
+    overflow: "hidden",
   }}
 >
 
@@ -1200,20 +1252,24 @@ style={{
   style={{
     display: "flex",
 
-    justifyContent:
-      "space-between",
+    justifyContent: "space-between",
 
-    alignItems: "center",
+    alignItems: mobile ? "flex-start" : "center",
 
-    flexWrap: "wrap",
+    flexDirection: mobile ? "column" : "row",
 
-    gap: "10px",
+    gap: "12px",
 
     marginBottom: "18px",
   }}
 >
 
-<div>
+<div
+  style={{
+    width: "100%",
+    minWidth: 0,
+  }}
+>
 
 <h3
   style={{
@@ -1221,10 +1277,7 @@ style={{
 
     color: "#111827",
 
-    fontSize:
-      window.innerWidth < 768
-        ? "14px"
-        : "16px",
+    fontSize: mobile ? "18px" : "16px",
 
     fontWeight: "900",
 
@@ -1233,6 +1286,8 @@ style={{
     alignItems: "center",
 
     gap: "8px",
+
+    flexWrap: "wrap",
   }}
 >
 <FaStar
@@ -1246,31 +1301,38 @@ Avis clients
 
 <p
   style={{
-    marginTop: "4px",
+    marginTop: "6px",
+
     color: "#6b7280",
-    fontSize: "12px",
+
+    fontSize: mobile ? "13px" : "12px",
+
     fontWeight: "500",
-    lineHeight: "1.5",
+
+    lineHeight: "1.6",
+
+    wordBreak: "break-word",
   }}
 >
-  ⭐ {
-    product?.reviews?.length > 0
-      ? (
-          product.reviews.reduce(
-            (total, review) =>
-              total + review.rating,
-            0
-          ) /
-          product.reviews.length
-        ).toFixed(1)
-      : "0.0"
-  } / 5 • {product?.reviews?.length || 0} avis vérifiés •
-  Votre avis compte pour la communauté Konan Shopping Cameroun.
+⭐ {
+product?.reviews?.length > 0
+? (
+product.reviews.reduce(
+(total, review) =>
+total + review.rating,
+0
+) /
+product.reviews.length
+).toFixed(1)
+: "0.0"
+} / 5 • {product?.reviews?.length || 0} avis vérifiés •
+Votre avis compte pour la communauté Konan Shopping Cameroun.
 </p>
 
 </div>
 
 </div>
+
 {/* FORM */}
 
 <div
@@ -1279,7 +1341,9 @@ Avis clients
 
     flexDirection: "column",
 
-    gap: "10px",
+    gap: "12px",
+
+    width: "100%",
   }}
 >
 
@@ -1290,7 +1354,7 @@ Avis clients
 
   value={reviewName}
 
-  onChange={(e) =>
+  onChange={(e)=>
     setReviewName(
       e.target.value
     )
@@ -1304,7 +1368,7 @@ Avis clients
 
   value={reviewComment}
 
-  onChange={(e) =>
+  onChange={(e)=>
     setReviewComment(
       e.target.value
     )
@@ -1313,7 +1377,7 @@ Avis clients
   style={{
     ...inputStyle,
 
-    height: "70px",
+    height: mobile ? "90px" : "70px",
 
     resize: "none",
 
@@ -1323,39 +1387,42 @@ Avis clients
 
 <div
   style={{
-    marginTop: "10px",
+    marginTop: "6px",
   }}
 >
 
 <label
   style={{
-    display: "flex",
+    display: "inline-flex",
 
     alignItems: "center",
 
     gap: "8px",
 
-    background:
-      "#f9fafb",
+    background: "#f9fafb",
 
-    border:
-      "1px dashed #c7d2fe",
+    border: "1px dashed #c7d2fe",
 
-    padding: "10px",
+    padding: mobile ? "12px 16px" : "10px 14px",
 
-    borderRadius: "10px",
+    borderRadius: "12px",
 
     cursor: "pointer",
 
-    fontSize: "12px",
+    fontSize: mobile ? "13px" : "12px",
 
     fontWeight: "700",
 
     color: "#4f46e5",
 
-    width: "fit-content",
+    maxWidth: "100%",
+
+    boxSizing: "border-box",
+
+    flexWrap: "wrap",
   }}
 >
+
 <FaImage
   style={{
     fontSize: "15px",
@@ -1387,15 +1454,21 @@ Ajouter des photos
 </label>
 
 {reviewImages.length > 0 && (
-  <p
-    style={{
-      color: "green",
-      fontWeight: "700",
-      marginTop: "8px",
-    }}
-  >
-    {reviewImages.length} photo(s) sélectionnée(s)
-  </p>
+
+<p
+  style={{
+    color: "#16a34a",
+
+    fontWeight: "700",
+
+    marginTop: "10px",
+
+    fontSize: mobile ? "13px" : "14px",
+  }}
+>
+{reviewImages.length} photo(s) sélectionnée(s)
+</p>
+
 )}
 
 </div>
@@ -1403,7 +1476,7 @@ Ajouter des photos
 <select
   value={reviewRating}
 
-  onChange={(e) =>
+  onChange={(e)=>
     setReviewRating(
       e.target.value
     )
@@ -1440,28 +1513,27 @@ Ajouter des photos
 
 </select>
 
-
 {/* BUTTON */}
 
 <button
   onClick={submitReview}
 
   onMouseEnter={(e) => {
-
-    e.currentTarget.style.transform =
-      "translateY(-2px)";
-
+    if (!mobile) {
+      e.currentTarget.style.transform =
+        "translateY(-2px)";
+    }
   }}
 
   onMouseLeave={(e) => {
-
     e.currentTarget.style.transform =
       "translateY(0px)";
-
   }}
 
   style={{
-    marginTop: "2px",
+    marginTop: "8px",
+
+    width: "100%",
 
     border: "none",
 
@@ -1470,18 +1542,15 @@ Ajouter des photos
 
     color: "white",
 
-    padding:
-      window.innerWidth < 768
-        ? "10px"
-        : "11px",
+    padding: mobile ? "15px" : "12px",
 
-    borderRadius: "12px",
+    borderRadius: "14px",
 
     cursor: "pointer",
 
     fontWeight: "800",
 
-    fontSize: "13px",
+    fontSize: mobile ? "15px" : "13px",
 
     display: "flex",
 
@@ -1489,7 +1558,7 @@ Ajouter des photos
 
     justifyContent: "center",
 
-    gap: "8px",
+    gap: "10px",
 
     transition: "0.3s ease",
 
@@ -1497,8 +1566,8 @@ Ajouter des photos
       "0 10px 20px rgba(79,70,229,0.16)",
   }}
 >
-<FaStar />
-Publier l'avis
+  <FaStar />
+  Publier l'avis
 </button>
 
 </div>
@@ -1518,134 +1587,140 @@ product.reviews.length > 0 ? (
 
 .sort((a, b) => {
 
-  // Avis le plus utile en premier
+if (
+(b.likes?.length || 0) !==
+(a.likes?.length || 0)
+)
+return (
+(b.likes?.length || 0) -
+(a.likes?.length || 0)
+);
 
 if (
-  (b.likes?.length || 0) !==
-  (a.likes?.length || 0)
+a.verifiedPurchase &&
+!b.verifiedPurchase
 )
-  return (
-    (b.likes?.length || 0) -
-    (a.likes?.length || 0)
-  );
+return -1;
 
-  // Achat vérifié en premier
+if (
+!a.verifiedPurchase &&
+b.verifiedPurchase
+)
+return 1;
 
-  if (
-    a.verifiedPurchase &&
-    !b.verifiedPurchase
-  )
-    return -1;
+if (b.rating !== a.rating)
+return b.rating - a.rating;
 
-  if (
-    !a.verifiedPurchase &&
-    b.verifiedPurchase
-  )
-    return 1;
-
-  // Meilleure note en premier
-
-  if (b.rating !== a.rating)
-    return b.rating - a.rating;
-
-  // Plus récent en premier
-
-  return (
-    new Date(b.createdAt) -
-    new Date(a.createdAt)
-  );
+return (
+new Date(b.createdAt) -
+new Date(a.createdAt)
+);
 
 })
 
-.map(
-  (review, index) => (
+.map((review, index) => (
 
-      <div
-        key={index}
+<div
+key={index}
 
-        style={{
-  marginTop: "8px",
+style={{
+marginTop: "12px",
 
-  background: "white",
+background: "#fff",
 
-  padding: "10px",
+padding: mobile ? "14px" : "12px",
 
-  borderRadius: "10px",
+borderRadius: mobile ? "16px" : "12px",
 
-  border:
-    "1px solid #eef2ff",
+border: "1px solid #eef2ff",
 
-  boxShadow:
-    "0 2px 8px rgba(0,0,0,0.03)",
+boxShadow:
+"0 4px 12px rgba(0,0,0,0.04)",
+
+width: "100%",
+
+boxSizing: "border-box",
+
+overflow: "hidden",
 }}
-      >
+>
 
-        {/* TOP */}
+{/* TOP */}
 
-        <div
-          style={{
-            display: "flex",
+<div
+style={{
+display: "flex",
 
-            justifyContent:
-              "space-between",
+justifyContent: "space-between",
 
-            alignItems: "center",
+alignItems: mobile ? "flex-start" : "center",
 
-            flexWrap: "wrap",
+flexDirection: mobile ? "column" : "row",
 
-            gap: "8px",
-          }}
-        >
+gap: "10px",
 
-          <div>
+width: "100%",
+}}
+>
 
-            <strong
-              style={{
-                fontSize: "12px",
+<div
+style={{
+flex: 1,
+minWidth: 0,
+}}
+>
 
-                color: "#111827",
+<strong
+style={{
+fontSize: mobile ? "14px" : "12px",
 
-                fontWeight: "800",
+color: "#111827",
 
-                display: "flex",
+fontWeight: "800",
 
-                alignItems: "center",
+display: "flex",
 
-                gap: "6px",
-              }}
-            >
-              <FaUserCircle
-                style={{
-                  color: "#6366f1",
-                }}
-              />
+alignItems: "center",
 
-              {review.name}
-            </strong>
+gap: "6px",
 
-            {index === 0 &&
+flexWrap: "wrap",
+}}
+>
+<FaUserCircle
+style={{
+color: "#6366f1",
+}}
+/>
+
+{review.name}
+</strong>
+
+{index === 0 &&
 (review.likes?.length || 0) > 0 && (
 
 <div
-  style={{
-    marginTop: "4px",
+style={{
+marginTop: "6px",
 
-    display: "flex",
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    gap: "5px",
+gap: "6px",
 
-    color: "#f59e0b",
+color: "#f59e0b",
 
-    fontSize: "10px",
+fontSize: mobile ? "11px" : "10px",
 
-    fontWeight: "800",
-  }}
+fontWeight: "800",
+
+flexWrap: "wrap",
+}}
 >
-  <FaTrophy />
+<FaTrophy />
 
-  Avis le plus utile
+Avis le plus utile
 
 </div>
 
@@ -1654,64 +1729,61 @@ if (
 {review.verifiedPurchase && (
 
 <div
-  style={{
-    marginTop: "8px",
+style={{
+marginTop: "8px",
 
-    background:
-      "linear-gradient(135deg,#ecfdf5,#dcfce7)",
+background:
+"linear-gradient(135deg,#ecfdf5,#dcfce7)",
 
-    color: "#166534",
+color: "#166534",
 
-    padding: "6px 12px",
+padding: "6px 12px",
 
-    borderRadius: "999px",
+borderRadius: "999px",
 
-    fontSize: "10px",
+fontSize: mobile ? "11px" : "10px",
 
-    fontWeight: "800",
+fontWeight: "800",
 
-    width: "fit-content",
+width: "fit-content",
 
-    display: "flex",
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    gap: "6px",
+gap: "6px",
 
-    border:
-      "1px solid rgba(34,197,94,0.15)",
+border:
+"1px solid rgba(34,197,94,0.15)",
 
-    boxShadow:
-      "0 4px 12px rgba(34,197,94,0.10)",
+boxShadow:
+"0 4px 12px rgba(34,197,94,0.10)",
 
-    letterSpacing: "0.3px",
-  }}
+letterSpacing: "0.3px",
+}}
 >
 
 <div
-  style={{
-    width: "18px",
+style={{
+width: "18px",
 
-    height: "18px",
+height: "18px",
 
-    borderRadius: "50%",
+borderRadius: "50%",
 
-    background:
-      "linear-gradient(135deg,#22c55e,#16a34a)",
+background:
+"linear-gradient(135deg,#22c55e,#16a34a)",
 
-    display: "flex",
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    justifyContent: "center",
+justifyContent: "center",
 
-    color: "white",
+color: "white",
 
-    fontSize: "9px",
-
-    boxShadow:
-      "0 4px 10px rgba(34,197,94,0.25)",
-  }}
+fontSize: "9px",
+}}
 >
 ✓
 </div>
@@ -1724,137 +1796,147 @@ Achat vérifié
 
 )}
 
-            <div
-  style={{
-    display: "flex",
+<div
+style={{
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    gap: "8px",
+gap: "8px",
 
-    marginTop: "8px",
-  }}
+marginTop: "8px",
+
+flexWrap: "wrap",
+}}
 >
 
 <div
-  style={{
-    display: "flex",
+style={{
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    gap: "3px",
+gap: "3px",
 
-    color: "#f59e0b",
+color: "#f59e0b",
 
-    fontSize: "12px",
-  }}
+fontSize: mobile ? "14px" : "12px",
+}}
 >
 
-{[...Array(5)].map(
-(_,index)=>(
+{[...Array(5)].map((_, index)=>(
 
 <FaStar
-  key={index}
+key={index}
 
-  style={{
-    opacity:
-      index < review.rating
-        ? 1
-        : 0.25,
+style={{
+opacity:
+index < review.rating
+? 1
+: 0.25,
 
-    filter:
-      index < review.rating
-        ? "drop-shadow(0 2px 4px rgba(245,158,11,0.35))"
-        : "none",
-  }}
+filter:
+index < review.rating
+? "drop-shadow(0 2px 4px rgba(245,158,11,0.35))"
+: "none",
+}}
 />
 
-)
-
-)}
+))}
 
 </div>
 
 <span
   style={{
-    fontSize: "11px",
+    fontSize: mobile ? "12px" : "11px",
 
     fontWeight: "700",
 
     color: "#111827",
 
-    background:
-      "#f9fafb",
+    background: "#f9fafb",
 
-    padding: "4px 8px",
+    padding: mobile ? "5px 10px" : "4px 8px",
 
     borderRadius: "999px",
 
-    border:
-      "1px solid #e5e7eb",
+    border: "1px solid #e5e7eb",
+
+    flexShrink: 0,
   }}
 >
-{review.rating}.0
+  {review.rating}.0
 </span>
 
 </div>
 
-          </div>
+</div>
 
-          {/* VERIFIED */}
+{/* VERIFIED */}
 
-          <div
-            style={{
-              background:
-                "linear-gradient(135deg,#dcfce7,#bbf7d0)",
-
-              color: "#166534",
-
-              padding: "6px 10px",
-
-              borderRadius: "10px",
-
-              fontSize: "10px",
-
-              fontWeight: "800",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              gap: "5px",
-            }}
-          >
-            <FaCheckCircle />
-
-            Vérifié
-          </div>
-
-        </div>
-
-        {/* COMMENT */}
-
-        <p
-  onClick={() =>
-  setOpenReply(
-    openReply === review._id
-      ? null
-      : review._id
-  )
-}
+<div
   style={{
-    fontSize: "12px",
+    background:
+      "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+
+    color: "#166534",
+
+    padding: mobile ? "8px 12px" : "6px 10px",
+
+    borderRadius: "10px",
+
+    fontSize: mobile ? "11px" : "10px",
+
+    fontWeight: "800",
+
+    display: "flex",
+
+    alignItems: "center",
+
+    gap: "6px",
+
+    alignSelf: mobile ? "flex-start" : "center",
+  }}
+>
+  <FaCheckCircle />
+
+  Vérifié
+</div>
+
+</div>
+
+{/* COMMENT */}
+
+<p
+  onClick={() =>
+    setOpenReply(
+      openReply === review._id
+        ? null
+        : review._id
+    )
+  }
+  style={{
+    fontSize: mobile ? "14px" : "12px",
+
     color: "#4b5563",
-    marginTop: "6px",
-    lineHeight: "1.4",
+
+    marginTop: "10px",
+
+    lineHeight: "1.7",
+
     marginBottom: 0,
+
     cursor: "pointer",
+
     fontWeight: "500",
+
+    wordBreak: "break-word",
   }}
 >
   {review.comment}
 </p>
-        {review.images &&
+
+{review.images &&
 review.images.length > 0 && (
 
 <div
@@ -1865,7 +1947,7 @@ review.images.length > 0 && (
 
     flexWrap: "wrap",
 
-    marginTop: "7px",
+    marginTop: "10px",
   }}
 >
 
@@ -1878,34 +1960,28 @@ review.images.length > 0 && (
 
   src={img}
 
-   alt=""
+  alt=""
 
-loading="lazy"
-decoding="async"
+  loading="lazy"
 
-  onClick={()=>
+  decoding="async"
+
+  onClick={() =>
     setSelectedImage(img)
   }
 
   style={{
-    width:
-      window.innerWidth < 768
-        ? "55px"
-        : "65px",
+    width: mobile ? "70px" : "65px",
 
-    height:
-      window.innerWidth < 768
-        ? "55px"
-        : "65px",
+    height: mobile ? "70px" : "65px",
 
     objectFit: "cover",
 
-    borderRadius: "8px",
+    borderRadius: "10px",
 
     cursor: "pointer",
 
-    border:
-      "1px solid #e5e7eb",
+    border: "1px solid #e5e7eb",
 
     boxShadow:
       "0 6px 14px rgba(0,0,0,0.05)",
@@ -1915,8 +1991,12 @@ decoding="async"
 
   onMouseEnter={(e)=>{
 
-    e.currentTarget.style.transform =
-      "scale(1.05)";
+    if(!mobile){
+
+      e.currentTarget.style.transform =
+        "scale(1.05)";
+
+    }
 
   }}
 
@@ -1946,7 +2026,9 @@ decoding="async"
 
     gap: "10px",
 
-    marginTop: "12px",
+    marginTop: "14px",
+
+    flexWrap: "wrap",
   }}
 >
 
@@ -1985,12 +2067,11 @@ console.log(err);
 style={{
   border: "none",
 
-  background:
-    "#eff6ff",
+  background: "#eff6ff",
 
   color: "#2563eb",
 
-  padding: "6px 10px",
+  padding: mobile ? "9px 14px" : "6px 10px",
 
   borderRadius: "10px",
 
@@ -2004,9 +2085,7 @@ style={{
 
   gap: "6px",
 
-  fontSize: "11px",
-
-  transition: "0.3s",
+  fontSize: mobile ? "13px" : "11px",
 
   boxShadow:
     "0 4px 10px rgba(37,99,235,0.10)",
@@ -2052,12 +2131,11 @@ console.log(err);
 style={{
   border: "none",
 
-  background:
-    "#fef2f2",
+  background: "#fef2f2",
 
   color: "#ef4444",
 
-  padding: "6px 10px",
+  padding: mobile ? "9px 14px" : "6px 10px",
 
   borderRadius: "10px",
 
@@ -2071,9 +2149,7 @@ style={{
 
   gap: "6px",
 
-  fontSize: "11px",
-
-  transition: "0.3s",
+  fontSize: mobile ? "13px" : "11px",
 
   boxShadow:
     "0 4px 10px rgba(239,68,68,0.10)",
@@ -2094,14 +2170,26 @@ style={{
   }
   style={{
     border: "none",
-    background: "transparent",
+
+    background: "#eef2ff",
+
     color: "#4f46e5",
+
+    padding: mobile ? "9px 14px" : "6px 10px",
+
+    borderRadius: "10px",
+
     cursor: "pointer",
+
     fontWeight: "700",
+
     display: "flex",
+
     alignItems: "center",
-    gap: "5px",
-    fontSize: "11px",
+
+    gap: "6px",
+
+    fontSize: mobile ? "13px" : "11px",
   }}
 >
   <FaReply />
@@ -2135,23 +2223,25 @@ e.target.value
 style={{
   width: "100%",
 
-  padding: "12px",
+  boxSizing: "border-box",
+
+  padding: mobile ? "14px" : "12px",
 
   borderRadius: "12px",
 
-  border:
-    "1px solid #e5e7eb",
+  border: "1px solid #e5e7eb",
 
-  fontSize: "12px",
+  fontSize: mobile ? "14px" : "12px",
 
   outline: "none",
 
   resize: "none",
 
-  height: "55px",
+  height: mobile ? "80px" : "55px",
 
-  background:
-    "#f9fafb",
+  background: "#f9fafb",
+
+  lineHeight: "1.6",
 }}
 />
 
@@ -2193,25 +2283,27 @@ setReplyText("");
 getProduct();
 
 toast.success(
-  "Réponse envoyée ✅"
+"Réponse envoyée ✅"
 );
 
 }
 
 catch(err){
 
-  console.log(err);
+console.log(err);
 
-  toast.error(
-    "Erreur lors de l'envoi"
-  );
+toast.error(
+"Erreur lors de l'envoi"
+);
 
 }
 
 }}
 
 style={{
-  marginTop: "10px",
+  marginTop: "12px",
+
+  width: mobile ? "100%" : "auto",
 
   border: "none",
 
@@ -2220,25 +2312,26 @@ style={{
 
   color: "white",
 
-  padding: "8px 12px",
+  padding: mobile ? "13px" : "8px 12px",
 
-  borderRadius: "10px",
+  borderRadius: "12px",
 
   cursor: "pointer",
 
   fontWeight: "700",
 
-  fontSize: "11px",
+  fontSize: mobile ? "14px" : "11px",
 
   display: "flex",
 
   alignItems: "center",
 
-  gap: "6px",
+  justifyContent: "center",
+
+  gap: "8px",
 }}
 >
 <FaReply />
-
 Répondre
 </button>
 
@@ -2249,66 +2342,76 @@ Répondre
 {/* REPLIES */}
 
 {openReply === review._id &&
- review.replies?.map(
+review.replies?.map(
 
 (reply,index)=>(
 
 <div
-  key={index}
+key={index}
 
-  style={{
-    marginTop: "12px",
+style={{
+marginTop: "12px",
 
-    marginLeft: "18px",
+marginLeft: mobile ? "0" : "18px",
 
-    background:
-      "#f9fafb",
+background: "#f9fafb",
 
-    padding: "12px",
+padding: mobile ? "14px" : "12px",
 
-    borderRadius: "12px",
+borderRadius: "12px",
 
-    border:
-      "1px solid #eef2ff",
-  }}
+border: "1px solid #eef2ff",
+
+width: "100%",
+
+boxSizing: "border-box",
+}}
 >
 
 <strong
-  style={{
-    fontSize: "12px",
+style={{
+fontSize: mobile ? "13px" : "12px",
 
-    color: "#111827",
+color: "#111827",
 
-    display: "flex",
+display: "flex",
 
-    alignItems: "center",
+alignItems: "center",
 
-    gap: "6px",
-  }}
+gap: "6px",
+
+wordBreak: "break-word",
+}}
 >
+
 <FaUserCircle
-  style={{
-    color: "#6366f1",
-  }}
+style={{
+color: "#6366f1",
+}}
 />
 
 {reply.name}
+
 </strong>
 
 <p
-  style={{
-    marginTop: "8px",
+style={{
+marginTop: "8px",
 
-    fontSize: "12px",
+fontSize: mobile ? "14px" : "12px",
 
-    color: "#4b5563",
+color: "#4b5563",
 
-    lineHeight: "1.6",
+lineHeight: "1.6",
 
-    marginBottom: 0,
-  }}
+marginBottom: 0,
+
+wordBreak: "break-word",
+}}
 >
+
 {reply.comment}
+
 </p>
 
 </div>
@@ -2318,129 +2421,152 @@ Répondre
 )}
 
 <div
-  style={{
-    display: "flex",
+style={{
+display: "flex",
 
-    justifyContent:
-      "space-between",
+justifyContent: "space-between",
 
-    alignItems: "center",
+alignItems: mobile ? "flex-start" : "center",
 
-    marginTop: "10px",
-  }}
+flexDirection: mobile ? "column" : "row",
+
+gap: "10px",
+
+marginTop: "14px",
+}}
 >
 
 <span
-  style={{
-    fontSize: "11px",
-    color: "#9ca3af",
-    fontWeight: "500",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-  }}
+style={{
+fontSize: mobile ? "12px" : "11px",
+
+color: "#9ca3af",
+
+fontWeight: "500",
+
+display: "flex",
+
+alignItems: "center",
+
+gap: "6px",
+}}
 >
-<FaClock
-  style={{
-    marginRight: "5px",
-  }}
-/>
+
+<FaClock />
 
 {getTimeAgo(review.createdAt)}
+
 </span>
 
 <div
-  style={{
-    display: "flex",
+style={{
+display: "flex",
 
-    gap: "6px",
-  }}
+justifyContent: mobile ? "flex-start" : "flex-end",
+}}
 >
 
 <span
-  style={{
-    background: "#fff7ed",
-    color: "#f59e0b",
-    padding: "2px 4px",
-    borderRadius: "999px",
-    fontSize: "8px",
-    fontWeight: "700",
-    display: "flex",
-    alignItems: "center",
-    gap: "4px",
-    border: "1px solid #fde68a",
-  }}
+style={{
+background: "#fff7ed",
+
+color: "#f59e0b",
+
+padding: mobile ? "5px 10px" : "2px 6px",
+
+borderRadius: "999px",
+
+fontSize: mobile ? "11px" : "8px",
+
+fontWeight: "700",
+
+display: "flex",
+
+alignItems: "center",
+
+gap: "5px",
+
+border: "1px solid #fde68a",
+}}
 >
+
 <FaStar />
 
 {review.rating}/5
+
 </span>
 
 </div>
 
 </div>
 
-      </div>
+</div>
 
-    )
-  )
+)
+
+)
 
 ) : (
 
-  <div
-    style={{
-      marginTop: "18px",
+<div
+style={{
+marginTop: "18px",
 
-      background: "white",
+background: "white",
 
-      padding: "18px",
+padding: mobile ? "25px" : "18px",
 
-      borderRadius: "16px",
+borderRadius: "16px",
 
-      textAlign: "center",
+textAlign: "center",
 
-      border:
-        "1px dashed #d1d5db",
-    }}
-  >
+border: "1px dashed #d1d5db",
+}}
+>
 
-    <FaCommentDots
-      style={{
-        fontSize: "30px",
+<FaCommentDots
+style={{
+fontSize: mobile ? "42px" : "30px",
 
-        color: "#6366f1",
+color: "#6366f1",
 
-        marginBottom: "10px",
-      }}
-    />
+marginBottom: "10px",
+}}
+/>
 
-    <h4
-      style={{
-        margin: 0,
+<h4
+style={{
+margin: 0,
 
-        color: "#111827",
+color: "#111827",
 
-        fontSize: "15px",
+fontSize: mobile ? "18px" : "15px",
 
-        fontWeight: "800",
-      }}
-    >
-      Aucun avis
-    </h4>
+fontWeight: "800",
+}}
+>
 
-    <p
-      style={{
-        color: "#6b7280",
+Aucun avis
 
-        fontSize: "12px",
+</h4>
 
-        marginTop: "6px",
-      }}
-    >
-      Soyez le premier à donner votre avis
-    </p>
+<p
+style={{
+color: "#6b7280",
 
-  </div>
+fontSize: mobile ? "14px" : "12px",
+
+marginTop: "8px",
+
+lineHeight: "1.6",
+}}
+>
+
+Soyez le premier à donner votre avis
+
+</p>
+
+</div>
 
 )}
 
@@ -2452,18 +2578,15 @@ Répondre
 
 <div
   style={{
-    marginTop: "40px",
+    marginTop: mobile ? "30px" : "40px",
   }}
 >
 
 <h2
   style={{
-    fontSize:
-      window.innerWidth < 768
-        ? "24px"
-        : "30px",
+    fontSize: mobile ? "22px" : "30px",
 
-    marginBottom: "22px",
+    marginBottom: mobile ? "18px" : "22px",
 
     color: "#111827",
 
@@ -2474,6 +2597,8 @@ Répondre
     alignItems: "center",
 
     gap: "10px",
+
+    flexWrap: "wrap",
   }}
 >
 <FaGem
@@ -2485,17 +2610,18 @@ Répondre
 Produits similaires
 </h2>
 
-
 <div
   style={{
     display: "grid",
 
     gridTemplateColumns:
-      window.innerWidth < 768
-        ? "repeat(2,1fr)"
+      mobile
+        ? "repeat(2,minmax(0,1fr))"
         : "repeat(auto-fit,minmax(220px,1fr))",
 
-    gap: "14px",
+    gap: mobile ? "12px" : "18px",
+
+    width: "100%",
   }}
 >
 
@@ -2506,32 +2632,44 @@ Produits similaires
 
   onMouseEnter={(e) => {
 
-    e.currentTarget.style.transform =
-      "translateY(-5px)";
+    if (!mobile) {
 
-    e.currentTarget.style.boxShadow =
-      "0 18px 35px rgba(0,0,0,0.08)";
+      e.currentTarget.style.transform =
+        "translateY(-5px)";
+
+      e.currentTarget.style.boxShadow =
+        "0 18px 35px rgba(0,0,0,0.08)";
+
+    }
 
   }}
 
   onMouseLeave={(e) => {
 
-    e.currentTarget.style.transform =
-      "translateY(0px)";
+    if (!mobile) {
 
-    e.currentTarget.style.boxShadow =
-      "0 6px 18px rgba(0,0,0,0.05)";
+      e.currentTarget.style.transform =
+        "translateY(0px)";
+
+      e.currentTarget.style.boxShadow =
+        "0 6px 18px rgba(0,0,0,0.05)";
+
+    }
 
   }}
 
   style={{
     background: "white",
 
-    borderRadius: "16px",
+    borderRadius: mobile ? "14px" : "16px",
 
     overflow: "hidden",
 
     transition: "0.3s",
+
+    width: "100%",
+
+    boxSizing: "border-box",
 
     boxShadow:
       "0 6px 18px rgba(0,0,0,0.05)",
@@ -2552,24 +2690,21 @@ Produits similaires
   style={{
     width: "100%",
 
-    height:
-      window.innerWidth < 768
-        ? "180px"
-        : "220px",
+    height: mobile ? "150px" : "220px",
 
     overflow: "hidden",
 
-    background:
-      "#f3f4f6",
+    background: "#f3f4f6",
   }}
 >
 
 <img
   src={item.image}
 
-   alt=""
+  alt=""
 
   loading="lazy"
+
   decoding="async"
 
   style={{
@@ -2580,6 +2715,8 @@ Produits similaires
     objectFit: "cover",
 
     display: "block",
+
+    transition: "0.3s",
   }}
 />
 
@@ -2591,7 +2728,11 @@ Produits similaires
 
 <div
   style={{
-    padding: "14px",
+    padding: mobile ? "12px" : "14px",
+
+    width: "100%",
+
+    boxSizing: "border-box",
   }}
 >
 
@@ -2599,11 +2740,23 @@ Produits similaires
   style={{
     color: "#111827",
 
-    fontSize: "16px",
+    fontSize: mobile ? "14px" : "16px",
 
     marginBottom: "6px",
 
     fontWeight: "700",
+
+    lineHeight: "1.35",
+
+    minHeight: mobile ? "38px" : "44px",
+
+    overflow: "hidden",
+
+    display: "-webkit-box",
+
+    WebkitLineClamp: 2,
+
+    WebkitBoxOrient: "vertical",
   }}
 >
   {item.name}
@@ -2619,7 +2772,9 @@ Produits similaires
 
     marginBottom: "10px",
 
-    fontSize: "11px",
+    flexWrap: "wrap",
+
+    fontSize: mobile ? "10px" : "11px",
 
     fontWeight: "700",
   }}
@@ -2665,31 +2820,31 @@ item.reviews.length
 return (
 
 <FaStar
-  key={index}
+key={index}
 
-  style={{
-    fontSize: "10px",
+style={{
+fontSize: mobile ? "9px" : "10px",
 
-    color:
-      index <
-      Math.round(
-        averageRating
-      )
+color:
+index <
+Math.round(
+averageRating
+)
 
-        ? "#f59e0b"
+? "#f59e0b"
 
-        : "#d1d5db",
+: "#d1d5db",
 
-    filter:
-      index <
-      Math.round(
-        averageRating
-      )
+filter:
+index <
+Math.round(
+averageRating
+)
 
-        ? "drop-shadow(0 1px 3px rgba(245,158,11,0.25))"
+? "drop-shadow(0 1px 3px rgba(245,158,11,0.25))"
 
-        : "none",
-  }}
+: "none",
+}}
 />
 
 );
@@ -2700,13 +2855,13 @@ return (
 </div>
 
 <span
-  style={{
-    color: "#111827",
+style={{
+color: "#111827",
 
-    fontWeight: "800",
+fontWeight: "800",
 
-    marginLeft: "3px",
-  }}
+marginLeft: "3px",
+}}
 >
 
 {
@@ -2736,150 +2891,160 @@ item.reviews.length
 </span>
 
 <span
-  style={{
-    color: "#9ca3af",
+style={{
+color: "#9ca3af",
 
-    fontSize: "10px",
+fontSize: mobile ? "9px" : "10px",
 
-    fontWeight: "600",
-  }}
+fontWeight: "600",
+}}
 >
 
-(
-
-{item.reviews?.length || 0}
-
-)
+({item.reviews?.length || 0})
 
 </span>
 
 </div>
 
 <h2
-  style={{
-    color: "#111827",
+style={{
+color: "#111827",
 
-    fontSize: "20px",
+fontSize: mobile ? "18px" : "20px",
 
-    fontWeight: "900",
+fontWeight: "900",
 
-    marginBottom: "14px",
-  }}
+marginBottom: "14px",
+
+wordBreak: "break-word",
+}}
 >
-  {item.price} FCFA
+{item.price} FCFA
 </h2>
 
 <button
 
 onClick={() => {
 
-  const cart =
+const cart =
 
-    JSON.parse(
-      localStorage.getItem(
-        cartKey
-      )
-    ) || [];
+JSON.parse(
+localStorage.getItem(
+cartKey
+)
+) || [];
 
-  const existing =
-    cart.find(
-      (p) =>
-        p._id === item._id
-    );
+const existing =
+cart.find(
+(p) =>
+p._id === item._id
+);
 
-  if (existing) {
+if (existing) {
 
-    existing.quantity += 1;
+existing.quantity += 1;
 
-  }
+}
 
-  else {
+else {
 
-    cart.push({
+cart.push({
 
-      ...item,
+...item,
 
-      quantity: 1,
+quantity: 1,
 
-    });
+});
 
-  }
+}
 
-  localStorage.setItem(
+localStorage.setItem(
 
-    cartKey,
+cartKey,
 
-    JSON.stringify(cart)
+JSON.stringify(cart)
 
-  );
+);
 
-  window.dispatchEvent(
-    new Event("cartUpdated")
-  );
+window.dispatchEvent(
+new Event("cartUpdated")
+);
 
-  toast.success(
-  "Produit ajouté au panier 🛒"
+toast.success(
+"Produit ajouté au panier 🛒"
 );
 
 }}
 
 style={{
-  width: "100%",
+width: "100%",
 
-  border: "none",
+border: "none",
 
-  background:
-    "linear-gradient(135deg,#6d28d9,#4f46e5)",
+background:
+"linear-gradient(135deg,#6d28d9,#4f46e5)",
 
-  color: "white",
+color: "white",
 
-  padding: "13px",
+padding: mobile ? "12px" : "13px",
 
-  borderRadius: "16px",
+borderRadius: "14px",
 
-  cursor: "pointer",
+cursor: "pointer",
 
-  fontWeight: "800",
+fontWeight: "800",
 
-  fontSize: "13px",
+fontSize: mobile ? "12px" : "13px",
 
-  display: "flex",
+display: "flex",
 
-  alignItems: "center",
+alignItems: "center",
 
-  justifyContent: "center",
+justifyContent: "center",
 
-  gap: "8px",
+gap: "8px",
 
-  transition: "0.3s ease",
+transition: "0.3s ease",
 
-  boxShadow:
-    "0 12px 24px rgba(79,70,229,0.18)",
+boxShadow:
+"0 12px 24px rgba(79,70,229,0.18)",
 
-  letterSpacing: "0.3px",
+letterSpacing: "0.3px",
 }}
+
 onMouseEnter={(e) => {
 
-  e.currentTarget.style.transform =
-    "translateY(-3px)";
+if(!mobile){
 
-  e.currentTarget.style.boxShadow =
-    "0 18px 30px rgba(79,70,229,0.28)";
+e.currentTarget.style.transform =
+"translateY(-3px)";
+
+e.currentTarget.style.boxShadow =
+"0 18px 30px rgba(79,70,229,0.28)";
+
+}
 
 }}
 
 onMouseLeave={(e) => {
 
-  e.currentTarget.style.transform =
-    "translateY(0px)";
+if(!mobile){
 
-  e.currentTarget.style.boxShadow =
-    "0 12px 24px rgba(79,70,229,0.18)";
+e.currentTarget.style.transform =
+"translateY(0px)";
+
+e.currentTarget.style.boxShadow =
+"0 12px 24px rgba(79,70,229,0.18)";
+
+}
 
 }}
 >
+
 <FaShoppingCart />
+
 Ajouter
+
 </button>
 
 </div>
@@ -2901,59 +3066,59 @@ Ajouter
 <div
 
 onClick={()=>
-  setSelectedImage(null)
+setSelectedImage(null)
 }
 
 style={{
-  position: "fixed",
+position: "fixed",
 
-  top: 0,
+top: 0,
 
-  left: 0,
+left: 0,
 
-  width: "100%",
+width: "100%",
 
-  height: "100%",
+height: "100%",
 
-  background:
-    "rgba(0,0,0,0.82)",
+background:
+"rgba(0,0,0,0.82)",
 
-  display: "flex",
+display: "flex",
 
-  justifyContent:
-    "center",
+justifyContent:
+"center",
 
-  alignItems:
-    "center",
+alignItems:
+"center",
 
-  zIndex: 9999,
+zIndex: 9999,
 
-  padding: "20px",
+padding: mobile ? "12px" : "20px",
 
-  backdropFilter:
-    "blur(8px)",
+backdropFilter:
+"blur(8px)",
 }}
 >
 
 <img
-  src={selectedImage}
+src={selectedImage}
 
-   alt=""
+alt=""
 
 decoding="async"
 
-  style={{
-    maxWidth: "95%",
+style={{
+maxWidth: "100%",
 
-    maxHeight: "92%",
+maxHeight: "90%",
 
-    borderRadius: "20px",
+borderRadius: mobile ? "14px" : "20px",
 
-    objectFit: "contain",
+objectFit: "contain",
 
-    boxShadow:
-      "0 20px 50px rgba(0,0,0,0.45)",
-  }}
+boxShadow:
+"0 20px 50px rgba(0,0,0,0.45)",
+}}
 />
 
 </div>
@@ -2968,61 +3133,65 @@ decoding="async"
 
 const badgeStyle = {
 
-  background: "#eef2ff",
+background: "#eef2ff",
 
-  padding: "8px 12px",
+padding: mobile ? "7px 10px" : "8px 12px",
 
-  borderRadius: "12px",
+borderRadius: "12px",
 
-  fontSize: "12px",
+fontSize: window.innerWidth <= 768 ? "11px" : "12px",
 
-  fontWeight: "700",
+fontWeight: "700",
 
-  color: "#4f46e5",
+color: "#4f46e5",
 
-  display: "flex",
+display: "flex",
 
-  alignItems: "center",
+alignItems: "center",
 
-  gap: "6px",
+gap: "6px",
 
-  width: "fit-content",
+width: "fit-content",
+
+flexWrap: "wrap",
 
 };
 
 const inputStyle = {
 
-  width: "100%",
+width: "100%",
 
-  padding: "15px 18px",
+boxSizing: "border-box",
 
-  borderRadius: "18px",
+padding: mobile ? "14px 16px" : "15px 18px",
 
-  border:
-    "1px solid rgba(229,231,235,0.9)",
+borderRadius: "18px",
 
-  marginTop: "14px",
+border:
+"1px solid rgba(229,231,235,0.9)",
 
-  fontSize: "14px",
+marginTop: "14px",
 
-  fontWeight: "500",
+fontSize: window.innerWidth <= 768 ? "16px" : "14px",
 
-  color: "#111827",
+fontWeight: "500",
 
-  outline: "none",
+color: "#111827",
 
-  background:
-    "linear-gradient(135deg,#ffffff,#f9fafb)",
+outline: "none",
 
-  boxShadow:
-    "0 4px 12px rgba(0,0,0,0.03)",
+background:
+"linear-gradient(135deg,#ffffff,#f9fafb)",
 
-  transition: "all 0.3s ease",
+boxShadow:
+"0 4px 12px rgba(0,0,0,0.03)",
 
-  backdropFilter: "blur(10px)",
+transition: "all 0.3s ease",
 
-  WebkitBackdropFilter:
-    "blur(10px)",
+backdropFilter: "blur(10px)",
+
+WebkitBackdropFilter:
+"blur(10px)",
 
 };
 
