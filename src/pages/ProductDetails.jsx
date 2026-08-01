@@ -1584,7 +1584,7 @@ Ajouter des photos
 {product.reviews &&
 product.reviews.length > 0 ? (
 
-  [...(product.reviews || [])]
+[...(product.reviews || [])]
 
 .sort((a, b) => {
 
@@ -1623,103 +1623,123 @@ new Date(a.createdAt)
 
 <div
 key={index}
-
 style={{
-marginTop: "12px",
-
+marginTop: "14px",
 background: "#fff",
-
-padding: mobile ? "14px" : "12px",
-
-borderRadius: mobile ? "16px" : "12px",
-
+padding: mobile ? "16px" : "14px",
+borderRadius: "18px",
 border: "1px solid #eef2ff",
-
-boxShadow:
-"0 4px 12px rgba(0,0,0,0.04)",
-
+boxShadow: "0 8px 20px rgba(0,0,0,.05)",
 width: "100%",
-
 boxSizing: "border-box",
-
 overflow: "hidden",
 }}
 >
 
-{/* TOP */}
+{/* HEADER */}
 
 <div
 style={{
 display: "flex",
-
 justifyContent: "space-between",
-
-alignItems: mobile ? "flex-start" : "center",
-
-flexDirection: mobile ? "column" : "row",
-
-gap: "10px",
-
-width: "100%",
+alignItems: "flex-start",
+gap: "12px",
 }}
 >
 
 <div
 style={{
+display: "flex",
+gap: "12px",
 flex: 1,
 minWidth: 0,
 }}
 >
 
-<strong
+<div
 style={{
-fontSize: mobile ? "14px" : "12px",
-
-color: "#111827",
-
-fontWeight: "800",
-
+width: mobile ? "42px" : "38px",
+height: mobile ? "42px" : "38px",
+borderRadius: "50%",
+background: "linear-gradient(135deg,#6d28d9,#4f46e5)",
 display: "flex",
-
 alignItems: "center",
-
-gap: "6px",
-
-flexWrap: "wrap",
+justifyContent: "center",
+color: "#fff",
+flexShrink: 0,
 }}
 >
-<FaUserCircle
-style={{
-color: "#6366f1",
-}}
-/>
-
-{review.name}
-</strong>
-
-{index === 0 &&
-(review.likes?.length || 0) > 0 && (
+<FaUserCircle size={22}/>
+</div>
 
 <div
 style={{
-marginTop: "6px",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "6px",
-
-color: "#f59e0b",
-
-fontSize: mobile ? "11px" : "10px",
-
-fontWeight: "800",
-
-flexWrap: "wrap",
+flex:1,
+minWidth:0,
 }}
 >
-<FaTrophy />
+
+<div
+style={{
+display:"flex",
+alignItems:"center",
+gap:"8px",
+flexWrap:"wrap",
+}}
+>
+
+<strong
+style={{
+fontSize: mobile ? "15px" : "13px",
+fontWeight:"800",
+color:"#111827",
+}}
+>
+{review.name}
+</strong>
+
+{review.verifiedPurchase && (
+
+<div
+style={{
+background:"linear-gradient(135deg,#dcfce7,#bbf7d0)",
+color:"#166534",
+padding:"4px 10px",
+borderRadius:"999px",
+fontSize:"10px",
+fontWeight:"800",
+display:"flex",
+alignItems:"center",
+gap:"5px",
+}}
+>
+
+<FaCheckCircle/>
+
+Vérifié
+
+</div>
+
+)}
+
+</div>
+
+{index===0 &&
+(review.likes?.length||0)>0 && (
+
+<div
+style={{
+marginTop:"5px",
+display:"flex",
+alignItems:"center",
+gap:"6px",
+fontSize:"11px",
+fontWeight:"800",
+color:"#f59e0b",
+}}
+>
+
+<FaTrophy/>
 
 Avis le plus utile
 
@@ -1727,119 +1747,31 @@ Avis le plus utile
 
 )}
 
-{review.verifiedPurchase && (
-
 <div
 style={{
-marginTop: "8px",
-
-background:
-"linear-gradient(135deg,#ecfdf5,#dcfce7)",
-
-color: "#166534",
-
-padding: "6px 12px",
-
-borderRadius: "999px",
-
-fontSize: mobile ? "11px" : "10px",
-
-fontWeight: "800",
-
-width: "fit-content",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "6px",
-
-border:
-"1px solid rgba(34,197,94,0.15)",
-
-boxShadow:
-"0 4px 12px rgba(34,197,94,0.10)",
-
-letterSpacing: "0.3px",
+display:"flex",
+alignItems:"center",
+gap:"8px",
+marginTop:"8px",
+flexWrap:"wrap",
 }}
 >
 
 <div
 style={{
-width: "18px",
-
-height: "18px",
-
-borderRadius: "50%",
-
-background:
-"linear-gradient(135deg,#22c55e,#16a34a)",
-
-display: "flex",
-
-alignItems: "center",
-
-justifyContent: "center",
-
-color: "white",
-
-fontSize: "9px",
-}}
->
-✓
-</div>
-
-<span>
-Achat vérifié
-</span>
-
-</div>
-
-)}
-
-<div
-style={{
-display: "flex",
-
-alignItems: "center",
-
-gap: "8px",
-
-marginTop: "8px",
-
-flexWrap: "wrap",
+display:"flex",
+gap:"3px",
+color:"#f59e0b",
 }}
 >
 
-<div
-style={{
-display: "flex",
-
-alignItems: "center",
-
-gap: "3px",
-
-color: "#f59e0b",
-
-fontSize: mobile ? "14px" : "12px",
-}}
->
-
-{[...Array(5)].map((_, index)=>(
+{[...Array(5)].map((_,i)=>(
 
 <FaStar
-key={index}
-
+key={i}
 style={{
-opacity:
-index < review.rating
-? 1
-: 0.25,
-
-filter:
-index < review.rating
-? "drop-shadow(0 2px 4px rgba(245,158,11,0.35))"
-: "none",
+fontSize: mobile ? "15px":"13px",
+opacity:i<review.rating?1:.25,
 }}
 />
 
@@ -1848,60 +1780,24 @@ index < review.rating
 </div>
 
 <span
-  style={{
-    fontSize: mobile ? "12px" : "11px",
-
-    fontWeight: "700",
-
-    color: "#111827",
-
-    background: "#f9fafb",
-
-    padding: mobile ? "5px 10px" : "4px 8px",
-
-    borderRadius: "999px",
-
-    border: "1px solid #e5e7eb",
-
-    flexShrink: 0,
-  }}
+style={{
+background:"#f9fafb",
+border:"1px solid #e5e7eb",
+padding:"4px 9px",
+borderRadius:"999px",
+fontWeight:"700",
+fontSize:"12px",
+}}
 >
-  {review.rating}.0
+
+{review.rating}.0
+
 </span>
 
 </div>
 
 </div>
 
-{/* VERIFIED */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(135deg,#dcfce7,#bbf7d0)",
-
-    color: "#166534",
-
-    padding: mobile ? "8px 12px" : "6px 10px",
-
-    borderRadius: "10px",
-
-    fontSize: mobile ? "11px" : "10px",
-
-    fontWeight: "800",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "6px",
-
-    alignSelf: mobile ? "flex-start" : "center",
-  }}
->
-  <FaCheckCircle />
-
-  Vérifié
 </div>
 
 </div>
@@ -1917,101 +1813,79 @@ index < review.rating
     )
   }
   style={{
-    fontSize: mobile ? "14px" : "12px",
-
-    color: "#4b5563",
-
-    marginTop: "10px",
-
-    lineHeight: "1.7",
-
+    marginTop: "14px",
     marginBottom: 0,
-
+    color: "#4b5563",
+    fontSize: mobile ? "14px" : "13px",
+    lineHeight: "1.7",
     cursor: "pointer",
-
-    fontWeight: "500",
-
     wordBreak: "break-word",
   }}
 >
   {review.comment}
 </p>
 
+{/* IMAGES */}
+
 {review.images &&
 review.images.length > 0 && (
 
 <div
-  style={{
-    display: "flex",
-
-    gap: "10px",
-
-    flexWrap: "wrap",
-
-    marginTop: "10px",
-  }}
+style={{
+display:"grid",
+gridTemplateColumns:
+mobile
+? "repeat(4,1fr)"
+: "repeat(auto-fill,70px)",
+gap:"8px",
+marginTop:"14px",
+}}
 >
 
-{review.images.map(
-
-(img,index)=>(
+{review.images.map((img,index)=>(
 
 <img
-  key={index}
+key={index}
+src={img}
+alt=""
+loading="lazy"
+decoding="async"
 
-  src={img}
+onClick={()=>
+setSelectedImage(img)
+}
 
-  alt=""
+style={{
+width:"100%",
+aspectRatio:"1",
+objectFit:"cover",
+borderRadius:"10px",
+cursor:"pointer",
+border:"1px solid #e5e7eb",
+boxShadow:
+"0 4px 12px rgba(0,0,0,.05)",
+transition:".25s",
+}}
 
-  loading="lazy"
+onMouseEnter={(e)=>{
 
-  decoding="async"
+if(!mobile){
 
-  onClick={() =>
-    setSelectedImage(img)
-  }
+e.currentTarget.style.transform="scale(1.05)";
 
-  style={{
-    width: mobile ? "70px" : "65px",
+}
 
-    height: mobile ? "70px" : "65px",
+}}
 
-    objectFit: "cover",
+onMouseLeave={(e)=>{
 
-    borderRadius: "10px",
+e.currentTarget.style.transform="scale(1)";
 
-    cursor: "pointer",
+}}
 
-    border: "1px solid #e5e7eb",
+ />
 
-    boxShadow:
-      "0 6px 14px rgba(0,0,0,0.05)",
-
-    transition: "0.3s",
-  }}
-
-  onMouseEnter={(e)=>{
-
-    if(!mobile){
-
-      e.currentTarget.style.transform =
-        "scale(1.05)";
-
-    }
-
-  }}
-
-  onMouseLeave={(e)=>{
-
-    e.currentTarget.style.transform =
-      "scale(1)";
-
-  }}
-/>
-
-)
-
-)}
+))}
 
 </div>
 
@@ -2020,24 +1894,29 @@ review.images.length > 0 && (
 {/* ACTIONS */}
 
 <div
-  style={{
-    display: "flex",
+style={{
+display:"flex",
+alignItems:"center",
+justifyContent:"space-between",
+gap:"10px",
+marginTop:"16px",
+flexWrap:"wrap",
+}}
+>
 
-    alignItems: "center",
-
-    gap: "10px",
-
-    marginTop: "14px",
-
-    flexWrap: "wrap",
-  }}
+<div
+style={{
+display:"flex",
+gap:"8px",
+flexWrap:"wrap",
+}}
 >
 
 {/* LIKE */}
 
 <button
 
-onClick={async () => {
+onClick={async()=>{
 
 try{
 
@@ -2066,42 +1945,33 @@ console.log(err);
 }}
 
 style={{
-  border: "none",
-
-  background: "#eff6ff",
-
-  color: "#2563eb",
-
-  padding: mobile ? "9px 14px" : "6px 10px",
-
-  borderRadius: "10px",
-
-  cursor: "pointer",
-
-  fontWeight: "700",
-
-  display: "flex",
-
-  alignItems: "center",
-
-  gap: "6px",
-
-  fontSize: mobile ? "13px" : "11px",
-
-  boxShadow:
-    "0 4px 10px rgba(37,99,235,0.10)",
+border:"none",
+background:"#eff6ff",
+color:"#2563eb",
+padding:"8px 12px",
+borderRadius:"10px",
+cursor:"pointer",
+fontWeight:"700",
+display:"flex",
+alignItems:"center",
+gap:"6px",
+fontSize:"12px",
+boxShadow:
+"0 4px 10px rgba(37,99,235,.10)",
 }}
 >
-<FaThumbsUp />
 
-{review.likes?.length || 0}
+<FaThumbsUp/>
+
+{review.likes?.length||0}
+
 </button>
 
 {/* DISLIKE */}
 
 <button
 
-onClick={async () => {
+onClick={async()=>{
 
 try{
 
@@ -2130,72 +2000,68 @@ console.log(err);
 }}
 
 style={{
-  border: "none",
-
-  background: "#fef2f2",
-
-  color: "#ef4444",
-
-  padding: mobile ? "9px 14px" : "6px 10px",
-
-  borderRadius: "10px",
-
-  cursor: "pointer",
-
-  fontWeight: "700",
-
-  display: "flex",
-
-  alignItems: "center",
-
-  gap: "6px",
-
-  fontSize: mobile ? "13px" : "11px",
-
-  boxShadow:
-    "0 4px 10px rgba(239,68,68,0.10)",
+border:"none",
+background:"#fef2f2",
+color:"#ef4444",
+padding:"8px 12px",
+borderRadius:"10px",
+cursor:"pointer",
+fontWeight:"700",
+display:"flex",
+alignItems:"center",
+gap:"6px",
+fontSize:"12px",
+boxShadow:
+"0 4px 10px rgba(239,68,68,.10)",
 }}
 >
-<FaThumbsDown />
 
-{review.dislikes?.length || 0}
+<FaThumbsDown/>
+
+{review.dislikes?.length||0}
+
 </button>
+
+{/* REPLY */}
 
 <button
-  onClick={() =>
-    setOpenReply(
-      openReply === review._id
-        ? null
-        : review._id
-    )
-  }
-  style={{
-    border: "none",
 
-    background: "#eef2ff",
+onClick={()=>
 
-    color: "#4f46e5",
+setOpenReply(
 
-    padding: mobile ? "9px 14px" : "6px 10px",
+openReply===review._id
 
-    borderRadius: "10px",
+? null
 
-    cursor: "pointer",
+: review._id
 
-    fontWeight: "700",
+)
 
-    display: "flex",
+}
 
-    alignItems: "center",
-
-    gap: "6px",
-
-    fontSize: mobile ? "13px" : "11px",
-  }}
+style={{
+border:"none",
+background:"#eef2ff",
+color:"#4f46e5",
+padding:"8px 12px",
+borderRadius:"10px",
+cursor:"pointer",
+fontWeight:"700",
+display:"flex",
+alignItems:"center",
+gap:"6px",
+fontSize:"12px",
+}}
 >
-  <FaReply />
-  {review.replies?.length || 0}
+
+<FaReply/>
+
+{review.replies?.length||0}
+
 </button>
+
+</div>
 
 </div>
 
@@ -2205,12 +2071,12 @@ style={{
 
 <div
   style={{
-    marginTop: "14px",
+    marginTop: "18px",
+    width: "100%",
   }}
 >
 
 <textarea
-
 placeholder="Répondre..."
 
 value={replyText}
@@ -2222,27 +2088,17 @@ e.target.value
 }
 
 style={{
-  width: "100%",
-
-  boxSizing: "border-box",
-
-  padding: mobile ? "14px" : "12px",
-
-  borderRadius: "12px",
-
-  border: "1px solid #e5e7eb",
-
-  fontSize: mobile ? "14px" : "12px",
-
-  outline: "none",
-
-  resize: "none",
-
-  height: mobile ? "80px" : "55px",
-
-  background: "#f9fafb",
-
-  lineHeight: "1.6",
+width:"100%",
+boxSizing:"border-box",
+padding: mobile ? "14px" : "12px",
+borderRadius:"14px",
+border:"1px solid #e5e7eb",
+fontSize: mobile ? "14px" : "12px",
+outline:"none",
+resize:"none",
+height: mobile ? "90px" : "65px",
+background:"#f9fafb",
+lineHeight:"1.6",
 }}
 />
 
@@ -2302,92 +2158,67 @@ toast.error(
 }}
 
 style={{
-  marginTop: "12px",
-
-  width: mobile ? "100%" : "auto",
-
-  border: "none",
-
-  background:
-    "linear-gradient(135deg,#6d28d9,#4f46e5)",
-
-  color: "white",
-
-  padding: mobile ? "13px" : "8px 12px",
-
-  borderRadius: "12px",
-
-  cursor: "pointer",
-
-  fontWeight: "700",
-
-  fontSize: mobile ? "14px" : "11px",
-
-  display: "flex",
-
-  alignItems: "center",
-
-  justifyContent: "center",
-
-  gap: "8px",
+marginTop:"12px",
+width:"100%",
+border:"none",
+background:
+"linear-gradient(135deg,#6d28d9,#4f46e5)",
+color:"white",
+padding:"14px",
+borderRadius:"12px",
+cursor:"pointer",
+fontWeight:"700",
+fontSize:"14px",
+display:"flex",
+alignItems:"center",
+justifyContent:"center",
+gap:"8px",
 }}
 >
-<FaReply />
+
+<FaReply/>
+
 Répondre
+
 </button>
 
 </div>
 
 )}
 
-{/* REPLIES */}
+{/* LISTE DES RÉPONSES */}
 
 {openReply === review._id &&
-review.replies?.map(
-
-(reply,index)=>(
+review.replies?.map((reply,index)=>(
 
 <div
 key={index}
-
 style={{
-marginTop: "12px",
-
-marginLeft: mobile ? "0" : "18px",
-
-background: "#f9fafb",
-
-padding: mobile ? "14px" : "12px",
-
-borderRadius: "12px",
-
-border: "1px solid #eef2ff",
-
-width: "100%",
-
-boxSizing: "border-box",
+marginTop:"14px",
+marginLeft: mobile ? "0" : "22px",
+padding:"14px",
+background:"#f8fafc",
+border:"1px solid #eef2ff",
+borderRadius:"14px",
+boxSizing:"border-box",
 }}
 >
 
 <strong
 style={{
-fontSize: mobile ? "13px" : "12px",
-
-color: "#111827",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "6px",
-
-wordBreak: "break-word",
+display:"flex",
+alignItems:"center",
+gap:"8px",
+fontSize:"13px",
+color:"#111827",
+fontWeight:"700",
+wordBreak:"break-word",
 }}
 >
 
 <FaUserCircle
 style={{
-color: "#6366f1",
+color:"#6366f1",
 }}
 />
 
@@ -2397,17 +2228,12 @@ color: "#6366f1",
 
 <p
 style={{
-marginTop: "8px",
-
-fontSize: mobile ? "14px" : "12px",
-
-color: "#4b5563",
-
-lineHeight: "1.6",
-
-marginBottom: 0,
-
-wordBreak: "break-word",
+marginTop:"8px",
+marginBottom:0,
+fontSize:"13px",
+lineHeight:"1.6",
+color:"#4b5563",
+wordBreak:"break-word",
 }}
 >
 
@@ -2417,81 +2243,54 @@ wordBreak: "break-word",
 
 </div>
 
-)
+))}
 
-)}
+{/* FOOTER */}
 
 <div
 style={{
-display: "flex",
-
-justifyContent: "space-between",
-
-alignItems: mobile ? "flex-start" : "center",
-
-flexDirection: mobile ? "column" : "row",
-
-gap: "10px",
-
-marginTop: "14px",
+marginTop:"16px",
+display:"flex",
+justifyContent:"space-between",
+alignItems:"center",
+flexWrap:"wrap",
+gap:"10px",
 }}
 >
 
 <span
 style={{
-fontSize: mobile ? "12px" : "11px",
-
-color: "#9ca3af",
-
-fontWeight: "500",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "6px",
+display:"flex",
+alignItems:"center",
+gap:"6px",
+fontSize:"12px",
+color:"#9ca3af",
+fontWeight:"600",
 }}
 >
 
-<FaClock />
+<FaClock/>
 
 {getTimeAgo(review.createdAt)}
 
 </span>
 
-<div
-style={{
-display: "flex",
-
-justifyContent: mobile ? "flex-start" : "flex-end",
-}}
->
-
 <span
 style={{
-background: "#fff7ed",
-
-color: "#f59e0b",
-
-padding: mobile ? "5px 10px" : "2px 6px",
-
-borderRadius: "999px",
-
-fontSize: mobile ? "11px" : "8px",
-
-fontWeight: "700",
-
-display: "flex",
-
-alignItems: "center",
-
-gap: "5px",
-
-border: "1px solid #fde68a",
+display:"flex",
+alignItems:"center",
+gap:"5px",
+background:"#fff7ed",
+border:"1px solid #fde68a",
+padding:"5px 10px",
+borderRadius:"999px",
+fontSize:"11px",
+fontWeight:"700",
+color:"#f59e0b",
 }}
 >
 
-<FaStar />
+<FaStar/>
 
 {review.rating}/5
 
@@ -2501,49 +2300,35 @@ border: "1px solid #fde68a",
 
 </div>
 
-</div>
-
-)
-
-)
+))
 
 ) : (
 
 <div
 style={{
-marginTop: "18px",
-
-background: "white",
-
-padding: mobile ? "25px" : "18px",
-
-borderRadius: "16px",
-
-textAlign: "center",
-
-border: "1px dashed #d1d5db",
+marginTop:"20px",
+padding:"26px",
+background:"#fff",
+borderRadius:"18px",
+border:"1px dashed #d1d5db",
+textAlign:"center",
 }}
 >
 
 <FaCommentDots
 style={{
-fontSize: mobile ? "42px" : "30px",
-
-color: "#6366f1",
-
-marginBottom: "10px",
+fontSize: mobile ? "42px" : "34px",
+color:"#6366f1",
+marginBottom:"12px",
 }}
 />
 
 <h4
 style={{
-margin: 0,
-
-color: "#111827",
-
-fontSize: mobile ? "18px" : "15px",
-
-fontWeight: "800",
+margin:0,
+fontSize: mobile ? "18px" : "16px",
+fontWeight:"800",
+color:"#111827",
 }}
 >
 
@@ -2553,13 +2338,11 @@ Aucun avis
 
 <p
 style={{
-color: "#6b7280",
-
-fontSize: mobile ? "14px" : "12px",
-
-marginTop: "8px",
-
-lineHeight: "1.6",
+marginTop:"8px",
+marginBottom:0,
+fontSize:"14px",
+lineHeight:"1.6",
+color:"#6b7280",
 }}
 >
 
