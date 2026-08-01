@@ -63,6 +63,7 @@ function ProductDetails() {
 
 const navigate = useNavigate();
 
+
    const [mobile, setMobile] = useState(
   window.innerWidth <= 768
 );
@@ -211,6 +212,27 @@ useState(null);
 const [openReply, setOpenReply] =
   useState(null);
 
+  const [clickSound] = useState(
+  () => new Audio("/sounds/click.mp3")
+);
+
+const playClick = () => {
+  clickSound.currentTime = 0;
+  clickSound.volume = 0.5;
+  clickSound.play().catch(() => {});
+};
+
+const openProduct = (_id) => {
+  playClick();
+
+  navigate(`/product/${_id}`);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 const getProduct = async () => {
 
   try {
@@ -257,6 +279,13 @@ useEffect(() => {
 
   getProduct();
 
+}, [id]);
+
+useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 }, [id]);
 
 // =========================
@@ -538,31 +567,6 @@ await axios.post(
 
 };
 
-const clickSound = new Audio("/sounds/click.mp3");
-
-const playClick = () => {
-  clickSound.currentTime = 0;
-  clickSound.volume = 0.5;
-  clickSound.play().catch(() => {});
-};
-
-const openProduct = (_id) => {
-  playClick();
-
-  navigate(`/product/${_id}`);
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-};
-
-useEffect(() => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-}, [id]);
 
 return (
 
