@@ -538,6 +538,32 @@ await axios.post(
 
 };
 
+const clickSound = new Audio("/sounds/click.mp3");
+
+const playClick = () => {
+  clickSound.currentTime = 0;
+  clickSound.volume = 0.5;
+  clickSound.play().catch(() => {});
+};
+
+const openProduct = (_id) => {
+  playClick();
+
+  navigate(`/product/${_id}`);
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
+useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}, [id]);
+
 return (
 
 <>
@@ -2462,11 +2488,11 @@ Produits similaires
 
 {/* IMAGE */}
 
-<Link
-  to={`/product/${item._id}`}
-
+<div
+  onClick={() => openProduct(item._id)}
   style={{
     textDecoration: "none",
+    cursor: "pointer",
   }}
 >
 
@@ -2506,7 +2532,7 @@ Produits similaires
 
 </div>
 
-</Link>
+</div>
 
 {/* CONTENT */}
 
