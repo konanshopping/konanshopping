@@ -11,6 +11,7 @@ import {
   Routes,
   Route,
   Link,
+  useLocation,
 } from "react-router-dom";
 
 import axios from "axios";
@@ -172,11 +173,17 @@ import KonanLoader from "./components/KonanLoader";
 
 function Home() {
 
+  console.log("HOME RENDER");
+
+  const location = useLocation();
+
 const [favoritesCount,
 setFavoritesCount] =
 useState(0);
 
 useEffect(() => {
+
+  console.log("Effect 1");
 
   const updateFavorites =
     () => {
@@ -260,6 +267,8 @@ const [likedProducts, setLikedProducts] =
 
 useEffect(() => {
 
+  console.log("Effect 2");
+
   const favorites =
     JSON.parse(
       localStorage.getItem(
@@ -318,6 +327,8 @@ const [placeholderIndex, setPlaceholderIndex] =
 
 useEffect(()=>{
 
+  console.log("Effect 3");
+
  trackVisitor();
 
 },[]);
@@ -372,6 +383,8 @@ console.log(geo);
 
 useEffect(() => {
 
+  console.log("Effect 4");
+
   const interval = setInterval(() => {
 
     setPlaceholderIndex((prev) =>
@@ -393,6 +406,8 @@ const [showAlert, setShowAlert] =
   const [showBottomNav, setShowBottomNav] = useState(false);
 
 useEffect(() => {
+
+  console.log("Effect 5");
 
   let timer;
 
@@ -430,6 +445,8 @@ const [showWelcomePopup, setShowWelcomePopup] =
   useState(false);
 
 useEffect(() => {
+
+  console.log("Effect 6");
 
   // =====================
   // CLIENT CONNECTÉ ?
@@ -478,6 +495,25 @@ useState([]);
 
   const [products, setProducts] =
     useState([]);
+
+    const randomizedProducts = useMemo(() => {
+  if (products.length === 0) return [];
+
+  // Si on revient d'une fiche produit,
+  // on garde exactement le même ordre.
+  if (location.state?.productsOrder) {
+    const ids = location.state.productsOrder;
+
+    return ids
+      .map((id) => products.find((p) => p._id === id))
+      .filter(Boolean);
+  }
+
+  // Sinon (première ouverture ou F5),
+  // on mélange.
+  return [...products].sort(() => Math.random() - 0.5);
+
+}, [products, location.state]);
 
     const [homeLoading, setHomeLoading] = useState(true);
 
@@ -561,6 +597,8 @@ const startVoice = () => {
 
 useEffect(() => {
 
+  console.log("Effect 7");
+
   const loadProducts = async () => {
 
     try {
@@ -585,14 +623,33 @@ useEffect(() => {
 
   };
 
+  console.log("HOME MOUNT");
+
   loadProducts();
 
 }, []);
+
+useEffect(() => {
+
+console.log("Effect 8");
+
+  if (location.state?.scrollY != null) {
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: location.state.scrollY,
+        behavior: "auto",
+      });
+    });
+  }
+}, [location]);
+
 
   const [addedProduct, setAddedProduct] =
 useState(null);
 
 useEffect(() => {
+
+  console.log("Effect 10");
   console.log("addedProduct =", addedProduct);
 }, [addedProduct]);
 
@@ -743,13 +800,11 @@ useEffect(() => {
 const [visibleProducts, setVisibleProducts] =
   useState(8);
 
-const randomizedProducts = useMemo(() => {
-  return [...products].sort(
-    () => Math.random() - 0.5
-  );
-}, [products]);
 
 useEffect(() => {
+
+  console.log("Effect 11");
+
   const handleScroll = () => {
 
     console.log("scroll déclenché");
@@ -782,6 +837,8 @@ useEffect(() => {
 }, [visibleProducts]);
 
 useEffect(() => {
+
+  console.log("Effect 12");
 
   const logScroll = () => {
 
@@ -1153,8 +1210,7 @@ setSearch(product.name);
 
 setSuggestions([]);
 
-window.location.href =
-`/product/${product._id}`;
+window.location.href = `/product/${product._id}`;
 
 }}
 
@@ -2489,8 +2545,14 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 .map((product) => (
 
 <Link
-to={`/product/${product._id}`}
-key={product._id}
+  to={`/product/${product._id}`}
+  key={product._id}
+  state={{
+    scrollY: window.scrollY,
+    productsOrder: randomizedProducts.map(
+      (p) => p._id
+    ),
+  }}
 style={{
 textDecoration:"none",
 color:"#111827",
@@ -4255,6 +4317,8 @@ function App() {
     });
 
  useEffect(() => {
+
+  console.log("Effect 13");
 
   const currentPath =
     window.location.pathname;

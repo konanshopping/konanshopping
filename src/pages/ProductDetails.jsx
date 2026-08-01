@@ -723,20 +723,22 @@ return (
 
 {/* BACK */}
 
-<Link
-  to="/boutique"
+<button
+  onClick={() => navigate(-1)}
   style={{
-    textDecoration: "none",
+    border: "none",
+    background: "transparent",
     color: "#4f46e5",
     fontWeight: "700",
     fontSize: mobile ? "15px" : "14px",
     display: "inline-flex",
     alignItems: "center",
+    cursor: "pointer",
     marginBottom: mobile ? "8px" : "0",
   }}
 >
-  ← Retour boutique
-</Link>
+  ← Retour
+</button>
 
 {/* PRODUCT CARD */}
 
