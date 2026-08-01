@@ -168,6 +168,8 @@ import SeoWebsite from "./components/SeoWebsite";
 import SeoBreadcrumb from "./components/SeoBreadcrumb";
 import SeoProduct from "./components/SeoProduct";
 
+import KonanLoader from "./components/KonanLoader";
+
 function Home() {
 
 const [favoritesCount,
@@ -477,6 +479,8 @@ useState([]);
   const [products, setProducts] =
     useState([]);
 
+    const [homeLoading, setHomeLoading] = useState(true);
+
     const [suggestions, setSuggestions] =
 useState([]);
 
@@ -557,22 +561,33 @@ const startVoice = () => {
 
 useEffect(() => {
 
-    axios
-      .get("https://konanshopping.com/api/products")
+  const loadProducts = async () => {
 
-      .then((res) => {
+    try {
 
-        setProducts(res.data);
+      setHomeLoading(true);
 
-      })
+      const res = await axios.get(
+        "https://konanshopping.com/api/products"
+      );
 
-      .catch((err) => {
+      setProducts(res.data);
 
-        console.log(err);
+    } catch (err) {
 
-      });
+      console.log(err);
 
-  }, []);
+    } finally {
+
+      setHomeLoading(false);
+
+    }
+
+  };
+
+  loadProducts();
+
+}, []);
 
   const [addedProduct, setAddedProduct] =
 useState(null);
@@ -863,6 +878,10 @@ setLoading(false);
 }
 
 };
+
+if (homeLoading) {
+  return <KonanLoader />;
+}
 
   return (
   <>
@@ -3169,7 +3188,6 @@ addedProduct === product._id
 </div>
 
 </Link>
-
 ))
 }
 
@@ -4222,13 +4240,11 @@ boxShadow:
   </p>
 
 </div>
-
- </div>
+</div>
 </>
 );
 
 }
-
 
 function App() {
 
