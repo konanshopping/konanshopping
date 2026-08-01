@@ -295,30 +295,138 @@ useEffect(() => {
 // =========================
 
 if (!product)
-
   return (
-    <div
-      style={{
-        minHeight: "100vh",
+    <>
+      <style>{`
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
 
-        display: "flex",
+        @keyframes pulse {
+          0%,100%{
+            transform: translate(-50%,-50%) scale(1);
+          }
 
-        justifyContent:
-          "center",
+          50%{
+            transform: translate(-50%,-50%) scale(1.05);
+          }
+        }
 
-        alignItems:
-          "center",
+        @keyframes fade {
+          from{
+            opacity:0;
+          }
 
-        fontSize: "22px",
+          to{
+            opacity:1;
+          }
+        }
+      `}</style>
 
-        fontWeight: "700",
+      <div
+        style={{
+          minHeight: "100vh",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          background: "#fff",
+          animation: "fade .35s ease",
+          padding: "20px",
+          boxSizing: "border-box",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            width: mobile ? "100px" : "140px",
+            height: mobile ? "100px" : "140px",
+          }}
+        >
+          {/* Cercle animé */}
 
-        color: "#4f46e5",
-      }}
-    >
-      Chargement...
-    </div>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              border: mobile
+                ? "3px solid #ececff"
+                : "4px solid #ececff",
 
+              borderTop: mobile
+                ? "3px solid #4f46e5"
+                : "4px solid #4f46e5",
+
+              borderRight: mobile
+                ? "3px solid #7c3aed"
+                : "4px solid #7c3aed",
+
+              borderRadius: "50%",
+              animation: "spin .9s linear infinite",
+            }}
+          />
+
+          {/* Logo */}
+
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%,-50%)",
+
+              width: mobile ? "60px" : "86px",
+              height: mobile ? "60px" : "86px",
+
+              borderRadius: "50%",
+              overflow: "hidden",
+
+              background: "#fff",
+
+              border: mobile
+                ? "2px solid #fff"
+                : "3px solid #fff",
+
+              animation: "pulse 1.5s ease-in-out infinite",
+
+              boxShadow:
+                "0 10px 28px rgba(79,70,229,.25)",
+            }}
+          >
+            <img
+              src="/logo.jpg"
+              alt="Konan Shopping"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "50%",
+                display: "block",
+              }}
+            />
+          </div>
+        </div>
+
+        <p
+          style={{
+            marginTop: mobile ? "18px" : "24px",
+            color: "#4f46e5",
+            fontSize: mobile ? "14px" : "17px",
+            fontWeight: "800",
+            letterSpacing: ".5px",
+            textAlign: "center",
+          }}
+        >
+          Chargement...
+        </p>
+      </div>
+    </>
   );
 
     const productUrl = `https://konanshopping.com/product/${product._id}`;
@@ -2112,6 +2220,7 @@ resize:"none",
 height: mobile ? "75px" : "65px",
 background:"#f9fafb",
 lineHeight:"1.5",
+color: "#111827",
 }}
 />
 
