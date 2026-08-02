@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
-const userSchema =
-  new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+
+  {
 
     name: String,
 
@@ -14,7 +15,7 @@ const userSchema =
 
     resetToken: String,
 
-resetTokenExpire: Date,
+    resetTokenExpire: Date,
 
     // ADMIN
 
@@ -56,9 +57,7 @@ resetTokenExpire: Date,
 
     favorites: [
       {
-        type:
-          mongoose.Schema.Types.ObjectId,
-
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
@@ -67,17 +66,34 @@ resetTokenExpire: Date,
 
     orders: [
       {
-        type:
-          mongoose.Schema.Types.ObjectId,
-
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Order",
       },
     ],
 
-  });
+    // DATE D'INSCRIPTION
 
-module.exports =
-  mongoose.model(
-    "User",
-    userSchema
-  );
+    registerDate: {
+      type: Date,
+      default: Date.now,
+    },
+
+    // COUPONS DÉJÀ UTILISÉS
+
+    usedCoupons: {
+      type: [String],
+      default: [],
+    },
+
+  },
+
+  {
+    timestamps: true,
+  }
+
+);
+
+module.exports = mongoose.model(
+  "User",
+  userSchema
+);

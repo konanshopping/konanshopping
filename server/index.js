@@ -43,6 +43,8 @@ const aiRoutes =
 const Coupon =
   require("./models/Coupon");
 
+  const couponRoutes = require("./routes/couponRoutes");
+
   const Visitor =
   require("./models/Visitor");
 
@@ -818,23 +820,68 @@ userId: req.body.userId,
 
 });
 
-    await order.save();
+  await order.save();
+
+// ===============================
+// AJOUTER LA COMMANDE AU CLIENT
+// ===============================
 
 if (req.body.userId) {
+
+  const update = {
+
+    $push: {
+
+      orders: order._id,
+
+    },
+
+  };
+
+  // ===============================
+  // SI UN COUPON A ÉTÉ UTILISÉ
+  // ===============================
+
+  if (req.body.couponCode) {
+
+    update.$addToSet = {
+
+      usedCoupons:
+        req.body.couponCode.toUpperCase(),
+
+    };
+
+    // Incrémenter le nombre
+    // d'utilisations du coupon
+
+    await Coupon.findOneAndUpdate(
+
+      {
+
+        code:
+          req.body.couponCode.toUpperCase(),
+
+      },
+
+      {
+
+        $inc: {
+
+          usedCount: 1,
+
+        },
+
+      }
+
+    );
+
+  }
 
   await User.findByIdAndUpdate(
 
     req.body.userId,
 
-    {
-
-      $push: {
-
-        orders: order._id,
-
-      },
-
-    }
+    update
 
   );
 
@@ -1452,6 +1499,12 @@ app.post(
 
       }
 
+      // Si c'est un ancien compte
+if (!user.registerDate) {
+  user.registerDate = new Date();
+  await user.save();
+}
+
       // CHECK PASSWORD
 
       const validPassword =
@@ -1508,6 +1561,12 @@ app.post(
     email: user.email,
 
     isAdmin: user.isAdmin,
+
+    createdAt: user.createdAt,
+
+    registerDate: user.registerDate,
+
+    usedCoupons: user.usedCoupons,
 
   },
 
@@ -2503,7 +2562,10 @@ console.log("REVIEW =", review);
   }
 );
 
+// ==========================
+// ==========================
 // VERIFIER COUPON
+// ==========================
 
 app.post(
 
@@ -2514,9 +2576,18 @@ app.post(
     try {
 
       const {
+
         code,
+
         total,
+
+        userId,
+
       } = req.body;
+
+      // =====================
+      // RECHERCHE COUPON
+      // =====================
 
       const coupon =
         await Coupon.findOne({
@@ -2525,8 +2596,6 @@ app.post(
             code.toUpperCase(),
 
         });
-
-      // PAS TROUVÉ
 
       if (!coupon) {
 
@@ -2539,7 +2608,46 @@ app.post(
 
       }
 
-      // DESACTIVE
+      // =====================
+      // RECHERCHE UTILISATEUR
+      // =====================
+
+      const user =
+        await User.findById(userId);
+
+      if (!user) {
+
+        return res.status(404).json({
+
+          message:
+            "Utilisateur introuvable",
+
+        });
+
+      }
+
+      // =====================
+      // COUPON DÉJÀ UTILISÉ
+      // =====================
+
+      if (
+        user.usedCoupons.includes(
+          coupon.code
+        )
+      ) {
+
+        return res.status(400).json({
+
+          message:
+            "Vous avez déjà utilisé ce coupon",
+
+        });
+
+      }
+
+      // =====================
+      // COUPON ACTIF
+      // =====================
 
       if (!coupon.active) {
 
@@ -2552,12 +2660,52 @@ app.post(
 
       }
 
-      // EXPIRÉ
+      // =====================
+      // EXPIRATION SELON
+      // DATE D'INSCRIPTION
+      // =====================
+
+      let expireDate =
+        new Date(user.registerDate);
+
+      switch (coupon.code) {
+
+        case "LIVRAISON":
+
+          expireDate.setDate(
+            expireDate.getDate() + 1
+          );
+
+          break;
+
+        case "KONAN10":
+
+          expireDate.setDate(
+            expireDate.getDate() + 7
+          );
+
+          break;
+
+        case "WELCOME20":
+
+          expireDate.setDate(
+            expireDate.getDate() + 7
+          );
+
+          break;
+
+        case "VIP50":
+
+          expireDate.setDate(
+            expireDate.getDate() + 30
+          );
+
+          break;
+
+      }
 
       if (
-        coupon.expiresAt &&
-        new Date() >
-          coupon.expiresAt
+        new Date() > expireDate
       ) {
 
         return res.status(400).json({
@@ -2569,7 +2717,9 @@ app.post(
 
       }
 
-      // LIMITE
+      // =====================
+      // LIMITE GLOBALE
+      // =====================
 
       if (
         coupon.usedCount >=
@@ -2585,7 +2735,9 @@ app.post(
 
       }
 
-      // MINIMUM
+      // =====================
+      // ACHAT MINIMUM
+      // =====================
 
       if (
         total <
@@ -2596,11 +2748,34 @@ app.post(
 
           message:
             `Minimum ${coupon.minPurchase} FCFA requis`,
+
         });
 
       }
 
-      // CALCUL
+      // =====================
+      // PREMIÈRE COMMANDE
+      // (WELCOME20)
+      // =====================
+
+      if (
+        coupon.code ===
+          "WELCOME20" &&
+        user.orders.length > 0
+      ) {
+
+        return res.status(400).json({
+
+          message:
+            "Coupon réservé à la première commande",
+
+        });
+
+      }
+
+      // =====================
+      // CALCUL RÉDUCTION
+      // =====================
 
       let discount = 0;
 
@@ -2632,7 +2807,10 @@ app.post(
         discount,
 
         finalTotal:
-          total - discount,
+          Math.max(
+            total - discount,
+            0
+          ),
 
         coupon,
 
@@ -2654,9 +2832,12 @@ app.post(
     }
 
   }
+
 );
 
 app.use("/ai", aiRoutes);
+
+app.use("/api/coupons", couponRoutes);
 
 app.use(
   "/products",

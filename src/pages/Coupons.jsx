@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import { FaGift } from "react-icons/fa";
 
@@ -22,6 +22,10 @@ function Coupons() {
       localStorage.getItem("user")
     ) || {};
 
+    console.log(user);
+console.log("registerDate =", user.registerDate);
+console.log("createdAt =", user.createdAt);
+
   // REGISTER DATE
 
   const registerDate =
@@ -41,95 +45,80 @@ function Coupons() {
 
   // COUPONS
 
-  const coupons = [
+  const now = new Date();
+
+const coupons = useMemo(() => {
+
+  const list = [
 
     {
       code: "KONAN10",
-
       discount: "10% OFF",
-
-      description:
-        "Réduction sur tous les produits",
-
-      condition:
-        "Dès 20 000 FCFA",
-
-      expire:
-        new Date(
-          registerDate +
-            sevenDays
-        ).toLocaleDateString(),
-
-      color:
-        "linear-gradient(135deg,#7c3aed,#4f46e5)",
+      description: "Réduction sur tous les produits",
+      condition: "Dès 20 000 FCFA",
+      days: 7,
+      color: "linear-gradient(135deg,#7c3aed,#4f46e5)",
     },
 
     {
       code: "LIVRAISON",
-
-      discount:
-        "Livraison gratuite",
-
-      description:
-        "Livraison offerte au Cameroun",
-
-      condition:
-        "24h après inscription",
-
-      expire:
-        new Date(
-          registerDate +
-            oneDay
-        ).toLocaleDateString(),
-
-      color:
-        "linear-gradient(135deg,#ec4899,#db2777)",
+      discount: "Livraison gratuite",
+      description: "Livraison offerte au Cameroun",
+      condition: "24h après inscription",
+      days: 1,
+      color: "linear-gradient(135deg,#ec4899,#db2777)",
     },
 
     {
       code: "WELCOME20",
-
       discount: "20% OFF",
-
-      description:
-        "Réduction nouveaux clients",
-
-      condition:
-        "1ère commande uniquement",
-
-      expire:
-        new Date(
-          registerDate +
-            sevenDays
-        ).toLocaleDateString(),
-
-      color:
-        "linear-gradient(135deg,#f59e0b,#ea580c)",
+      description: "Réduction nouveaux clients",
+      condition: "1ère commande uniquement",
+      days: 7,
+      color: "linear-gradient(135deg,#f59e0b,#ea580c)",
     },
 
     {
       code: "VIP50",
-
-      discount:
-        "5000 FCFA",
-
-      description:
-        "Réduction achats premium",
-
-      condition:
-        "Clients VIP seulement",
-
-      expire:
-        new Date(
-          registerDate +
-            thirtyDays
-        ).toLocaleDateString(),
-
-      color:
-        "linear-gradient(135deg,#10b981,#059669)",
-    },
+      discount: "5000 FCFA",
+      description: "Réduction achats premium",
+      condition: "Clients VIP seulement",
+      days: 30,
+      color: "linear-gradient(135deg,#10b981,#059669)",
+    }
 
   ];
+
+  return list.map(coupon => {
+
+    const expireDate = new Date(registerDate);
+
+    expireDate.setDate(
+      expireDate.getDate() + coupon.days
+    );
+
+    const expired = now > expireDate;
+
+    const used =
+      (user.usedCoupons || [])
+        .includes(coupon.code);
+
+    return {
+
+      ...coupon,
+
+      expire:
+        expireDate.toLocaleDateString(),
+
+      expired,
+
+      used,
+
+    };
+
+  });
+
+}, [registerDate, user]);
 
   // COPY
 
@@ -172,6 +161,30 @@ function Coupons() {
     alert("Impossible de copier le code.");
 
   }
+
+};
+
+const getRemainingText = (expireDate) => {
+
+  const now = new Date();
+
+  const end = new Date(expireDate);
+
+  const diff = end - now;
+
+  if (diff <= 0) return "Expiré";
+
+  const days = Math.ceil(
+    diff / (1000 * 60 * 60 * 24)
+  );
+
+  if (days === 1)
+    return "Expire demain";
+
+  if (days === 0)
+    return "Expire aujourd'hui";
+
+  return `Expire dans ${days} jours`;
 
 };
 
@@ -430,32 +443,52 @@ function Coupons() {
 
         {/* BADGE */}
 
-        <div
-          style={{
-            position: "absolute",
+<div
+  style={{
+    position: "absolute",
+    top: "16px",
+    right: "16px",
 
-            top: "16px",
+    background: coupon.used
+      ? "#374151"
+      : coupon.expired
+      ? "#DC2626"
+      : "#16A34A",
 
-            right: "16px",
+    color: "#fff",
 
-            background:
-              "rgba(255,255,255,0.15)",
+    padding: "8px 12px",
 
-            backdropFilter:
-              "blur(10px)",
+    borderRadius: "999px",
 
-            padding: "8px 12px",
+    fontSize: "11px",
 
-            borderRadius: "999px",
+    fontWeight: "800",
 
-            fontSize: "11px",
+    display: "flex",
 
-            fontWeight: "800",
-          }}
-        >
-          <FaGift />
-{" "}Coupon Premium
-        </div>
+    alignItems: "center",
+
+    gap: "6px",
+  }}
+>
+  {coupon.used ? (
+    <>
+      <FaCheck />
+      Déjà utilisé
+    </>
+  ) : coupon.expired ? (
+    <>
+      <FaClock />
+      Expiré
+    </>
+  ) : (
+    <>
+      <FaGift />
+      Disponible
+    </>
+  )}
+</div>
 
         {/* CONTENT */}
 
@@ -568,135 +601,193 @@ function Coupons() {
 
               fontSize: "12px",
 
-              opacity: 0.9,
+              color: coupon.expired
+  ? "#FCA5A5"
+  : "#FFFFFF",
+
+fontWeight: "700",
             }}
           >
 
             <FaClock />
 
-            Expire le {coupon.expire}
+            {getRemainingText(coupon.expire)}
 
           </div>
 
-          {/* CODE */}
+<div
+  style={{
+    marginTop: "10px",
+  }}
+>
+  <div
+    style={{
+      height: "6px",
+      borderRadius: "999px",
+      background: "rgba(255,255,255,.25)",
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        width: `${Math.max(
+          0,
+          Math.min(
+            100,
+            (() => {
 
-          <div
-            style={{
-              display: "flex",
+              const total =
+                coupon.code === "LIVRAISON"
+                  ? 1
+                  : coupon.code === "VIP50"
+                  ? 30
+                  : 7;
 
-              justifyContent:
-                "space-between",
+              const expire =
+                new Date(coupon.expire);
 
-              alignItems: "center",
+              const remaining =
+                Math.ceil(
+                  (expire - new Date()) /
+                  (1000 * 60 * 60 * 24)
+                );
 
-              gap: "10px",
+              return (remaining / total) * 100;
 
-              background:
-                "rgba(255,255,255,0.15)",
+            })()
+          )
+        )}%`,
 
-              backdropFilter:
-                "blur(12px)",
+        height: "100%",
 
-              padding: "10px 12px",
+        borderRadius: "999px",
 
-              borderRadius: "12px",
-            }}
-          >
+        background:
+          coupon.expired
+            ? "#ef4444"
+            : "#22c55e",
 
-            <div>
+        transition: ".5s",
+      }}
+    />
+  </div>
+</div>
 
-              <p
-                style={{
-                  margin: 0,
+{/* CODE */}
 
-                  fontSize: "11px",
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "10px",
+    background: "rgba(255,255,255,0.15)",
+    backdropFilter: "blur(12px)",
+    padding: "10px 12px",
+    borderRadius: "12px",
+  }}
+>
 
-                  opacity: 0.8,
-                }}
-              >
-                CODE PROMO
-              </p>
+  <div>
 
-              <h3
-                style={{
-                  margin: 0,
+    <p
+      style={{
+        margin: 0,
+        fontSize: "11px",
+        opacity: 0.8,
+      }}
+    >
+      CODE PROMO
+    </p>
 
-                  marginTop: "4px",
+    <h3
+      style={{
+        margin: 0,
+        marginTop: "4px",
+        fontSize:
+          window.innerWidth < 768
+            ? "16px"
+            : "20px",
+        fontWeight: "900",
+        letterSpacing: "1px",
+      }}
+    >
+      {coupon.code}
+    </h3>
 
-                  fontSize:
-                    window.innerWidth < 768
-                      ? "16px"
-                      : "20px",
+  </div>
 
-                  fontWeight: "900",
+  {coupon.used ? (
 
-                  letterSpacing: "1px",
-                }}
-              >
-                {coupon.code}
-              </h3>
+    <div
+      style={{
+        background: "#374151",
+        color: "#fff",
+        padding: "10px 14px",
+        borderRadius: "12px",
+        fontWeight: "800",
+        fontSize: "12px",
+      }}
+    >
+      ✓ Déjà utilisé
+    </div>
 
-            </div>
+  ) : coupon.expired ? (
 
-            <button
-              onClick={() =>
-                copyCoupon(
-                  coupon.code
-                )
-              }
+    <div
+      style={{
+        background: "#DC2626",
+        color: "#fff",
+        padding: "10px 14px",
+        borderRadius: "12px",
+        fontWeight: "800",
+        fontSize: "12px",
+      }}
+    >
+      Expiré
+    </div>
 
-              style={{
-                border: "none",
+  ) : (
 
-                background: "#FFFFFF",
+    <button
+      onClick={() => copyCoupon(coupon.code)}
+      style={{
+        border: "none",
+        background: "#FFFFFF",
+        color: "#111827",
+        padding:
+          window.innerWidth < 768
+            ? "8px 12px"
+            : "10px 14px",
+        borderRadius: "12px",
+        fontWeight: "800",
+        fontSize: "12px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        minWidth: "80px",
+        justifyContent: "center",
+        boxShadow:
+          "0 4px 12px rgba(0,0,0,0.12)",
+      }}
+    >
+      {copied === coupon.code ? (
+        <>
+          <FaCheck />
+          Copié
+        </>
+      ) : (
+        <>
+          <FaCopy />
+          Copier
+        </>
+      )}
+    </button>
 
-                color: "#111827",
+  )}
 
-                padding:
-                  window.innerWidth < 768
-                    ? "8px 12px"
-                    : "10px 14px",
-
-                borderRadius: "12px",
-
-                fontWeight: "800",
-
-                fontSize: "12px",
-
-                cursor: "pointer",
-
-                display: "flex",
-
-                alignItems: "center",
-
-                gap: "6px",
-
-                minWidth: "80px",
-
-                justifyContent:
-                  "center",
-
-                boxShadow:
-                  "0 4px 12px rgba(0,0,0,0.12)",
-              }}
-            >
-
-              {copied ===
-              coupon.code ? (
-                <>
-                  <FaCheck />
-                  Copié
-                </>
-              ) : (
-                <>
-                  <FaCopy />
-                  Copier
-                </>
-              )}
-
-            </button>
-
-          </div>
+</div>
 
         </div>
 

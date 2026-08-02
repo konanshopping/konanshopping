@@ -407,24 +407,20 @@ localStorage.setItem(
 
     try {
 
-      const res =
-        await axios.post(
-
-          "https://konanshopping.com/api/apply-coupon",
-
-          {
-
-            code: coupon,
-
-            total,
-
-          }
-
-        );
+     const res = await axios.post(
+  "https://konanshopping.com/api/apply-coupon",
+  {
+    code: coupon,
+    total,
+    userId: user?._id,
+  }
+);
 
       setDiscount(
         res.data.discount
       );
+
+      setCoupon(res.data.coupon.code);
 
       toast.success(
         "Coupon appliqué ✅"
@@ -555,7 +551,7 @@ await axios.post(
     userId:
       user?._id || null,
 
-    
+    couponCode: coupon || null,
 
     customerName,
 
