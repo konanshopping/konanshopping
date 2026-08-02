@@ -2573,6 +2573,8 @@ app.post(
 
   async (req, res) => {
 
+    console.log("ROUTE APPLY COUPON CHARGÉE");
+
     try {
 
       const {
