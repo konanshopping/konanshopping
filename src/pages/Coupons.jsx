@@ -45,8 +45,6 @@ console.log("createdAt =", user.createdAt);
 
   // COUPONS
 
-  const now = new Date();
-
 const coupons = useMemo(() => {
 
   const list = [
@@ -89,31 +87,17 @@ const coupons = useMemo(() => {
 
   ];
 
-  return list.map(coupon => {
+return list.map((coupon) => {
 
-    const expireDate = new Date(registerDate);
-
-    expireDate.setDate(
-      expireDate.getDate() + coupon.days
-    );
-
-    const expired = now > expireDate;
-
-    const used =
-      (user.usedCoupons || [])
-        .includes(coupon.code);
+    const expireTime =
+      Number(registerDate) +
+      coupon.days * 24 * 60 * 60 * 1000;
 
     return {
-
       ...coupon,
-
-      expire:
-        expireDate.toLocaleDateString(),
-
-      expired,
-
-      used,
-
+      expire: new Date(expireTime),
+      expired: Date.now() >= expireTime,
+      used: (user.usedCoupons || []).includes(coupon.code),
     };
 
   });
@@ -168,7 +152,7 @@ const getRemainingText = (expireDate) => {
 
   const now = new Date();
 
-  const end = new Date(expireDate);
+  const end = expireDate;
 
   const diff = end - now;
 
