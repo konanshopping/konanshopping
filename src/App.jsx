@@ -175,6 +175,8 @@ import KonanLoader from "./components/KonanLoader";
 
 import PageLoader from "./components/PageLoader";
 
+import InstallButton from "./components/InstallButton";
+
 function Home() {
 
   console.log("HOME RENDER");
@@ -4298,6 +4300,9 @@ boxShadow:
   </p>
 
 </div>
+
+<InstallButton />
+
 </div>
 </>
 );
