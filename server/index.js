@@ -2569,7 +2569,7 @@ console.log("REVIEW =", review);
 
 app.post(
 
-  "/api/apply-coupon",
+  "/apply-coupon",
 
   async (req, res) => {
 
