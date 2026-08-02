@@ -2614,6 +2614,9 @@ app.post(
       // RECHERCHE UTILISATEUR
       // =====================
 
+      console.log("userId =", userId);
+console.log("Type =", typeof userId);
+
       const user =
         await User.findById(userId);
 
