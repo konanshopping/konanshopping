@@ -14,6 +14,8 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+
 import axios from "axios";
 
 import Login from "./pages/Login";
@@ -171,9 +173,13 @@ import SeoProduct from "./components/SeoProduct";
 
 import KonanLoader from "./components/KonanLoader";
 
+import PageLoader from "./components/PageLoader";
+
 function Home() {
 
   console.log("HOME RENDER");
+
+  const navigate = useNavigate();
 
   const location = useLocation();
 
@@ -333,51 +339,41 @@ useEffect(()=>{
 
 },[]);
 
-const trackVisitor =
-  async()=>{
+const trackVisitor = async () => {
 
-    try{
+  // Ne pas exécuter en développement
+  if (import.meta.env.DEV) return;
 
-      // GEO LOCALISATION IP
+  try {
 
-      const response =
-  await fetch(
-    "https://ipapi.co/json/"
-  );
+    const response = await fetch(
+      "https://ipapi.co/json/"
+    );
 
-const geo =
-  await response.json();
-
-console.log(geo);
-
-      await axios.post(
-
-        "https://konanshopping.com/api/track-visitor",
-
-        {
-
-          ip: geo.ip,
-
-          country:
-            geo.country,
-
-          city:
-            geo.city,
-
-          device:
-            navigator.userAgent,
-
-        }
-
-      );
-
+    if (!response.ok) {
+      console.log("Impossible de récupérer la géolocalisation");
+      return;
     }
 
-    catch(err){
+    const geo = await response.json();
 
-      console.log(err);
+    console.log(geo);
 
-    }
+    await axios.post(
+      "https://konanshopping.com/api/track-visitor",
+      {
+        ip: geo.ip,
+        country: geo.country,
+        city: geo.city,
+        device: navigator.userAgent,
+      }
+    );
+
+  } catch (err) {
+
+    console.log("Erreur suivi visiteur :", err);
+
+  }
 
 };
 
@@ -1210,7 +1206,7 @@ setSearch(product.name);
 
 setSuggestions([]);
 
-window.location.href = `/product/${product._id}`;
+navigate(`/product/${product._id}`);
 
 }}
 
@@ -3900,7 +3896,7 @@ boxShadow:
       <button
         onClick={() => {
           setShowWelcomePopup(false);
-          window.location.href = "/login";
+          navigate("/login");
         }}
         style={{
           width: "100%",
@@ -4482,6 +4478,8 @@ function App() {
 
 
     <BrowserRouter>
+
+<PageLoader />
 
       <Routes>
 
