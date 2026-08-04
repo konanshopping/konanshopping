@@ -3573,7 +3573,7 @@ app.use(
 );
 
 app.use(
-  "/api/messages",
+  "/messages",
   messageRoutes
 );
 
