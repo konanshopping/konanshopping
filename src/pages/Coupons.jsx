@@ -95,7 +95,7 @@ const input = document.createElement("textarea");
 
 useEffect(() => {
   axios
-    .get("https://konanshopping.com/coupons")
+    .get("https://konanshopping.com/api/coupons")
     .then((res) => {
 
       console.log("Coupons MongoDB :", res.data);

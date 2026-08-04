@@ -2562,7 +2562,7 @@ console.log("REVIEW =", review);
   }
 );
 
-app.post("/api/coupons/create-default", async (req, res) => {
+app.post("/coupons/create-default", async (req, res) => {
 
   try {
 
@@ -2626,7 +2626,7 @@ app.post("/api/coupons/create-default", async (req, res) => {
 
 });
 
-app.get("/api/coupons", async (req, res) => {
+app.get("/coupons", async (req, res) => {
   try {
     const coupons = await Coupon.find({ active: true });
     res.json(coupons);
@@ -2637,7 +2637,7 @@ app.get("/api/coupons", async (req, res) => {
   }
 });
 
-app.post("/api/coupons", async (req, res) => {
+app.post("/coupons", async (req, res) => {
   try {
     const coupon = new Coupon(req.body);
 
@@ -2656,7 +2656,7 @@ app.post("/api/coupons", async (req, res) => {
   }
 });
 
-app.delete("/api/coupons/:id", async (req, res) => {
+app.delete("/coupons/:id", async (req, res) => {
 
   await Coupon.findByIdAndDelete(
     req.params.id
