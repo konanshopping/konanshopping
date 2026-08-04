@@ -85,6 +85,26 @@ const userSchema = new mongoose.Schema(
       default: [],
     },
 
+    // COUPONS PERSONNALISÉS
+
+userCoupons: [
+  {
+    code: String,
+
+    assignedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    expiresAt: Date,
+
+    used: {
+      type: Boolean,
+      default: false,
+    },
+  },
+],
+
   },
 
   {

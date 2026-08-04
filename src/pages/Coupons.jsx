@@ -102,10 +102,26 @@ useEffect(() => {
 
       const data = res.data.map((coupon) => {
 
-        const expireTime =
-          new Date(registerDate).getTime() +
-          (coupon.days || 7) * 24 * 60 * 60 * 1000;
+        let days = 7;
 
+switch (coupon.code) {
+  case "LIVRAISON":
+    days = 2;
+    break;
+
+  case "VIP50":
+    days = 30;
+    break;
+
+  case "KONAN10":
+  case "WELCOME20":
+    days = 7;
+    break;
+}
+
+const expireTime =
+  new Date(registerDate).getTime() +
+  days * 24 * 60 * 60 * 1000;
         return {
   ...coupon,
 
