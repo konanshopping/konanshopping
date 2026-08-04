@@ -2581,7 +2581,7 @@ app.post("/coupons/create-default", async (req, res) => {
         code: "WELCOME20",
         discountType: "percent",
         discountValue: 20,
-        minPurchase: 0,
+        minPurchase: 30000,
         maxUses: 9999,
         active: true,
       },
@@ -2599,7 +2599,7 @@ app.post("/coupons/create-default", async (req, res) => {
         code: "LIVRAISON",
         discountType: "fixed",
         discountValue: 1500,
-        minPurchase: 0,
+        minPurchase: 10000,
         maxUses: 9999,
         active: true,
       }
