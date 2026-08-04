@@ -95,7 +95,7 @@ const input = document.createElement("textarea");
 
 useEffect(() => {
   axios
-    .get("https://konanshopping.com/api/coupons")
+    .get("https://konanshopping.com/coupons")
     .then((res) => {
 
       console.log("Coupons MongoDB :", res.data);
@@ -107,11 +107,36 @@ useEffect(() => {
           (coupon.days || 7) * 24 * 60 * 60 * 1000;
 
         return {
-          ...coupon,
-          expire: new Date(expireTime),
-          expired: Date.now() >= expireTime,
-          used: (user.usedCoupons || []).includes(coupon.code),
-        };
+  ...coupon,
+
+  discount:
+    coupon.discountType === "percent"
+      ? `${coupon.discountValue}%`
+      : `${coupon.discountValue.toLocaleString()} FCFA`,
+
+  description:
+    coupon.discountType === "percent"
+      ? `${coupon.discountValue}% de réduction sur votre commande.`
+      : `${coupon.discountValue.toLocaleString()} FCFA de réduction.`,
+
+  condition:
+    `Achat minimum : ${coupon.minPurchase.toLocaleString()} FCFA`,
+
+  color:
+    coupon.code === "KONAN10"
+      ? "linear-gradient(135deg,#2563EB,#1D4ED8)"
+      : coupon.code === "WELCOME20"
+      ? "linear-gradient(135deg,#10B981,#059669)"
+      : coupon.code === "VIP50"
+      ? "linear-gradient(135deg,#7C3AED,#5B21B6)"
+      : "linear-gradient(135deg,#F59E0B,#D97706)",
+
+  expire: new Date(expireTime),
+
+  expired: Date.now() >= expireTime,
+
+  used: (user.usedCoupons || []).includes(coupon.code),
+};
 
       });
 
@@ -122,7 +147,7 @@ useEffect(() => {
       console.log(err);
     });
 
-}, [registerDate, user]);
+}, [registerDate]);
 
 const getRemainingText = (expireDate) => {
 
