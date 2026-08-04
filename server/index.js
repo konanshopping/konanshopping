@@ -2562,16 +2562,126 @@ console.log("REVIEW =", review);
   }
 );
 
+app.post("/api/coupons/create-default", async (req, res) => {
+
+  try {
+
+    const coupons = [
+
+      {
+        code: "KONAN10",
+        discountType: "percent",
+        discountValue: 10,
+        minPurchase: 20000,
+        maxUses: 9999,
+        active: true,
+      },
+
+      {
+        code: "WELCOME20",
+        discountType: "percent",
+        discountValue: 20,
+        minPurchase: 0,
+        maxUses: 9999,
+        active: true,
+      },
+
+      {
+        code: "VIP50",
+        discountType: "fixed",
+        discountValue: 5000,
+        minPurchase: 50000,
+        maxUses: 9999,
+        active: true,
+      },
+
+      {
+        code: "LIVRAISON",
+        discountType: "fixed",
+        discountValue: 1500,
+        minPurchase: 0,
+        maxUses: 9999,
+        active: true,
+      }
+
+    ];
+
+    await Coupon.insertMany(coupons, {
+      ordered: false,
+    });
+
+    res.json({
+      message: "Coupons créés"
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.json({
+      message: "Les coupons existent déjà."
+    });
+
+  }
+
+});
+
+app.get("/api/coupons", async (req, res) => {
+  try {
+    const coupons = await Coupon.find({ active: true });
+    res.json(coupons);
+  } catch (err) {
+    res.status(500).json({
+      message: "Erreur serveur",
+    });
+  }
+});
+
+app.post("/api/coupons", async (req, res) => {
+  try {
+    const coupon = new Coupon(req.body);
+
+    await coupon.save();
+
+    res.json(coupon);
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      message: "Erreur serveur",
+    });
+
+  }
+});
+
+app.delete("/api/coupons/:id", async (req, res) => {
+
+  await Coupon.findByIdAndDelete(
+    req.params.id
+  );
+
+  res.json({
+    message: "Coupon supprimé",
+  });
+
+});
+
 // ==========================
 // ==========================
 // VERIFIER COUPON
 // ==========================
 
+console.log("Je suis juste avant apply-coupon");
+
 app.post(
 
-  "/api/apply-coupon",
+  "/apply-coupon",
 
   async (req, res) => {
+
+    console.log("BODY =", req.body);
 
     console.log("ROUTE APPLY COUPON CHARGÉE");
 
@@ -2591,6 +2701,10 @@ app.post(
       // RECHERCHE COUPON
       // =====================
 
+const coupons = await Coupon.find();
+
+console.log("Tous les coupons :", coupons);
+
       const coupon =
         await Coupon.findOne({
 
@@ -2598,6 +2712,8 @@ app.post(
             code.toUpperCase(),
 
         });
+
+        console.log("Coupon trouvé :", coupon);
 
       if (!coupon) {
 
@@ -2610,13 +2726,14 @@ app.post(
 
       }
 
+
       // =====================
       // RECHERCHE UTILISATEUR
       // =====================
 
       console.log("userId =", userId);
 console.log("Type =", typeof userId);
-
+console.log("Je vais chercher l'utilisateur");
       const user =
         await User.findById(userId);
 
@@ -2840,9 +2957,9 @@ console.log("Type =", typeof userId);
 
 );
 
-app.use("/ai", aiRoutes);
+ console.log("Je suis juste après apply-coupon");
 
-app.use("/api/coupons", couponRoutes);
+app.use("/ai", aiRoutes);
 
 app.use(
   "/products",

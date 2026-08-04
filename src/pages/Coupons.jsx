@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 import { FaGift } from "react-icons/fa";
 
@@ -14,6 +15,8 @@ function Coupons() {
 
   const [copied, setCopied] =
     useState("");
+
+const [coupons, setCoupons] = useState([]);
 
   // USER
 
@@ -45,64 +48,6 @@ console.log("createdAt =", user.createdAt);
 
   // COUPONS
 
-const coupons = useMemo(() => {
-
-  const list = [
-
-    {
-      code: "KONAN10",
-      discount: "10% OFF",
-      description: "Réduction sur tous les produits",
-      condition: "Dès 20 000 FCFA",
-      days: 7,
-      color: "linear-gradient(135deg,#7c3aed,#4f46e5)",
-    },
-
-    {
-      code: "LIVRAISON",
-      discount: "Livraison gratuite",
-      description: "Livraison offerte au Cameroun",
-      condition: "24h après inscription",
-      days: 1,
-      color: "linear-gradient(135deg,#ec4899,#db2777)",
-    },
-
-    {
-      code: "WELCOME20",
-      discount: "20% OFF",
-      description: "Réduction nouveaux clients",
-      condition: "1ère commande uniquement",
-      days: 7,
-      color: "linear-gradient(135deg,#f59e0b,#ea580c)",
-    },
-
-    {
-      code: "VIP50",
-      discount: "5000 FCFA",
-      description: "Réduction achats premium",
-      condition: "Clients VIP seulement",
-      days: 30,
-      color: "linear-gradient(135deg,#10b981,#059669)",
-    }
-
-  ];
-
-return list.map((coupon) => {
-
-    const expireTime =
-      Number(registerDate) +
-      coupon.days * 24 * 60 * 60 * 1000;
-
-    return {
-      ...coupon,
-      expire: new Date(expireTime),
-      expired: Date.now() >= expireTime,
-      used: (user.usedCoupons || []).includes(coupon.code),
-    };
-
-  });
-
-}, [registerDate, user]);
 
   // COPY
 
@@ -116,7 +61,7 @@ return list.map((coupon) => {
 
     } else {
 
-      const input = document.createElement("textarea");
+const input = document.createElement("textarea");
 
       input.value = code;
 
@@ -147,6 +92,37 @@ return list.map((coupon) => {
   }
 
 };
+
+useEffect(() => {
+  axios
+    .get("https://konanshopping.com/api/coupons")
+    .then((res) => {
+
+      console.log("Coupons MongoDB :", res.data);
+
+      const data = res.data.map((coupon) => {
+
+        const expireTime =
+          new Date(registerDate).getTime() +
+          (coupon.days || 7) * 24 * 60 * 60 * 1000;
+
+        return {
+          ...coupon,
+          expire: new Date(expireTime),
+          expired: Date.now() >= expireTime,
+          used: (user.usedCoupons || []).includes(coupon.code),
+        };
+
+      });
+
+      setCoupons(data);
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+}, [registerDate, user]);
 
 const getRemainingText = (expireDate) => {
 

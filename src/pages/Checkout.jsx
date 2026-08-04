@@ -402,46 +402,34 @@ localStorage.setItem(
   // COUPON
   // =========================
 
-  const applyCoupon =
-  async () => {
+  const applyCoupon = async () => {
+  try {
 
-    try {
+    const res = await axios.post(
+      "https://konanshopping.com/api/apply-coupon",
+      {
+        code: coupon,
+        total,
+        userId: user?._id,
+      }
+    );
 
-     const res = await axios.post(
-  "https://konanshopping.com/api/apply-coupon",
-  {
-    code: coupon,
-    total,
-    userId: user?._id,
+    console.log(res.data);
+
+    setDiscount(res.data.discount);
+    setCoupon(res.data.coupon.code);
+
+    toast.success("Coupon appliqué ✅");
+
+  } catch (err) {
+
+    console.log(err.response?.data);
+
+    toast.error(
+      err.response?.data?.message || "Coupon invalide"
+    );
   }
-);
-
-      setDiscount(
-        res.data.discount
-      );
-
-      setCoupon(res.data.coupon.code);
-
-      toast.success(
-        "Coupon appliqué ✅"
-      );
-
-    }
-
-    catch (err) {
-
-      toast.error(
-
-        err.response?.data
-          ?.message ||
-
-        "Coupon invalide"
-
-      );
-
-    }
-
-  };
+};
 
   // =========================
   // PLACE ORDER
