@@ -46,6 +46,8 @@ import {
   Cell,
 } from "recharts";
 
+import { FaGift } from "react-icons/fa";
+
 import { Link } from "react-router-dom";
 
 import "./Admin.css";
@@ -508,6 +510,13 @@ return (
         </span>
 
       </button>
+
+      <button
+  onClick={() => navigate("/admin-coupons")}
+>
+  <FaGift />
+  <span>Coupons</span>
+</button>
 
       <button
         onClick={() =>

@@ -26,6 +26,19 @@ const messageSchema =
   },
 ],
 
+target: {
+  type: String,
+  enum: ["all", "new"],
+  default: "all",
+},
+
+recipients: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+],
+
     createdAt: {
       type: Date,
       default: Date.now,

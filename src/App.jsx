@@ -163,6 +163,8 @@ from "./pages/AdminOrders";
 
 import AdminSettings from "./pages/AdminSettings";
 
+import AdminCoupons from "./pages/AdminCoupons";
+
 import Deliveries from "./pages/Deliveries";
 
 import SeoOrganization from "./components/SeoOrganization";
@@ -4655,6 +4657,11 @@ function App() {
 <Route
   path="/admin/settings"
   element={<AdminSettings />}
+/>
+
+<Route
+  path="/admin-coupons"
+  element={<AdminCoupons />}
 />
 
 <Route

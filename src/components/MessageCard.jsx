@@ -1,14 +1,14 @@
-import { useSwipeable } from "react-swipeable";
-
 import {
   FaEnvelope,
   FaClock,
   FaCheckCircle,
   FaCircle,
   FaTrash,
+  FaChevronLeft,
 } from "react-icons/fa";
 
 import { useState } from "react";
+import { useSwipeable } from "react-swipeable";
 
 function MessageCard({
   msg,
@@ -17,367 +17,745 @@ function MessageCard({
   deleteMessage,
 }) {
 
-    const [offset, setOffset] =
-  useState(0)
+  // =====================================================
+  // SWIPE
+  // =====================================================
+
+  const [offset, setOffset] =
+    useState(0);
+
+  const isRead =
+    (msg.readBy || [])
+      .map(String)
+      .includes(
+        String(user?._id)
+      );
+
 
   const handlers =
-  useSwipeable({
+    useSwipeable({
 
-    onSwiping: (event) => {
+      onSwiping: (event) => {
 
-      if (event.deltaX < 0) {
+        // Swipe uniquement vers la gauche
 
-        setOffset(
-          Math.max(
-            event.deltaX,
-            -200
-          )
-        );
+        if (event.deltaX < 0) {
 
-      }
+          setOffset(
+            Math.max(
+              event.deltaX,
+              -190
+            )
+          );
 
-    },
+        }
 
-    onSwipedLeft: () => {
+      },
 
-      if (offset <= -150) {
 
-        deleteMessage(
-          msg._id
-        );
+      onSwipedLeft: () => {
 
-      }
+        if (offset <= -150) {
 
-      setOffset(0);
+          deleteMessage(
+            msg._id
+          );
 
-    },
-
-    onSwipedRight: () => {
-
-      setOffset(0);
-
-    },
-
-    onSwiped: () => {
-
-      if (offset > -150) {
+        }
 
         setOffset(0);
 
-      }
+      },
 
-    },
 
-    trackMouse: true,
+      onSwipedRight: () => {
 
-    preventScrollOnSwipe: true,
+        setOffset(0);
 
-  });
-;
+      },
+
+
+      onSwiped: () => {
+
+        if (offset > -150) {
+
+          setOffset(0);
+
+        }
+
+      },
+
+
+      trackMouse: true,
+
+      preventScrollOnSwipe: true,
+
+      delta: 10,
+
+    });
+
+
+  // =====================================================
+  // READ
+  // =====================================================
+
+  const handleRead = () => {
+
+    if (
+      user?._id &&
+      !isRead
+    ) {
+
+      markAsRead(
+        msg._id
+      );
+
+    }
+
+  };
+
 
   return (
 
     <div
       {...handlers}
       style={{
-        position: "relative",
-        overflow: "hidden",
-        marginTop: "12px",
+        position:
+          "relative",
+
+        width:
+          "100%",
+
+        overflow:
+          "hidden",
+
+        marginTop:
+          "10px",
+
+        borderRadius:
+          "20px",
+
+        touchAction:
+          "pan-y",
+
+        WebkitTapHighlightColor:
+          "transparent",
       }}
     >
 
-      {/* FOND SUPPRESSION */}
+      {/* =================================================
+          DELETE BACKGROUND
+      ================================================= */}
 
       <div
-  style={{
-    position: "absolute",
-    top: 0,
-    right: 0,
-    bottom: 0,
+        style={{
+          position:
+            "absolute",
 
-    width:
-      `${Math.abs(offset)}px`,
+          inset:
+            "0",
 
-    background:
-  "linear-gradient(135deg,#ef4444,#dc2626)",
+          display:
+            "flex",
 
-    borderRadius:
-      "18px",
+          alignItems:
+            "center",
 
-    display: "flex",
+          justifyContent:
+            "flex-end",
 
-    justifyContent:
-      "center",
+          paddingRight:
+            "25px",
 
-    alignItems:
-      "center",
+          background:
+            "linear-gradient(135deg,#ef4444,#dc2626)",
 
-    color: "#fff",
+          borderRadius:
+            "20px",
 
-    zIndex: 0,
-  }}
->
+          color:
+            "#fff",
+
+          zIndex:
+            0,
+
+          opacity:
+            offset < 0
+              ? 1
+              : 0,
+
+          transition:
+            offset === 0
+              ? "opacity .2s ease"
+              : "none",
+        }}
+      >
 
         <div
-  style={{
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "6px",
-    color: "#fff",
-  }}
->
+          style={{
+            display:
+              "flex",
 
-  <FaTrash
-    style={{
-      fontSize: "22px",
-    }}
-  />
+            flexDirection:
+              "column",
 
-  <span
-    style={{
-      fontSize: "12px",
-      fontWeight: "700",
-    }}
-  >
-    Supprimer
-  </span>
+            alignItems:
+              "center",
 
-</div>
+            justifyContent:
+              "center",
 
-</div>
+            gap:
+              "5px",
 
-      
+            minWidth:
+              "70px",
+          }}
+        >
 
-      {/* CARTE MESSAGE */}
+          <FaTrash
+            style={{
+              fontSize:
+                "20px",
+            }}
+          />
+
+          <span
+            style={{
+              fontSize:
+                "11px",
+
+              fontWeight:
+                "800",
+            }}
+          >
+            Supprimer
+          </span>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          MESSAGE CARD
+      ================================================= */}
 
       <div
-     onClick={() => user?._id && markAsRead(msg._id)}
-        
+        onClick={
+          handleRead
+        }
+
         style={{
-  position: "relative",
+          position:
+            "relative",
 
-  zIndex: 1,
+          zIndex:
+            1,
 
-  cursor: "pointer",
+          width:
+            "100%",
 
-  transform:
-    `translateX(${offset}px)`,
+          boxSizing:
+            "border-box",
 
-  transition:
-    offset === 0
-      ? "transform .25s ease"
-      : "none",
+          cursor:
+            "pointer",
 
-  background: "#fff",
+          transform:
+            `translate3d(${offset}px,0,0)`,
 
-  border:
-    (msg.readBy || []).includes(user?._id)
-      ? "1px solid #e5e7eb"
-      : "2px solid #2563eb",
+          transition:
+            offset === 0
+              ? "transform .25s cubic-bezier(.2,.8,.2,1)"
+              : "none",
 
-  borderRadius: "18px",
+          background:
+            "#ffffff",
 
-  padding: "16px",
+          border:
+            isRead
+              ? "1px solid #e5e7eb"
+              : "2px solid #2563eb",
 
-  boxShadow:
-    "0 8px 24px rgba(0,0,0,0.06)",
-}}
+          borderRadius:
+            "20px",
 
->
+          padding:
+            "15px",
 
-    <div
-  style={{
-    flex: 1,
-  }}
->
+          boxShadow:
+            isRead
+              ? "0 7px 22px rgba(15,23,42,.055)"
+              : "0 9px 25px rgba(37,99,235,.10)",
 
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "12px",
-  }}
->
-  <strong
-    style={{
-      fontSize: "15px",
-      fontWeight: "700",
-      color: "#111827",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-    }}
-  >
-    {msg.title}
+          minWidth:
+            0,
 
-    <FaEnvelope
-      style={{
-        color: "#2563eb",
-        fontSize: "14px",
-      }}
-    />
-  </strong>
+          overflow:
+            "hidden",
 
-  <div
-    style={{
-      background: "#eef2ff",
-      color: "#2563eb",
-      padding: "5px 12px",
-      borderRadius: "999px",
-      fontSize: "10px",
-      fontWeight: "700",
-      whiteSpace: "nowrap",
-      border: "1px solid #dbeafe",
-    }}
-  >
-    KONAN SHOPPING
-  </div>
-</div>
+          userSelect:
+            "none",
 
-            {/* MESSAGE */}
+          WebkitUserSelect:
+            "none",
 
-            <p
-              style={{
-                margin: 0,
+          WebkitTapHighlightColor:
+            "transparent",
+        }}
+      >
 
-                color:
-                  "#4b5563",
+        {/* =================================================
+            TOP
+        ================================================= */}
 
-                fontSize:
-                  "13px",
+        <div
+          style={{
+            display:
+              "flex",
 
-                lineHeight:
-                  "1.6",
-              }}
-            >
-              {msg.content}
-            </p>
+            alignItems:
+              "flex-start",
 
-            {/* FOOTER */}
+            justifyContent:
+              "space-between",
+
+            gap:
+              "10px",
+
+            minWidth:
+              0,
+          }}
+        >
+
+          {/* TITLE */}
+
+          <div
+            style={{
+              display:
+                "flex",
+
+              alignItems:
+                "flex-start",
+
+              gap:
+                "8px",
+
+              flex:
+                1,
+
+              minWidth:
+                0,
+            }}
+          >
 
             <div
               style={{
-                display: "flex",
+                width:
+                  "36px",
 
-                justifyContent:
-                  "space-between",
+                height:
+                  "36px",
+
+                minWidth:
+                  "36px",
+
+                borderRadius:
+                  "11px",
+
+                background:
+                  isRead
+                    ? "#eef2ff"
+                    : "#dbeafe",
+
+                color:
+                  "#2563eb",
+
+                display:
+                  "flex",
 
                 alignItems:
                   "center",
 
-                marginTop:
-                  "14px",
+                justifyContent:
+                  "center",
+              }}
+            >
+
+              <FaEnvelope
+                style={{
+                  fontSize:
+                    "14px",
+                }}
+              />
+
+            </div>
+
+
+            <div
+              style={{
+                minWidth:
+                  0,
+
+                flex:
+                  1,
               }}
             >
 
               <div
                 style={{
-                  display: "flex",
+                  display:
+                    "flex",
 
                   alignItems:
                     "center",
 
-                  gap: "6px",
+                  gap:
+                    "6px",
 
-                  color:
-                    "#9ca3af",
-
-                  fontSize:
-                    "11px",
+                  minWidth:
+                    0,
                 }}
               >
 
-                <FaClock />
+                <strong
+                  style={{
+                    fontSize:
+                      "14px",
 
-               {new Date(
-  msg.createdAt
-).toLocaleString(
-  "fr-FR",
-  {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }
-)}
+                    lineHeight:
+                      "1.35",
+
+                    fontWeight:
+                      "800",
+
+                    color:
+                      "#111827",
+
+                    overflow:
+                      "hidden",
+
+                    textOverflow:
+                      "ellipsis",
+
+                    display:
+                      "-webkit-box",
+
+                    WebkitLineClamp:
+                      2,
+
+                    WebkitBoxOrient:
+                      "vertical",
+
+                    wordBreak:
+                      "break-word",
+                  }}
+                >
+                  {msg.title}
+                </strong>
 
               </div>
 
-              {(msg.readBy || []).includes(user?._id)? (
 
-                <div
-                  style={{
-                    display:
-                      "flex",
+              <div
+                style={{
+                  marginTop:
+                    "3px",
 
-                    alignItems:
-                      "center",
+                  fontSize:
+                    "9px",
 
-                    gap: "5px",
+                  color:
+                    "#94a3b8",
 
-                    color:
-                      "#16a34a",
+                  fontWeight:
+                    "700",
 
-                    fontSize:
-                      "11px",
+                  letterSpacing:
+                    ".3px",
 
-                    fontWeight:
-                      "700",
-                  }}
-                >
-
-                  <FaCheckCircle />
-
-                  Lu
-
-                </div>
-
-              ) : (
-
-                <div
-                  style={{
-                    display:
-                      "flex",
-
-                    alignItems:
-                      "center",
-
-                    gap: "5px",
-
-                    color:
-                      "#2563eb",
-
-                    fontSize:
-                      "11px",
-
-                    fontWeight:
-                      "700",
-                  }}
-                >
-
-                  <FaCircle
-                    style={{
-                      fontSize:
-                        "8px",
-                    }}
-                  />
-
-                  Nouveau
-
-                </div>
-
-              )}
+                  textTransform:
+                    "uppercase",
+                }}
+              >
+                KONAN SHOPPING
+              </div>
 
             </div>
 
           </div>
 
+
+          {/* STATUS */}
+
+          <div
+            style={{
+              flexShrink:
+                0,
+
+              display:
+                "inline-flex",
+
+              alignItems:
+                "center",
+
+              gap:
+                "5px",
+
+              padding:
+                "5px 8px",
+
+              borderRadius:
+                "999px",
+
+              background:
+                isRead
+                  ? "#f0fdf4"
+                  : "#eff6ff",
+
+              color:
+                isRead
+                  ? "#16a34a"
+                  : "#2563eb",
+
+              fontSize:
+                "9px",
+
+              fontWeight:
+                "800",
+
+              whiteSpace:
+                "nowrap",
+            }}
+          >
+
+            {isRead
+              ? <FaCheckCircle />
+              : <FaCircle
+                  style={{
+                    fontSize:
+                      "6px",
+                  }}
+                />
+            }
+
+            {isRead
+              ? "Lu"
+              : "Nouveau"}
+
+          </div>
+
         </div>
 
+
+        {/* =================================================
+            MESSAGE CONTENT
+        ================================================= */}
+
+        <div
+          style={{
+            marginTop:
+              "14px",
+
+            paddingTop:
+              "13px",
+
+            borderTop:
+              "1px solid #f1f5f9",
+          }}
+        >
+
+          <p
+            style={{
+              margin:
+                0,
+
+              color:
+                "#475569",
+
+              fontSize:
+                "13px",
+
+              lineHeight:
+                "1.65",
+
+              whiteSpace:
+                "pre-wrap",
+
+              overflowWrap:
+                "anywhere",
+
+              wordBreak:
+                "break-word",
+            }}
+          >
+            {msg.content}
+          </p>
+
+        </div>
+
+
+        {/* =================================================
+            FOOTER
+        ================================================= */}
+
+        <div
+          style={{
+            marginTop:
+              "14px",
+
+            paddingTop:
+              "11px",
+
+            borderTop:
+              "1px solid #f1f5f9",
+
+            display:
+              "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "space-between",
+
+            gap:
+              "8px",
+
+            minWidth:
+              0,
+          }}
+        >
+
+          {/* DATE */}
+
+          <div
+            style={{
+              display:
+                "flex",
+
+              alignItems:
+                "center",
+
+              gap:
+                "6px",
+
+              color:
+                "#94a3b8",
+
+              fontSize:
+                "10px",
+
+              minWidth:
+                0,
+
+              overflow:
+                "hidden",
+            }}
+          >
+
+            <FaClock
+              style={{
+                flexShrink:
+                  0,
+
+                fontSize:
+                  "10px",
+              }}
+            />
+
+            <span
+              style={{
+                overflow:
+                  "hidden",
+
+                textOverflow:
+                  "ellipsis",
+
+                whiteSpace:
+                  "nowrap",
+              }}
+            >
+
+              {msg.createdAt
+                ? new Date(
+                    msg.createdAt
+                  ).toLocaleString(
+                    "fr-FR",
+                    {
+                      day:
+                        "numeric",
+
+                      month:
+                        "short",
+
+                      year:
+                        "numeric",
+
+                      hour:
+                        "2-digit",
+
+                      minute:
+                        "2-digit",
+                    }
+                  )
+                : "Date inconnue"}
+
+            </span>
+
+          </div>
+
+
+          {/* SWIPE HINT */}
+
+          <div
+            style={{
+              display:
+                "flex",
+
+              alignItems:
+                "center",
+
+              gap:
+                "4px",
+
+              color:
+                "#cbd5e1",
+
+              fontSize:
+                "9px",
+
+              fontWeight:
+                "700",
+
+              flexShrink:
+                0,
+
+              opacity:
+                isRead
+                  ? .75
+                  : .9,
+            }}
+          >
+
+            <FaChevronLeft
+              style={{
+                fontSize:
+                  "8px",
+              }}
+            />
+
+            Glisser pour supprimer
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
+
   );
 
 }
