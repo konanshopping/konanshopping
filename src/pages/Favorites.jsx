@@ -299,6 +299,135 @@ useEffect(() => {
 
     };
 
+    // =========================
+// ACHETER MAINTENANT
+// =========================
+
+const buyNow = async (product) => {
+
+  try {
+
+    const currentUser =
+      JSON.parse(
+        localStorage.getItem("user")
+      );
+
+    // =====================
+    // IDENTIFIANT CLIENT
+    // =====================
+
+    const clientId =
+      currentUser?._id ||
+
+      localStorage.getItem(
+        "guestId"
+      ) ||
+
+      (() => {
+
+        const newGuestId =
+          "guest_" + Date.now();
+
+        localStorage.setItem(
+          "guestId",
+          newGuestId
+        );
+
+        return newGuestId;
+
+      })();
+
+    // =====================
+    // PANIER CLIENT
+    // =====================
+
+    const cartKey =
+      `cart_${clientId}`;
+
+    let cart =
+      JSON.parse(
+        localStorage.getItem(
+          cartKey
+        )
+      ) || [];
+
+    // =====================
+    // VÉRIFIER SI PRODUIT EXISTE
+    // =====================
+
+    const existing =
+      cart.find(
+        (item) =>
+          item._id === product._id
+      );
+
+    if (existing) {
+
+      existing.quantity += 1;
+
+    } else {
+
+      cart.push({
+
+        ...product,
+
+        quantity: 1,
+
+      });
+
+    }
+
+    // =====================
+    // SAUVEGARDER LE PANIER
+    // =====================
+
+    localStorage.setItem(
+      cartKey,
+      JSON.stringify(cart)
+    );
+
+    // =====================
+    // COMPTEUR PANIER
+    // =====================
+
+    localStorage.setItem(
+      "cartCount",
+      cart.length
+    );
+
+    // =====================
+    // ACTUALISER L'INTERFACE
+    // =====================
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+
+    // =====================
+    // RETIRER DES FAVORIS
+    // =====================
+
+    await removeFavorite(
+      product._id
+    );
+
+    // =====================
+    // ALLER AU CHECKOUT
+    // =====================
+
+    navigate("/checkout");
+
+  } catch (error) {
+
+    console.log(
+      "Erreur achat favori :",
+      error
+    );
+
+  }
+
+};
+
   // =========================
   // REMOVE FAVORITE
   // =========================
@@ -927,31 +1056,11 @@ console.log("user =", user);
 
                     {/* BUY NOW */}
 
-                    <button
+             <button
 
-  onClick={() => {
-
-    localStorage.setItem(
-
-      "checkoutProduct",
-
-      JSON.stringify({
-
-        ...product,
-
-        quantity: 1
-
-      })
-
-    );
-
-    removeFavorite(
-      product._id
-    );
-
-    navigate("/checkout");
-
-  }}
+  onClick={() =>
+    buyNow(product)
+  }
 
   style={{
 
