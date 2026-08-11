@@ -191,6 +191,20 @@ const [favoritesCount,
 setFavoritesCount] =
 useState(0);
 
+const [clickSound] = useState(
+  () => new Audio("/sounds/click.mp3")
+);
+
+const playSound = () => {
+
+  clickSound.currentTime = 0;
+
+  clickSound.volume = 0.5;
+
+  clickSound.play().catch(() => {});
+
+};
+
 useEffect(() => {
 
   console.log("Effect 1");
@@ -403,39 +417,52 @@ useState(null);
 const [showAlert, setShowAlert] =
   useState(false);
 
-  const [showBottomNav, setShowBottomNav] = useState(false);
+  const [showBottomNav, setShowBottomNav] = useState(true);
 
 useEffect(() => {
 
   console.log("Effect 5");
 
-  let timer;
+  let scrollTimer;
 
-  const showNav = () => {
+  const handleScroll = () => {
 
-    setShowBottomNav(true);
+    // =========================
+    // LE CLIENT SCROLL
+    // =========================
 
-    clearTimeout(timer);
+    setShowBottomNav(false);
 
-    timer = setTimeout(() => {
+    // Annuler le précédent timer
+    clearTimeout(scrollTimer);
 
-      setShowBottomNav(false);
+    // =========================
+    // ATTENDRE 5 SECONDES
+    // SANS SCROLL
+    // =========================
 
-    }, 3000);
+    scrollTimer = setTimeout(() => {
+
+      setShowBottomNav(true);
+
+    }, 5000);
 
   };
 
-  window.addEventListener("touchstart", showNav);
-
-  window.addEventListener("click", showNav);
+  window.addEventListener(
+    "scroll",
+    handleScroll,
+    { passive: true }
+  );
 
   return () => {
 
-    window.removeEventListener("touchstart", showNav);
+    window.removeEventListener(
+      "scroll",
+      handleScroll
+    );
 
-    window.removeEventListener("click", showNav);
-
-    clearTimeout(timer);
+    clearTimeout(scrollTimer);
 
   };
 
@@ -494,28 +521,48 @@ setAiProducts] =
 useState([]);
 
   const [products, setProducts] =
-    useState([]);
+  useState([]);
+
+const [homeLoading, setHomeLoading] =
+  useState(true);
+
 
     const randomizedProducts = useMemo(() => {
-  if (products.length === 0) return [];
 
-  // Si on revient d'une fiche produit,
-  // on garde exactement le même ordre.
-  if (location.state?.productsOrder) {
-    const ids = location.state.productsOrder;
+  if (products.length === 0) {
+    return [];
+  }
+
+  // =========================
+  // RETOUR DE PRODUCT DETAILS
+  // =========================
+
+  if (location.state?.productsOrder?.length) {
+
+    const ids =
+      location.state.productsOrder;
 
     return ids
-      .map((id) => products.find((p) => p._id === id))
+      .map((id) =>
+        products.find(
+          (p) => p._id === id
+        )
+      )
       .filter(Boolean);
   }
 
-  // Sinon (première ouverture ou F5),
-  // on mélange.
-  return [...products].sort(() => Math.random() - 0.5);
+  // =========================
+  // NOUVELLE ARRIVÉE
+  // =========================
 
-}, [products, location.state]);
+  return [...products].sort(
+    () => Math.random() - 0.5
+  );
 
-    const [homeLoading, setHomeLoading] = useState(true);
+}, [
+  products,
+  location.state?.productsOrder
+]);
 
     const [suggestions, setSuggestions] =
 useState([]);
@@ -603,19 +650,70 @@ useEffect(() => {
 
     try {
 
+      // =========================
+      // CACHE EXISTANT
+      // =========================
+
+      const cached =
+        sessionStorage.getItem(
+          "konan_home_products"
+        );
+
+      if (cached) {
+
+        console.log(
+          "PRODUITS RÉCUPÉRÉS DU CACHE"
+        );
+
+        setProducts(
+          JSON.parse(cached)
+        );
+
+        setHomeLoading(false);
+
+        return;
+      }
+
+      // =========================
+      // PREMIÈRE CHARGE
+      // =========================
+
       setHomeLoading(true);
 
       const res = await axios.get(
         "https://konanshopping.com/api/products"
       );
 
-      setProducts(res.data);
+      const productsData =
+        res.data;
 
-    } catch (err) {
+      setProducts(
+        productsData
+      );
 
-      console.log(err);
+      // =========================
+      // SAUVEGARDE CACHE
+      // =========================
 
-    } finally {
+      sessionStorage.setItem(
+        "konan_home_products",
+        JSON.stringify(
+          productsData
+        )
+      );
+
+    }
+
+    catch (err) {
+
+      console.log(
+        "Erreur chargement produits :",
+        err
+      );
+
+    }
+
+    finally {
 
       setHomeLoading(false);
 
@@ -642,6 +740,20 @@ console.log("Effect 8");
     });
   }
 }, [location]);
+
+useEffect(() => {
+
+  if (
+    location.state?.visibleProducts
+  ) {
+
+    setVisibleProducts(
+      location.state.visibleProducts
+    );
+
+  }
+
+}, [location.state?.visibleProducts]);
 
 
   const [addedProduct, setAddedProduct] =
@@ -936,7 +1048,10 @@ setLoading(false);
 
 };
 
-if (homeLoading) {
+if (
+  homeLoading &&
+  !location.state?.productsOrder
+) {
   return <KonanLoader />;
 }
 
@@ -2547,12 +2662,18 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 <Link
   to={`/product/${product._id}`}
   key={product._id}
+  onClick={() => playSound()}
   state={{
-    scrollY: window.scrollY,
-    productsOrder: randomizedProducts.map(
+  scrollY: window.scrollY,
+
+  productsOrder:
+    randomizedProducts.map(
       (p) => p._id
     ),
-  }}
+
+  visibleProducts:
+    visibleProducts,
+}}
 style={{
 textDecoration:"none",
 color:"#111827",

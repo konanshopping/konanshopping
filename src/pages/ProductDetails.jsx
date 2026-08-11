@@ -251,17 +251,29 @@ const getProduct = async () => {
       );
 
     const similar =
-      response.data.filter(
-        (item) =>
+  response.data.filter(
+    (item) =>
+      item.category ===
+        res.data.category &&
 
-          item.category ===
-            res.data.category &&
+      item._id !==
+        res.data._id
+  );
 
-          item._id !==
-            res.data._id
-      );
+// =========================
+// MÉLANGE ALÉATOIRE
+// =========================
+// Tous les produits sont conservés.
+// Seul leur ordre est mélangé.
 
-    setSimilarProducts(similar);
+const shuffledSimilar =
+  [...similar].sort(
+    () => Math.random() - 0.5
+  );
+
+setSimilarProducts(
+  shuffledSimilar
+);
 
   }
 
@@ -299,132 +311,231 @@ if (!product)
     <>
       <style>{`
         @keyframes spin {
+
           from {
             transform: rotate(0deg);
           }
+
           to {
             transform: rotate(360deg);
           }
+
         }
 
         @keyframes pulse {
-          0%,100%{
-            transform: translate(-50%,-50%) scale(1);
+
+          0%, 100% {
+            transform:
+              translate(-50%, -50%)
+              scale(1);
+
+            box-shadow:
+              0 0 10px
+              rgba(75,46,131,.15);
           }
 
-          50%{
-            transform: translate(-50%,-50%) scale(1.05);
+          50% {
+            transform:
+              translate(-50%, -50%)
+              scale(1.08);
+
+            box-shadow:
+              0 0 24px
+              rgba(124,58,237,.35);
           }
+
         }
 
         @keyframes fade {
-          from{
-            opacity:0;
+
+          from {
+            opacity: 0;
           }
 
-          to{
-            opacity:1;
+          to {
+            opacity: 1;
           }
+
+        }
+
+        @keyframes shimmer {
+
+          0% {
+            background-position: -200% 0;
+          }
+
+          100% {
+            background-position: 200% 0;
+          }
+
         }
       `}</style>
 
       <div
         style={{
-          minHeight: "100vh",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
+          position: "fixed",
+
+          inset: 0,
+
           background: "#fff",
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          alignItems: "center",
+
+          flexDirection: "column",
+
+          zIndex: 999999,
+
           animation: "fade .35s ease",
-          padding: "20px",
-          boxSizing: "border-box",
         }}
       >
+
+        {/* LOADER */}
+
         <div
           style={{
             position: "relative",
-            width: mobile ? "100px" : "140px",
-            height: mobile ? "100px" : "140px",
+
+            width:
+              mobile
+                ? "74px"
+                : "90px",
+
+            height:
+              mobile
+                ? "74px"
+                : "90px",
           }}
         >
-          {/* Cercle animé */}
+
+          {/* CERCLE */}
 
           <div
             style={{
               position: "absolute",
+
               inset: 0,
-              border: mobile
-                ? "3px solid #ececff"
-                : "4px solid #ececff",
 
-              borderTop: mobile
-                ? "3px solid #4f46e5"
-                : "4px solid #4f46e5",
+              border:
+                "3px solid #ECECF8",
 
-              borderRight: mobile
-                ? "3px solid #7c3aed"
-                : "4px solid #7c3aed",
+              borderTop:
+                "3px solid #4B2E83",
+
+              borderRight:
+                "3px solid #7C3AED",
 
               borderRadius: "50%",
-              animation: "spin .9s linear infinite",
+
+              animation:
+                "spin .85s linear infinite",
             }}
           />
 
-          {/* Logo */}
+          {/* LOGO */}
 
           <div
             style={{
               position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
 
-              width: mobile ? "60px" : "86px",
-              height: mobile ? "60px" : "86px",
+              top: "50%",
+
+              left: "50%",
+
+              transform:
+                "translate(-50%,-50%)",
+
+              width:
+                mobile
+                  ? "46px"
+                  : "56px",
+
+              height:
+                mobile
+                  ? "46px"
+                  : "56px",
 
               borderRadius: "50%",
+
               overflow: "hidden",
 
               background: "#fff",
 
-              border: mobile
-                ? "2px solid #fff"
-                : "3px solid #fff",
+              border: "2px solid #fff",
 
-              animation: "pulse 1.5s ease-in-out infinite",
+              animation:
+                "pulse 1.8s ease-in-out infinite",
 
               boxShadow:
-                "0 10px 28px rgba(79,70,229,.25)",
+                "0 8px 22px rgba(75,46,131,.18)",
             }}
           >
+
             <img
               src="/logo.jpg"
+
               alt="Konan Shopping"
+
               style={{
                 width: "100%",
+
                 height: "100%",
+
                 objectFit: "cover",
-                borderRadius: "50%",
+
                 display: "block",
+
               }}
             />
+
           </div>
+
         </div>
 
-        <p
+        {/* TEXTE */}
+
+        <div
+          translate="no"
           style={{
-            marginTop: mobile ? "18px" : "24px",
-            color: "#4f46e5",
-            fontSize: mobile ? "14px" : "17px",
-            fontWeight: "800",
-            letterSpacing: ".5px",
-            textAlign: "center",
+            marginTop: "18px",
+
+            fontSize:
+              mobile
+                ? "11px"
+                : "12px",
+
+            fontStyle: "italic",
+
+            fontWeight: "600",
+
+            letterSpacing: "1.2px",
+
+            textTransform: "lowercase",
+
+            background:
+              "linear-gradient(90deg,#B8BCC8 20%,#4B2E83 50%,#B8BCC8 80%)",
+
+            backgroundSize:
+              "200% auto",
+
+            WebkitBackgroundClip:
+              "text",
+
+            WebkitTextFillColor:
+              "transparent",
+
+            animation:
+              "shimmer 1.8s linear infinite",
+
+            userSelect: "none",
           }}
         >
-          Chargement...
-        </p>
+          Chargement produits...
+        </div>
+
       </div>
     </>
   );

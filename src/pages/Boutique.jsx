@@ -3318,78 +3318,94 @@ fontSize:
 
   onClick={(e) => {
 
-e.preventDefault();
-
+    e.preventDefault();
     e.stopPropagation();
 
     playSound();
 
-    const user = JSON.parse(
-  localStorage.getItem("user")
-);
+    const user =
+      JSON.parse(
+        localStorage.getItem("user")
+      );
 
-const clientId =
+    const clientId =
+      user?._id ||
+      localStorage.getItem("guestId") ||
+      (() => {
 
-  user?._id ||
+        const newGuestId =
+          "guest_" + Date.now();
 
-  localStorage.getItem(
-    "guestId"
-  );
+        localStorage.setItem(
+          "guestId",
+          newGuestId
+        );
 
-localStorage.setItem(
+        return newGuestId;
 
-  `checkoutProduct_${clientId}`,
+      })();
 
-  JSON.stringify(product)
+    const cart =
+      JSON.parse(
+        localStorage.getItem(
+          `cart_${clientId}`
+        )
+      ) || [];
 
-);
+    const existing =
+      cart.find(
+        (item) =>
+          item._id === product._id
+      );
 
-    navigate(
-  "/checkout",
-  {
-    state: {
-      directBuy: true,
-    },
-  }
-);
+    if (existing) {
 
-  }}
+      existing.quantity += 1;
 
-  onMouseEnter={(e) => {
+    } else {
 
-    e.currentTarget.style.transform =
-      "translateY(-3px) scale(1.03)";
+      cart.push({
 
-    e.currentTarget.style.boxShadow =
-      "0 12px 25px rgba(0,0,0,0.25)";
+        ...product,
 
-    e.currentTarget.style.background =
-      "linear-gradient(135deg,#1f2937,#111827)";
+        quantity: 1,
 
-  }}
+      });
 
-  onMouseLeave={(e) => {
+    }
 
-    e.currentTarget.style.transform =
-      "translateY(0px) scale(1)";
+    localStorage.setItem(
 
-    e.currentTarget.style.boxShadow =
-      "0 6px 15px rgba(0,0,0,0.15)";
+      `cart_${clientId}`,
 
-    e.currentTarget.style.background =
-      "linear-gradient(135deg,#111827,#374151)";
+      JSON.stringify(cart)
+
+    );
+
+    localStorage.setItem(
+      "cartCount",
+      cart.length
+    );
+
+    window.dispatchEvent(
+      new Event("cartUpdated")
+    );
+
+    navigate("/checkout");
 
   }}
 
   style={{
     width: "100%",
+    padding:
+      window.innerWidth < 768
+        ? "10px"
+        : "12px",
 
-    padding: window.innerWidth < 768 ? "10px" : "12px",
-
-fontSize:
-  window.innerWidth < 768
-    ? "12px"
-    : "13px",
+    fontSize:
+      window.innerWidth < 768
+        ? "12px"
+        : "13px",
 
     flex: 1,
 
@@ -3405,7 +3421,6 @@ fontSize:
     cursor: "pointer",
 
     fontWeight: "800",
-
 
     display: "flex",
 

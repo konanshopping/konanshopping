@@ -4,22 +4,33 @@ export default function LoaderPage() {
   return (
     <div className="loader-page">
 
+      {/* CERCLE + LOGO */}
+
       <div className="loader-circle">
+
+        {/* CERCLE ANIMÉ */}
 
         <div className="loader-ring"></div>
 
-        <img
-          src="/logo.jpg"
-          alt="Konan Shopping"
-          className="loader-logo"
-        />
+        {/* LOGO */}
+
+        <div className="loader-logo-wrapper">
+          <img
+            src="/logo.jpg"
+            alt="Konan Shopping"
+            className="loader-logo"
+          />
+        </div>
 
       </div>
 
-      <div className="loader-dots">
-        <span></span>
-        <span></span>
-        <span></span>
+      {/* TEXTE */}
+
+      <div
+        className="loader-text"
+        translate="no"
+      >
+        Chargement...
       </div>
 
     </div>

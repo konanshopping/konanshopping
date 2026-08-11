@@ -152,48 +152,74 @@ const [cancelledOrders, setCancelledOrders] =
 
 }, [user._id]);
 
-  useEffect(() => {
+useEffect(() => {
 
-  const loadMessages =
-    async () => {
+  const loadMessages = async () => {
 
-      try {
+    try {
 
-        const res =
-          await axios.get(
-            "https://konanshopping.com/api/messages"
-          );
-
-        const user =
-          JSON.parse(
-            localStorage.getItem(
-              "user"
-            )
-          );
-
-        const unread =
-          res.data.filter(
-            (msg) =>
-              !(
-                msg.readBy || []
-              ).includes(
-                user._id
-              )
-          );
-
-        setUnreadCount(
-          unread.length
+      const currentUser =
+        JSON.parse(
+          localStorage.getItem("user")
         );
 
-      } catch (err) {
-
-        console.log(err);
-
+      if (!currentUser?._id) {
+        setUnreadCount(0);
+        return;
       }
 
-    };
+      const res =
+        await axios.get(
+          "https://konanshopping.com/api/messages",
+          {
+            params: {
+              userId:
+                currentUser._id,
+            },
+          }
+        );
 
-  loadMessages();
+      const messages =
+        Array.isArray(res.data)
+          ? res.data
+          : [];
+
+      const unread =
+        messages.filter(
+          (msg) => {
+
+            const alreadyRead =
+              (msg.readBy || [])
+                .map(String)
+                .includes(
+                  String(
+                    currentUser._id
+                  )
+                );
+
+            return !alreadyRead;
+
+          }
+        );
+
+      setUnreadCount(
+        unread.length
+      );
+
+    } catch (err) {
+
+      console.log(
+        "Erreur compteur messages:",
+        err
+      );
+
+      setUnreadCount(0);
+
+    }
+
+  };
+
+  loadMessages();  
 
   const loadOrders = async () => {
 
