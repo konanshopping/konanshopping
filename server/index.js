@@ -4529,60 +4529,115 @@ app.delete("/drivers/:id", async (req, res) => {
 
 });
 
-app.post("/driver-register", async (req, res) => {
+app.post(
+  "/driver-register",
+  upload.single("photo"),
+  async (req, res) => {
 
-  try {
+    try {
 
-    const existingDriver =
-      await Driver.findOne({
-        email: req.body.email,
+      const existingDriver =
+        await Driver.findOne({
+          email: req.body.email,
+        });
+
+      if (existingDriver) {
+
+        return res.status(400).json({
+          success: false,
+          message: "Livreur existe déjà",
+        });
+
+      }
+
+      // =====================================
+      // 📸 PHOTO CLOUDINARY
+      // =====================================
+
+      const photoUrl =
+        req.file?.secure_url ||
+        req.file?.path ||
+        "";
+
+      // =====================================
+      // 🚚 CREATION LIVREUR
+      // =====================================
+
+      const driver =
+        new Driver({
+
+          name:
+            req.body.name,
+
+          email:
+            req.body.email,
+
+          password:
+            req.body.password,
+
+          phone:
+            req.body.phone,
+
+          city:
+            req.body.city,
+
+          vehicle:
+            req.body.vehicle,
+
+          plate:
+            req.body.plate,
+
+          photo:
+            photoUrl,
+
+        });
+
+      await driver.save();
+
+      console.log(
+        "🚚 LIVREUR CRÉÉ :",
+        driver.name
+      );
+
+      console.log(
+        "☁️ PHOTO CLOUDINARY :",
+        photoUrl
+      );
+
+      return res.status(201).json({
+
+        success: true,
+
+        message:
+          "Compte livreur créé avec succès",
+
+        driver,
+
       });
 
-    if (existingDriver) {
+    } catch (err) {
 
-      return res.status(400).json({
+      console.error(
+        "❌ DRIVER REGISTER ERROR:",
+        err
+      );
+
+      return res.status(500).json({
+
+        success: false,
+
         message:
-          "Livreur existe déjà",
+          "Erreur inscription livreur",
+
+        error:
+          err.message,
+
       });
 
     }
 
-    const driver =
-      new Driver({
-
-        name: req.body.name,
-
-        email: req.body.email,
-
-        password:
-          req.body.password,
-
-        phone: req.body.phone,
-
-        city: req.body.city,
-
-        vehicle:
-          req.body.vehicle,
-
-        plate: req.body.plate,
-
-        photo: req.body.photo,
-
-      });
-
-    await driver.save();
-
-    res.json(driver);
-
-  } catch (err) {
-
-    res.status(500).json({
-      error: err.message,
-    });
-
   }
-
-});
+);
 
 // ======================================================
 // 📍 GPS DU LIVREUR

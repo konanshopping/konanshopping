@@ -31,7 +31,7 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // FORM
+  // 📝 FORMULAIRE
   // =====================================================
 
   const [email, setEmail] =
@@ -42,12 +42,17 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // UI
+  // 👁️ MOT DE PASSE
   // =====================================================
 
   const [showPassword,
     setShowPassword] =
     useState(false);
+
+
+  // =====================================================
+  // ⏳ LOADING
+  // =====================================================
 
   const [loading,
     setLoading] =
@@ -55,7 +60,7 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // NOTIFICATION
+  // 🔔 NOTIFICATION
   // =====================================================
 
   const [notification,
@@ -64,7 +69,7 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // NOTIFICATION PROFESSIONNELLE
+  // 🔔 NOTIFICATION PROFESSIONNELLE
   // =====================================================
 
   const showNotification = (
@@ -74,9 +79,11 @@ export default function DriverLogin() {
   ) => {
 
     setNotification({
+
       type,
       title,
       message
+
     });
 
 
@@ -90,21 +97,25 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // CONNEXION
+  // 🔐 CONNEXION
   // =====================================================
 
   const login = async () => {
 
-    // ---------------------------------------------
-    // VALIDATION EMAIL
-    // ---------------------------------------------
+    // ===================================================
+    // EMAIL
+    // ===================================================
 
     if (!email.trim()) {
 
       showNotification(
+
         "warning",
+
         "Adresse email requise",
-        "Veuillez saisir votre adresse email."
+
+        "Veuillez saisir l'adresse email utilisée pour votre compte livreur."
+
       );
 
       return;
@@ -112,16 +123,20 @@ export default function DriverLogin() {
     }
 
 
-    // ---------------------------------------------
-    // VALIDATION PASSWORD
-    // ---------------------------------------------
+    // ===================================================
+    // PASSWORD
+    // ===================================================
 
     if (!password) {
 
       showNotification(
+
         "warning",
+
         "Mot de passe requis",
+
         "Veuillez saisir votre mot de passe."
+
       );
 
       return;
@@ -135,7 +150,7 @@ export default function DriverLogin() {
 
 
       // =================================================
-      // BACKEND EXISTANT
+      // 🚀 BACKEND
       // =================================================
 
       const res =
@@ -156,7 +171,7 @@ export default function DriverLogin() {
 
 
       // =================================================
-      // SAUVEGARDE LIVREUR
+      // 💾 SAUVEGARDE LIVREUR
       // =================================================
 
       localStorage.setItem(
@@ -171,14 +186,14 @@ export default function DriverLogin() {
 
 
       // =================================================
-      // NOTIFICATION
+      // 🎉 SUCCÈS
       // =================================================
 
       showNotification(
 
         "success",
 
-        "Connexion réussie",
+        "Connexion réussie 🎉",
 
         "Bienvenue dans votre Centre Livreur Konan Shopping."
 
@@ -186,7 +201,7 @@ export default function DriverLogin() {
 
 
       // =================================================
-      // REDIRECTION
+      // 🚚 DASHBOARD
       // =================================================
 
       setTimeout(() => {
@@ -200,24 +215,18 @@ export default function DriverLogin() {
 
     } catch (err) {
 
-      console.log(
-        "❌ DRIVER LOGIN:",
+      console.error(
+        "❌ DRIVER LOGIN :",
+        err.response?.data ||
         err
       );
 
 
-      let message =
+      const message =
+
+        err.response?.data?.message ||
+
         "Email ou mot de passe incorrect.";
-
-
-      if (
-        err.response?.data?.message
-      ) {
-
-        message =
-          err.response.data.message;
-
-      }
 
 
       showNotification(
@@ -230,7 +239,6 @@ export default function DriverLogin() {
 
       );
 
-
     } finally {
 
       setLoading(false);
@@ -241,26 +249,27 @@ export default function DriverLogin() {
 
 
   // =====================================================
-  // ENTER
+  // ⌨️ ENTER
   // =====================================================
 
-  const handleKeyDown =
-    (e) => {
+  const handleKeyDown = (
+    e
+  ) => {
 
-      if (
-        e.key === "Enter" &&
-        !loading
-      ) {
+    if (
+      e.key === "Enter" &&
+      !loading
+    ) {
 
-        login();
+      login();
 
-      }
+    }
 
-    };
+  };
 
 
   // =====================================================
-  // NOTIFICATION STYLE
+  // 🔔 ICÔNE NOTIFICATION
   // =====================================================
 
   const getNotificationIcon =
@@ -277,25 +286,16 @@ export default function DriverLogin() {
 
       }
 
-
-      if (
-        notification?.type ===
-        "warning"
-      ) {
-
-        return (
-          <FaExclamationTriangle />
-        );
-
-      }
-
-
       return (
         <FaExclamationTriangle />
       );
 
     };
 
+
+  // =====================================================
+  // 🎨 COULEUR
+  // =====================================================
 
   const getNotificationColor =
     () => {
@@ -309,7 +309,6 @@ export default function DriverLogin() {
 
       }
 
-
       if (
         notification?.type ===
         "warning"
@@ -319,1180 +318,1630 @@ export default function DriverLogin() {
 
       }
 
-
       return "#dc2626";
 
     };
 
 
+  // =====================================================
+  // 🎨 INTERFACE
+  // =====================================================
+
   return (
 
-    <div
-      onKeyDown={
-        handleKeyDown
-      }
+    <>
 
-      style={{
+      <style>{`
 
-        minHeight:
-          "100vh",
+        /* ==================================================
+           RESET
+        ================================================== */
 
-        width:
-          "100%",
+        * {
+          box-sizing: border-box;
+        }
 
-        display:
-          "flex",
+        html,
+        body,
+        #root {
+          width: 100%;
+          min-height: 100%;
+          margin: 0;
+          padding: 0;
+        }
 
-        justifyContent:
-          "center",
+        body {
+          overflow-x: hidden;
 
-        alignItems:
-          "center",
-
-        padding:
-          "20px",
-
-        boxSizing:
-          "border-box",
-
-        background:
-          "linear-gradient(135deg,#eef4ff 0%,#f8fafc 45%,#eef2ff 100%)",
-
-        fontFamily:
-          "'Inter',Arial,sans-serif",
-
-        position:
-          "relative",
-
-        overflow:
-          "hidden"
-
-      }}
-    >
+          font-family:
+            Inter,
+            Arial,
+            sans-serif;
+        }
 
 
-      {/* ================================================= */}
-      {/* BACKGROUND DECORATION */}
-      {/* ================================================= */}
+        /* ==================================================
+           PAGE
+        ================================================== */
 
-      <div
-        style={{
+        .driver-login-page {
 
-          position:
-            "absolute",
+          width: 100%;
 
-          width:
-            "420px",
+          min-height: 100vh;
 
-          height:
-            "420px",
+          min-height: 100dvh;
 
-          borderRadius:
-            "50%",
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          padding: 24px;
+
+          position: relative;
+
+          overflow: hidden;
 
           background:
-            "rgba(37,99,235,0.12)",
 
-          top:
-            "-180px",
+            radial-gradient(
+              circle at 0% 0%,
+              rgba(
+                37,
+                99,
+                235,
+                .12
+              ),
+              transparent 32%
+            ),
 
-          left:
-            "-160px",
+            radial-gradient(
+              circle at 100% 100%,
+              rgba(
+                79,
+                70,
+                229,
+                .10
+              ),
+              transparent 32%
+            ),
 
-          filter:
-            "blur(70px)",
+            linear-gradient(
+              135deg,
+              #eef4ff,
+              #f8fafc
+            );
 
-          pointerEvents:
-            "none"
-
-        }}
-      />
+        }
 
 
-      <div
-        style={{
+        /* ==================================================
+           BACKGROUND
+        ================================================== */
 
-          position:
-            "absolute",
+        .driver-login-bg-one {
 
-          width:
-            "360px",
+          position: absolute;
 
-          height:
-            "360px",
+          width: 420px;
 
-          borderRadius:
-            "50%",
+          height: 420px;
+
+          top: -180px;
+
+          left: -160px;
+
+          border-radius: 50%;
 
           background:
-            "rgba(91,61,245,0.12)",
+            rgba(
+              37,
+              99,
+              235,
+              .11
+            );
 
-          bottom:
-            "-150px",
+          filter: blur(70px);
 
-          right:
-            "-120px",
+          pointer-events: none;
 
-          filter:
-            "blur(70px)",
+        }
 
-          pointerEvents:
-            "none"
 
-        }}
-      />
+        .driver-login-bg-two {
 
+          position: absolute;
 
-      {/* ================================================= */}
-      {/* NOTIFICATION */}
-      {/* ================================================= */}
+          width: 360px;
 
-      {notification && (
+          height: 360px;
 
-        <div
-          style={{
+          right: -130px;
 
-            position:
-              "fixed",
+          bottom: -160px;
 
-            top:
-              "20px",
-
-            right:
-              "20px",
-
-            width:
-              "min(390px, calc(100vw - 40px))",
-
-            background:
-              "rgba(255,255,255,0.96)",
-
-            backdropFilter:
-              "blur(18px)",
-
-            WebkitBackdropFilter:
-              "blur(18px)",
-
-            borderRadius:
-              "18px",
-
-            padding:
-              "15px",
-
-            display:
-              "flex",
-
-            alignItems:
-              "center",
-
-            gap:
-              "12px",
-
-            boxShadow:
-              "0 18px 50px rgba(15,23,42,0.16)",
-
-            border:
-              "1px solid rgba(226,232,240,0.9)",
-
-            zIndex:
-              99999,
-
-            animation:
-              "driverNotificationIn .35s ease"
-
-          }}
-        >
-
-          {/* ICON */}
-
-          <div
-            style={{
-
-              width:
-                "42px",
-
-              height:
-                "42px",
-
-              minWidth:
-                "42px",
-
-              borderRadius:
-                "13px",
-
-              display:
-                "flex",
-
-              alignItems:
-                "center",
-
-              justifyContent:
-                "center",
-
-              background:
-                `${getNotificationColor()}18`,
-
-              color:
-                getNotificationColor(),
-
-              fontSize:
-                "18px"
-
-            }}
-          >
-
-            {getNotificationIcon()}
-
-          </div>
-
-
-          {/* TEXT */}
-
-          <div
-            style={{
-              flex: 1,
-              minWidth: 0
-            }}
-          >
-
-            <div
-              style={{
-
-                fontSize:
-                  "13px",
-
-                fontWeight:
-                  "900",
-
-                color:
-                  "#0f172a"
-
-              }}
-            >
-
-              {notification.title}
-
-            </div>
-
-
-            <div
-              style={{
-
-                marginTop:
-                  "3px",
-
-                fontSize:
-                  "12px",
-
-                lineHeight:
-                  "1.45",
-
-                color:
-                  "#64748b"
-
-              }}
-            >
-
-              {notification.message}
-
-            </div>
-
-          </div>
-
-
-          {/* CLOSE */}
-
-          <button
-            onClick={() =>
-              setNotification(null)
-            }
-
-            style={{
-
-              border:
-                "none",
-
-              background:
-                "transparent",
-
-              color:
-                "#94a3b8",
-
-              fontSize:
-                "18px",
-
-              cursor:
-                "pointer",
-
-              padding:
-                "4px"
-
-            }}
-          >
-            ×
-          </button>
-
-        </div>
-
-      )}
-
-
-      {/* ================================================= */}
-      {/* MAIN CARD */}
-      {/* ================================================= */}
-
-      <div
-        style={{
-
-          width:
-            "100%",
-
-          maxWidth:
-            "440px",
+          border-radius: 50%;
 
           background:
-            "rgba(255,255,255,0.94)",
+            rgba(
+              79,
+              70,
+              229,
+              .11
+            );
 
-          backdropFilter:
-            "blur(20px)",
+          filter: blur(70px);
 
-          WebkitBackdropFilter:
-            "blur(20px)",
+          pointer-events: none;
 
-          borderRadius:
-            "28px",
+        }
+
+
+        /* ==================================================
+           CARD PC
+        ================================================== */
+
+        .driver-login-card {
+
+          width: 100%;
+
+          max-width: 440px;
 
           padding:
-            "clamp(24px, 6vw, 42px)",
+            40px;
 
-          boxSizing:
-            "border-box",
+          position: relative;
 
-          position:
-            "relative",
+          z-index: 2;
 
-          zIndex:
-            2,
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              .96
+            );
 
           border:
-            "1px solid rgba(255,255,255,0.85)",
+            1px solid
+            rgba(
+              226,
+              232,
+              240,
+              .9
+            );
 
-          boxShadow:
-            "0 25px 70px rgba(15,23,42,0.12)"
+          border-radius: 28px;
 
-        }}
+          box-shadow:
+            0 30px 80px
+            rgba(
+              15,
+              23,
+              42,
+              .12
+            );
+
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .driver-login-header {
+
+          text-align: center;
+
+        }
+
+
+        .driver-login-logo {
+
+          width: 78px;
+
+          height: 78px;
+
+          margin: 0 auto;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border-radius: 23px;
+
+          background:
+            linear-gradient(
+              135deg,
+              #2563eb,
+              #4f46e5
+            );
+
+          color: white;
+
+          font-size: 30px;
+
+          box-shadow:
+            0 15px 35px
+            rgba(
+              37,
+              99,
+              235,
+              .28
+            );
+
+        }
+
+
+        .driver-login-brand {
+
+          margin-top: 17px;
+
+          color: #2563eb;
+
+          font-size: 10px;
+
+          font-weight: 950;
+
+          letter-spacing: 1.8px;
+
+        }
+
+
+        .driver-login-title {
+
+          margin:
+            7px 0 0;
+
+          color: #0f172a;
+
+          font-size: 32px;
+
+          line-height: 1.1;
+
+          font-weight: 950;
+
+          letter-spacing: -.8px;
+
+        }
+
+
+        .driver-login-subtitle {
+
+          margin:
+            10px auto 0;
+
+          max-width: 380px;
+
+          color: #64748b;
+
+          font-size: 13px;
+
+          line-height: 1.6;
+
+        }
+
+
+        /* ==================================================
+           SECURITY
+        ================================================== */
+
+        .driver-login-security {
+
+          margin-top: 22px;
+
+          padding:
+            11px 13px;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          gap: 8px;
+
+          border-radius: 13px;
+
+          background: #f8fafc;
+
+          border:
+            1px solid
+            #e2e8f0;
+
+          color: #475569;
+
+          font-size: 10px;
+
+          font-weight: 800;
+
+        }
+
+
+        .driver-login-security svg {
+
+          color: #2563eb;
+
+        }
+
+
+        /* ==================================================
+           FORM
+        ================================================== */
+
+        .driver-login-form {
+
+          margin-top: 22px;
+
+        }
+
+
+        .driver-login-field {
+
+          margin-top: 16px;
+
+        }
+
+
+        .driver-login-field label {
+
+          display: block;
+
+          margin-bottom: 8px;
+
+          color: #334155;
+
+          font-size: 12px;
+
+          font-weight: 850;
+
+        }
+
+
+        .driver-login-input {
+
+          width: 100%;
+
+          min-height: 53px;
+
+          display: flex;
+
+          align-items: center;
+
+          gap: 10px;
+
+          padding:
+            0 14px;
+
+          border:
+            1px solid
+            #dbe3ef;
+
+          border-radius: 15px;
+
+          background: #f8fafc;
+
+          transition:
+            .2s ease;
+
+        }
+
+
+        .driver-login-input:focus-within {
+
+          background: white;
+
+          border-color:
+            #2563eb;
+
+          box-shadow:
+            0 0 0 4px
+            rgba(
+              37,
+              99,
+              235,
+              .09
+            );
+
+        }
+
+
+        .driver-login-input-icon {
+
+          flex-shrink: 0;
+
+          display: flex;
+
+          color: #64748b;
+
+          font-size: 14px;
+
+        }
+
+
+        .driver-login-input input {
+
+          width: 100%;
+
+          min-width: 0;
+
+          border: none;
+
+          outline: none;
+
+          background: transparent;
+
+          color: #0f172a;
+
+          font-size: 14px;
+
+          padding:
+            15px 0;
+
+        }
+
+
+        .driver-login-input input::placeholder {
+
+          color: #94a3b8;
+
+        }
+
+
+        /* ==================================================
+           PASSWORD BUTTON
+        ================================================== */
+
+        .driver-login-password-button {
+
+          width: 34px;
+
+          height: 34px;
+
+          flex-shrink: 0;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border: none;
+
+          border-radius: 9px;
+
+          background: transparent;
+
+          color: #64748b;
+
+          cursor: pointer;
+
+        }
+
+
+        /* ==================================================
+           LOGIN BUTTON
+        ================================================== */
+
+        .driver-login-button {
+
+          width: 100%;
+
+          min-height: 55px;
+
+          margin-top: 24px;
+
+          border: none;
+
+          border-radius: 15px;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          gap: 9px;
+
+          background:
+            linear-gradient(
+              135deg,
+              #2563eb,
+              #4f46e5
+            );
+
+          color: white;
+
+          font-size: 14px;
+
+          font-weight: 950;
+
+          cursor: pointer;
+
+          box-shadow:
+            0 12px 30px
+            rgba(
+              37,
+              99,
+              235,
+              .25
+            );
+
+          transition:
+            .2s ease;
+
+        }
+
+
+        .driver-login-button:hover {
+
+          transform:
+            translateY(-1px);
+
+          box-shadow:
+            0 16px 35px
+            rgba(
+              37,
+              99,
+              235,
+              .30
+            );
+
+        }
+
+
+        .driver-login-button:disabled {
+
+          opacity: .65;
+
+          cursor:
+            not-allowed;
+
+          transform: none;
+
+          box-shadow: none;
+
+        }
+
+
+        /* ==================================================
+           REGISTER
+        ================================================== */
+
+        .driver-login-register {
+
+          margin-top: 21px;
+
+          padding-top: 19px;
+
+          border-top:
+            1px solid
+            #eef2f7;
+
+          text-align: center;
+
+          color: #64748b;
+
+          font-size: 12px;
+
+        }
+
+
+        .driver-login-register a {
+
+          display: inline-flex;
+
+          align-items: center;
+
+          gap: 5px;
+
+          margin-left: 5px;
+
+          color: #2563eb;
+
+          text-decoration: none;
+
+          font-weight: 900;
+
+        }
+
+
+        .driver-login-footer {
+
+          margin-top: 16px;
+
+          text-align: center;
+
+          color: #94a3b8;
+
+          font-size: 9px;
+
+          font-weight: 700;
+
+        }
+
+
+        /* ==================================================
+           NOTIFICATION
+        ================================================== */
+
+        .driver-login-notification {
+
+          position: fixed;
+
+          top: 18px;
+
+          right: 18px;
+
+          z-index: 999999;
+
+          width:
+            min(
+              410px,
+              calc(100vw - 36px)
+            );
+
+          min-height: 68px;
+
+          display: flex;
+
+          align-items: center;
+
+          gap: 12px;
+
+          padding: 13px;
+
+          border:
+            1px solid
+            #e2e8f0;
+
+          border-radius: 17px;
+
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              .98
+            );
+
+          backdrop-filter:
+            blur(18px);
+
+          -webkit-backdrop-filter:
+            blur(18px);
+
+          box-shadow:
+            0 20px 60px
+            rgba(
+              15,
+              23,
+              42,
+              .18
+            );
+
+          animation:
+            driverLoginNotificationIn
+            .3s ease;
+
+        }
+
+
+        .driver-login-notification-icon {
+
+          width: 42px;
+
+          height: 42px;
+
+          flex-shrink: 0;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border-radius: 12px;
+
+          font-size: 17px;
+
+        }
+
+
+        .driver-login-notification-content {
+
+          min-width: 0;
+
+          flex: 1;
+
+        }
+
+
+        .driver-login-notification-title {
+
+          color: #0f172a;
+
+          font-size: 12px;
+
+          font-weight: 950;
+
+        }
+
+
+        .driver-login-notification-message {
+
+          margin-top: 3px;
+
+          color: #64748b;
+
+          font-size: 11px;
+
+          line-height: 1.45;
+
+          overflow-wrap:
+            anywhere;
+
+        }
+
+
+        .driver-login-notification-close {
+
+          width: 28px;
+
+          height: 28px;
+
+          flex-shrink: 0;
+
+          border: none;
+
+          border-radius: 8px;
+
+          background: #f1f5f9;
+
+          color: #64748b;
+
+          font-size: 17px;
+
+          cursor: pointer;
+
+        }
+
+
+        /* ==================================================
+           ANIMATIONS
+        ================================================== */
+
+        @keyframes driverLoginNotificationIn {
+
+          from {
+
+            opacity: 0;
+
+            transform:
+              translateY(-12px)
+              scale(.97);
+
+          }
+
+          to {
+
+            opacity: 1;
+
+            transform:
+              translateY(0)
+              scale(1);
+
+          }
+
+        }
+
+
+        @keyframes driverLoginSpin {
+
+          from {
+
+            transform:
+              rotate(0deg);
+
+          }
+
+          to {
+
+            transform:
+              rotate(360deg);
+
+          }
+
+        }
+
+
+        /* ==================================================
+           📱 MOBILE — PLEIN ÉCRAN
+        ================================================== */
+
+        @media (
+          max-width: 600px
+        ) {
+
+          .driver-login-page {
+
+            /*
+             * 🔥 TOUTE LA LARGEUR
+             */
+
+            width: 100vw;
+
+            min-height: 100dvh;
+
+            min-height: 100vh;
+
+            padding: 0;
+
+            display: flex;
+
+            align-items: stretch;
+
+            justify-content: stretch;
+
+            background:
+              linear-gradient(
+                135deg,
+                #f1f5ff,
+                #f8fafc
+              );
+
+          }
+
+
+          /*
+           * 🔥 LA CARTE DEVIENT
+           * LA PAGE ELLE-MÊME
+           */
+
+          .driver-login-card {
+
+            width: 100%;
+
+            max-width: none;
+
+            min-height: 100dvh;
+
+            min-height: 100vh;
+
+            padding:
+              28px
+              18px
+              30px;
+
+            border: none;
+
+            border-radius: 0;
+
+            box-shadow: none;
+
+            background:
+              rgba(
+                255,
+                255,
+                255,
+                .98
+              );
+
+            display: flex;
+
+            flex-direction: column;
+
+          }
+
+
+          .driver-login-bg-one,
+          .driver-login-bg-two {
+
+            display: none;
+
+          }
+
+
+          /* HEADER */
+
+          .driver-login-logo {
+
+            width: 68px;
+
+            height: 68px;
+
+            border-radius: 20px;
+
+            font-size: 27px;
+
+          }
+
+
+          .driver-login-brand {
+
+            margin-top: 13px;
+
+            font-size: 9px;
+
+          }
+
+
+          .driver-login-title {
+
+            font-size:
+              clamp(
+                26px,
+                8vw,
+                32px
+              );
+
+          }
+
+
+          .driver-login-subtitle {
+
+            max-width: 340px;
+
+            font-size: 12px;
+
+          }
+
+
+          /* SECURITY */
+
+          .driver-login-security {
+
+            margin-top: 18px;
+
+            font-size: 9px;
+
+          }
+
+
+          /* FORM */
+
+          .driver-login-form {
+
+            margin-top: 16px;
+
+          }
+
+
+          .driver-login-field {
+
+            margin-top: 14px;
+
+          }
+
+
+          .driver-login-field label {
+
+            font-size: 11px;
+
+          }
+
+
+          .driver-login-input {
+
+            min-height: 54px;
+
+            border-radius: 14px;
+
+          }
+
+
+          .driver-login-input input {
+
+            font-size: 14px;
+
+            padding:
+              15px 0;
+
+          }
+
+
+          /* BUTTON */
+
+          .driver-login-button {
+
+            min-height: 55px;
+
+            margin-top: 21px;
+
+          }
+
+
+          /* FOOTER */
+
+          .driver-login-register {
+
+            margin-top: 20px;
+
+          }
+
+
+          /*
+           * 🔔 NOTIFICATION MOBILE
+           */
+
+          .driver-login-notification {
+
+            top: 10px;
+
+            left: 10px;
+
+            right: 10px;
+
+            width: auto;
+
+          }
+
+        }
+
+
+        /* ==================================================
+           📱 PETITS ÉCRANS
+        ================================================== */
+
+        @media (
+          max-width: 380px
+        ) {
+
+          .driver-login-card {
+
+            padding:
+              22px
+              14px
+              25px;
+
+          }
+
+
+          .driver-login-logo {
+
+            width: 62px;
+
+            height: 62px;
+
+            font-size: 24px;
+
+          }
+
+
+          .driver-login-title {
+
+            font-size: 25px;
+
+          }
+
+
+          .driver-login-subtitle {
+
+            font-size: 11px;
+
+          }
+
+
+          .driver-login-input {
+
+            min-height: 52px;
+
+          }
+
+
+          .driver-login-input input {
+
+            font-size: 13px;
+
+          }
+
+
+          .driver-login-button {
+
+            min-height: 53px;
+
+            font-size: 13px;
+
+          }
+
+        }
+
+      `}</style>
+
+
+      {/* ==================================================
+          PAGE
+      ================================================== */}
+
+      <main
+        className="
+          driver-login-page
+        "
+        onKeyDown={
+          handleKeyDown
+        }
       >
 
 
-        {/* ================================================= */}
-        {/* BRAND */}
-        {/* ================================================= */}
+        {/* BACKGROUND */}
 
         <div
-          style={{
-
-            display:
-              "flex",
-
-            flexDirection:
-              "column",
-
-            alignItems:
-              "center",
-
-            textAlign:
-              "center"
-
-          }}
-        >
-
-          <div
-            style={{
-
-              width:
-                "76px",
-
-              height:
-                "76px",
-
-              borderRadius:
-                "22px",
-
-              display:
-                "flex",
-
-              alignItems:
-                "center",
-
-              justifyContent:
-                "center",
-
-              background:
-                "linear-gradient(135deg,#2563eb,#4f46e5)",
-
-              color:
-                "white",
-
-              fontSize:
-                "30px",
-
-              boxShadow:
-                "0 14px 32px rgba(37,99,235,0.28)"
-
-            }}
-          >
-
-            <FaTruck />
-
-          </div>
-
-
-          <div
-            style={{
-
-              marginTop:
-                "20px",
-
-              fontSize:
-                "12px",
-
-              fontWeight:
-                "900",
-
-              letterSpacing:
-                "1.5px",
-
-              color:
-                "#2563eb"
-
-            }}
-          >
-
-            KONAN SHOPPING
-
-          </div>
-
-
-          <h1
-            style={{
-
-              margin:
-                "8px 0 0",
-
-              fontSize:
-                "clamp(25px,7vw,34px)",
-
-              lineHeight:
-                "1.1",
-
-              fontWeight:
-                "900",
-
-              letterSpacing:
-                "-1px",
-
-              color:
-                "#0f172a"
-
-            }}
-          >
-
-            Centre Livreur
-
-          </h1>
-
-
-          <p
-            style={{
-
-              margin:
-                "10px 0 0",
-
-              color:
-                "#64748b",
-
-              fontSize:
-                "13px",
-
-              lineHeight:
-                "1.6"
-
-            }}
-          >
-
-            Connectez-vous pour gérer
-            vos livraisons en temps réel.
-
-          </p>
-
-        </div>
-
-
-        {/* ================================================= */}
-        {/* SECURITY BADGE */}
-        {/* ================================================= */}
+          className="
+            driver-login-bg-one
+          "
+        />
 
         <div
-          style={{
-
-            marginTop:
-              "24px",
-
-            padding:
-              "11px 13px",
-
-            borderRadius:
-              "14px",
-
-            background:
-              "#f8fafc",
-
-            border:
-              "1px solid #e2e8f0",
-
-            display:
-              "flex",
-
-            alignItems:
-              "center",
-
-            gap:
-              "9px",
-
-            color:
-              "#475569",
-
-            fontSize:
-              "11px",
-
-            fontWeight:
-              "700"
-
-          }}
-        >
-
-          <FaShieldAlt
-            style={{
-              color:
-                "#2563eb",
-              fontSize:
-                "14px"
-            }}
-          />
-
-          Connexion sécurisée du livreur
-
-        </div>
+          className="
+            driver-login-bg-two
+          "
+        />
 
 
-        {/* ================================================= */}
-        {/* EMAIL */}
-        {/* ================================================= */}
+        {/* =================================================
+            🔔 NOTIFICATION
+        ================================================= */}
 
-        <div
-          style={{
-            marginTop:
-              "24px"
-          }}
-        >
-
-          <label
-            style={{
-
-              display:
-                "block",
-
-              marginBottom:
-                "8px",
-
-              fontSize:
-                "12px",
-
-              fontWeight:
-                "800",
-
-              color:
-                "#334155"
-
-            }}
-          >
-
-            Adresse email
-
-          </label>
-
+        {notification && (
 
           <div
-            style={{
-
-              display:
-                "flex",
-
-              alignItems:
-                "center",
-
-              gap:
-                "10px",
-
-              background:
-                "#f8fafc",
-
-              border:
-                "1px solid #e2e8f0",
-
-              borderRadius:
-                "15px",
-
-              padding:
-                "0 14px",
-
-              transition:
-                "all .2s ease"
-
-            }}
+            className="
+              driver-login-notification
+            "
           >
 
-            <FaEnvelope
+            <div
+              className="
+                driver-login-notification-icon
+              "
               style={{
+
                 color:
-                  "#64748b",
-                fontSize:
-                  "14px",
-                flexShrink:
-                  0
-              }}
-            />
-
-
-            <input
-
-              type="email"
-
-              value={
-                email
-              }
-
-              onChange={
-                e =>
-                  setEmail(
-                    e.target.value
-                  )
-              }
-
-              onKeyDown={
-                handleKeyDown
-              }
-
-              placeholder=
-                "votre@email.com"
-
-              autoComplete=
-                "email"
-
-              style={{
-
-                width:
-                  "100%",
-
-                minWidth:
-                  0,
-
-                padding:
-                  "15px 0",
-
-                border:
-                  "none",
-
-                outline:
-                  "none",
+                  getNotificationColor(),
 
                 background:
-                  "transparent",
-
-                fontSize:
-                  "14px",
-
-                color:
-                  "#0f172a"
+                  `${getNotificationColor()}18`
 
               }}
+            >
 
-            />
-
-          </div>
-
-        </div>
-
-
-        {/* ================================================= */}
-        {/* PASSWORD */}
-        {/* ================================================= */}
-
-        <div
-          style={{
-            marginTop:
-              "17px"
-          }}
-        >
-
-          <label
-            style={{
-
-              display:
-                "block",
-
-              marginBottom:
-                "8px",
-
-              fontSize:
-                "12px",
-
-              fontWeight:
-                "800",
-
-              color:
-                "#334155"
-
-            }}
-          >
-
-            Mot de passe
-
-          </label>
-
-
-          <div
-            style={{
-
-              display:
-                "flex",
-
-              alignItems:
-                "center",
-
-              gap:
-                "10px",
-
-              background:
-                "#f8fafc",
-
-              border:
-                "1px solid #e2e8f0",
-
-              borderRadius:
-                "15px",
-
-              padding:
-                "0 14px"
-
-            }}
-          >
-
-            <FaLock
-              style={{
-
-                color:
-                  "#64748b",
-
-                fontSize:
-                  "14px",
-
-                flexShrink:
-                  0
-
-              }}
-            />
-
-
-            <input
-
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
+              {
+                getNotificationIcon()
               }
 
-              value={
-                password
-              }
+            </div>
 
-              onChange={
-                e =>
-                  setPassword(
-                    e.target.value
-                  )
-              }
 
-              onKeyDown={
-                handleKeyDown
-              }
+            <div
+              className="
+                driver-login-notification-content
+              "
+            >
 
-              placeholder=
-                "Votre mot de passe"
+              <div
+                className="
+                  driver-login-notification-title
+                "
+              >
 
-              autoComplete=
-                "current-password"
+                {
+                  notification.title
+                }
 
-              style={{
+              </div>
 
-                flex:
-                  1,
 
-                minWidth:
-                  0,
+              <div
+                className="
+                  driver-login-notification-message
+                "
+              >
 
-                padding:
-                  "15px 0",
+                {
+                  notification.message
+                }
 
-                border:
-                  "none",
+              </div>
 
-                outline:
-                  "none",
-
-                background:
-                  "transparent",
-
-                fontSize:
-                  "14px",
-
-                color:
-                  "#0f172a"
-
-              }}
-
-            />
+            </div>
 
 
             <button
 
               type="button"
 
+              className="
+                driver-login-notification-close
+              "
+
               onClick={() =>
-                setShowPassword(
-                  !showPassword
+                setNotification(
+                  null
                 )
               }
 
-              aria-label={
-                showPassword
-                  ? "Masquer le mot de passe"
-                  : "Afficher le mot de passe"
-              }
-
-              style={{
-
-                border:
-                  "none",
-
-                background:
-                  "transparent",
-
-                color:
-                  "#64748b",
-
-                cursor:
-                  "pointer",
-
-                padding:
-                  "5px",
-
-                display:
-                  "flex",
-
-                alignItems:
-                  "center",
-
-                justifyContent:
-                  "center"
-
-              }}
             >
 
-              {showPassword
-                ? <FaEyeSlash />
-                : <FaEye />
-              }
+              ×
 
             </button>
 
           </div>
 
-        </div>
+        )}
 
 
-        {/* ================================================= */}
-        {/* LOGIN BUTTON */}
-        {/* ================================================= */}
+        {/* =================================================
+            🚚 CARTE
+        ================================================= */}
 
-        <button
-
-          type="button"
-
-          onClick={
-            login
-          }
-
-          disabled={
-            loading
-          }
-
-          style={{
-
-            width:
-              "100%",
-
-            marginTop:
-              "24px",
-
-            border:
-              "none",
-
-            borderRadius:
-              "15px",
-
-            padding:
-              "15px 18px",
-
-            background:
-              loading
-                ? "#94a3b8"
-                : "linear-gradient(135deg,#2563eb,#4f46e5)",
-
-            color:
-              "white",
-
-            display:
-              "flex",
-
-            alignItems:
-              "center",
-
-            justifyContent:
-              "center",
-
-            gap:
-              "10px",
-
-            fontSize:
-              "13px",
-
-            fontWeight:
-              "900",
-
-            cursor:
-              loading
-                ? "not-allowed"
-                : "pointer",
-
-            boxShadow:
-              loading
-                ? "none"
-                : "0 12px 28px rgba(37,99,235,0.25)",
-
-            transition:
-              "all .2s ease"
-
-          }}
+        <section
+          className="
+            driver-login-card
+          "
         >
 
-          {loading ? (
 
-            <>
-              <FaSpinner
-                style={{
-                  animation:
-                    "driverSpin 1s linear infinite"
-                }}
-              />
+          {/* =================================================
+              HEADER
+          ================================================= */}
 
-              Connexion en cours...
+          <header
+            className="
+              driver-login-header
+            "
+          >
 
-            </>
-
-          ) : (
-
-            <>
+            <div
+              className="
+                driver-login-logo
+              "
+            >
 
               <FaTruck />
 
-              Se connecter
-
-              <FaArrowRight />
-
-            </>
-
-          )}
-
-        </button>
+            </div>
 
 
-        {/* ================================================= */}
-        {/* REGISTER */}
-        {/* ================================================= */}
+            <div
+              className="
+                driver-login-brand
+              "
+            >
 
-        <div
-          style={{
+              KONAN SHOPPING
 
-            marginTop:
-              "22px",
+            </div>
 
-            paddingTop:
-              "20px",
 
-            borderTop:
-              "1px solid #eef2f7",
+            <h1
+              className="
+                driver-login-title
+              "
+            >
 
-            textAlign:
-              "center",
+              Centre Livreur
 
-            fontSize:
-              "12px",
+            </h1>
 
-            color:
-              "#64748b"
 
-          }}
-        >
+            <p
+              className="
+                driver-login-subtitle
+              "
+            >
 
-          Pas encore livreur ?
+              Connectez-vous pour gérer
+              vos commandes, vos livraisons
+              et votre activité en temps réel.
 
-          <Link
+            </p>
 
-            to="/driver-register"
+          </header>
 
-            style={{
 
-              display:
-                "inline-flex",
+          {/* =================================================
+              🔐 SÉCURITÉ
+          ================================================= */}
 
-              alignItems:
-                "center",
-
-              gap:
-                "5px",
-
-              marginLeft:
-                "5px",
-
-              color:
-                "#2563eb",
-
-              textDecoration:
-                "none",
-
-              fontWeight:
-                "900"
-
-            }}
+          <div
+            className="
+              driver-login-security
+            "
           >
 
-            <FaUserPlus />
+            <FaShieldAlt />
 
-            Créer un compte
+            Connexion sécurisée du livreur
 
-          </Link>
-
-        </div>
+          </div>
 
 
-        {/* ================================================= */}
-        {/* FOOTER */}
-        {/* ================================================= */}
+          {/* =================================================
+              FORMULAIRE
+          ================================================= */}
 
-        <div
-          style={{
-
-            marginTop:
-              "18px",
-
-            textAlign:
-              "center",
-
-            fontSize:
-              "10px",
-
-            color:
-              "#94a3b8"
-
-          }}
-        >
-
-          🚚 KONAN SHOPPING CAMEROUN
-
-        </div>
-
-      </div>
+          <div
+            className="
+              driver-login-form
+            "
+          >
 
 
-      {/* ================================================= */}
-      {/* ANIMATIONS */}
-      {/* ================================================= */}
+            {/* EMAIL */}
 
-      <style>
+            <div
+              className="
+                driver-login-field
+              "
+            >
 
-        {`
+              <label>
 
-          @keyframes driverNotificationIn {
+                Adresse email
 
-            from {
-
-              opacity: 0;
-
-              transform:
-                translateY(-15px)
-                scale(.97);
-
-            }
-
-            to {
-
-              opacity: 1;
-
-              transform:
-                translateY(0)
-                scale(1);
-
-            }
-
-          }
+              </label>
 
 
-          @keyframes driverSpin {
+              <div
+                className="
+                  driver-login-input
+                "
+              >
 
-            from {
+                <span
+                  className="
+                    driver-login-input-icon
+                  "
+                >
 
-              transform:
-                rotate(0deg);
+                  <FaEnvelope />
 
-            }
-
-            to {
-
-              transform:
-                rotate(360deg);
-
-            }
-
-          }
+                </span>
 
 
-          @media (max-width: 480px) {
+                <input
 
-            body {
+                  type="email"
 
-              overflow-x:
-                hidden;
+                  value={
+                    email
+                  }
 
-            }
+                  onChange={
+                    e =>
+                      setEmail(
+                        e.target.value
+                      )
+                  }
 
-          }
+                  onKeyDown={
+                    handleKeyDown
+                  }
 
-        `}
+                  placeholder="
+                    votre@email.com
+                  "
 
-      </style>
+                  autoComplete="
+                    email
+                  "
 
-    </div>
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* PASSWORD */}
+
+            <div
+              className="
+                driver-login-field
+              "
+            >
+
+              <label>
+
+                Mot de passe
+
+              </label>
+
+
+              <div
+                className="
+                  driver-login-input
+                "
+              >
+
+                <span
+                  className="
+                    driver-login-input-icon
+                  "
+                >
+
+                  <FaLock />
+
+                </span>
+
+
+                <input
+
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
+
+                  value={
+                    password
+                  }
+
+                  onChange={
+                    e =>
+                      setPassword(
+                        e.target.value
+                      )
+                  }
+
+                  onKeyDown={
+                    handleKeyDown
+                  }
+
+                  placeholder="
+                    Votre mot de passe
+                  "
+
+                  autoComplete="
+                    current-password
+                  "
+
+                />
+
+
+                <button
+
+                  type="button"
+
+                  className="
+                    driver-login-password-button
+                  "
+
+                  onClick={() =>
+                    setShowPassword(
+                      previous =>
+                        !previous
+                    )
+                  }
+
+                  aria-label={
+                    showPassword
+                      ? "Masquer le mot de passe"
+                      : "Afficher le mot de passe"
+                  }
+
+                >
+
+                  {showPassword
+
+                    ? <FaEyeSlash />
+
+                    : <FaEye />
+
+                  }
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                🚀 CONNEXION
+            ================================================= */}
+
+            <button
+
+              type="button"
+
+              className="
+                driver-login-button
+              "
+
+              onClick={
+                login
+              }
+
+              disabled={
+                loading
+              }
+
+            >
+
+              {loading ? (
+
+                <>
+
+                  <FaSpinner
+                    style={{
+                      animation:
+                        "driverLoginSpin 1s linear infinite"
+                    }}
+                  />
+
+                  Connexion en cours...
+
+                </>
+
+              ) : (
+
+                <>
+
+                  <FaTruck />
+
+                  Se connecter
+
+                  <FaArrowRight />
+
+                </>
+
+              )}
+
+            </button>
+
+
+            {/* =================================================
+                👤 INSCRIPTION
+            ================================================= */}
+
+            <div
+              className="
+                driver-login-register
+              "
+            >
+
+              Pas encore livreur ?
+
+              <Link
+                to="/driver-register"
+              >
+
+                <FaUserPlus />
+
+                Créer un compte
+
+              </Link>
+
+            </div>
+
+
+            {/* =================================================
+                FOOTER
+            ================================================= */}
+
+            <div
+              className="
+                driver-login-footer
+              "
+            >
+
+              🚚 KONAN SHOPPING CAMEROUN
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </>
 
   );
 
