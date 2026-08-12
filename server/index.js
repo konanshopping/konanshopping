@@ -4098,56 +4098,30 @@ app.post(
 
     try {
 
-      const driver =
-        await Driver.findById(
-          req.params.id
-        );
+      console.log(
+        "📲 TELEGRAM CONNECT"
+      );
 
+      console.log(
+        "👤 Driver ID :",
+        req.params.id
+      );
 
-      if (!driver) {
-
-        return res.status(404).json({
-
-          success: false,
-
-          message:
-            "Livreur introuvable"
-
-        });
-
-      }
-
-
-      // ==========================================
-      // 🔐 TOKEN UNIQUE
-      // ==========================================
-
-      const token =
-        crypto
-          .randomBytes(24)
-          .toString("hex");
-
-
-      driver.telegramConnectToken =
-        token;
-
-      driver.telegramConnectExpires =
-        new Date(
-          Date.now() +
-          10 * 60 * 1000
-        );
-
-
-      await driver.save();
-
-
-      // ==========================================
-      // 🤖 NOM DU BOT
-      // ==========================================
+      // ==================================================
+      // 🔐 VÉRIFICATION CONFIGURATION TELEGRAM
+      // ==================================================
 
       const botUsername =
-        process.env.TELEGRAM_BOT_USERNAME;
+        String(
+          process.env.TELEGRAM_BOT_USERNAME || ""
+        ).trim();
 
+      console.log(
+        "🤖 TELEGRAM_BOT_USERNAME :",
+        botUsername
+          ? "✅ DISPONIBLE"
+          : "❌ MANQUANT"
+      );
 
       if (!botUsername) {
 
@@ -4162,15 +4136,75 @@ app.post(
 
       }
 
+      // ==================================================
+      // 👤 RECHERCHER LE LIVREUR
+      // ==================================================
+
+      const driver =
+        await Driver.findById(
+          req.params.id
+        );
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+      // ==================================================
+      // 🔐 GÉNÉRER UN TOKEN UNIQUE
+      // ==================================================
+
+      const token =
+        crypto
+          .randomBytes(24)
+          .toString("hex");
+
+      // ==================================================
+      // 💾 ENREGISTRER LE TOKEN
+      // ==================================================
+
+      driver.telegramConnectToken =
+        token;
+
+      driver.telegramConnectExpires =
+        new Date(
+          Date.now() +
+          10 * 60 * 1000
+        );
+
+      await driver.save();
+
+      // ==================================================
+      // 🤖 NETTOYER LE NOM DU BOT
+      // ==================================================
+
+      const cleanBotUsername =
+        botUsername
+          .replace(/^@/, "")
+          .trim();
+
+      // ==================================================
+      // 🔗 LIEN TELEGRAM
+      // ==================================================
 
       const telegramUrl =
-        `https://t.me/${botUsername}?start=driver_${token}`;
-
+        `https://t.me/${cleanBotUsername}?start=driver_${token}`;
 
       console.log(
-        `📲 Lien Telegram généré pour ${driver.name}`
+        `✅ Lien Telegram généré pour ${driver.name}`
       );
 
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
 
       return res.json({
 
@@ -4178,26 +4212,25 @@ app.post(
 
         telegramUrl,
 
-        expiresIn:
-          600
+        expiresIn: 600
 
       });
-
 
     } catch (err) {
 
       console.error(
         "❌ TELEGRAM CONNECT ERROR:",
+        err.response?.data ||
+        err.message ||
         err
       );
-
 
       return res.status(500).json({
 
         success: false,
 
         message:
-          "Erreur serveur"
+          "Erreur serveur lors de la connexion Telegram"
 
       });
 

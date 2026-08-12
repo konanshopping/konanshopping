@@ -883,7 +883,7 @@ export default function DriverTracking() {
         const response =
           await axios.post(
 
-            `${API}/api/driver/${driver._id}/telegram-connect`
+            `${API}/driver/${driver._id}/telegram-connect`
 
           );
 
