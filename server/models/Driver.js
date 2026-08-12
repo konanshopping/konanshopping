@@ -1,61 +1,140 @@
-const mongoose =
-  require("mongoose");
+const mongoose = require("mongoose");
 
-const DriverSchema =
-  new mongoose.Schema({
+const DriverSchema = new mongoose.Schema({
 
-    name: String,
+  // ==========================================
+  // 👤 INFORMATIONS LIVREUR
+  // ==========================================
 
-    email: String,
+  name: {
+    type: String,
+    required: true,
+  },
 
-    password: String,
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
 
-    phone: String,
+  password: {
+    type: String,
+    required: true,
+  },
 
-    city: String,
+  phone: {
+    type: String,
+    default: "",
+  },
 
-    vehicle: String,
+  city: {
+    type: String,
+    default: "",
+  },
 
-    plate: String,
+  vehicle: {
+    type: String,
+    default: "",
+  },
 
-    photo: {
-      type: String,
-      default: "",
+  plate: {
+    type: String,
+    default: "",
+  },
+
+  photo: {
+    type: String,
+    default: "",
+  },
+
+
+  // ==========================================
+  // 🟢 DISPONIBILITÉ
+  // ==========================================
+
+  available: {
+    type: Boolean,
+    default: true,
+  },
+
+  isOnline: {
+    type: Boolean,
+    default: false,
+  },
+
+
+  // ==========================================
+  // 📍 POSITION ACTUELLE DU LIVREUR
+  // ==========================================
+
+  currentLocation: {
+
+    lat: {
+      type: Number,
+      default: 4.0511,
     },
 
-    available: {
-      type: Boolean,
-      default: true,
+    lng: {
+      type: Number,
+      default: 9.7679,
     },
 
-    isOnline: {
-      type: Boolean,
-      default: false,
-    },
-
-    currentLocation: {
-
-      lat: {
-        type: Number,
-        default: 4.0511,
-      },
-
-      lng: {
-        type: Number,
-        default: 9.7679,
-      },
-
-    },
-
-    createdAt: {
+    updatedAt: {
       type: Date,
-      default: Date.now,
+      default: null,
     },
 
-  });
+  },
 
-module.exports =
-  mongoose.model(
-    "Driver",
-    DriverSchema
-  );
+
+// ==========================================
+// 📲 TELEGRAM
+// ==========================================
+
+telegramChatId: {
+  type: String,
+  default: null,
+  index: true,
+},
+
+telegramUsername: {
+  type: String,
+  default: "",
+},
+
+telegramConnected: {
+  type: Boolean,
+  default: false,
+},
+
+telegramConnectedAt: {
+  type: Date,
+  default: null,
+},
+
+telegramConnectToken: {
+  type: String,
+  default: null,
+},
+
+telegramConnectExpires: {
+  type: Date,
+  default: null,
+},
+
+
+  // ==========================================
+  // 📅 CRÉATION
+  // ==========================================
+
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+
+});
+
+module.exports = mongoose.model(
+  "Driver",
+  DriverSchema
+);

@@ -108,6 +108,68 @@ async function sendTelegramMessage(message) {
 
 }
 
+// ======================================================
+// 🚚 TELEGRAM LIVREUR — MESSAGE INDIVIDUEL
+// ======================================================
+
+async function sendDriverTelegramMessage(
+  chatId,
+  message
+) {
+
+  try {
+
+    if (!chatId) {
+
+      console.log(
+        "⚠️ Aucun Telegram associé à ce livreur."
+      );
+
+      return false;
+
+    }
+
+
+    await axios.post(
+
+      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/sendMessage`,
+
+      {
+
+        chat_id:
+          chatId,
+
+        text:
+          message,
+
+        disable_web_page_preview:
+          false,
+
+      }
+
+    );
+
+
+    return true;
+
+
+  } catch (err) {
+
+    console.error(
+
+      "❌ TELEGRAM DRIVER ERROR:",
+
+      err.response?.data ||
+      err.message
+
+    );
+
+    return false;
+
+  }
+
+}
+
 const mongoose = require("mongoose");
 
 const bcrypt = require("bcryptjs");
@@ -312,6 +374,385 @@ app.post("/admin-login", async (req, res) => {
 });
 
 });
+
+// ======================================================
+// 🤖 TELEGRAM — WEBHOOK LIVREURS
+// ======================================================
+
+app.post(
+  "/telegram/webhook",
+  async (req, res) => {
+
+    try {
+
+      const message =
+        req.body?.message;
+
+      // Telegram peut envoyer d'autres types
+      // d'updates. On les ignore simplement.
+
+      if (!message) {
+        return res.sendStatus(200);
+      }
+
+
+      const chatId =
+        message.chat?.id;
+
+      const username =
+        message.from?.username || "";
+
+      const text =
+        message.text || "";
+
+
+      if (!chatId) {
+        return res.sendStatus(200);
+      }
+
+
+      // ==================================================
+      // 🔗 CONNEXION LIVREUR
+      // FORMAT :
+      // /start driver_TOKEN
+      // ==================================================
+
+      if (
+        text.startsWith("/start driver_")
+      ) {
+
+        const token =
+          text
+            .replace(
+              "/start driver_",
+              ""
+            )
+            .trim();
+
+
+        if (!token) {
+
+          await sendDriverTelegramMessage(
+
+            chatId,
+
+            `
+❌ CONNEXION IMPOSSIBLE
+
+Le lien de connexion est invalide.
+
+Retournez dans votre
+🚚 Centre Livreur KONAN SHOPPING
+et générez un nouveau lien.
+            `
+
+          );
+
+          return res.sendStatus(200);
+        }
+
+
+        // ==============================================
+        // 🔍 RECHERCHER LE LIVREUR
+        // ==============================================
+
+        const driver =
+          await Driver.findOne({
+
+            telegramConnectToken:
+              token,
+
+            telegramConnectExpires: {
+              $gt: new Date()
+            }
+
+          });
+
+
+        // ==============================================
+        // ❌ TOKEN INVALIDE / EXPIRÉ
+        // ==============================================
+
+        if (!driver) {
+
+          await sendDriverTelegramMessage(
+
+            chatId,
+
+            `
+❌ LIEN EXPIRÉ
+
+Ce lien de connexion n'est plus valide.
+
+🚚 Retournez dans votre Centre Livreur
+KONAN SHOPPING et générez un nouveau
+lien de connexion Telegram.
+            `
+
+          );
+
+          return res.sendStatus(200);
+        }
+
+
+        // ==============================================
+        // 🔐 ENREGISTRER TELEGRAM
+        // ==============================================
+
+        driver.telegramChatId =
+          String(chatId);
+
+        driver.telegramUsername =
+          username;
+
+        driver.telegramConnected =
+          true;
+
+        driver.telegramConnectedAt =
+          new Date();
+
+        // Le token devient inutilisable
+        // après la connexion.
+
+        driver.telegramConnectToken =
+          null;
+
+        driver.telegramConnectExpires =
+          null;
+
+
+        await driver.save();
+
+
+        // ==============================================
+        // 🎉 CONFIRMATION
+        // ==============================================
+
+        await sendDriverTelegramMessage(
+
+          chatId,
+
+          `
+🎉 TELEGRAM CONNECTÉ
+
+🚚 KONAN SHOPPING
+CENTRE LIVREUR
+
+Bonjour ${driver.name} 👋
+
+Votre compte livreur est maintenant
+connecté à Telegram.
+
+━━━━━━━━━━━━━━━━━━
+
+🟢 NOTIFICATIONS
+ACTIVÉES
+
+🚨 Vous recevrez ici les nouvelles
+commandes disponibles.
+
+⚡ Le premier livreur à accepter
+une commande sera automatiquement
+assigné à celle-ci.
+
+━━━━━━━━━━━━━━━━━━
+
+📱 CENTRE LIVREUR
+
+https://konanshopping.com/driver
+
+━━━━━━━━━━━━━━━━━━
+
+🏪 KONAN SHOPPING CAMEROUN
+          `
+
+        );
+
+
+        console.log(
+          `📲 Telegram connecté : ${driver.name} | Chat ID : ${chatId}`
+        );
+
+
+        return res.sendStatus(200);
+
+      }
+
+
+      // ==================================================
+      // 👋 /start SIMPLE
+      // ==================================================
+
+      if (
+        text.trim() === "/start"
+      ) {
+
+        await sendDriverTelegramMessage(
+
+          chatId,
+
+          `
+👋 BIENVENUE CHEZ KONAN SHOPPING
+
+🚚 Vous êtes sur le bot du
+Centre Livreur.
+
+Pour connecter votre compte :
+
+1️⃣ Connectez-vous à votre Centre Livreur
+2️⃣ Cliquez sur « Connecter Telegram »
+3️⃣ Ouvrez le lien Telegram généré
+4️⃣ Appuyez sur START
+
+🔐 La connexion sera automatique.
+          `
+
+        );
+
+      }
+
+
+      return res.sendStatus(200);
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ TELEGRAM WEBHOOK ERROR:",
+        err
+      );
+
+      // Toujours répondre 200 à Telegram
+      // pour éviter des répétitions inutiles.
+
+      return res.sendStatus(200);
+
+    }
+
+  }
+);
+
+// ======================================================
+// 🔗 CONFIGURER LE WEBHOOK TELEGRAM
+// ======================================================
+
+app.get(
+  "/telegram/setup-webhook",
+  async (req, res) => {
+
+    try {
+
+      const webhookUrl =
+        "https://konanshopping.com/telegram/webhook";
+
+
+      const response =
+        await axios.get(
+
+          `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/setWebhook`,
+
+          {
+            params: {
+              url: webhookUrl,
+            },
+          }
+
+        );
+
+
+      console.log(
+        "🤖 WEBHOOK TELEGRAM :",
+        response.data
+      );
+
+
+      res.json({
+
+        success:
+          response.data.ok,
+
+        telegram:
+          response.data,
+
+        webhook:
+          webhookUrl,
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ ERREUR WEBHOOK TELEGRAM :",
+        err.response?.data ||
+        err.message
+      );
+
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          "Impossible de configurer le webhook Telegram",
+
+        error:
+          err.response?.data ||
+          err.message,
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// 🔎 VÉRIFIER LE WEBHOOK TELEGRAM
+// ======================================================
+
+app.get(
+  "/telegram/webhook-info",
+  async (req, res) => {
+
+    try {
+
+      const response =
+        await axios.get(
+
+          `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/getWebhookInfo`
+
+        );
+
+
+      res.json(
+        response.data
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ WEBHOOK INFO ERROR:",
+        err.response?.data ||
+        err.message
+      );
+
+
+      res.status(500).json({
+
+        success: false,
+
+        error:
+          err.response?.data ||
+          err.message,
+
+      });
+
+    }
+
+  }
+);
 
 // ==========================
 // ROUTE ADMIN PROTÉGÉE
@@ -3194,51 +3635,402 @@ app.delete(
   }
 );
 
-app.put("/accept-order/:id", async (req, res) => {
+// ======================================================
+// 📲 GÉNÉRER LE LIEN TELEGRAM DU LIVREUR
+// ======================================================
 
-  try {
+app.post(
+  "/driver/:id/telegram-connect",
+  async (req, res) => {
 
-    const order = await Order.findByIdAndUpdate(
+    try {
 
-      req.params.id,
+      const driver =
+        await Driver.findById(
+          req.params.id
+        );
 
-      {
 
-        status: "En livraison",
+      if (!driver) {
 
-        assignedDriver: {
+        return res.status(404).json({
 
-          id: req.body.driverId,
+          success: false,
 
-          name: req.body.driverName,
+          message:
+            "Livreur introuvable"
 
-          phone: req.body.driverPhone,
+        });
 
-          photo: req.body.driverPhoto,
+      }
 
-          vehicle: req.body.driverVehicle,
 
-        },
+      // ==========================================
+      // 🔐 TOKEN UNIQUE
+      // ==========================================
 
-      },
+      const token =
+        crypto
+          .randomBytes(24)
+          .toString("hex");
 
-      { new: true }
 
-    );
+      driver.telegramConnectToken =
+        token;
 
-    res.json(order);
+      driver.telegramConnectExpires =
+        new Date(
+          Date.now() +
+          10 * 60 * 1000
+        );
 
-  } catch (err) {
 
-    console.log(err);
+      await driver.save();
 
-    res.status(500).json({
-      error: "Erreur serveur",
-    });
+
+      // ==========================================
+      // 🤖 NOM DU BOT
+      // ==========================================
+
+      const botUsername =
+        process.env.TELEGRAM_BOT_USERNAME;
+
+
+      if (!botUsername) {
+
+        return res.status(500).json({
+
+          success: false,
+
+          message:
+            "TELEGRAM_BOT_USERNAME manque dans le fichier .env"
+
+        });
+
+      }
+
+
+      const telegramUrl =
+        `https://t.me/${botUsername}?start=driver_${token}`;
+
+
+      console.log(
+        `📲 Lien Telegram généré pour ${driver.name}`
+      );
+
+
+      return res.json({
+
+        success: true,
+
+        telegramUrl,
+
+        expiresIn:
+          600
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ TELEGRAM CONNECT ERROR:",
+        err
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur serveur"
+
+      });
+
+    }
 
   }
+);
 
-});
+// ======================================================
+// 🚚 ACCEPTER UNE COMMANDE
+// ======================================================
+
+app.put(
+  "/accept-order/:id",
+  async (req, res) => {
+
+    try {
+
+      const {
+        driverId,
+        driverName,
+        driverPhone,
+        driverPhoto,
+        driverVehicle
+      } = req.body;
+
+
+      // ============================================
+      // VALIDATION LIVREUR
+      // ============================================
+
+      if (!driverId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Livreur non identifié"
+
+        });
+
+      }
+
+
+      // ============================================
+      // ACCEPTATION ATOMIQUE
+      // ============================================
+
+      const order =
+        await Order.findOneAndUpdate(
+
+          {
+
+            _id:
+              req.params.id,
+
+            // La commande doit être disponible
+
+            status: {
+              $in: [
+                "En attente",
+                "Confirmée",
+                "Préparation"
+              ]
+            },
+
+            // Aucun livreur ne doit déjà
+            // être assigné
+
+            $or: [
+
+              {
+                assignedDriver:
+                  { $exists: false }
+              },
+
+              {
+                assignedDriver:
+                  null
+              }
+
+            ]
+
+          },
+
+          {
+
+            $set: {
+
+              status:
+                "En livraison",
+
+              assignedDriver: {
+
+                id:
+                  driverId,
+
+                name:
+                  driverName || "",
+
+                phone:
+                  driverPhone || "",
+
+                photo:
+                  driverPhoto || "",
+
+                vehicle:
+                  driverVehicle || ""
+
+              },
+
+              acceptedAt:
+                new Date()
+
+            }
+
+          },
+
+          {
+            new: true
+          }
+
+        );
+
+
+      // ============================================
+      // COMMANDE NON DISPONIBLE
+      // ============================================
+
+      if (!order) {
+
+        const existingOrder =
+          await Order.findById(
+            req.params.id
+          );
+
+
+        if (!existingOrder) {
+
+          return res.status(404).json({
+
+            success: false,
+
+            message:
+              "Commande introuvable"
+
+          });
+
+        }
+
+
+        return res.status(409).json({
+
+          success: false,
+
+          message:
+            "Cette commande a déjà été prise par un autre livreur.",
+
+          alreadyAssigned: true,
+
+          assignedDriver:
+            existingOrder.assignedDriver || null
+
+        });
+
+      }
+
+
+      // ============================================
+      // SUCCÈS
+      // ============================================
+
+      console.log(
+        `🚚 Commande ${order._id} acceptée par ${driverName}`
+      );
+
+
+      return res.json({
+
+        success: true,
+
+        message:
+          "Commande acceptée avec succès",
+
+        order
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ ACCEPT ORDER ERROR:",
+        err
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur serveur lors de l'acceptation"
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// 📦 COMMANDES DISPONIBLES POUR LES LIVREURS
+// ======================================================
+
+app.get(
+  "/driver-orders",
+  async (req, res) => {
+
+    try {
+
+      const orders =
+        await Order.find({
+
+          status: {
+            $in: [
+              "En attente",
+              "Confirmée",
+              "Préparation"
+            ]
+          },
+
+          $or: [
+
+            {
+              assignedDriver:
+                { $exists: false }
+            },
+
+            {
+              assignedDriver:
+                null
+            }
+
+          ]
+
+        })
+        .sort({
+          createdAt: -1
+        });
+
+
+      res.json({
+
+        success: true,
+
+        count:
+          orders.length,
+
+        orders
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ DRIVER ORDERS ERROR:",
+        err
+      );
+
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur récupération commandes"
+
+      });
+
+    }
+
+  }
+);
 
 app.get("/drivers", async (req, res) => {
 
@@ -3339,44 +4131,371 @@ app.post("/driver-register", async (req, res) => {
 
 });
 
+// ======================================================
+// 📍 GPS DU LIVREUR
+// ======================================================
+
 app.put(
   "/order-location/:orderId",
-
   async (req, res) => {
 
     try {
 
-      const order =
-        await Order.findByIdAndUpdate(
+      const {
+        driverId,
+        lat,
+        lng
+      } = req.body;
 
-          req.params.orderId,
+
+      // ============================================
+      // VALIDATION
+      // ============================================
+
+      if (!driverId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Livreur non identifié"
+
+        });
+
+      }
+
+
+      if (
+        lat === undefined ||
+        lng === undefined
+      ) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Coordonnées GPS manquantes"
+
+        });
+
+      }
+
+
+      // ============================================
+      // VÉRIFIER LE LIVREUR
+      // ============================================
+
+      const order =
+        await Order.findOneAndUpdate(
 
           {
-            driverLocation: {
 
-              lat: req.body.lat,
+            _id:
+              req.params.orderId,
 
-              lng: req.body.lng,
-
-            },
+            "assignedDriver.id":
+              driverId,
 
             status:
-              "En livraison",
+              "En livraison"
+
           },
 
-          { new: true }
+          {
+
+            $set: {
+
+              driverLocation: {
+
+                lat:
+                  Number(lat),
+
+                lng:
+                  Number(lng),
+
+                updatedAt:
+                  new Date()
+
+              }
+
+            }
+
+          },
+
+          {
+            new: true
+          }
 
         );
 
-      res.json(order);
+
+      // ============================================
+      // PAS AUTORISÉ
+      // ============================================
+
+      if (!order) {
+
+        return res.status(403).json({
+
+          success: false,
+
+          message:
+            "Vous n'êtes pas le livreur assigné à cette commande."
+
+        });
+
+      }
+
+
+      // ============================================
+      // OK
+      // ============================================
+
+      return res.json({
+
+        success: true,
+
+        order
+
+      });
+
 
     } catch (err) {
 
-      console.log(err);
+      console.error(
+        "❌ GPS ERROR:",
+        err
+      );
+
 
       res.status(500).json({
-        error:
-          "Erreur serveur",
+
+        success: false,
+
+        message:
+          "Erreur serveur GPS"
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// ✅ LIVRER UNE COMMANDE
+// ======================================================
+
+app.put(
+  "/driver-deliver/:orderId",
+  async (req, res) => {
+
+    try {
+
+      const {
+        driverId
+      } = req.body;
+
+
+      if (!driverId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Livreur non identifié"
+
+        });
+
+      }
+
+
+      const order =
+        await Order.findOneAndUpdate(
+
+          {
+
+            _id:
+              req.params.orderId,
+
+            "assignedDriver.id":
+              driverId,
+
+            status:
+              "En livraison"
+
+          },
+
+          {
+
+            $set: {
+
+              status:
+                "Livrée",
+
+              deliveredAt:
+                new Date()
+
+            }
+
+          },
+
+          {
+            new: true
+          }
+
+        );
+
+
+      if (!order) {
+
+        return res.status(403).json({
+
+          success: false,
+
+          message:
+            "Vous n'êtes pas autorisé à livrer cette commande."
+
+        });
+
+      }
+
+
+      console.log(
+        `✅ Commande ${order._id} livrée par ${driverId}`
+      );
+
+
+      res.json({
+
+        success: true,
+
+        message:
+          "Commande livrée avec succès",
+
+        order
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ DELIVERY ERROR:",
+        err
+      );
+
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur serveur"
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// ❌ ANNULER / ABANDONNER UNE LIVRAISON
+// ======================================================
+
+app.put(
+  "/driver-cancel/:orderId",
+  async (req, res) => {
+
+    try {
+
+      const {
+        driverId
+      } = req.body;
+
+
+      const order =
+        await Order.findOneAndUpdate(
+
+          {
+
+            _id:
+              req.params.orderId,
+
+            "assignedDriver.id":
+              driverId,
+
+            status:
+              "En livraison"
+
+          },
+
+          {
+
+            $set: {
+
+              status:
+                "En attente",
+
+              assignedDriver:
+                null,
+
+              cancelledAt:
+                new Date()
+
+            }
+
+          },
+
+          {
+            new: true
+          }
+
+        );
+
+
+      if (!order) {
+
+        return res.status(403).json({
+
+          success: false,
+
+          message:
+            "Impossible d'annuler cette livraison."
+
+        });
+
+      }
+
+
+      res.json({
+
+        success: true,
+
+        message:
+          "Commande remise à disposition",
+
+        order
+
+      });
+
+
+    } catch (err) {
+
+      console.error(err);
+
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur serveur"
+
       });
 
     }
