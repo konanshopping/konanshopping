@@ -170,6 +170,445 @@ async function sendDriverTelegramMessage(
 
 }
 
+// ======================================================
+// 🚚 TELEGRAM — NOTIFIER TOUS LES LIVREURS CONNECTÉS
+// ======================================================
+
+async function notifyDriversNewOrder(order) {
+
+  try {
+
+    // ==========================================
+    // 🚚 LIVREURS CONNECTÉS À TELEGRAM
+    // ==========================================
+
+    const drivers = await Driver.find({
+
+      telegramConnected: true,
+
+      telegramChatId: {
+        $exists: true,
+        $nin: ["", null],
+      },
+
+    });
+
+
+    if (!drivers.length) {
+
+      console.log(
+        "ℹ️ Aucun livreur connecté à Telegram."
+      );
+
+      return;
+
+    }
+
+
+    console.log(
+      `📲 ${drivers.length} livreur(s) connecté(s) à Telegram.`
+    );
+
+
+    // ==========================================
+    // 📋 RÉFÉRENCE
+    // ==========================================
+
+    const orderRef =
+      `KS-${order._id
+        .toString()
+        .slice(-6)
+        .toUpperCase()}`;
+
+
+    // ==========================================
+    // 📦 PRODUITS
+    // ==========================================
+
+    const products =
+      (order.items || [])
+        .map((item) => {
+
+          return `▪️ ${item.name}
+📦 Quantité : x${item.quantity}
+💰 Prix : ${Number(
+            item.price || 0
+          ).toLocaleString("fr-FR")} FCFA`;
+
+        })
+        .join("\n\n");
+
+
+    // ==========================================
+    // 🚨 MESSAGE LIVREUR
+    // ==========================================
+
+    const message = `
+
+🚨 NOUVELLE COMMANDE
+
+🚚 KONAN SHOPPING
+CENTRE LIVREUR
+
+━━━━━━━━━━━━━━━━━━
+
+📋 COMMANDE
+${orderRef}
+
+👤 CLIENT
+${order.customerName || "Non renseigné"}
+
+📞 TÉLÉPHONE
+${order.phone || "Non renseigné"}
+
+📍 ADRESSE
+${order.address || "Non renseignée"}
+
+🏙️ VILLE
+${order.city || "Non renseignée"}
+
+📌 QUARTIER
+${order.district || "Non renseigné"}
+
+━━━━━━━━━━━━━━━━━━
+
+📦 PRODUITS
+
+${products || "Aucun produit"}
+
+━━━━━━━━━━━━━━━━━━
+
+💰 TOTAL
+
+${Number(
+  order.total || 0
+).toLocaleString("fr-FR")} FCFA
+
+━━━━━━━━━━━━━━━━━━
+
+⚡ ACTION REQUISE
+
+🥇 Le premier livreur qui accepte
+la commande sera automatiquement
+assigné.
+
+🔒 Une fois acceptée, elle devient
+indisponible pour les autres livreurs.
+
+━━━━━━━━━━━━━━━━━━
+
+📲 CENTRE LIVREUR
+
+https://konanshopping.com/driver
+
+🚚 Soyez le premier à accepter !
+
+🏪 KONAN SHOPPING CAMEROUN
+
+`;
+
+
+    // ==========================================
+    // 📲 ENVOI À CHAQUE LIVREUR
+    // ==========================================
+
+    for (const driver of drivers) {
+
+      try {
+
+        const sent =
+          await sendDriverTelegramMessage(
+
+            driver.telegramChatId,
+
+            message
+
+          );
+
+
+        if (sent) {
+
+          console.log(
+            `✅ Notification envoyée à ${driver.name}`
+          );
+
+        } else {
+
+          console.log(
+            `⚠️ Notification non envoyée à ${driver.name}`
+          );
+
+        }
+
+      } catch (err) {
+
+        console.error(
+          `❌ Telegram ${driver.name}:`,
+          err.response?.data ||
+          err.message
+        );
+
+      }
+
+    }
+
+
+  } catch (err) {
+
+    console.error(
+      "❌ ERREUR NOTIFICATION LIVREURS :",
+      err
+    );
+
+  }
+
+}
+
+// ======================================================
+// 🔄 TELEGRAM — COMMANDE REDEVENUE DISPONIBLE
+// ======================================================
+
+async function notifyDriversOrderAvailableAgain(
+  order,
+  cancelledDriverId = null
+) {
+
+  try {
+
+    // ==========================================
+    // 🚚 LIVREURS TELEGRAM CONNECTÉS
+    // ==========================================
+
+    const drivers =
+      await Driver.find({
+
+        telegramConnected: true,
+
+        telegramChatId: {
+          $exists: true,
+          $nin: ["", null],
+        },
+
+      });
+
+
+    if (!drivers.length) {
+
+      console.log(
+        "ℹ️ Aucun livreur connecté à Telegram."
+      );
+
+      return;
+
+    }
+
+
+    // ==========================================
+    // 📋 RÉFÉRENCE COMMANDE
+    // ==========================================
+
+    const orderRef =
+      `KS-${order._id
+        .toString()
+        .slice(-6)
+        .toUpperCase()}`;
+
+
+    // ==========================================
+    // 📦 PRODUITS
+    // ==========================================
+
+    const products =
+      (order.items || [])
+        .map((item) => {
+
+          return (
+            `▪️ ${item.name || "Produit"}\n` +
+
+            `📦 Quantité : x${item.quantity || 1}\n` +
+
+            `💰 Prix : ${
+              Number(
+                item.price || 0
+              ).toLocaleString("fr-FR")
+            } FCFA`
+          );
+
+        })
+        .join("\n\n");
+
+
+    // ==========================================
+    // 🚨 MESSAGE TELEGRAM
+    // ==========================================
+
+    const message = `
+
+🔄 COMMANDE REDEVENUE DISPONIBLE
+
+🚚 KONAN SHOPPING
+CENTRE LIVREUR
+
+━━━━━━━━━━━━━━━━━━
+
+⚠️ UNE COMMANDE VIENT D'ÊTRE LIBÉRÉE
+
+Le livreur précédemment assigné
+a annulé cette livraison.
+
+La commande est maintenant
+à nouveau disponible.
+
+━━━━━━━━━━━━━━━━━━
+
+📋 COMMANDE
+
+${orderRef}
+
+👤 CLIENT
+
+${order.customerName || "Non renseigné"}
+
+📞 TÉLÉPHONE
+
+${order.phone || "Non renseigné"}
+
+📍 ADRESSE
+
+${order.address || "Non renseignée"}
+
+🏙️ VILLE
+
+${order.city || "Non renseignée"}
+
+📌 QUARTIER
+
+${order.district || "Non renseigné"}
+
+━━━━━━━━━━━━━━━━━━
+
+📦 PRODUITS
+
+${products || "Aucun produit"}
+
+━━━━━━━━━━━━━━━━━━
+
+💰 TOTAL
+
+${Number(
+  order.total || 0
+).toLocaleString("fr-FR")} FCFA
+
+━━━━━━━━━━━━━━━━━━
+
+⚡ ACTION REQUISE
+
+🥇 Le premier livreur qui accepte
+la commande sera automatiquement
+assigné.
+
+🔒 Dès qu'un livreur l'accepte,
+elle devient indisponible
+pour les autres.
+
+━━━━━━━━━━━━━━━━━━
+
+📲 CENTRE LIVREUR
+
+https://konanshopping.com/driver
+
+🚚 Soyez le premier à accepter !
+
+🏪 KONAN SHOPPING CAMEROUN
+
+`;
+
+
+    // ==========================================
+    // 📲 ENVOYER AUX LIVREURS
+    // ==========================================
+
+    for (
+      const driver of drivers
+    ) {
+
+      try {
+
+        // ======================================
+        // 🚫 NE PAS RENOTIFIER LE LIVREUR
+        // QUI VIENT D'ANNULER
+        // ======================================
+
+        if (
+          cancelledDriverId &&
+          String(driver._id) ===
+          String(cancelledDriverId)
+        ) {
+
+          console.log(
+            `ℹ️ ${driver.name} exclu de la notification d'annulation.`
+          );
+
+          continue;
+
+        }
+
+
+        // ======================================
+        // 📲 ENVOI TELEGRAM
+        // ======================================
+
+        const sent =
+          await sendDriverTelegramMessage(
+
+            driver.telegramChatId,
+
+            message
+
+          );
+
+
+        if (sent) {
+
+          console.log(
+            `✅ Commande ${orderRef} `
+            + `renotifiée à ${driver.name}`
+          );
+
+        } else {
+
+          console.log(
+            `⚠️ Notification non envoyée à ${driver.name}`
+          );
+
+        }
+
+      } catch (err) {
+
+        console.error(
+
+          `❌ Telegram ${driver.name}:`,
+
+          err.response?.data ||
+          err.message
+
+        );
+
+      }
+
+    }
+
+  } catch (err) {
+
+    console.error(
+      "❌ ERREUR NOTIFICATION COMMANDE LIBÉRÉE :",
+      err
+    );
+
+  }
+
+}
+
 const mongoose = require("mongoose");
 
 const bcrypt = require("bcryptjs");
@@ -1262,6 +1701,20 @@ userId: req.body.userId,
 });
 
   await order.save();
+
+  // ===============================
+// 🚚 NOTIFICATION TELEGRAM LIVREURS
+// ===============================
+
+notifyDriversNewOrder(order)
+  .catch((err) => {
+
+    console.error(
+      "❌ ERREUR NOTIFICATION LIVREURS :",
+      err
+    );
+
+  });
 
 // ===============================
 // AJOUTER LA COMMANDE AU CLIENT
@@ -4404,7 +4857,8 @@ app.put(
 );
 
 // ======================================================
-// ❌ ANNULER / ABANDONNER UNE LIVRAISON
+// 🔄 LIVREUR ANNULE SA LIVRAISON
+// → LA COMMANDE REDEVIENT DISPONIBLE POUR TOUS
 // ======================================================
 
 app.put(
@@ -4418,16 +4872,43 @@ app.put(
       } = req.body;
 
 
+      // ================================================
+      // VALIDATION
+      // ================================================
+
+      if (!driverId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Livreur non identifié"
+
+        });
+
+      }
+
+
+      // ================================================
+      // ANNULATION ATOMIQUE
+      // ================================================
+
       const order =
         await Order.findOneAndUpdate(
 
           {
-
             _id:
               req.params.orderId,
 
+            // SEUL LE LIVREUR QUI POSSÈDE
+            // LA COMMANDE PEUT L'ANNULER
+
             "assignedDriver.id":
               driverId,
+
+            // La commande doit être
+            // actuellement en livraison
 
             status:
               "En livraison"
@@ -4435,17 +4916,25 @@ app.put(
           },
 
           {
-
             $set: {
+
+              // Retour dans les commandes
+              // disponibles
 
               status:
                 "En attente",
 
-              assignedDriver:
-                null,
-
               cancelledAt:
                 new Date()
+
+            },
+
+            // SUPPRESSION DU LIVREUR
+
+            $unset: {
+
+              assignedDriver:
+                ""
 
             }
 
@@ -4458,26 +4947,47 @@ app.put(
         );
 
 
+      // ================================================
+      // COMMANDE NON TROUVÉE
+      // ================================================
+
       if (!order) {
 
-        return res.status(403).json({
+        return res.status(409).json({
 
           success: false,
 
           message:
-            "Impossible d'annuler cette livraison."
+            "Cette commande n'est plus assignée à ce livreur ou a déjà été modifiée."
 
         });
 
       }
 
 
-      res.json({
+      console.log(
+        `🔄 Commande ${order._id} remise à disposition par le livreur ${driverId}`
+      );
+
+// ================================================
+// 📲 TELEGRAM — COMMANDE REDEVENUE DISPONIBLE
+// ================================================
+
+await notifyDriversOrderAvailableAgain(
+  order,
+  driverId
+);
+
+      // ================================================
+      // RÉPONSE
+      // ================================================
+
+      return res.json({
 
         success: true,
 
         message:
-          "Commande remise à disposition",
+          "Commande remise à disposition pour tous les livreurs",
 
         order
 
@@ -4486,45 +4996,20 @@ app.put(
 
     } catch (err) {
 
-      console.error(err);
+      console.error(
+        "❌ DRIVER CANCEL ERROR:",
+        err
+      );
 
 
-      res.status(500).json({
+      return res.status(500).json({
 
         success: false,
 
         message:
-          "Erreur serveur"
+          "Erreur serveur lors de l'annulation"
 
       });
-
-    }
-
-  }
-);
-
-// UPDATE PRODUCT
-
-app.put(
-  "/update-product/:id",
-  async (req, res) => {
-
-    try {
-
-      const updated =
-        await Product.findByIdAndUpdate(
-          req.params.id,
-          req.body,
-          {
-            new:true
-          }
-        );
-
-      res.json(updated);
-
-    } catch (err) {
-
-      res.status(500).json(err);
 
     }
 

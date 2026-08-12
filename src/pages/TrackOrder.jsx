@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
 import {
@@ -14,61 +13,44 @@ import {
 } from "react-leaflet";
 
 import {
-  FaMoneyBillWave
-} from "react-icons/fa";
-
-import {
   FaTruck,
-  FaMapMarkedAlt,
   FaMotorcycle,
   FaClock,
-} from "react-icons/fa";
-
-import {
-  FaCity,
-  FaLocationArrow,
-} from "react-icons/fa";
-
-import {
   FaRoute,
   FaChartLine,
-  FaCheckCircle
-} from "react-icons/fa";
-
-import {
+  FaCheckCircle,
   FaPhoneAlt,
-  FaBolt,
-  FaCrown,
-} from "react-icons/fa";
-
-import {
-  FaShoppingBag,
-  FaCube,
-} from "react-icons/fa";
-
-import {
+  FaSignal,
+  FaBoxOpen,
+  FaTimesCircle,
+  FaCircle,
+  FaUser,
+  FaCar,
   FaMapMarkerAlt,
-  FaMapPin,
+  FaSatelliteDish,
 } from "react-icons/fa";
-
-import { FaCircle } from "react-icons/fa";
 
 import L from "leaflet";
 
 import "leaflet/dist/leaflet.css";
 
-import {
-  useParams,
-} from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-// =========================
-// LEAFLET FIX
-// =========================
+
+// ======================================================
+// 🌐 API
+// ======================================================
+
+const API = "https://konanshopping.com";
+
+
+// ======================================================
+// 📍 LEAFLET FIX
+// ======================================================
 
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
-
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
 
@@ -77,73 +59,75 @@ L.Icon.Default.mergeOptions({
 
   shadowUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-
 });
 
-// =========================
-// DRIVER ICON
-// =========================
 
-const driverIcon =
-  new L.Icon({
+// ======================================================
+// 🚚 DRIVER ICON
+// ======================================================
 
-    iconUrl:
-      "https://cdn-icons-png.flaticon.com/512/854/854894.png",
+const driverIcon = new L.Icon({
+  iconUrl:
+    "https://cdn-icons-png.flaticon.com/512/854/854894.png",
 
-    iconSize: [38, 38],
+  iconSize: [42, 42],
 
-    iconAnchor: [19, 19],
+  iconAnchor: [21, 21],
 
-  });
-
-// =========================
-// CUSTOMER ICON
-// =========================
-
-const customerIcon =
-  new L.Icon({
-
-    iconUrl:
-      "https://cdn-icons-png.flaticon.com/512/684/684908.png",
-
-    iconSize: [40, 40],
-
-    iconAnchor: [20, 20],
-
-  });
+  popupAnchor: [0, -20],
+});
 
 
-// =========================
-// RECENTER MAP
-// =========================
+// ======================================================
+// 📍 CUSTOMER ICON
+// ======================================================
 
-function RecenterMap({
-  position,
-}) {
+const customerIcon = new L.Icon({
+  iconUrl:
+    "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+
+  iconSize: [40, 40],
+
+  iconAnchor: [20, 40],
+
+  popupAnchor: [0, -40],
+});
+
+
+// ======================================================
+// 🗺️ RECENTER MAP
+// ======================================================
+
+function RecenterMap({ position }) {
 
   const map = useMap();
 
   useEffect(() => {
 
-    map.flyTo(
-  position,
-  window.innerWidth < 768
-    ? 16
-    : 15,
-  {
-    duration: 1.5,
-  }
-);
+    if (
+      !position ||
+      position.length !== 2
+    ) {
+      return;
+    }
 
-  }, [position]);
+    map.flyTo(
+      position,
+      window.innerWidth < 768 ? 16 : 15,
+      {
+        duration: 1.2,
+      }
+    );
+
+  }, [map, position]);
 
   return null;
-
 }
 
-// =========================
-// DISTANCE GPS
-// =========================
+
+// ======================================================
+// 📏 DISTANCE GPS
+// ======================================================
 
 function calculateDistance(
   lat1,
@@ -156,14 +140,15 @@ function calculateDistance(
 
   const dLat =
     (lat2 - lat1) *
-    Math.PI / 180;
+    Math.PI /
+    180;
 
   const dLon =
     (lon2 - lon1) *
-    Math.PI / 180;
+    Math.PI /
+    180;
 
   const a =
-
     Math.sin(dLat / 2) *
     Math.sin(dLat / 2) +
 
@@ -186,2427 +171,2025 @@ function calculateDistance(
     );
 
   return R * c;
-
 }
 
-// =========================
-// COMPONENT
-// =========================
+
+// ======================================================
+// 🚚 TRACK ORDER
+// ======================================================
 
 export default function TrackOrder() {
 
-  const { id } =
-    useParams();
+  const { id } = useParams();
 
-  // =========================
-  // STATES
-  // =========================
 
-  const [position,
-    setPosition] =
-      useState([
-        4.0511,
-        9.7679,
-      ]);
+  // ====================================================
+  // 📦 ORDER
+  // ====================================================
 
-const [location, setLocation] =
-  useState(null);
+  const [
+    order,
+    setOrder
+  ] = useState(null);
 
-  const [order,
-    setOrder] =
-      useState(null);
 
-  // =========================
-  // CUSTOMER POSITION
-  // =========================
+  // ====================================================
+  // 📍 DRIVER POSITION
+  // ====================================================
 
-  const customerPosition = [
+  const [
+    driverPosition,
+    setDriverPosition
+  ] = useState(null);
 
-    order?.location?.lat ||
+
+  // ====================================================
+  // 🔄 LOADING
+  // ====================================================
+
+  const [
+    loading,
+    setLoading
+  ] = useState(true);
+
+
+  // ====================================================
+  // ❌ ERROR
+  // ====================================================
+
+  const [
+    error,
+    setError
+  ] = useState("");
+
+
+  // ====================================================
+  // 🕐 LAST GPS UPDATE
+  // ====================================================
+
+  const [
+    lastGpsUpdate,
+    setLastGpsUpdate
+  ] = useState(null);
+
+
+  // ====================================================
+  // 📡 GPS LIVE
+  // ====================================================
+
+  const [
+    gpsOnline,
+    setGpsOnline
+  ] = useState(false);
+
+
+  // ====================================================
+  // 📍 CUSTOMER POSITION
+  // ====================================================
+
+  const customerPosition = useMemo(() => {
+
+    const lat =
+      Number(order?.location?.lat);
+
+    const lng =
+      Number(order?.location?.lng);
+
+    if (
+      Number.isFinite(lat) &&
+      Number.isFinite(lng)
+    ) {
+
+      return [
+        lat,
+        lng
+      ];
+
+    }
+
+    return [
       4.0511,
+      9.7679
+    ];
 
-    order?.location?.lng ||
-      9.7679,
+  }, [order]);
 
-  ];
 
-  // =========================
-  // FETCH ORDER
-  // =========================
+  // ====================================================
+  // 📦 FETCH ORDER
+  // ====================================================
 
   useEffect(() => {
 
-    const fetchOrder =
-      async () => {
+    let mounted = true;
 
-        try {
+    const fetchOrder = async () => {
 
-          const res =
-            await axios.get(
-              `https://konanshopping.com/api/order/${id}`
-            );
+      try {
 
-          setOrder(
-            res.data
+        const res =
+          await axios.get(
+            `${API}/api/order/${id}`
           );
 
-          if (
-            res.data.driverLocation
-          ) {
+        if (!mounted) {
+          return;
+        }
 
-            setPosition([
-              res.data
-                .driverLocation.lat,
+        const data = res.data;
 
-              res.data
-                .driverLocation.lng,
-            ]);
+        setOrder(data);
+
+        setError("");
+
+
+        // ==========================================
+        // 📍 DRIVER LOCATION
+        // ==========================================
+
+        const gps =
+          data?.driverLocation;
+
+        if (
+          gps &&
+          Number.isFinite(
+            Number(gps.lat)
+          ) &&
+          Number.isFinite(
+            Number(gps.lng)
+          )
+        ) {
+
+          setDriverPosition([
+            Number(gps.lat),
+            Number(gps.lng)
+          ]);
+
+          setLastGpsUpdate(
+            gps.updatedAt || null
+          );
+
+
+          // ======================================
+          // 📡 GPS LIVE
+          // ======================================
+
+          if (gps.updatedAt) {
+
+            const age =
+              Date.now() -
+              new Date(
+                gps.updatedAt
+              ).getTime();
+
+            setGpsOnline(
+              age < 30000
+            );
+
+          } else {
+
+            setGpsOnline(true);
 
           }
 
-        } catch (err) {
+        } else {
 
-          console.log(err);
+          setDriverPosition(null);
+
+          setGpsOnline(false);
+
+          setLastGpsUpdate(null);
 
         }
 
-      };
+      } catch (err) {
+
+        console.error(
+          "❌ TRACK ORDER ERROR:",
+          err
+        );
+
+        if (mounted) {
+
+          setError(
+            "Impossible de récupérer le suivi de cette commande."
+          );
+
+        }
+
+      } finally {
+
+        if (mounted) {
+          setLoading(false);
+        }
+
+      }
+
+    };
+
+
+    // ============================================
+    // PREMIER CHARGEMENT
+    // ============================================
 
     fetchOrder();
+
+
+    // ============================================
+    // 🔄 GPS LIVE
+    // ============================================
 
     const interval =
       setInterval(
         fetchOrder,
-        4000
+        3000
       );
 
-    return () =>
-      clearInterval(
-        interval
-      );
+
+    return () => {
+
+      mounted = false;
+
+      clearInterval(interval);
+
+    };
 
   }, [id]);
 
 
-  // =========================
-  // REAL DISTANCE
-  // =========================
+  // ====================================================
+  // 🚚 ASSIGNED DRIVER
+  // ====================================================
 
-  const realDistance =
-    calculateDistance(
-      position[0],
-      position[1],
+  const assignedDriver =
+    order?.assignedDriver || null;
+
+
+  // ====================================================
+  // 📏 DISTANCE
+  // ====================================================
+
+  const realDistance = useMemo(() => {
+
+    if (!driverPosition) {
+      return null;
+    }
+
+    return calculateDistance(
+      driverPosition[0],
+      driverPosition[1],
       customerPosition[0],
       customerPosition[1]
     );
 
-  // =========================
-  // DISTANCE FORMAT
-  // =========================
-
-  const distance =
-    `${realDistance.toFixed(
-      1
-    )} km`;
+  }, [
+    driverPosition,
+    customerPosition
+  ]);
 
 
-  // =========================
-// ETA RÉEL DYNAMIQUE
-// =========================
+  // ====================================================
+  // 🚗 SPEED ESTIMATION
+  // ====================================================
 
-// vitesse dynamique du livreur
+  const liveSpeed = useMemo(() => {
 
-const liveSpeed =
-  realDistance > 8
-    ? 55
-    : realDistance > 5
-    ? 45
-    : realDistance > 2
-    ? 35
-    : realDistance > 1
-    ? 25
-    : 12;
+    if (realDistance === null) {
+      return 0;
+    }
 
-const realSpeed =
-  `${liveSpeed} km/h`;
+    if (realDistance > 8) {
+      return 55;
+    }
 
-// =========================
-// ETA RÉEL CORRIGÉ
-// =========================
+    if (realDistance > 5) {
+      return 45;
+    }
 
-let estimatedTime = "";
+    if (realDistance > 2) {
+      return 35;
+    }
 
-if (realDistance <= 0.05) {
+    if (realDistance > 1) {
+      return 25;
+    }
 
-  estimatedTime = "0 min";
+    return 12;
 
-}
+  }, [realDistance]);
 
-else {
 
-  const estimatedMinutes =
-    Math.round(
-      (realDistance / liveSpeed) * 60
-    );
+  // ====================================================
+  // ⏱️ ETA
+  // ====================================================
 
-  estimatedTime =
-    estimatedMinutes <= 1
-      ? "1 min"
-      : estimatedMinutes < 60
-      ? `${estimatedMinutes} min`
-      : `${(
-          estimatedMinutes / 60
-        ).toFixed(1)} h`;
+  const estimatedTime = useMemo(() => {
 
-}
+    if (realDistance === null) {
+      return "--";
+    }
 
-  // =========================
-  // DELIVERY STATUS
-  // =========================
+    if (realDistance <= 0.05) {
+      return "Arrivé";
+    }
 
- const deliveryStatus =
+    const minutes =
+      Math.round(
+        (realDistance / liveSpeed) * 60
+      );
 
-  realDistance <= 0.05
-    ? "Livrée"
-    : order?.status ||
-      "En attente";
+    if (minutes <= 1) {
+      return "1 min";
+    }
 
-  // =========================
-  // PROGRESS
-  // =========================
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
 
-  const maxDistance = 10;
+    return `${(
+      minutes / 60
+    ).toFixed(1)} h`;
 
-  const progress =
-    Math.min(
+  }, [
+    realDistance,
+    liveSpeed
+  ]);
+
+
+  // ====================================================
+  // 📊 DISTANCE TEXT
+  // ====================================================
+
+  const distanceText =
+    realDistance === null
+      ? "--"
+      : `${realDistance.toFixed(1)} km`;
+
+
+  // ====================================================
+  // 📈 PROGRESS
+  // ====================================================
+
+  const progress = useMemo(() => {
+
+    if (realDistance === null) {
+      return 0;
+    }
+
+    const maxDistance = 10;
+
+    return Math.min(
       100,
-
       Math.max(
         0,
-
         (
-          (
-            maxDistance -
-            realDistance
-          ) /
+          (maxDistance - realDistance) /
           maxDistance
         ) * 100
       )
+    );
 
-    ).toFixed(0);
+  }, [realDistance]);
 
-  // =========================
-  // STATUS COLOR
-  // =========================
 
-  const statusColor =
+  // ====================================================
+  // 🎨 STATUS
+  // ====================================================
 
-    realDistance > 5
-      ? "#2563eb"
+  const statusInfo = useMemo(() => {
 
-      : realDistance > 2
-      ? "#16a34a"
+    switch (order?.status) {
 
-      : realDistance > 0.3
-      ? "#f59e0b"
+      case "Livrée":
 
-      : "#22c55e";
+        return {
+          label: "Livrée",
+          color: "#16A34A",
+          bg: "#DCFCE7",
+        };
 
-  // =========================
-  // LIVE STATUS
-  // =========================
 
- const liveStatus =
+      case "Annulée":
 
-  realDistance <= 0.05
-    ? "Livrée"
+        return {
+          label: "Annulée",
+          color: "#DC2626",
+          bg: "#FEE2E2",
+        };
 
-    : realDistance > 5
-    ? "En livraison"
 
-    : realDistance > 2
-    ? "Arrivée proche"
+      case "En livraison":
 
-    : realDistance > 0.3
-    ? "Presque arrivé"
+        return {
+          label: "En livraison",
+          color: "#2563EB",
+          bg: "#DBEAFE",
+        };
 
-    : "Livrée";
 
-    // =========================
-// AUTO LIVRÉ
-// =========================
+      case "Préparation":
 
-useEffect(() => {
+        return {
+          label: "Préparation",
+          color: "#D97706",
+          bg: "#FEF3C7",
+        };
 
-  const autoDelivered = async () => {
+
+      case "Confirmée":
+
+        return {
+          label: "Confirmée",
+          color: "#7C3AED",
+          bg: "#EDE9FE",
+        };
+
+
+      default:
+
+        return {
+          label:
+            order?.status ||
+            "En attente",
+
+          color: "#64748B",
+
+          bg: "#F1F5F9",
+        };
+
+    }
+
+  }, [order?.status]);
+
+
+  // ====================================================
+  // 📡 GPS STATUS
+  // ====================================================
+
+  const gpsStatus =
+    order?.status !== "En livraison"
+      ? "GPS en attente"
+      : gpsOnline
+        ? "GPS en direct"
+        : "GPS hors ligne";
+
+
+  // ====================================================
+  // 🕐 GPS TIME
+  // ====================================================
+
+  const gpsTime = useMemo(() => {
+
+    if (!lastGpsUpdate) {
+      return "";
+    }
+
+    const date =
+      new Date(lastGpsUpdate);
 
     if (
-      realDistance <= 0.05 &&
-      order?._id &&
-      order?.status !== "Livrée"
+      Number.isNaN(
+        date.getTime()
+      )
     ) {
-
-     try {
-
-  console.log("AUTO LIVRAISON");
-
-  await axios.put(
-    `https://konanshopping.com/api/orders/${order._id}`,
-    {
-      status: "Livrée",
-    }
-  );
-
-  setOrder((prev) => ({
-    ...prev,
-    status: "Livrée",
-  }));
-
-} catch (err) {
-
-  console.log("ERREUR AUTO LIVRAISON");
-  console.log(err);
-
-}
-
+      return "";
     }
 
-  };
+    return date.toLocaleTimeString(
+      "fr-FR",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }
+    );
 
-  autoDelivered();
+  }, [lastGpsUpdate]);
 
-}, [realDistance, order]);
 
-  if (!order) {
+  // ====================================================
+  // ⏳ LOADING
+  // ====================================================
+
+  if (loading) {
+
+    return (
+
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: "14px",
+          background: "#F8FAFC",
+          fontFamily: "'Inter',sans-serif",
+          padding: "20px",
+          boxSizing: "border-box",
+        }}
+      >
+
+        <div
+          style={{
+            width: "62px",
+            height: "62px",
+            borderRadius: "18px",
+            background:
+              "linear-gradient(135deg,#2563EB,#1D4ED8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#FFFFFF",
+            fontSize: "25px",
+            boxShadow:
+              "0 12px 30px rgba(37,99,235,.25)",
+          }}
+        >
+          <FaTruck />
+        </div>
+
+        <strong
+          style={{
+            color: "#0F172A",
+            fontSize: "18px",
+            textAlign: "center",
+          }}
+        >
+          Chargement du suivi...
+        </strong>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ====================================================
+  // ❌ ERROR
+  // ====================================================
+
+  if (error || !order) {
+
+    return (
+
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          background: "#F8FAFC",
+          fontFamily: "'Inter',sans-serif",
+          boxSizing: "border-box",
+        }}
+      >
+
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "420px",
+            background: "#FFFFFF",
+            borderRadius: "24px",
+            padding: "30px",
+            textAlign: "center",
+            boxShadow:
+              "0 15px 40px rgba(15,23,42,.08)",
+            border:
+              "1px solid #E2E8F0",
+          }}
+        >
+
+          <FaTimesCircle
+            style={{
+              color: "#EF4444",
+              fontSize: "42px",
+              marginBottom: "15px",
+            }}
+          />
+
+          <h2
+            style={{
+              margin: 0,
+              color: "#0F172A",
+            }}
+          >
+            Suivi indisponible
+          </h2>
+
+          <p
+            style={{
+              color: "#64748B",
+              fontSize: "14px",
+              lineHeight: "1.6",
+            }}
+          >
+            {error ||
+              "Cette commande est introuvable."}
+          </p>
+
+        </div>
+
+      </div>
+
+    );
+
+  }
+
+
+  // ====================================================
+  // 🖥️ INTERFACE
+  // ====================================================
 
   return (
 
     <div
       style={{
         minHeight: "100vh",
-        background: "#F8FAFC",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flexDirection: "column",
-        gap: "16px",
-      }}
-    >
-
-      <div
-        style={{
-          width: "65px",
-          height: "65px",
-          borderRadius: "18px",
-          background:
-            "linear-gradient(135deg,#2563EB,#1D4ED8)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#FFFFFF",
-          fontSize: "26px",
-          boxShadow:
-            "0 10px 25px rgba(37,99,235,0.25)",
-        }}
-      >
-        <FaTruck />
-      </div>
-
-      <h2
-        style={{
-          margin: 0,
-          color: "#111827",
-          fontSize: "20px",
-          fontWeight: "800",
-        }}
-      >
-        Suivi de livraison
-      </h2>
-
-      <p
-        style={{
-          margin: 0,
-          color: "#6B7280",
-          fontSize: "14px",
-        }}
-      >
-        Chargement des informations...
-      </p>
-
-    </div>
-
-  );
-
-}
-
-return (
-
-  <div
-    style={{
-      minHeight: "100vh",
-
-      background:
-  "linear-gradient(180deg,#FFFFFF,#F8FAFC)",
-
-      padding:
-        window.innerWidth < 768
-          ? "10px"
-          : "20px",
-
-      width: "100%",
-
-      maxWidth: "100vw",
-
-      overflowX: "hidden",
-
-      overflowY: "auto",
-
-      boxSizing: "border-box",
-
-      fontFamily:
-        "'Inter', sans-serif",
-    }}
-  >
-    {/* ========================= */}
-{/* ULTRA PREMIUM HEADER */}
-{/* ========================= */}
-
-<div
-  style={{
-    background: "#FFFFFF",
-
-    borderRadius: "22px",
-
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "18px",
-
-    display: "flex",
-
-    justifyContent:
-      "space-between",
-
-    alignItems:
-      window.innerWidth < 768
-        ? "flex-start"
-        : "center",
-
-    flexWrap:
-      window.innerWidth < 768
-        ? "wrap"
-        : "nowrap",
-
-    gap: "14px",
-
-    marginBottom: "16px",
-
-    border:
-      "1px solid #E5E7EB",
-
-    boxShadow:
-      "0 10px 30px rgba(15,23,42,0.06)",
-
-    position: "relative",
-
-    overflow: "hidden",
-  }}
->
-
-  {/* LIGHT EFFECT */}
-
-  <div
-    style={{
-      position: "absolute",
-
-      top: "-50px",
-
-      right: "-50px",
-
-      width: "140px",
-
-      height: "140px",
-
-      borderRadius: "50%",
-
-      background:
-        "rgba(37,99,235,0.06)",
-
-      filter: "blur(35px)",
-    }}
-  />
-
-  {/* LEFT */}
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "12px",
-
-      flex: 1,
-
-      minWidth: 0,
-
-      zIndex: 2,
-    }}
-  >
-
-    {/* LOGO */}
-
-    <div
-      style={{
-        width:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
-
-        height:
-          window.innerWidth < 768
-            ? "50px"
-            : "58px",
-
-        borderRadius: "16px",
-
-        overflow: "hidden",
-
+        width: "100%",
+        maxWidth: "100vw",
+        overflowX: "hidden",
         background:
-          "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-        padding: "2px",
-
-        flexShrink: 0,
-
-        boxShadow:
-          "0 8px 20px rgba(37,99,235,0.20)",
+          "linear-gradient(180deg,#FFFFFF,#F8FAFC)",
+        padding:
+          window.innerWidth < 768
+            ? "10px"
+            : "20px",
+        boxSizing: "border-box",
+        fontFamily:
+          "'Inter',sans-serif",
       }}
     >
 
+
+      {/* ================================================= */}
+      {/* HEADER */}
+      {/* ================================================= */}
+
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          borderRadius: "14px",
-          overflow: "hidden",
           background: "#FFFFFF",
-        }}
-      >
-
-        <img
-          src="/logo.jpg"
-          alt="Konan Shopping"
-
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-
-      </div>
-
-    </div>
-
-    {/* TEXT */}
-
-    <div
-      style={{
-        minWidth: 0,
-        flex: 1,
-      }}
-    >
-
-      <div
-        style={{
+          borderRadius: "20px",
+          padding:
+            window.innerWidth < 768
+              ? "13px"
+              : "18px",
+          marginBottom: "14px",
+          border:
+            "1px solid #E5E7EB",
+          boxShadow:
+            "0 10px 30px rgba(15,23,42,.06)",
           display: "flex",
-
+          justifyContent: "space-between",
           alignItems: "center",
-
-          gap: "8px",
-
+          gap: "12px",
           flexWrap: "wrap",
         }}
       >
 
-        <h1
-          style={{
-            margin: 0,
-
-            fontSize:
-              window.innerWidth < 768
-                ? "18px"
-                : "22px",
-
-            color: "#0F172A",
-
-            fontWeight: "900",
-
-            lineHeight: 1.2,
-          }}
-        >
-          Suivi de Livraison
-        </h1>
-
-        <div
-          style={{
-            background:
-              "linear-gradient(135deg,#22C55E,#16A34A)",
-
-            color: "#FFFFFF",
-
-            padding: "4px 8px",
-
-            borderRadius: "999px",
-
-            fontSize: "9px",
-
-            fontWeight: "800",
-
-            boxShadow:
-              "0 4px 12px rgba(34,197,94,0.25)",
-          }}
-        >
-          LIVE
-        </div>
-
-      </div>
-
-      <p
-        style={{
-          margin: "4px 0 0 0",
-
-          color: "#64748B",
-
-          fontSize:
-            window.innerWidth < 768
-              ? "12px"
-              : "13px",
-
-          fontWeight: "500",
-        }}
-      >
-        Suivi GPS en temps réel de votre commande
-      </p>
-
-    </div>
-
-  </div>
-
-
-     {/* STATUS */}
-
-<div
-  style={{
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "8px",
-
-    marginTop: "6px",
-
-    flexWrap: "wrap",
-  }}
->
-
-  <div
-    style={{
-      width: "10px",
-
-      height: "10px",
-
-      borderRadius: "50%",
-
-      background: statusColor,
-
-      boxShadow:
-        `0 0 12px ${statusColor}`,
-
-      flexShrink: 0,
-    }}
-  />
-
-  <div
-    style={{
-      background:
-        `${statusColor}15`,
-
-      color: statusColor,
-
-      padding: "4px 10px",
-
-      borderRadius: "999px",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "10px"
-          : "11px",
-
-      fontWeight: "800",
-
-      border:
-        `1px solid ${statusColor}30`,
-    }}
-  >
-    {deliveryStatus}
-  </div>
-
-</div>
-
-</div>
-
-
-  {/* ETA */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-    borderRadius: "16px",
-
-    padding:
-      window.innerWidth < 768
-        ? "10px 12px"
-        : "12px 16px",
-
-    color: "#FFFFFF",
-
-    minWidth:
-      window.innerWidth < 768
-        ? "85px"
-        : "110px",
-
-    textAlign: "center",
-
-    boxShadow:
-      "0 10px 25px rgba(37,99,235,0.25)",
-
-    flexShrink: 0,
-  }}
->
-
-  <p
-    style={{
-      margin: 0,
-
-      fontSize:
-        window.innerWidth < 768
-          ? "9px"
-          : "10px",
-
-      opacity: 0.9,
-
-      fontWeight: "700",
-
-      textTransform: "uppercase",
-
-      letterSpacing: "0.5px",
-    }}
-  >
-    ETA
-  </p>
-
-  <h2
-    style={{
-      margin: 0,
-
-      marginTop: "3px",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "18px"
-          : "24px",
-
-      fontWeight: "900",
-
-      lineHeight: 1.1,
-    }}
-  >
-    {estimatedTime}
-  </h2>
-
-  <p
-    style={{
-      margin: 0,
-
-      marginTop: "2px",
-
-      fontSize: "9px",
-
-      opacity: 0.85,
-    }}
-  >
-    Arrivée
-  </p>
-
-</div>
-
-    {/* GPS */}
-
-<div
-  style={{
-    background: "#FFFFFF",
-
-    border: "1px solid #E2E8F0",
-
-    borderRadius: "16px",
-
-    padding:
-      window.innerWidth < 768
-        ? "10px"
-        : "12px 14px",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "10px",
-
-    minWidth:
-      window.innerWidth < 768
-        ? "120px"
-        : "145px",
-
-    boxShadow:
-      "0 4px 12px rgba(15,23,42,0.04)",
-
-    flexShrink: 0,
-  }}
->
-
-  {/* ICON */}
-
-  <div
-    style={{
-      width:
-        window.innerWidth < 768
-          ? "34px"
-          : "38px",
-
-      height:
-        window.innerWidth < 768
-          ? "34px"
-          : "38px",
-
-      borderRadius: "12px",
-
-      background:
-        "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-      display: "flex",
-
-      alignItems: "center",
-
-      justifyContent: "center",
-
-      color: "#FFFFFF",
-
-      flexShrink: 0,
-
-      boxShadow:
-        "0 6px 14px rgba(37,99,235,0.20)",
-    }}
-  >
-    <FaMapMarkerAlt
-      style={{
-        fontSize:
-          window.innerWidth < 768
-            ? "13px"
-            : "15px",
-      }}
-    />
-  </div>
-
-  {/* TEXT */}
-
-  <div>
-
-    <p
-      style={{
-        margin: 0,
-
-        color: "#94A3B8",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "8px"
-            : "9px",
-
-        fontWeight: "700",
-
-        letterSpacing: "0.5px",
-      }}
-    >
-      GPS TRACKING
-    </p>
-
-    <h3
-      style={{
-        margin: 0,
-
-        marginTop: "2px",
-
-        color: "#0F172A",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "11px"
-            : "13px",
-
-        fontWeight: "900",
-
-        lineHeight: 1.2,
-      }}
-    >
-      {liveStatus}
-    </h3>
-
-  </div>
-
-</div>
-
-
-{/* ========================= */}
-{/* PREMIUM MAIN GRID */}
-{/* ========================= */}
-
-<div
-  style={{
-    display: "grid",
-
-    gridTemplateColumns: "1fr",
-
-    gap:
-      window.innerWidth < 768
-        ? "14px"
-        : "22px",
-
-    width: "100%",
-
-    maxWidth: "100%",
-
-    overflow: "hidden",
-  }}
->
-
-  {/* ========================= */}
-  {/* MAP CONTAINER */}
-  {/* ========================= */}
-
-  <div
-    style={{
-      background:
-        "linear-gradient(180deg,#FFFFFF,#F8FAFC)",
-
-      borderRadius:
-        window.innerWidth < 768
-          ? "24px"
-          : "32px",
-
-      overflow: "hidden",
-
-      position: "relative",
-
-      width: "100%",
-
-     minHeight:
-  window.innerWidth < 768
-    ? "75vh"
-    : "100vh",
-
-height: "auto",
-
-      border:
-        "1px solid #E5E7EB",
-
-      boxShadow:
-        "0 12px 40px rgba(15,23,42,0.08)",
-
-      transition:
-        "all .3s ease",
-    }}
-  >
-{/* LIVE BADGE */}
-
-<div
-  style={{
-    position: "absolute",
-
-    top:
-      window.innerWidth < 768
-        ? "10px"
-        : "20px",
-
-    right:
-      window.innerWidth < 768
-        ? "10px"
-        : "20px",
-
-    zIndex: 999,
-
-    background:
-      "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-    padding:
-      window.innerWidth < 768
-        ? "6px 10px"
-        : "10px 14px",
-
-    borderRadius: "999px",
-
-    color: "#FFFFFF",
-
-    fontWeight: "800",
-
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "6px",
-
-    fontSize:
-      window.innerWidth < 768
-        ? "9px"
-        : "12px",
-
-    boxShadow:
-      "0 6px 18px rgba(37,99,235,0.18)",
-
-    border:
-      "1px solid rgba(255,255,255,0.15)",
-
-    backdropFilter: "blur(10px)",
-
-    maxWidth:
-      window.innerWidth < 768
-        ? "130px"
-        : "180px",
-  }}
->
-
-  <FaCircle
-    style={{
-      color: "#22C55E",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "6px"
-          : "8px",
-
-      filter:
-        "drop-shadow(0 0 6px rgba(34,197,94,0.9))",
-
-      flexShrink: 0,
-    }}
-  />
-
-  <span
-    style={{
-      whiteSpace: "nowrap",
-
-      overflow: "hidden",
-
-      textOverflow: "ellipsis",
-    }}
-  >
-    {liveStatus}
-  </span>
-
-</div>
-
-{/* DESTINATION */}
-
-<div
-  style={{
-    marginTop: "12px",
-
-    background: "#FFFFFF",
-
-    borderRadius: "14px",
-
-    padding:
-      window.innerWidth < 768
-        ? "10px"
-        : "14px",
-
-    border: "1px solid #E2E8F0",
-
-    boxShadow:
-      "0 4px 12px rgba(15,23,42,0.04)",
-  }}
->
-
-  {/* HEADER */}
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      marginBottom: "8px",
-    }}
-  >
-
-    <div
-      style={{
-        width:
-          window.innerWidth < 768
-            ? "26px"
-            : "30px",
-
-        height:
-          window.innerWidth < 768
-            ? "26px"
-            : "30px",
-
-        borderRadius: "8px",
-
-        background: "#DBEAFE",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        color: "#2563EB",
-
-        flexShrink: 0,
-      }}
-    >
-      <FaMapMarkerAlt
-        style={{
-          fontSize: "12px",
-        }}
-      />
-    </div>
-
-    <p
-      style={{
-        margin: 0,
-
-        color: "#64748B",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "10px"
-            : "11px",
-
-        fontWeight: "800",
-
-        textTransform: "uppercase",
-
-        letterSpacing: "0.8px",
-      }}
-    >
-      Adresse de livraison
-    </p>
-
-  </div>
-
-  {/* ADRESSE */}
-
-  <h3
-    style={{
-      margin: 0,
-
-      color: "#0F172A",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "13px"
-          : "15px",
-
-      fontWeight: "900",
-
-      lineHeight: "20px",
-    }}
-  >
-    {order?.address}
-  </h3>
-
-  {/* VILLE + QUARTIER */}
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      flexWrap: "wrap",
-
-      marginTop: "10px",
-    }}
-  >
-
-    <div
-      style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "5px",
-
-        color: "#64748B",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "11px"
-            : "12px",
-
-        fontWeight: "700",
-      }}
-    >
-      <FaCity
-        style={{
-          color: "#2563EB",
-          fontSize: "11px",
-        }}
-      />
-
-      {order?.city}
-    </div>
-
-    <div
-      style={{
-        width: "4px",
-
-        height: "4px",
-
-        borderRadius: "50%",
-
-        background: "#CBD5E1",
-      }}
-    />
-
-    <div
-      style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "5px",
-
-        color: "#64748B",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "11px"
-            : "12px",
-
-        fontWeight: "700",
-      }}
-    >
-      <FaLocationArrow
-        style={{
-          color: "#2563EB",
-          fontSize: "11px",
-        }}
-      />
-
-      {order?.district}
-    </div>
-
-  </div>
-
-</div>
-
-{/* ========================= */}
-{/* PRODUITS COMMANDÉS */}
-{/* ========================= */}
-
-{order?.items?.map((item, index) => (
-
-  <div
-    key={index}
-    style={{
-      marginTop: index === 0 ? "16px" : "10px",
-
-      background: "#FFFFFF",
-
-      borderRadius: "14px",
-
-      padding:
-        window.innerWidth < 768
-          ? "12px"
-          : "14px",
-
-      border: "1px solid #E2E8F0",
-
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "10px",
-
-      boxShadow:
-        "0 4px 12px rgba(0,0,0,0.04)",
-    }}
-  >
-
-    {/* IMAGE */}
-
-    <img
-      src={
-  item?.image
-    ? item.image.includes("localhost:5000")
-      ? item.image.replace(
-          "http://localhost:5000",
-          "https://konanshopping.com/api/"
-        )
-      : item.image.startsWith("/uploads")
-      ? `https://konanshopping.com/api/${item.image}`
-      : item.image
-    : "/logo.jpg"
-}
-      alt={item?.name || "Produit"}
-  onError={(e) => {
-    e.target.src = "/logo.jpg";
-  }}
-      style={{
-        width:
-          window.innerWidth < 768
-            ? "58px"
-            : "72px",
-
-        height:
-          window.innerWidth < 768
-            ? "58px"
-            : "72px",
-
-        borderRadius: "14px",
-
-        objectFit: "cover",
-
-        border:
-          "1px solid #E2E8F0",
-
-        flexShrink: 0,
-      }}
-    />
-
-    {/* INFOS */}
-
-    <div
-      style={{
-        flex: 1,
-        minWidth: 0,
-      }}
-    >
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-          marginBottom: "6px",
-        }}
-      >
-
-        <FaShoppingBag
-          style={{
-            color: "#2563EB",
-            fontSize: "12px",
-          }}
-        />
-
-        <p
-          style={{
-            margin: 0,
-            color: "#64748B",
-            fontSize: "11px",
-            fontWeight: "800",
-            textTransform:
-              "uppercase",
-          }}
-        >
-          Produit {index + 1}
-        </p>
-
-      </div>
-
-      <h3
-        style={{
-          margin: 0,
-          color: "#0F172A",
-          fontSize:
-            window.innerWidth < 768
-              ? "13px"
-              : "15px",
-          fontWeight: "900",
-        }}
-      >
-        {item?.name}
-      </h3>
-
-{/* PRIX */}
-
-<div
-  style={{
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "6px",
-
-    marginTop: "8px",
-
-    color: "#16A34A",
-
-    fontSize:
-      window.innerWidth < 768
-        ? "13px"
-        : "14px",
-
-    fontWeight: "900",
-  }}
->
-
-  <FaMoneyBillWave
-    style={{
-      color: "#16A34A",
-      fontSize: "12px",
-    }}
-  />
-
-  <span>
-    {item?.price?.toLocaleString?.() ||
-      0} FCFA
-  </span>
-
-</div>
-
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          marginTop: "10px",
-          background:
-            "#EEF2FF",
-          color: "#2563EB",
-          padding: "6px 10px",
-          borderRadius: "999px",
-          fontSize: "11px",
-          fontWeight: "800",
-        }}
-      >
-
-        <FaCube />
-
-        Quantité :
-        {" "}
-        x{item?.quantity}
-
-      </div>
-
-    </div>
-
-  </div>
-
-))}
-
-  {/* STATS */}
-
-  <div
-    style={{
-      display: "grid",
-
-      gridTemplateColumns:
-        "1fr 1fr",
-
-      gap: "12px",
-
-      marginTop: "16px",
-    }}
-  >
-
-   {/* ETA */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "18px",
-
-    color: "#FFFFFF",
-
-    boxShadow:
-      "0 10px 25px rgba(37,99,235,0.25)",
-
-    display: "flex",
-
-    flexDirection: "column",
-
-    justifyContent: "center",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "85px"
-        : "120px",
-  }}
->
-
-  {/* HEADER */}
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      marginBottom: "8px",
-    }}
-  >
-
-    <FaClock
-      style={{
-        fontSize:
-          window.innerWidth < 768
-            ? "14px"
-            : "16px",
-
-        opacity: 0.9,
-      }}
-    />
-
-    <p
-      style={{
-        margin: 0,
-
-        fontSize:
-          window.innerWidth < 768
-            ? "11px"
-            : "12px",
-
-        fontWeight: "800",
-
-        textTransform:
-          "uppercase",
-
-        opacity: 0.9,
-
-        letterSpacing: "0.5px",
-      }}
-    >
-      Temps estimé
-    </p>
-
-  </div>
-
-  {/* TEMPS */}
-
-  <h2
-    style={{
-      margin: 0,
-
-      fontSize:
-        window.innerWidth < 768
-          ? "24px"
-          : "30px",
-
-      fontWeight: "900",
-
-      lineHeight: 1.1,
-    }}
-  >
-    {estimatedTime}
-  </h2>
-
-  {/* DESCRIPTION */}
-
-  <p
-    style={{
-      marginTop: "6px",
-
-      marginBottom: 0,
-
-      fontSize:
-        window.innerWidth < 768
-          ? "11px"
-          : "12px",
-
-      opacity: 0.85,
-
-      fontWeight: "600",
-    }}
-  >
-    Heure d'arrivée estimée
-  </p>
-
-</div>
-
-{/* DISTANCE */}
-
-<div
-  style={{
-    background: "#FFFFFF",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "18px",
-
-    border:
-      "1px solid #E2E8F0",
-
-    boxShadow:
-      "0 8px 20px rgba(15,23,42,0.05)",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "100px"
-        : "120px",
-  }}
->
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      marginBottom: "8px",
-    }}
-  >
-
-    <FaRoute
-      style={{
-        color: "#2563EB",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "14px"
-            : "16px",
-      }}
-    />
-
-    <p
-      style={{
-        margin: 0,
-
-        color: "#64748B",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "11px"
-            : "12px",
-
-        fontWeight: "800",
-
-        textTransform:
-          "uppercase",
-      }}
-    >
-      Distance
-    </p>
-
-  </div>
-
-  <h2
-    style={{
-      margin: 0,
-
-      color: "#0F172A",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "24px"
-          : "30px",
-
-      fontWeight: "900",
-    }}
-  >
-    {distance}
-  </h2>
-
-  <p
-    style={{
-      marginTop: "6px",
-
-      marginBottom: 0,
-
-      color: "#64748B",
-
-      fontSize:
-        window.innerWidth < 768
-          ? "11px"
-          : "12px",
-
-      fontWeight: "600",
-    }}
-  >
-    Distance restante
-  </p>
-
-</div>
-
-</div>
-
-{/* PROGRESSION */}
-
-<div
-  style={{
-    marginTop: "18px",
-
-    background: "#FFFFFF",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "14px"
-        : "18px",
-
-    border:
-      "1px solid #E2E8F0",
-
-    boxShadow:
-      "0 8px 20px rgba(15,23,42,0.04)",
-  }}
->
-
-  <div
-    style={{
-      display: "flex",
-
-      justifyContent:
-        "space-between",
-
-      alignItems: "center",
-
-      marginBottom: "12px",
-    }}
-  >
-
-    <div
-      style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "8px",
-      }}
-    >
-
-      <FaChartLine
-        style={{
-          color: "#2563EB",
-        }}
-      />
-
-      <span
-        style={{
-          color: "#475569",
-
-          fontSize: "12px",
-
-          fontWeight: "800",
-        }}
-      >
-        Progression
-      </span>
-
-    </div>
-
-    <span
-      style={{
-        color: "#2563EB",
-
-        fontWeight: "900",
-
-        fontSize: "13px",
-      }}
-    >
-      {progress}%
-    </span>
-
-  </div>
-
-  <div
-    style={{
-      width: "100%",
-
-      height: "10px",
-
-      background: "#E2E8F0",
-
-      borderRadius: "999px",
-
-      overflow: "hidden",
-    }}
-  >
-
-    <div
-      style={{
-        width: `${progress}%`,
-
-        height: "100%",
-
-        background:
-          "linear-gradient(90deg,#2563EB,#3B82F6)",
-
-        borderRadius: "999px",
-
-        transition:
-          "all .5s ease",
-      }}
-    />
-
-  </div>
-
-</div>
-
-{/* ========================= */}
-{/* MAP */}
-{/* ========================= */}
-
-<MapContainer
-  center={position}
-  zoom={15}
-  zoomControl={false}
-  style={{
-    width: "100%",
-
-    height: "100%",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "50vh"
-        : "70vh",
-
-    zIndex: 2,
-
-    borderRadius:
-      window.innerWidth < 768
-        ? "20px"
-        : "30px",
-  }}
-
-  whenCreated={(map) => {
-
-    map.on("click", (e) => {
-
-      setLocation({
-        lat: e.latlng.lat,
-        lng: e.latlng.lng,
-      });
-
-      console.log(e.latlng);
-
-    });
-
-  }}
-
->
-
-  {/* RECENTER */}
-
-  <RecenterMap
-    position={position}
-  />
-
-  {/* ZOOM */}
-
-  <ZoomControl
-    position="bottomright"
-  />
-
-  {/* MAP TILE */}
-
-  <TileLayer
-    attribution="&copy; MapTiler & OpenStreetMap contributors"
-
-    url="https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=9JxhpJjsI1LkjTuEYlOC"
-  />
-
-  {/* ROUTE GLOW */}
-
-  <Polyline
-    positions={[
-      position,
-      customerPosition,
-    ]}
-
-    pathOptions={{
-      color: "#93C5FD",
-
-      weight:
-        window.innerWidth < 768
-          ? 12
-          : 18,
-
-      opacity: 0.22,
-
-      lineCap: "round",
-
-      lineJoin: "round",
-    }}
-  />
-
-  {/* MAIN ROUTE */}
-
-<Polyline
-  positions={[
-    position,
-    customerPosition,
-  ]}
-
-  pathOptions={{
-    color: "#2563EB",
-
-    weight:
-      window.innerWidth < 768
-        ? 5
-        : 7,
-
-    opacity: 1,
-
-    lineCap: "round",
-
-    lineJoin: "round",
-
-    dashArray:
-      realDistance > 1
-        ? null
-        : "12,8",
-  }}
-/>
-
-{/* DRIVER GLOW */}
-
-<Circle
-  center={position}
-
-  radius={
-    window.innerWidth < 768
-      ? 120
-      : 180
-  }
-
-  pathOptions={{
-    color: "#2563EB",
-
-    fillColor: "#2563EB",
-
-    fillOpacity: 0.15,
-
-    weight: 2,
-  }}
-/>
-
-{/* CLIENT GLOW */}
-
-<Circle
-  center={customerPosition}
-
-  radius={
-    window.innerWidth < 768
-      ? 120
-      : 180
-  }
-
-  pathOptions={{
-    color: "#EF4444",
-
-    fillColor: "#EF4444",
-
-    fillOpacity: 0.15,
-
-    weight: 2,
-  }}
-/>
-
-{/* DRIVER */}
-
-<Marker
-  position={position}
-  icon={driverIcon}
->
-
-  <Popup>
-
-    <div
-      style={{
-        minWidth:
-          window.innerWidth < 768
-            ? "180px"
-            : "220px",
-
-        fontFamily:
-          "Inter, sans-serif",
-      }}
-    >
-
-{/* DRIVER HEADER */}
-
-<div
-  style={{
-    display: "flex",
-
-    alignItems: "center",
-
-    gap: "12px",
-  }}
->
-
-  {/* PHOTO */}
-
-  <div
-    style={{
-      position: "relative",
-    }}
-  >
-
-    <img
-      src={
-        order?.driver?.photo ||
-        "https://randomuser.me/api/portraits/men/32.jpg"
-      }
-
-      alt="Livreur"
-
-      style={{
-        width: "56px",
-
-        height: "56px",
-
-        borderRadius: "50%",
-
-        objectFit: "cover",
-
-        border:
-          "3px solid #DBEAFE",
-
-        boxShadow:
-          "0 4px 12px rgba(37,99,235,0.15)",
-      }}
-    />
-
-    {/* ONLINE */}
-
-    <div
-      style={{
-        position: "absolute",
-
-        right: "2px",
-
-        bottom: "2px",
-
-        width: "14px",
-
-        height: "14px",
-
-        borderRadius: "50%",
-
-        background: "#22C55E",
-
-        border:
-          "2px solid #FFFFFF",
-      }}
-    />
-
-  </div>
-
-  {/* INFOS */}
-
-  <div
-    style={{
-      flex: 1,
-    }}
-  >
-
-    <h3
-      style={{
-        margin: 0,
-
-        color: "#0F172A",
-
-        fontSize: "16px",
-
-        fontWeight: "900",
-      }}
-    >
-      {
-        order?.driver?.name ||
-        "Konan Delivery"
-      }
-    </h3>
-
-    <div
-      style={{
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "6px",
-
-        marginTop: "4px",
-      }}
-    >
-
-      <FaCheckCircle
-        style={{
-          color: statusColor,
-
-          fontSize: "12px",
-        }}
-      />
-
-      <span
-        style={{
-          color: statusColor,
-
-          fontWeight: "700",
-
-          fontSize: "12px",
-        }}
-      >
-        {deliveryStatus}
-      </span>
-
-    </div>
-
-  </div>
-
-</div>
-
-{/* INFOS */}
-
-<div
-  style={{
-    marginTop: "14px",
-
-    paddingTop: "14px",
-
-    borderTop:
-      "1px solid #E5E7EB",
-  }}
->
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      marginBottom: "10px",
-
-      color: "#475569",
-
-      fontSize: "13px",
-
-      fontWeight: "700",
-    }}
-  >
-
-    <FaRoute
-      style={{
-        color: "#2563EB",
-      }}
-    />
-
-    <span>
-      Distance :
-    </span>
-
-    <strong>
-      {distance}
-    </strong>
-
-  </div>
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      marginBottom: "10px",
-
-      color: "#475569",
-
-      fontSize: "13px",
-
-      fontWeight: "700",
-    }}
-  >
-
-    <FaClock
-      style={{
-        color: "#2563EB",
-      }}
-    />
-
-    <span>
-      ETA :
-    </span>
-
-    <strong>
-      {estimatedTime}
-    </strong>
-
-  </div>
-
-  <div
-    style={{
-      display: "flex",
-
-      alignItems: "center",
-
-      gap: "8px",
-
-      color: "#475569",
-
-      fontSize: "13px",
-
-      fontWeight: "700",
-    }}
-  >
-
-    <FaMotorcycle
-      style={{
-        color: "#2563EB",
-      }}
-    />
-
-    <strong>
-      {realSpeed}
-    </strong>
-
-  </div>
-
-</div>
-
-</div>
-
-</Popup>
-
-</Marker>
-
-  {/* CLIENT */}
-
-<Marker
-  position={customerPosition}
-  icon={customerIcon}
->
-
-  <Popup>
-
-    <div
-      style={{
-        minWidth:
-          window.innerWidth < 768
-            ? "180px"
-            : "230px",
-
-        fontFamily:
-          "Inter, sans-serif",
-      }}
-    >
-
-      {/* HEADER */}
-
-      <div
-        style={{
-          display: "flex",
-
-          alignItems: "center",
-
-          gap: "10px",
-
-          marginBottom: "12px",
-        }}
-      >
-
-        <div
-          style={{
-            width: "42px",
-
-            height: "42px",
-
-            borderRadius: "12px",
-
-            background:
-              "#DBEAFE",
-
-            display: "flex",
-
-            justifyContent:
-              "center",
-
-            alignItems:
-              "center",
-
-            color: "#2563EB",
-          }}
-        >
-          <FaMapMarkerAlt />
-        </div>
-
-        <div>
-
-          <h3
-            style={{
-              margin: 0,
-
-              color: "#0F172A",
-
-              fontSize: "15px",
-
-              fontWeight: "900",
-            }}
-          >
-            Destination Client
-          </h3>
-
-          <p
-            style={{
-              margin: 0,
-
-              color: "#64748B",
-
-              fontSize: "11px",
-
-              marginTop: "2px",
-            }}
-          >
-            Adresse de livraison
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* ADRESSE */}
-
-      <div
-        style={{
-          background:
-            "#F8FAFC",
-
-          border:
-            "1px solid #E2E8F0",
-
-          borderRadius: "14px",
-
-          padding: "12px",
-        }}
-      >
-
         <div
           style={{
             display: "flex",
-
-            alignItems: "flex-start",
-
-            gap: "8px",
+            alignItems: "center",
+            gap: "11px",
+            minWidth: 0,
+            flex: 1,
           }}
         >
 
-          <FaLocationArrow
+          <div
             style={{
-              color: "#2563EB",
+              width:
+                window.innerWidth < 768
+                  ? "48px"
+                  : "56px",
 
-              marginTop: "3px",
+              height:
+                window.innerWidth < 768
+                  ? "48px"
+                  : "56px",
+
+              borderRadius: "15px",
+
+              background:
+                "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+              display: "flex",
+
+              alignItems: "center",
+
+              justifyContent: "center",
+
+              color: "#FFFFFF",
+
+              fontSize:
+                window.innerWidth < 768
+                  ? "20px"
+                  : "23px",
 
               flexShrink: 0,
+
+              boxShadow:
+                "0 8px 20px rgba(37,99,235,.2)",
+            }}
+          >
+            <FaTruck />
+          </div>
+
+
+          <div
+            style={{
+              minWidth: 0,
+            }}
+          >
+
+            <h1
+              style={{
+                margin: 0,
+                color: "#0F172A",
+                fontSize:
+                  window.innerWidth < 768
+                    ? "17px"
+                    : "22px",
+                fontWeight: "900",
+                lineHeight: 1.2,
+              }}
+            >
+              Suivi de livraison
+            </h1>
+
+            <p
+              style={{
+                margin: "4px 0 0",
+                color: "#64748B",
+                fontSize:
+                  window.innerWidth < 768
+                    ? "10px"
+                    : "12px",
+              }}
+            >
+              Commande #
+              {String(order._id).slice(-8)}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        {/* STATUS */}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            background: statusInfo.bg,
+            color: statusInfo.color,
+            border:
+              `1px solid ${statusInfo.color}30`,
+            padding: "7px 11px",
+            borderRadius: "999px",
+            fontSize: "11px",
+            fontWeight: "900",
+            flexShrink: 0,
+          }}
+        >
+
+          <FaCircle
+            style={{
+              fontSize: "6px",
             }}
           />
 
-          <p
-            style={{
-              margin: 0,
-
-              color: "#334155",
-
-              fontSize: "13px",
-
-              fontWeight: "700",
-
-              lineHeight: "20px",
-            }}
-          >
-            {order?.address}
-          </p>
+          {statusInfo.label}
 
         </div>
 
       </div>
 
-      {/* QUARTIER */}
 
-      <div
-        style={{
-          marginTop: "10px",
+      {/* ================================================= */}
+      {/* DRIVER CARD */}
+      {/* ================================================= */}
 
-          display: "flex",
+      {assignedDriver && (
 
-          alignItems: "center",
-
-          gap: "8px",
-        }}
-      >
-
-        <FaMapPin
+        <div
           style={{
-            color: "#EF4444",
+            background:
+              "linear-gradient(135deg,#EFF6FF,#FFFFFF)",
+            border:
+              "1px solid #BFDBFE",
+            borderRadius: "18px",
+            padding:
+              window.innerWidth < 768
+                ? "12px"
+                : "16px",
+            marginBottom: "14px",
+            boxShadow:
+              "0 8px 22px rgba(37,99,235,.08)",
           }}
-        />
+        >
 
-        <span
+          {/* HEADER LIVREUR */}
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+            }}
+          >
+
+            {/* PHOTO */}
+
+            <div
+              style={{
+                position: "relative",
+                flexShrink: 0,
+              }}
+            >
+
+              <img
+                src={
+                  assignedDriver.photo ||
+                  "/logo.jpg"
+                }
+                alt={
+                  assignedDriver.name ||
+                  "Livreur"
+                }
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "/logo.jpg";
+                }}
+                style={{
+                  width:
+                    window.innerWidth < 768
+                      ? "58px"
+                      : "68px",
+                  height:
+                    window.innerWidth < 768
+                      ? "58px"
+                      : "68px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border:
+                    "3px solid #DBEAFE",
+                  boxShadow:
+                    "0 8px 20px rgba(37,99,235,.15)",
+                }}
+              />
+
+              <span
+                style={{
+                  position: "absolute",
+                  right: "2px",
+                  bottom: "2px",
+                  width: "14px",
+                  height: "14px",
+                  borderRadius: "50%",
+                  background:
+                    gpsOnline
+                      ? "#22C55E"
+                      : "#94A3B8",
+                  border:
+                    "2px solid white",
+                }}
+              />
+
+            </div>
+
+
+            {/* NOM */}
+
+            <div
+              style={{
+                flex: 1,
+                minWidth: 0,
+              }}
+            >
+
+              <div
+                style={{
+                  color: "#64748B",
+                  fontSize: "9px",
+                  fontWeight: "900",
+                  textTransform: "uppercase",
+                  letterSpacing: ".7px",
+                }}
+              >
+                Votre livreur
+              </div>
+
+              <h2
+                style={{
+                  margin: "3px 0",
+                  color: "#0F172A",
+                  fontSize:
+                    window.innerWidth < 768
+                      ? "17px"
+                      : "20px",
+                  fontWeight: "900",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {assignedDriver.name ||
+                  "Livreur Konan"}
+              </h2>
+
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color:
+                    gpsOnline
+                      ? "#16A34A"
+                      : "#64748B",
+                  fontSize: "10px",
+                  fontWeight: "800",
+                }}
+              >
+
+                <FaSignal />
+
+                {gpsOnline
+                  ? "GPS en direct"
+                  : "GPS hors ligne"}
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* INFORMATIONS */}
+
+          <div
+            style={{
+              display: "grid",
+
+              gridTemplateColumns:
+                window.innerWidth < 600
+                  ? "1fr 1fr"
+                  : "repeat(3,1fr)",
+
+              gap: "8px",
+
+              marginTop: "13px",
+            }}
+          >
+
+            {/* TELEPHONE */}
+
+            <div
+              style={{
+                background: "#F8FAFC",
+                borderRadius: "12px",
+                padding: "10px",
+                border:
+                  "1px solid #E2E8F0",
+              }}
+            >
+
+              <div
+                style={{
+                  color: "#94A3B8",
+                  fontSize: "8px",
+                  fontWeight: "800",
+                }}
+              >
+                <FaPhoneAlt /> TÉLÉPHONE
+              </div>
+
+              <div
+                style={{
+                  marginTop: "5px",
+                  color: "#0F172A",
+                  fontSize: "11px",
+                  fontWeight: "900",
+                }}
+              >
+                {assignedDriver.phone ||
+                  "Non renseigné"}
+              </div>
+
+            </div>
+
+
+            {/* VEHICULE */}
+
+            <div
+              style={{
+                background: "#F8FAFC",
+                borderRadius: "12px",
+                padding: "10px",
+                border:
+                  "1px solid #E2E8F0",
+              }}
+            >
+
+              <div
+                style={{
+                  color: "#94A3B8",
+                  fontSize: "8px",
+                  fontWeight: "800",
+                }}
+              >
+                <FaMotorcycle /> VÉHICULE
+              </div>
+
+              <div
+                style={{
+                  marginTop: "5px",
+                  color: "#0F172A",
+                  fontSize: "11px",
+                  fontWeight: "900",
+                  textTransform: "capitalize",
+                }}
+              >
+                {assignedDriver.vehicle ||
+                  "Non renseigné"}
+              </div>
+
+            </div>
+
+
+            {/* PLAQUE */}
+
+            <div
+              style={{
+                background: "#F8FAFC",
+                borderRadius: "12px",
+                padding: "10px",
+                border:
+                  "1px solid #E2E8F0",
+              }}
+            >
+
+              <div
+                style={{
+                  color: "#94A3B8",
+                  fontSize: "8px",
+                  fontWeight: "800",
+                }}
+              >
+                <FaTruck /> PLAQUE
+              </div>
+
+              <div
+                style={{
+                  marginTop: "5px",
+                  color: "#0F172A",
+                  fontSize: "11px",
+                  fontWeight: "900",
+                }}
+              >
+                {assignedDriver.plate ||
+                  "Non renseignée"}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* APPELER */}
+
+          {assignedDriver.phone && (
+
+            <a
+              href={`tel:${assignedDriver.phone}`}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                textDecoration: "none",
+                background:
+                  "linear-gradient(135deg,#16A34A,#22C55E)",
+                color: "#FFFFFF",
+                padding: "11px",
+                borderRadius: "12px",
+                fontSize: "12px",
+                fontWeight: "900",
+                boxShadow:
+                  "0 8px 18px rgba(22,163,74,.18)",
+              }}
+            >
+
+              <FaPhoneAlt />
+
+              Appeler le livreur
+
+            </a>
+
+          )}
+
+        </div>
+
+      )}
+
+
+      {/* ================================================= */}
+      {/* NO DRIVER */}
+      {/* ================================================= */}
+
+      {!assignedDriver &&
+        order.status !== "Livrée" && (
+
+        <div
           style={{
+            background: "#FFFFFF",
+            border:
+              "1px solid #E2E8F0",
+            borderRadius: "18px",
+            padding: "14px",
+            marginBottom: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
             color: "#64748B",
-
             fontSize: "12px",
-
             fontWeight: "700",
           }}
         >
-          {order?.district}
-        </span>
+
+          <FaBoxOpen
+            style={{
+              color: "#2563EB",
+              fontSize: "20px",
+            }}
+          />
+
+          Votre commande est en attente
+          d'un livreur.
+
+        </div>
+
+      )}
+
+
+      {/* ================================================= */}
+      {/* STATS */}
+      {/* ================================================= */}
+
+      <div
+        style={{
+          display: "grid",
+
+          gridTemplateColumns:
+            "repeat(3,1fr)",
+
+          gap:
+            window.innerWidth < 768
+              ? "8px"
+              : "12px",
+
+          marginBottom: "14px",
+        }}
+      >
+
+        {/* ETA */}
+
+        <div
+          style={{
+            background:
+              "linear-gradient(135deg,#2563EB,#1D4ED8)",
+            color: "#FFFFFF",
+            borderRadius: "16px",
+            padding:
+              window.innerWidth < 768
+                ? "11px"
+                : "15px",
+            boxShadow:
+              "0 9px 22px rgba(37,99,235,.18)",
+          }}
+        >
+
+          <FaClock
+            style={{
+              fontSize: "12px",
+            }}
+          />
+
+          <div
+            style={{
+              marginTop: "5px",
+              fontSize:
+                window.innerWidth < 768
+                  ? "17px"
+                  : "23px",
+              fontWeight: "900",
+            }}
+          >
+            {estimatedTime}
+          </div>
+
+          <div
+            style={{
+              marginTop: "2px",
+              fontSize: "8px",
+              opacity: .8,
+              fontWeight: "700",
+            }}
+          >
+            ETA
+          </div>
+
+        </div>
+
+
+        {/* DISTANCE */}
+
+        <div
+          style={{
+            background: "#FFFFFF",
+            border:
+              "1px solid #E2E8F0",
+            borderRadius: "16px",
+            padding:
+              window.innerWidth < 768
+                ? "11px"
+                : "15px",
+          }}
+        >
+
+          <FaRoute
+            style={{
+              color: "#2563EB",
+              fontSize: "12px",
+            }}
+          />
+
+          <div
+            style={{
+              marginTop: "5px",
+              color: "#0F172A",
+              fontSize:
+                window.innerWidth < 768
+                  ? "17px"
+                  : "23px",
+              fontWeight: "900",
+            }}
+          >
+            {distanceText}
+          </div>
+
+          <div
+            style={{
+              marginTop: "2px",
+              color: "#64748B",
+              fontSize: "8px",
+              fontWeight: "700",
+            }}
+          >
+            Distance
+          </div>
+
+        </div>
+
+
+        {/* SPEED */}
+
+        <div
+          style={{
+            background: "#FFFFFF",
+            border:
+              "1px solid #E2E8F0",
+            borderRadius: "16px",
+            padding:
+              window.innerWidth < 768
+                ? "11px"
+                : "15px",
+          }}
+        >
+
+          <FaMotorcycle
+            style={{
+              color: "#7C3AED",
+              fontSize: "12px",
+            }}
+          />
+
+          <div
+            style={{
+              marginTop: "5px",
+              color: "#0F172A",
+              fontSize:
+                window.innerWidth < 768
+                  ? "17px"
+                  : "23px",
+              fontWeight: "900",
+            }}
+          >
+            {liveSpeed || "--"}
+          </div>
+
+          <div
+            style={{
+              marginTop: "2px",
+              color: "#64748B",
+              fontSize: "8px",
+              fontWeight: "700",
+            }}
+          >
+            km/h
+          </div>
+
+        </div>
 
       </div>
 
+
+      {/* ================================================= */}
+      {/* MAP */}
+      {/* ================================================= */}
+
+      <div
+        style={{
+          background: "#FFFFFF",
+          borderRadius:
+            window.innerWidth < 768
+              ? "20px"
+              : "28px",
+          overflow: "hidden",
+          border:
+            "1px solid #E2E8F0",
+          boxShadow:
+            "0 12px 35px rgba(15,23,42,.08)",
+          position: "relative",
+        }}
+      >
+
+        {/* GPS BADGE */}
+
+        <div
+          style={{
+            position: "absolute",
+            top: "12px",
+            right: "12px",
+            zIndex: 999,
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            background: "#0F172A",
+            color: "#FFFFFF",
+            padding: "7px 10px",
+            borderRadius: "999px",
+            fontSize: "9px",
+            fontWeight: "900",
+            boxShadow:
+              "0 6px 18px rgba(15,23,42,.2)",
+          }}
+        >
+
+          <FaCircle
+            style={{
+              color:
+                gpsOnline
+                  ? "#22C55E"
+                  : "#94A3B8",
+              fontSize: "6px",
+            }}
+          />
+
+          {gpsOnline
+            ? "GPS EN DIRECT"
+            : "GPS EN ATTENTE"}
+
+        </div>
+
+
+        <MapContainer
+          center={
+            driverPosition ||
+            customerPosition
+          }
+
+          zoom={
+            window.innerWidth < 768
+              ? 15
+              : 14
+          }
+
+          zoomControl={false}
+
+          style={{
+            width: "100%",
+            height:
+              window.innerWidth < 768
+                ? "58vh"
+                : "72vh",
+            minHeight: "430px",
+          }}
+        >
+
+          <RecenterMap
+            position={
+              driverPosition ||
+              customerPosition
+            }
+          />
+
+          <ZoomControl
+            position="bottomright"
+          />
+
+
+          {/* MAP */}
+
+          <TileLayer
+            attribution="
+              &copy; OpenStreetMap contributors
+            "
+            url="
+              https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=9JxhpJjsI1LkjTuEYlOC
+            "
+          />
+
+
+          {/* ROUTE */}
+
+          {driverPosition && (
+
+            <>
+
+              <Polyline
+                positions={[
+                  driverPosition,
+                  customerPosition,
+                ]}
+                pathOptions={{
+                  color: "#60A5FA",
+                  weight:
+                    window.innerWidth < 768
+                      ? 12
+                      : 18,
+                  opacity: .20,
+                  lineCap: "round",
+                }}
+              />
+
+
+              <Polyline
+                positions={[
+                  driverPosition,
+                  customerPosition,
+                ]}
+                pathOptions={{
+                  color: "#2563EB",
+                  weight:
+                    window.innerWidth < 768
+                      ? 5
+                      : 7,
+                  opacity: 1,
+                  lineCap: "round",
+                  lineJoin: "round",
+                }}
+              />
+
+            </>
+
+          )}
+
+
+          {/* DRIVER AREA */}
+
+          {driverPosition && (
+
+            <Circle
+              center={driverPosition}
+              radius={
+                window.innerWidth < 768
+                  ? 100
+                  : 160
+              }
+              pathOptions={{
+                color: "#2563EB",
+                fillColor: "#2563EB",
+                fillOpacity: .12,
+                weight: 2,
+              }}
+            />
+
+          )}
+
+
+          {/* DRIVER */}
+
+          {driverPosition && (
+
+            <Marker
+              position={driverPosition}
+              icon={driverIcon}
+            >
+
+              <Popup>
+
+                <div
+                  style={{
+                    minWidth: "210px",
+                    fontFamily:
+                      "Inter,sans-serif",
+                  }}
+                >
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
+
+                    <img
+                      src={
+                        assignedDriver?.photo ||
+                        "/logo.jpg"
+                      }
+                      alt="Livreur"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "/logo.jpg";
+                      }}
+                      style={{
+                        width: "52px",
+                        height: "52px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border:
+                          "3px solid #DBEAFE",
+                      }}
+                    />
+
+                    <div>
+
+                      <strong
+                        style={{
+                          color: "#0F172A",
+                          fontSize: "15px",
+                        }}
+                      >
+                        {assignedDriver?.name ||
+                          "Livreur Konan"}
+                      </strong>
+
+                      <div
+                        style={{
+                          color: "#16A34A",
+                          fontSize: "11px",
+                          fontWeight: "800",
+                          marginTop: "3px",
+                        }}
+                      >
+
+                        <FaCheckCircle />
+
+                        {" "}
+                        En livraison
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      paddingTop: "10px",
+                      borderTop:
+                        "1px solid #E2E8F0",
+                      color: "#475569",
+                      fontSize: "12px",
+                      lineHeight: "1.8",
+                    }}
+                  >
+
+                    📞{" "}
+                    {assignedDriver?.phone ||
+                      "Téléphone non renseigné"}
+
+                    <br />
+
+                    🏍️{" "}
+                    {assignedDriver?.vehicle ||
+                      "Véhicule non renseigné"}
+
+                    <br />
+
+                    🔢{" "}
+                    {assignedDriver?.plate ||
+                      "Plaque non renseignée"}
+
+                    <br />
+
+                    📍 Distance :
+                    {" "}
+                    <strong>
+                      {distanceText}
+                    </strong>
+
+                    <br />
+
+                    ⏱️ ETA :
+                    {" "}
+                    <strong>
+                      {estimatedTime}
+                    </strong>
+
+                  </div>
+
+                </div>
+
+              </Popup>
+
+            </Marker>
+
+          )}
+
+
+          {/* CUSTOMER */}
+
+          <Marker
+            position={customerPosition}
+            icon={customerIcon}
+          >
+
+            <Popup>
+
+              <div
+                style={{
+                  minWidth: "200px",
+                  fontFamily:
+                    "Inter,sans-serif",
+                }}
+              >
+
+                <strong
+                  style={{
+                    color: "#0F172A",
+                    fontSize: "15px",
+                  }}
+                >
+                  📍 Destination
+                </strong>
+
+                <p
+                  style={{
+                    color: "#64748B",
+                    fontSize: "12px",
+                    lineHeight: "1.5",
+                    marginBottom: "5px",
+                  }}
+                >
+                  {order.address ||
+                    "Adresse de livraison"}
+                </p>
+
+                <div
+                  style={{
+                    color: "#64748B",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                  }}
+                >
+
+                  {order.city}
+                  {" • "}
+                  {order.district}
+
+                </div>
+
+              </div>
+
+            </Popup>
+
+          </Marker>
+
+        </MapContainer>
+
+      </div>
+
+
+      {/* ================================================= */}
+      {/* PROGRESS */}
+      {/* ================================================= */}
+
+      {order.status ===
+        "En livraison" && (
+
+        <div
+          style={{
+            marginTop: "14px",
+            background: "#FFFFFF",
+            border:
+              "1px solid #E2E8F0",
+            borderRadius: "18px",
+            padding:
+              window.innerWidth < 768
+                ? "13px"
+                : "17px",
+            boxShadow:
+              "0 8px 20px rgba(15,23,42,.04)",
+          }}
+        >
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent:
+                "space-between",
+              alignItems: "center",
+              marginBottom: "9px",
+            }}
+          >
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                color: "#475569",
+                fontSize: "11px",
+                fontWeight: "800",
+              }}
+            >
+
+              <FaChartLine
+                style={{
+                  color: "#2563EB",
+                }}
+              />
+
+              Progression
+
+            </div>
+
+            <strong
+              style={{
+                color: "#2563EB",
+                fontSize: "12px",
+              }}
+            >
+              {Math.round(progress)}%
+            </strong>
+
+          </div>
+
+
+          <div
+            style={{
+              height: "9px",
+              background: "#E2E8F0",
+              borderRadius: "999px",
+              overflow: "hidden",
+            }}
+          >
+
+            <div
+              style={{
+                width: `${progress}%`,
+                height: "100%",
+                background:
+                  "linear-gradient(90deg,#2563EB,#3B82F6)",
+                borderRadius: "999px",
+                transition:
+                  "width .5s ease",
+              }}
+            />
+
+          </div>
+
+
+          {gpsTime && (
+
+            <div
+              style={{
+                marginTop: "8px",
+                color: "#94A3B8",
+                fontSize: "9px",
+                textAlign: "right",
+              }}
+            >
+
+              Dernière position :
+              {" "}
+              {gpsTime}
+
+            </div>
+
+          )}
+
+        </div>
+
+      )}
+
+
+      {/* ================================================= */}
+      {/* ✅ DELIVERY COMPLETED */}
+      {/* ================================================= */}
+
+      {order.status ===
+        "Livrée" && (
+
+        <div
+          style={{
+            marginTop: "14px",
+            background:
+              "linear-gradient(135deg,#DCFCE7,#F0FDF4)",
+            border:
+              "1px solid #86EFAC",
+            borderRadius: "18px",
+            padding: "16px",
+            boxShadow:
+              "0 8px 20px rgba(22,163,74,.08)",
+          }}
+        >
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+
+            <FaCheckCircle
+              style={{
+                color: "#16A34A",
+                fontSize: "25px",
+                flexShrink: 0,
+              }}
+            />
+
+            <div>
+
+              <div
+                style={{
+                  color: "#166534",
+                  fontSize: "16px",
+                  fontWeight: "900",
+                }}
+              >
+                Commande livrée
+              </div>
+
+              <div
+                style={{
+                  color: "#15803D",
+                  fontSize: "11px",
+                  marginTop: "3px",
+                }}
+              >
+                Votre commande a été livrée
+                avec succès.
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* LIVREUR QUI A LIVRÉ */}
+
+          {assignedDriver && (
+
+            <div
+              style={{
+                marginTop: "13px",
+                paddingTop: "12px",
+                borderTop:
+                  "1px solid #BBF7D0",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+
+              <img
+                src={
+                  assignedDriver.photo ||
+                  "/logo.jpg"
+                }
+                alt="Livreur"
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "/logo.jpg";
+                }}
+                style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border:
+                    "2px solid #86EFAC",
+                }}
+              />
+
+              <div>
+
+                <div
+                  style={{
+                    color: "#166534",
+                    fontSize: "9px",
+                    fontWeight: "800",
+                    textTransform:
+                      "uppercase",
+                  }}
+                >
+                  Livrée par
+                </div>
+
+                <strong
+                  style={{
+                    color: "#14532D",
+                    fontSize: "14px",
+                  }}
+                >
+                  {assignedDriver.name ||
+                    "Livreur Konan"}
+                </strong>
+
+                <div
+                  style={{
+                    color: "#15803D",
+                    fontSize: "10px",
+                    marginTop: "3px",
+                  }}
+                >
+
+                  {assignedDriver.vehicle ||
+                    "Véhicule"}
+
+                  {assignedDriver.plate
+                    ? ` • ${assignedDriver.plate}`
+                    : ""}
+
+                </div>
+
+              </div>
+
+            </div>
+
+          )}
+
+        </div>
+
+      )}
+
+
+      {/* ================================================= */}
+      {/* ❌ CANCELLED */}
+      {/* ================================================= */}
+
+      {order.status ===
+        "Annulée" && (
+
+        <div
+          style={{
+            marginTop: "14px",
+            background: "#FEF2F2",
+            border:
+              "1px solid #FECACA",
+            borderRadius: "18px",
+            padding: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            color: "#991B1B",
+            fontSize: "13px",
+            fontWeight: "800",
+          }}
+        >
+
+          <FaTimesCircle
+            style={{
+              fontSize: "22px",
+            }}
+          />
+
+          Cette commande a été
+          annulée.
+
+        </div>
+
+      )}
+
     </div>
 
-  </Popup>
-
-</Marker>
-
-</MapContainer>
-
-</div>
-
-</div>
-
-</div>
-
-
-);
+  );
 
 }

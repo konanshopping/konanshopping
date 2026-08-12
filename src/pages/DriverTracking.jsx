@@ -7,10 +7,6 @@ import {
 import axios from "axios";
 
 import {
-  toast
-} from "react-toastify";
-
-import {
   FaTruck,
   FaBoxOpen,
   FaMapMarkerAlt,
@@ -31,22 +27,113 @@ import {
   FaBox,
   FaLocationArrow,
   FaChevronRight,
-  FaTimes,
   FaShippingFast,
-  FaCircle
+  FaCircle,
+  FaTelegramPlane,
+  FaLink,
+  FaWifi,
+  FaBan,
+  FaArrowRight,
+  FaUserCircle
 } from "react-icons/fa";
+
+
+const API =
+  "https://konanshopping.com";
 
 
 export default function DriverTracking() {
 
-  // =====================================================
-  // STATES
-  // =====================================================
+  // =========================================================
+  // 🔔 NOTIFICATIONS PREMIUM
+  // =========================================================
 
-  const [orders, setOrders] = useState([]);
+  const [notification, setNotification] =
+    useState(null);
+
+  const notificationTimer =
+    useRef(null);
+
+  const notify = (
+    message,
+    type = "info",
+    title
+  ) => {
+
+    if (notificationTimer.current) {
+      clearTimeout(
+        notificationTimer.current
+      );
+    }
+
+    const titles = {
+      success: "Opération réussie",
+      error: "Une erreur est survenue",
+      info: "Information"
+    };
+
+    setNotification({
+      message:
+        String(message || ""),
+      type,
+      title:
+        title ||
+        titles[type] ||
+        "Notification"
+    });
+
+    notificationTimer.current =
+      setTimeout(() => {
+
+        setNotification(null);
+
+      }, 4500);
+
+  };
+
+  const closeNotification = () => {
+
+    if (notificationTimer.current) {
+      clearTimeout(
+        notificationTimer.current
+      );
+    }
+
+    setNotification(null);
+
+  };
+
+
+  // =========================================================
+  // STATES
+  // =========================================================
+
+  const [orders, setOrders] =
+    useState([]);
+
+  // Liste dédiée aux commandes réellement disponibles
+  // renvoyée par GET /driver-orders.
+  const [availableOrdersState, setAvailableOrdersState] =
+    useState([]);
+
+  // Liste dédiée aux commandes appartenant au livreur.
+  const [myDeliveries, setMyDeliveries] =
+    useState([]);
+
+  const [driver, setDriver] =
+    useState(null);
 
   const [isTracking, setIsTracking] =
     useState(false);
+
+  const [isRefreshing, setIsRefreshing] =
+    useState(false);
+
+  const [activeSection, setActiveSection] =
+    useState("available");
+
+  const [refusedOrders, setRefusedOrders] =
+    useState([]);
 
   const [clientAddresses, setClientAddresses] =
     useState({});
@@ -57,17 +144,14 @@ export default function DriverTracking() {
   const [etas, setEtas] =
     useState({});
 
-  const [activeSection, setActiveSection] =
-    useState("all");
-
-  const [isRefreshing, setIsRefreshing] =
+  const [connectingTelegram, setConnectingTelegram] =
     useState(false);
 
-  const [refusedOrders, setRefusedOrders] =
-    useState([]);
+  const [telegramConnected, setTelegramConnected] =
+    useState(false);
 
-  const [driver, setDriver] =
-    useState(null);
+  const [telegramUsername, setTelegramUsername] =
+    useState("");
 
   const previousOrderIds =
     useRef([]);
@@ -78,10 +162,13 @@ export default function DriverTracking() {
   const watchIdsRef =
     useRef({});
 
+  const mountedRef =
+    useRef(true);
 
-  // =====================================================
+
+  // =========================================================
   // LOAD DRIVER
-  // =====================================================
+  // =========================================================
 
   useEffect(() => {
 
@@ -92,799 +179,51 @@ export default function DriverTracking() {
           localStorage.getItem("driver") || "null"
         );
 
-      if (savedDriver) {
-        setDriver(savedDriver);
+      if (!savedDriver) {
+
+        setDriver(null);
+
+        return;
+
       }
 
-    } catch (err) {
+      setDriver(savedDriver);
 
-      console.log("Driver invalide");
+      setTelegramConnected(
+        savedDriver.telegramConnected === true
+      );
+
+      setTelegramUsername(
+        savedDriver.telegramUsername || ""
+      );
+
+    } catch (error) {
+
+      console.log(
+        "Erreur driver localStorage :",
+        error
+      );
 
       localStorage.removeItem("driver");
+
+      setDriver(null);
 
     }
 
   }, []);
 
 
-  // =====================================================
-  // CALCUL DISTANCE
-  // =====================================================
-
-  function calculateDistance(
-    lat1,
-    lon1,
-    lat2,
-    lon2
-  ) {
-
-    const R = 6371;
-
-    const dLat =
-      (lat2 - lat1) *
-      Math.PI / 180;
-
-    const dLon =
-      (lon2 - lon1) *
-      Math.PI / 180;
-
-    const a =
-      Math.sin(dLat / 2) *
-      Math.sin(dLat / 2) +
-
-      Math.cos(
-        lat1 * Math.PI / 180
-      ) *
-
-      Math.cos(
-        lat2 * Math.PI / 180
-      ) *
-
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-    const c =
-      2 *
-      Math.atan2(
-        Math.sqrt(a),
-        Math.sqrt(1 - a)
-      );
-
-    return R * c;
-
-  }
-
-
-  // =====================================================
-  // REVERSE GPS
-  // =====================================================
-
-  const getClientAddress =
-    async (order) => {
-
-      if (
-        !order?.location?.lat ||
-        !order?.location?.lng
-      ) {
-        return;
-      }
-
-      if (
-        clientAddresses[order._id]
-      ) {
-        return;
-      }
-
-      try {
-
-        const geoRes =
-          await axios.get(
-
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${order.location.lat}&lon=${order.location.lng}`,
-
-            {
-              headers: {
-                "Accept-Language": "fr"
-              }
-            }
-
-          );
-
-        if (
-          geoRes.data?.display_name
-        ) {
-
-          setClientAddresses(
-            previous => ({
-              ...previous,
-              [order._id]:
-                geoRes.data.display_name
-            })
-          );
-
-        }
-
-      } catch (err) {
-
-        console.log(
-          "Erreur adresse GPS :",
-          err
-        );
-
-      }
-
-    };
-
-
-  // =====================================================
-  // CALCUL GPS POUR UNE COMMANDE
-  // =====================================================
-
-  const calculateOrderDistance =
-    (order) => {
-
-      if (
-        !order?.location?.lat ||
-        !order?.location?.lng
-      ) {
-        return;
-      }
-
-      if (
-        !navigator.geolocation
-      ) {
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-
-        (position) => {
-
-          const driverLat =
-            position.coords.latitude;
-
-          const driverLng =
-            position.coords.longitude;
-
-          const km =
-            calculateDistance(
-
-              driverLat,
-              driverLng,
-
-              order.location.lat,
-              order.location.lng
-
-            );
-
-          setDistances(
-            previous => ({
-              ...previous,
-              [order._id]:
-                `${km.toFixed(1)} km`
-            })
-          );
-
-          const speed = 35;
-
-          const minutes =
-            Math.max(
-              1,
-              Math.round(
-                (km / speed) * 60
-              )
-            );
-
-          setEtas(
-            previous => ({
-              ...previous,
-              [order._id]:
-                `${minutes} min`
-            })
-          );
-
-        },
-
-        (err) => {
-
-          console.log(
-            "GPS distance :",
-            err
-          );
-
-        },
-
-        {
-          enableHighAccuracy: true,
-          maximumAge: 10000,
-          timeout: 10000
-        }
-
-      );
-
-    };
-
-
-  // =====================================================
-  // LOAD ORDERS
-  // =====================================================
-
-  const fetchOrders =
-    async (showLoader = false) => {
-
-      try {
-
-        if (showLoader) {
-          setIsRefreshing(true);
-        }
-
-        const res =
-          await axios.get(
-            "https://konanshopping.com/api/orders"
-          );
-
-        const newOrders =
-          Array.isArray(res.data)
-            ? res.data
-            : [];
-
-        const currentIds =
-          newOrders.map(
-            order => order._id
-          );
-
-        const newIncomingOrders =
-          previousOrderIds.current.length > 0
-
-            ? newOrders.filter(
-                order =>
-                  !previousOrderIds.current.includes(
-                    order._id
-                  ) &&
-                  !order.assignedDriver
-              )
-
-            : [];
-
-        if (
-          newIncomingOrders.length > 0
-        ) {
-
-          try {
-
-            if (!audioRef.current) {
-
-              audioRef.current =
-                new Audio(
-                  "/sounds/click.mp3"
-                );
-
-            }
-
-            audioRef.current.volume = 1;
-
-            await audioRef.current.play();
-
-          } catch (audioError) {
-
-            console.log(
-              "Audio notification bloqué :",
-              audioError
-            );
-
-          }
-
-          toast.success(
-            newIncomingOrders.length > 1
-              ? "Nouvelles commandes disponibles"
-              : "Nouvelle commande disponible"
-          );
-
-        }
-
-        previousOrderIds.current =
-          currentIds;
-
-        setOrders(newOrders);
-
-
-        // =================================================
-        // GPS / ADRESSES
-        // =================================================
-
-        newOrders.forEach(
-          order => {
-
-            if (
-              order.location?.lat &&
-              order.location?.lng
-            ) {
-
-              calculateOrderDistance(order);
-
-              getClientAddress(order);
-
-            }
-
-          }
-        );
-
-      } catch (err) {
-
-        console.log(
-          "Erreur chargement commandes :",
-          err
-        );
-
-      } finally {
-
-        setIsRefreshing(false);
-
-      }
-
-    };
-
-
-  // =====================================================
-  // INITIAL + AUTO REFRESH
-  // =====================================================
+  // =========================================================
+  // CLEAN COMPONENT
+  // =========================================================
 
   useEffect(() => {
 
-    fetchOrders();
-
-    const interval =
-      setInterval(
-        () => {
-          fetchOrders();
-        },
-        5000
-      );
-
-    return () =>
-      clearInterval(interval);
-
-  }, []);
-
-
-  // =====================================================
-  // START / ACCEPT DELIVERY
-  // =====================================================
-
-  const startTracking =
-    async (orderId) => {
-
-      if (!driver) {
-
-        toast.error(
-          "Chauffeur non connecté"
-        );
-
-        return;
-
-      }
-
-      try {
-
-        const response =
-          await axios.put(
-
-            `https://konanshopping.com/api/accept-order/${orderId}`,
-
-            {
-
-              driverId:
-                driver._id,
-
-              driverName:
-                driver.name,
-
-              driverPhone:
-                driver.phone,
-
-              driverPhoto:
-                driver.photo,
-
-              driverVehicle:
-                driver.vehicle
-
-            }
-
-          );
-
-        const acceptedOrder =
-          response.data?.order ||
-          response.data;
-
-
-        // =================================================
-        // UPDATE LOCAL
-        // =================================================
-
-        setOrders(
-          previous =>
-            previous.map(
-              order =>
-
-                order._id === orderId
-
-                  ? {
-
-                      ...order,
-
-                      ...(acceptedOrder || {}),
-
-                      status:
-                        "En livraison",
-
-                      assignedDriver:
-                        acceptedOrder?.assignedDriver ||
-
-                        {
-
-                          id:
-                            driver._id,
-
-                          name:
-                            driver.name,
-
-                          phone:
-                            driver.phone,
-
-                          photo:
-                            driver.photo,
-
-                          vehicle:
-                            driver.vehicle
-
-                        }
-
-                    }
-
-                  : order
-            )
-        );
-
-        setIsTracking(true);
-
-
-        // =================================================
-        // GPS LIVE
-        // =================================================
-
-        if (
-          navigator.geolocation
-        ) {
-
-          if (
-            watchIdsRef.current[orderId]
-          ) {
-
-            navigator.geolocation.clearWatch(
-              watchIdsRef.current[orderId]
-            );
-
-          }
-
-          const watchId =
-            navigator.geolocation.watchPosition(
-
-              async (position) => {
-
-                try {
-
-                  const lat =
-                    position.coords.latitude;
-
-                  const lng =
-                    position.coords.longitude;
-
-                  await axios.put(
-
-                    `https://konanshopping.com/api/order-location/${orderId}`,
-
-                    {
-
-                      driverId:
-                        driver._id,
-
-                      lat,
-
-                      lng
-
-                    }
-
-                  );
-
-                } catch (err) {
-
-                  console.log(
-                    "Erreur GPS serveur :",
-                    err
-                  );
-
-                }
-
-              },
-
-              (err) => {
-
-                console.log(
-                  "Erreur GPS :",
-                  err
-                );
-
-                toast.error(
-                  "Impossible d'accéder au GPS"
-                );
-
-              },
-
-              {
-
-                enableHighAccuracy:
-                  true,
-
-                maximumAge:
-                  0,
-
-                timeout:
-                  10000
-
-              }
-
-            );
-
-          watchIdsRef.current[orderId] =
-            watchId;
-
-        }
-
-        toast.success(
-          "Livraison démarrée"
-        );
-
-        fetchOrders();
-
-      } catch (err) {
-
-        console.log(
-          "Erreur acceptation :",
-          err
-        );
-
-        if (
-          err.response?.status === 409
-        ) {
-
-          toast.error(
-            "Cette commande a déjà été prise."
-          );
-
-          fetchOrders();
-
-          return;
-
-        }
-
-        toast.error(
-          err.response?.data?.error ||
-          "Impossible d'accepter cette commande."
-        );
-
-      }
-
-    };
-
-
-  // =====================================================
-  // REFUSER
-  // =====================================================
-
-  const refuseOrder =
-    (orderId) => {
-
-      setRefusedOrders(
-        previous => [
-          ...previous,
-          orderId
-        ]
-      );
-
-      toast.info(
-        "Commande ignorée"
-      );
-
-    };
-
-
-  // =====================================================
-  // FINISH DELIVERY
-  // =====================================================
-
-  const finishDelivery =
-    async (orderId) => {
-
-      try {
-
-        await axios.put(
-
-          `https://konanshopping.com/api/update-order-status/${orderId}`,
-
-          {
-            status:
-              "Livrée"
-          }
-
-        );
-
-        if (
-          watchIdsRef.current[orderId]
-        ) {
-
-          navigator.geolocation.clearWatch(
-            watchIdsRef.current[orderId]
-          );
-
-          delete watchIdsRef.current[
-            orderId
-          ];
-
-        }
-
-        setOrders(
-          previous =>
-            previous.map(
-              order =>
-
-                order._id === orderId
-
-                  ? {
-                      ...order,
-                      status:
-                        "Livrée"
-                    }
-
-                  : order
-            )
-        );
-
-        setIsTracking(false);
-
-        toast.success(
-          "Commande livrée avec succès"
-        );
-
-      } catch (err) {
-
-        console.log(err);
-
-        toast.error(
-          "Impossible de terminer la livraison"
-        );
-
-      }
-
-    };
-
-
-  // =====================================================
-  // DELETE ORDER
-  // =====================================================
-
-  const deleteOrder =
-    async (id) => {
-
-      try {
-
-        await axios.delete(
-
-          `https://konanshopping.com/api/delete-order/${id}`
-
-        );
-
-        setOrders(
-          previous =>
-            previous.filter(
-              order =>
-                order._id !== id
-            )
-        );
-
-        toast.success(
-          "Commande supprimée"
-        );
-
-      } catch (err) {
-
-        console.log(err);
-
-        toast.error(
-          "Impossible de supprimer la commande"
-        );
-
-      }
-
-    };
-
-
-  // =====================================================
-  // CANCEL ORDER
-  // =====================================================
-
-  const cancelOrder =
-    async (orderId) => {
-
-      try {
-
-        await axios.put(
-
-          `https://konanshopping.com/api/update-order-status/${orderId}`,
-
-          {
-            status:
-              "Annulée"
-          }
-
-        );
-
-        if (
-          watchIdsRef.current[orderId]
-        ) {
-
-          navigator.geolocation.clearWatch(
-            watchIdsRef.current[orderId]
-          );
-
-          delete watchIdsRef.current[
-            orderId
-          ];
-
-        }
-
-        setOrders(
-          previous =>
-            previous.map(
-              order =>
-
-                order._id === orderId
-
-                  ? {
-                      ...order,
-                      status:
-                        "Annulée"
-                    }
-
-                  : order
-            )
-        );
-
-        setIsTracking(false);
-
-        toast.error(
-          "Commande annulée"
-        );
-
-      } catch (err) {
-
-        console.log(err);
-
-        toast.error(
-          "Une erreur est survenue"
-        );
-
-      }
-
-    };
-
-
-  // =====================================================
-  // CLEAN GPS
-  // =====================================================
-
-  useEffect(() => {
+    mountedRef.current = true;
 
     return () => {
+
+      mountedRef.current = false;
 
       Object.values(
         watchIdsRef.current
@@ -902,25 +241,1344 @@ export default function DriverTracking() {
         }
       );
 
+      watchIdsRef.current = {};
+
     };
 
   }, []);
 
 
-  // =====================================================
+  // =========================================================
+  // DISTANCE
+  // =========================================================
+
+  const calculateDistance = (
+    lat1,
+    lon1,
+    lat2,
+    lon2
+  ) => {
+
+    const R = 6371;
+
+    const dLat =
+      (lat2 - lat1) *
+      Math.PI /
+      180;
+
+    const dLon =
+      (lon2 - lon1) *
+      Math.PI /
+      180;
+
+    const a =
+
+      Math.sin(dLat / 2) *
+      Math.sin(dLat / 2) +
+
+      Math.cos(
+        lat1 *
+        Math.PI /
+        180
+      ) *
+
+      Math.cos(
+        lat2 *
+        Math.PI /
+        180
+      ) *
+
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+    const c =
+      2 *
+      Math.atan2(
+        Math.sqrt(a),
+        Math.sqrt(1 - a)
+      );
+
+    return R * c;
+
+  };
+
+
+  // =========================================================
+  // REVERSE GEOCODING
+  // =========================================================
+
+  const getClientAddress = async (
+    order
+  ) => {
+
+    if (
+      !order?.location?.lat ||
+      !order?.location?.lng
+    ) {
+
+      return;
+
+    }
+
+    if (
+      clientAddresses[order._id]
+    ) {
+
+      return;
+
+    }
+
+    try {
+
+      const response =
+        await axios.get(
+
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${order.location.lat}&lon=${order.location.lng}`,
+
+          {
+            headers: {
+              "Accept-Language": "fr"
+            }
+          }
+
+        );
+
+      if (
+        response.data?.display_name &&
+        mountedRef.current
+      ) {
+
+        setClientAddresses(
+          previous => ({
+
+            ...previous,
+
+            [order._id]:
+              response.data.display_name
+
+          })
+        );
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Reverse GPS :",
+        error
+      );
+
+    }
+
+  };
+
+
+  // =========================================================
+  // DISTANCE + ETA
+  // =========================================================
+
+  const calculateOrderDistance = (
+    order
+  ) => {
+
+    if (
+      !order?.location?.lat ||
+      !order?.location?.lng
+    ) {
+
+      return;
+
+    }
+
+    if (
+      !navigator.geolocation
+    ) {
+
+      return;
+
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+      position => {
+
+        const driverLat =
+          position.coords.latitude;
+
+        const driverLng =
+          position.coords.longitude;
+
+        const km =
+          calculateDistance(
+
+            driverLat,
+            driverLng,
+
+            order.location.lat,
+            order.location.lng
+
+          );
+
+        if (!mountedRef.current) {
+          return;
+        }
+
+        setDistances(
+          previous => ({
+
+            ...previous,
+
+            [order._id]:
+              `${km.toFixed(1)} km`
+
+          })
+        );
+
+        // vitesse moyenne
+        const speed = 35;
+
+        const minutes =
+          Math.max(
+            1,
+            Math.round(
+              (km / speed) * 60
+            )
+          );
+
+        setEtas(
+          previous => ({
+
+            ...previous,
+
+            [order._id]:
+              `${minutes} min`
+
+          })
+        );
+
+      },
+
+      error => {
+
+        console.log(
+          "GPS distance :",
+          error
+        );
+
+      },
+
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 10000
+      }
+
+    );
+
+  };
+
+
+  // =========================================================
+  // LOAD ORDERS
+  // =========================================================
+
+  // =========================================================
+  // 📦 COMMANDES DISPONIBLES
+  // =========================================================
+  // Ton backend possède une route dédiée :
+  // GET /driver-orders
+  //
+  // Elle ne renvoie que les commandes encore libres.
+  // =========================================================
+
+  const fetchAvailableOrders = async () => {
+
+    try {
+
+      const response =
+        await axios.get(
+          `${API}/driver-orders`
+        );
+
+      const list =
+        Array.isArray(response.data)
+          ? response.data
+          : (
+              Array.isArray(response.data?.orders)
+                ? response.data.orders
+                : []
+            );
+
+      if (!mountedRef.current) {
+        return list;
+      }
+
+      setAvailableOrdersState(
+        list
+      );
+
+      // Charger adresse / distance pour les nouvelles cartes.
+      list.forEach(
+        order => {
+
+          if (
+            order.location?.lat !== undefined &&
+            order.location?.lng !== undefined
+          ) {
+
+            calculateOrderDistance(order);
+            getClientAddress(order);
+
+          }
+
+        }
+      );
+
+      return list;
+
+    } catch (error) {
+
+      console.log(
+        "Commandes disponibles :",
+        error
+      );
+
+      return [];
+
+    }
+
+  };
+
+
+  // =========================================================
+  // 🚚 MES LIVRAISONS
+  // =========================================================
+  // On utilise /api/orders comme source des commandes complètes
+  // puis on garde uniquement celles appartenant au livreur.
+  // =========================================================
+
+  const fetchMyDeliveries = async () => {
+
+    try {
+
+      const response =
+        await axios.get(
+          `${API}/api/orders`
+        );
+
+      const list =
+        Array.isArray(response.data)
+          ? response.data
+          : (
+              Array.isArray(response.data?.orders)
+                ? response.data.orders
+                : []
+            );
+
+      const mine =
+        list.filter(
+          order => {
+
+            const assignedId =
+              typeof order.assignedDriver === "string"
+                ? order.assignedDriver
+                : (
+                    order.assignedDriver?.id ||
+                    order.assignedDriver?._id ||
+                    ""
+                  );
+
+            return (
+              String(assignedId) ===
+              String(driver?._id)
+            );
+
+          }
+        );
+
+      if (!mountedRef.current) {
+        return mine;
+      }
+
+      setMyDeliveries(
+        mine
+      );
+
+      // Garder aussi la liste globale pour l'historique.
+      setOrders(
+        list
+      );
+
+      mine.forEach(
+        order => {
+
+          if (
+            order.location?.lat !== undefined &&
+            order.location?.lng !== undefined
+          ) {
+
+            calculateOrderDistance(order);
+            getClientAddress(order);
+
+          }
+
+        }
+      );
+
+      return mine;
+
+    } catch (error) {
+
+      console.log(
+        "Mes livraisons :",
+        error
+      );
+
+      return [];
+
+    }
+
+  };
+
+
+  // =========================================================
+  // 🔄 CENTRE LIVREUR
+  // =========================================================
+
+  const syncDriverCenter = async () => {
+
+    await Promise.all([
+      fetchAvailableOrders(),
+      fetchMyDeliveries()
+    ]);
+
+  };
+
+
+  // =========================================================
+  // AUTO REFRESH
+  // =========================================================
+
+  useEffect(() => {
+
+    if (!driver?._id) {
+      return;
+    }
+
+    syncDriverCenter();
+
+    const interval =
+      setInterval(
+        () => {
+          syncDriverCenter();
+        },
+        5000
+      );
+
+    return () =>
+      clearInterval(interval);
+
+  }, [driver?._id]);
+
+
+  // =========================================================
+  // TELEGRAM
+  // =========================================================
+
+  const connectTelegram = async () => {
+
+    if (!driver?._id) {
+
+      notify(
+        "Livreur non connecté",
+        "error"
+      );
+
+      return;
+
+    }
+
+    try {
+
+      setConnectingTelegram(true);
+
+      const response =
+        await axios.post(
+
+          `${API}/driver/${driver._id}/telegram-connect`
+
+        );
+
+      if (
+        response.data?.success &&
+        response.data?.telegramUrl
+      ) {
+
+        const telegramUrl =
+          response.data.telegramUrl;
+
+        /*
+          On ouvre Telegram.
+
+          Sur mobile :
+          → application Telegram
+
+          Sur PC :
+          → Telegram Web / application
+        */
+
+        window.open(
+          telegramUrl,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
+        notify(
+        "Ouvrez Telegram pour terminer la connexion.",
+        "success"
+      );
+
+      } else {
+
+        notify(
+        "Impossible de générer le lien Telegram.",
+        "error"
+      );
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "Telegram connect :",
+        error
+      );
+
+      notify(
+        error.response?.data?.message ||
+
+        "Impossible de connecter Telegram.",
+        "error"
+      );
+
+    } finally {
+
+      setConnectingTelegram(false);
+
+    }
+
+  };
+
+
+  // =========================================================
+  // ACCEPT ORDER
+  // =========================================================
+
+  const acceptOrder = async (
+    orderId
+  ) => {
+
+    if (!driver) {
+
+      notify(
+        "Livreur non connecté",
+        "error"
+      );
+
+      return;
+
+    }
+
+    const currentOrder =
+      orders.find(
+        order =>
+          order._id === orderId
+      );
+
+    if (!currentOrder) {
+
+      notify(
+        "Commande introuvable",
+        "error"
+      );
+
+      return;
+
+    }
+
+    // =====================================================
+    // VERIFICATION LOCALE
+    // =====================================================
+
+    if (
+      currentOrder.assignedDriver &&
+      String(
+        typeof currentOrder.assignedDriver === "string"
+          ? currentOrder.assignedDriver
+          : currentOrder.assignedDriver?.id ||
+            currentOrder.assignedDriver?._id ||
+            ""
+      ) !== String(driver._id)
+    ) {
+
+      notify(
+        "Cette commande a déjà été prise.",
+        "error"
+      );
+
+      syncDriverCenter();
+
+      return;
+
+    }
+
+    if (
+      String(
+        typeof currentOrder.assignedDriver === "string"
+          ? currentOrder.assignedDriver
+          : currentOrder.assignedDriver?.id ||
+            currentOrder.assignedDriver?._id ||
+            ""
+      ) === String(driver._id)
+    ) {
+
+      notify(
+        "Cette commande vous est déjà attribuée.",
+        "info"
+      );
+
+      return;
+
+    }
+
+    try {
+
+      /*
+        IMPORTANT :
+
+        Le backend doit effectuer le verrouillage
+        atomique.
+
+        Si un autre livreur gagne la course :
+        backend → HTTP 409
+      */
+
+      const response =
+        await axios.put(
+
+          `${API}/api/accept-order/${orderId}`,
+
+          {
+
+            driverId:
+              driver._id,
+
+            driverName:
+              driver.name,
+
+            driverPhone:
+              driver.phone,
+
+            driverPhoto:
+              driver.photo,
+
+            driverVehicle:
+              driver.vehicle
+
+          }
+
+        );
+
+      const acceptedOrder =
+        response.data?.order ||
+        response.data?.data ||
+        response.data;
+
+      // =====================================================
+      // UPDATE LOCAL
+      // =====================================================
+
+      // Retirer immédiatement la commande de la liste
+      // DISPONIBLE de ce livreur.
+      setAvailableOrdersState(
+        previous =>
+          previous.filter(
+            order =>
+              order._id !== orderId
+          )
+      );
+
+      setOrders(
+        previous =>
+
+          previous.map(
+            order =>
+
+              order._id === orderId
+
+                ? {
+
+                    ...order,
+
+                    ...(acceptedOrder || {}),
+
+                    // =================================================
+                    // ÉTAT LOCAL IMMÉDIAT
+                    // =================================================
+                    // Le badge passe de DISPONIBLE à EN LIVRAISON.
+                    // assignedDriver identifie précisément le livreur
+                    // qui vient de prendre la commande.
+                    // =================================================
+
+                    status:
+                      "En livraison",
+
+                    assignedDriver:
+
+                      acceptedOrder?.assignedDriver ||
+
+                      {
+
+                        id:
+                          driver._id,
+
+                        name:
+                          driver.name,
+
+                        phone:
+                          driver.phone,
+
+                        photo:
+                          driver.photo,
+
+                        vehicle:
+                          driver.vehicle
+
+                      }
+
+                  }
+
+                : order
+
+          )
+
+      );
+
+      // Placer immédiatement la commande dans
+      // MES LIVRAISONS sans attendre le prochain polling.
+      setMyDeliveries(
+        previous => {
+
+          const exists =
+            previous.some(
+              order =>
+                order._id === orderId
+            );
+
+          const localOrder =
+            {
+              ...currentOrder,
+              ...(acceptedOrder || {}),
+              status:
+                "En livraison",
+              assignedDriver:
+                acceptedOrder?.assignedDriver ||
+                {
+                  id:
+                    driver._id,
+                  name:
+                    driver.name || "",
+                  phone:
+                    driver.phone || "",
+                  photo:
+                    driver.photo || "",
+                  vehicle:
+                    driver.vehicle || ""
+                }
+            };
+
+          return exists
+            ? previous.map(
+                order =>
+                  order._id === orderId
+                    ? localOrder
+                    : order
+              )
+            : [
+                ...previous,
+                localOrder
+              ];
+
+        }
+      );
+
+      notify(
+        "Commande acceptée ! Elle est maintenant dans « Mes livraisons ».",
+        "success"
+      );
+
+      // =====================================================
+      // PASSER AUTOMATIQUEMENT SUR « MES LIVRAISONS »
+      // =====================================================
+
+      setActiveSection("active");
+
+      // =====================================================
+      // GPS
+      // =====================================================
+
+      startDriverGPS(
+        orderId
+      );
+
+      setIsTracking(true);
+
+      // =====================================================
+      // ACTUALISATION SERVEUR
+      // =====================================================
+
+      // Le backend est la source de vérité.
+      // Après acceptation, assignedDriver = ce livreur
+      // et status = "En livraison".
+      //
+      // Pour les autres livreurs, la même commande
+      // disparaît de availableOrders dès que leur
+      // prochain fetch reçoit assignedDriver.
+      // =====================================================
+
+      setTimeout(
+        () => {
+          syncDriverCenter();
+        },
+        300
+      );
+
+    } catch (error) {
+
+      console.log(
+        "Erreur acceptation :",
+        error
+      );
+
+      // =====================================================
+      // COMMANDE DÉJÀ PRISE
+      // =====================================================
+
+      if (
+        error.response?.status === 409
+      ) {
+
+        setAvailableOrdersState(
+          previous =>
+            previous.filter(
+              order =>
+                order._id !== orderId
+            )
+        );
+
+        notify(
+        "Cette commande vient d'être acceptée par un autre livreur.",
+        "error"
+      );
+
+        /*
+          Très important :
+          on recharge immédiatement les commandes.
+
+          Elle disparaîtra de la liste.
+        */
+
+        syncDriverCenter();
+
+        return;
+
+      }
+
+      notify(
+        error.response?.data?.error ||
+
+        error.response?.data?.message ||
+
+        "Impossible d'accepter la commande.",
+        "error"
+      );
+
+    }
+
+  };
+
+
+  // =========================================================
+  // GPS LIVREUR
+  // =========================================================
+
+  const startDriverGPS = (
+    orderId
+  ) => {
+
+    if (
+      !navigator.geolocation
+    ) {
+
+      notify(
+        "La géolocalisation n'est pas disponible.",
+        "error"
+      );
+
+      return;
+
+    }
+
+    // arrêter ancien tracking
+    if (
+      watchIdsRef.current[orderId]
+    ) {
+
+      navigator.geolocation.clearWatch(
+        watchIdsRef.current[orderId]
+      );
+
+    }
+
+    const watchId =
+      navigator.geolocation.watchPosition(
+
+        async position => {
+
+          try {
+
+            const lat =
+              position.coords.latitude;
+
+            const lng =
+              position.coords.longitude;
+
+            await axios.put(
+
+              `${API}/api/order-location/${orderId}`,
+
+              {
+
+                driverId:
+                  driver._id,
+
+                lat,
+
+                lng
+
+              }
+
+            );
+
+          } catch (error) {
+
+            console.log(
+              "GPS serveur :",
+              error
+            );
+
+          }
+
+        },
+
+        error => {
+
+          console.log(
+            "GPS :",
+            error
+          );
+
+        },
+
+        {
+
+          enableHighAccuracy: true,
+
+          maximumAge: 0,
+
+          timeout: 10000
+
+        }
+
+      );
+
+    watchIdsRef.current[orderId] =
+      watchId;
+
+  };
+
+
+  // =========================================================
+  // REFUSER
+  // =========================================================
+
+  const refuseOrder = (
+    orderId
+  ) => {
+
+    setRefusedOrders(
+      previous => {
+
+        if (
+          previous.includes(
+            orderId
+          )
+        ) {
+
+          return previous;
+
+        }
+
+        return [
+          ...previous,
+          orderId
+        ];
+
+      }
+    );
+
+    notify(
+        "Commande ignorée",
+        "info"
+      );
+
+  };
+
+
+  // =========================================================
+  // FINISH DELIVERY
+  // =========================================================
+
+  const finishDelivery =
+    async (
+      orderId
+    ) => {
+
+      try {
+
+        await axios.put(
+
+          `${API}/api/driver-deliver/${orderId}`,
+
+          {
+            driverId:
+              driver._id
+          }
+
+        );
+
+        stopGPS(
+          orderId
+        );
+
+        setOrders(
+          previous =>
+
+            previous.map(
+              order =>
+
+                order._id === orderId
+
+                  ? {
+
+                      ...order,
+
+                      status:
+                        "Livrée"
+
+                    }
+
+                  : order
+
+            )
+
+        );
+
+        setIsTracking(false);
+
+        notify(
+        "Commande livrée avec succès",
+        "success"
+      );
+
+        syncDriverCenter();
+
+      } catch (error) {
+
+        console.log(
+          error
+        );
+
+        notify(
+        "Impossible de terminer la livraison",
+        "error"
+      );
+
+      }
+
+    };
+
+
+  // =========================================================
+  // CANCEL DRIVER DELIVERY
+  // IMPORTANT:
+  // Le livreur ne doit PAS mettre la commande "Annulée".
+  // Elle doit redevenir "En attente" et être disponible
+  // pour tous les livreurs.
+  // =========================================================
+
+  const cancelOrder =
+    async (
+      orderId
+    ) => {
+
+      if (!driver?._id) {
+
+        notify(
+        "Livreur non connecté",
+        "error"
+      );
+
+        return;
+
+      }
+
+      try {
+
+        const response =
+          await axios.put(
+
+            `${API}/api/driver-cancel/${orderId}`,
+
+            {
+              driverId:
+                driver._id
+            }
+
+          );
+
+        if (
+          response.data?.success === false
+        ) {
+
+          throw new Error(
+            response.data?.message ||
+            "Impossible d'annuler la livraison"
+          );
+
+        }
+
+        // =====================================================
+        // ARRÊTER LE GPS DE CETTE COMMANDE
+        // =====================================================
+
+        stopGPS(
+          orderId
+        );
+
+        // =====================================================
+        // RETIRER IMMÉDIATEMENT LA COMMANDE DE MES LIVRAISONS
+        // =====================================================
+
+        setOrders(
+          previous =>
+            previous.map(
+              order =>
+
+                order._id === orderId
+
+                  ? {
+
+                      ...order,
+
+                      status:
+                        "En attente",
+
+                      // Le backend supprime assignedDriver.
+                      assignedDriver:
+                        undefined
+
+                    }
+
+                  : order
+
+            )
+
+        );
+
+        // =====================================================
+        // SI PLUS AUCUNE LIVRAISON N'EST ACTIVE
+        // =====================================================
+
+        setIsTracking(
+          previous => {
+
+            const stillTracking =
+              orders.some(
+                order =>
+                  order._id !== orderId &&
+                  order.assignedDriver?.id ===
+                    driver._id &&
+                  order.status !== "Livrée" &&
+                  order.status !== "Annulée"
+              );
+
+            return stillTracking;
+
+          }
+        );
+
+        // =====================================================
+        // MESSAGE
+        // =====================================================
+
+        notify(
+        "↩️ Commande remise à disposition pour tous les livreurs.",
+        "success"
+      );
+
+        // =====================================================
+        // RECHARGEMENT SERVEUR
+        // =====================================================
+
+        await syncDriverCenter();
+
+      } catch (error) {
+
+        console.log(
+          "❌ DRIVER CANCEL ERROR:",
+          error
+        );
+
+        // La commande peut avoir été modifiée
+        // entre-temps par un autre processus.
+
+        if (
+          error.response?.status === 409
+        ) {
+
+          notify(
+        error.response?.data?.message ||
+            "Cette livraison ne peut plus être annulée.",
+        "error"
+      );
+
+          await syncDriverCenter();
+
+          return;
+
+        }
+
+        notify(
+        error.response?.data?.message ||
+
+          error.response?.data?.error ||
+
+          error.message ||
+
+          "Impossible d'annuler la livraison",
+        "error"
+      );
+
+      }
+
+    };
+
+
+  // =========================================================
+  // STOP GPS
+  // =========================================================
+
+  const stopGPS = (
+    orderId
+  ) => {
+
+    if (
+      watchIdsRef.current[orderId]
+    ) {
+
+      try {
+
+        navigator.geolocation.clearWatch(
+          watchIdsRef.current[orderId]
+        );
+
+      } catch {}
+
+      delete watchIdsRef.current[
+        orderId
+      ];
+
+    }
+
+  };
+
+
+  // =========================================================
+  // DELETE
+  // =========================================================
+
+  const deleteOrder =
+    async (
+      orderId
+    ) => {
+
+      try {
+
+        await axios.delete(
+
+          `${API}/api/delete-order/${orderId}`
+
+        );
+
+        setOrders(
+          previous =>
+
+            previous.filter(
+              order =>
+                order._id !==
+                orderId
+            )
+
+        );
+
+        notify(
+        "Commande supprimée",
+        "success"
+      );
+
+      } catch (error) {
+
+        console.log(
+          error
+        );
+
+        notify(
+        "Impossible de supprimer la commande",
+        "error"
+      );
+
+      }
+
+    };
+
+
+  // =========================================================
   // DRIVER NOT CONNECTED
-  // =====================================================
+  // =========================================================
 
   if (!driver) {
 
     return (
 
-      <div className="driver-login-empty">
+      <div className="driver-page">
 
-        <div className="driver-login-card">
+        <div className="empty-login">
 
-          <div className="driver-login-icon">
+          <div className="empty-login-icon">
+
             <FaTruck />
+
           </div>
 
           <h2>
@@ -928,86 +1586,55 @@ export default function DriverTracking() {
           </h2>
 
           <p>
-            Chauffeur non connecté
+            Aucun compte livreur connecté.
           </p>
 
         </div>
 
         <style>{`
 
-          .driver-login-empty {
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-
-            background:
-              linear-gradient(
-                135deg,
-                #eef4ff,
-                #f8fbff,
-                #ffffff
-              );
-
-            font-family:
-              Inter,
-              system-ui,
-              sans-serif;
+          .driver-page {
+            min-height:100vh;
+            background:#f4f7fb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            font-family:Inter,system-ui,sans-serif;
           }
 
-          .driver-login-card {
-            width: 100%;
-            max-width: 390px;
-            background: #ffffff;
-            border-radius: 22px;
-            padding: 28px 22px;
-            text-align: center;
-
-            box-shadow:
-              0 20px 55px
-              rgba(15,23,42,.10);
+          .empty-login {
+            width:100%;
+            max-width:380px;
+            background:white;
+            padding:35px 25px;
+            border-radius:24px;
+            text-align:center;
+            box-shadow:0 20px 60px rgba(15,23,42,.10);
           }
 
-          .driver-login-icon {
-            width: 65px;
-            height: 65px;
-            margin: 0 auto 15px;
-
-            border-radius: 20px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background:
-              linear-gradient(
-                135deg,
-                #2563eb,
-                #4f46e5
-              );
-
-            color: white;
-            font-size: 28px;
-
-            box-shadow:
-              0 12px 25px
-              rgba(37,99,235,.20);
+          .empty-login-icon {
+            width:70px;
+            height:70px;
+            margin:auto;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:20px;
+            background:linear-gradient(135deg,#2563eb,#4f46e5);
+            color:white;
+            font-size:28px;
           }
 
-          .driver-login-card h2 {
-            margin: 0;
-            color: #0f172a;
-            font-size: 21px;
-            font-weight: 900;
+          .empty-login h2 {
+            margin:18px 0 5px;
+            font-size:22px;
           }
 
-          .driver-login-card p {
-            color: #64748b;
-            margin: 7px 0 0;
-            font-size: 12px;
+          .empty-login p {
+            margin:0;
+            color:#64748b;
+            font-size:13px;
           }
 
         `}</style>
@@ -1019,706 +1646,879 @@ export default function DriverTracking() {
   }
 
 
-  // =====================================================
-  // FILTER ORDERS
-  // =====================================================
-
-  const visibleOrders =
-    orders.filter(
-      order => {
-
-        if (
-          refusedOrders.includes(
-            order._id
-          ) &&
-          !order.assignedDriver
-        ) {
-          return false;
-        }
-
-        if (
-          order.assignedDriver &&
-          order.assignedDriver.id !==
-            driver._id
-        ) {
-          return false;
-        }
-
-        return true;
-
-      }
-    );
-
-
-  // =====================================================
-  // CATEGORIES
-  // =====================================================
+  // =========================================================
+  // FILTERS
+  // =========================================================
 
   const availableOrders =
-    visibleOrders.filter(
+    availableOrdersState.filter(
       order =>
-        !order.assignedDriver &&
+
+        !refusedOrders.includes(
+          order._id
+        ) &&
+
         order.status !== "Livrée" &&
+
         order.status !== "Annulée"
+
     );
+
 
   const myActiveOrders =
-    visibleOrders.filter(
+    myDeliveries.filter(
       order =>
-        order.assignedDriver?.id ===
-        driver._id &&
+
         order.status !== "Livrée" &&
+
         order.status !== "Annulée"
+
     );
 
+
   const deliveredOrders =
-    visibleOrders.filter(
+    myDeliveries.filter(
       order =>
-        order.assignedDriver?.id ===
-        driver._id &&
         order.status === "Livrée"
     );
 
 
-  // =====================================================
-  // DISPLAY ORDERS
-  // =====================================================
+  const myOrders =
+    myDeliveries;
+
 
   let displayedOrders =
-    visibleOrders;
+    availableOrders;
+
+
+  if (
+    activeSection === "all"
+  ) {
+
+    displayedOrders =
+      [
+        ...availableOrders,
+        ...myActiveOrders
+      ];
+
+  }
+
 
   if (
     activeSection === "available"
   ) {
+
     displayedOrders =
       availableOrders;
+
   }
+
 
   if (
     activeSection === "active"
   ) {
+
     displayedOrders =
       myActiveOrders;
+
   }
+
 
   if (
     activeSection === "delivered"
   ) {
+
     displayedOrders =
       deliveredOrders;
+
   }
 
 
-  // =====================================================
+  // =========================================================
   // ORDER CARD
-  // =====================================================
+  // =========================================================
 
-  const renderOrder =
-    (order) => {
+  const renderOrder = (
+    order
+  ) => {
 
-      const isMine =
-        order.assignedDriver?.id ===
-        driver._id;
+    const assignedDriverId =
+      typeof order.assignedDriver === "string"
+        ? order.assignedDriver
+        : order.assignedDriver?.id ||
+          order.assignedDriver?._id;
 
-      const isAvailable =
-        !order.assignedDriver;
+    const isMine =
+      String(assignedDriverId || "") ===
+      String(driver._id);
 
-      const isDelivered =
-        order.status === "Livrée";
+    const isAvailable =
+      !order.assignedDriver;
 
-      const isCancelled =
-        order.status === "Annulée";
+    const isDelivered =
+      order.status ===
+      "Livrée";
 
-      const address =
-        clientAddresses[
-          order._id
-        ] ||
-        "Localisation GPS du client";
+    const isCancelled =
+      order.status ===
+      "Annulée";
 
-      const distance =
-        distances[
-          order._id
-        ] ||
-        "--";
+    const address =
+      clientAddresses[
+        order._id
+      ] ||
+      "Localisation GPS du client";
 
-      const eta =
-        etas[
-          order._id
-        ] ||
-        "--";
+    const distance =
+      distances[
+        order._id
+      ] ||
+      "--";
+
+    const eta =
+      etas[
+        order._id
+      ] ||
+      "--";
 
 
-      return (
+    return (
 
-        <article
-          key={order._id}
-          className={
-            `driver-order-card ${
-              isAvailable
-                ? "available-card"
-                : ""
-            }`
-          }
-        >
+      <article
+        key={order._id}
+        className={
+          `order-card ${
+            isAvailable
+              ? "available-card"
+              : isMine
+              ? "mine-card"
+              : ""
+          }`
+        }
+      >
 
-          {/* HEADER */}
+        {/* HEADER */}
 
-          <div className="order-header">
+        <div className="order-top">
 
-            <div className="order-client">
-
-              <div
-                className={
-                  `order-main-icon ${
-                    isAvailable
-                      ? "blue-icon"
-                      : "green-icon"
-                  }`
-                }
-              >
-                <FaBoxOpen />
-              </div>
-
-              <div className="order-client-text">
-
-                <h2>
-                  {order.customerName ||
-                    "Client"}
-                </h2>
-
-                <span>
-                  Commande #{order._id}
-                </span>
-
-              </div>
-
-            </div>
-
+          <div className="client-block">
 
             <div
               className={
-                `order-status ${
-                  isDelivered
-                    ? "status-delivered"
-                    : isCancelled
-                    ? "status-cancelled"
-                    : isMine
-                    ? "status-active"
-                    : "status-available"
+                `order-icon ${
+                  isAvailable
+                    ? "blue-icon"
+                    : "green-icon"
                 }`
               }
             >
 
-              {isDelivered && (
-                <>
-                  <FaCheckCircle />
-                  LIVRÉE
-                </>
-              )}
-
-              {isCancelled && (
-                <>
-                  <FaTimesCircle />
-                  ANNULÉE
-                </>
-              )}
-
-              {isMine &&
-                !isDelivered &&
-                !isCancelled && (
-                <>
-                  <FaTruck />
-                  EN LIVRAISON
-                </>
-              )}
-
-              {isAvailable && (
-                <>
-                  <FaExclamationTriangle />
-                  DISPONIBLE
-                </>
-              )}
+              <FaBoxOpen />
 
             </div>
-
-          </div>
-
-
-          {/* TOTAL */}
-
-          <div className="order-total-box">
 
             <div>
 
-              <div className="small-label">
-                MONTANT DE LA COMMANDE
-              </div>
-
-              <div className="order-total">
-                {order.total || 0} FCFA
-              </div>
-
-            </div>
-
-            <div className="order-mini-info">
+              <h3>
+                {order.customerName ||
+                  "Client"}
+              </h3>
 
               <span>
-                <FaBox />
-                {order.items?.length || 0}
+                #{String(
+                  order._id
+                ).slice(-8)}
               </span>
-
-              {order.phone && (
-                <span>
-                  <FaPhoneAlt />
-                  {order.phone}
-                </span>
-              )}
 
             </div>
 
           </div>
 
 
-          {/* DESTINATION / PHONE */}
+          <div
+            className={
+              `status-pill ${
+                isDelivered
+                  ? "delivered"
+                  : isCancelled
+                  ? "cancelled"
+                  : isMine
+                  ? "active"
+                  : "available"
+              }`
+            }
+          >
 
-          <div className="order-info-grid">
+            {isDelivered && (
+              <>
+                <FaCheckCircle />
+                LIVRÉE
+              </>
+            )}
 
-            <div className="info-panel">
+            {isCancelled && (
+              <>
+                <FaTimesCircle />
+                ANNULÉE
+              </>
+            )}
 
-              <div className="info-label">
+            {isMine &&
+              !isDelivered &&
+              !isCancelled && (
+              <>
+                <FaTruck />
+                EN LIVRAISON
+              </>
+            )}
 
-                <FaMapMarkerAlt />
-
-                DESTINATION CLIENT
-
-              </div>
-
-              <div className="client-address">
-
-                {address}
-
-              </div>
-
-              {order.location?.lat &&
-                order.location?.lng && (
-
-                <a
-                  href={
-                    `https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`
-                  }
-
-                  target="_blank"
-
-                  rel="noreferrer"
-
-                  className="maps-button"
-                >
-
-                  <FaRoute />
-
-                  OUVRIR L'ITINÉRAIRE
-
-                  <FaChevronRight
-                    className="button-arrow"
-                  />
-
-                </a>
-
-              )}
-
-            </div>
-
-
-            {order.phone && (
-
-              <a
-                href={
-                  `tel:${order.phone}`
-                }
-
-                className="phone-button"
-              >
-
-                <div className="phone-icon">
-                  <FaPhoneAlt />
-                </div>
-
-                <div className="phone-content">
-
-                  <span>
-                    APPELER LE CLIENT
-                  </span>
-
-                  <strong>
-                    {order.phone}
-                  </strong>
-
-                </div>
-
-                <FaChevronRight />
-
-              </a>
-
+            {isAvailable && (
+              <>
+                <FaCircle />
+                DISPONIBLE
+              </>
             )}
 
           </div>
 
+        </div>
 
-          {/* ETA / DISTANCE */}
 
-          <div className="eta-grid">
+        {/* TOTAL */}
 
-            <div
-              className="eta-card eta-purple"
+        <div className="total-box">
+
+          <div>
+
+            <small>
+              TOTAL
+            </small>
+
+            <strong>
+              {order.total || 0}
+              {" "}
+              FCFA
+            </strong>
+
+          </div>
+
+          <div className="mini-data">
+
+            <span>
+              <FaBox />
+              {order.items?.length || 0}
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {/* DESTINATION */}
+
+        <div className="destination-box">
+
+          <div className="label">
+
+            <FaMapMarkerAlt />
+
+            DESTINATION
+
+          </div>
+
+          <p>
+            {address}
+          </p>
+
+          {order.location?.lat &&
+            order.location?.lng && (
+
+            <a
+              href={
+                `https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`
+              }
+
+              target="_blank"
+
+              rel="noreferrer"
+
+              className="map-button"
             >
 
-              <div className="eta-icon">
-                <FaClock />
-              </div>
+              <FaRoute />
 
-              <div>
+              OUVRIR L'ITINÉRAIRE
 
-                <span>
-                  ETA
-                </span>
+              <FaArrowRight />
 
-                <strong>
-                  {eta}
-                </strong>
+            </a>
 
-              </div>
+          )}
+
+        </div>
+
+
+        {/* PHONE */}
+
+        {order.phone && (
+
+          <a
+            href={
+              `tel:${order.phone}`
+            }
+
+            className="phone-button"
+          >
+
+            <div className="phone-symbol">
+
+              <FaPhoneAlt />
 
             </div>
 
+            <div>
 
-            <div
-              className="eta-card eta-white"
-            >
+              <small>
+                CLIENT
+              </small>
 
-              <div
-                className="eta-icon road-icon"
-              >
-                <FaRoad />
-              </div>
+              <strong>
+                {order.phone}
+              </strong>
 
-              <div>
+            </div>
 
-                <span>
-                  DISTANCE
-                </span>
+            <FaChevronRight />
 
-                <strong>
-                  {distance}
-                </strong>
+          </a>
 
-              </div>
+        )}
+
+
+        {/* ETA */}
+
+        <div className="eta-row">
+
+          <div className="eta-box purple">
+
+            <FaClock />
+
+            <div>
+
+              <small>
+                ETA
+              </small>
+
+              <strong>
+                {eta}
+              </strong>
 
             </div>
 
           </div>
 
 
-          {/* PRODUCTS */}
+          <div className="eta-box">
 
-          {order.items?.length > 0 && (
+            <FaRoad />
 
-            <div className="products-section">
+            <div>
 
-              <div className="section-label">
+              <small>
+                DISTANCE
+              </small>
 
-                <FaBoxOpen />
+              <strong>
+                {distance}
+              </strong>
 
-                PRODUITS DE LA COMMANDE
+            </div>
 
-              </div>
+          </div>
 
-              <div className="products-list">
+        </div>
 
-                {order.items.map(
-                  (item, index) => (
 
-                    <div
-                      key={index}
-                      className="product-item"
-                    >
+        {/* PRODUCTS */}
+
+        {order.items?.length > 0 && (
+
+          <div className="products">
+
+            <div className="label">
+
+              <FaBoxOpen />
+
+              PRODUITS
+
+            </div>
+
+            {order.items
+              .slice(0, 4)
+              .map(
+                (
+                  item,
+                  index
+                ) => (
+
+                  <div
+                    className="product-row"
+                    key={index}
+                  >
+
+                    {item.image ? (
 
                       <img
                         src={item.image}
                         alt=""
                       />
 
-                      <div className="product-info">
+                    ) : (
 
-                        <strong>
-                          {item.name}
-                        </strong>
-
-                        <span>
-                          Quantité ×{item.quantity}
-                        </span>
-
+                      <div className="no-image">
+                        <FaBox />
                       </div>
+
+                    )}
+
+                    <div>
+
+                      <strong>
+                        {item.name}
+                      </strong>
+
+                      <span>
+                        Quantité ×
+                        {item.quantity}
+                      </span>
 
                     </div>
 
-                  )
-                )}
+                  </div>
+
+                )
+              )}
+
+            {order.items.length > 4 && (
+
+              <div className="more-products">
+
+                +
+                {order.items.length - 4}
+                {" "}
+                autres produits
 
               </div>
-
-            </div>
-
-          )}
-
-
-          {/* ACTIONS */}
-
-          <div className="order-actions">
-
-            {isAvailable && (
-
-              <>
-
-                <button
-                  onClick={() =>
-                    startTracking(
-                      order._id
-                    )
-                  }
-
-                  className="primary-action"
-                >
-
-                  <FaTruck />
-
-                  <span>
-                    ACCEPTER LA COMMANDE
-                  </span>
-
-                  <FaChevronRight />
-
-                </button>
-
-
-                <button
-                  onClick={() =>
-                    refuseOrder(
-                      order._id
-                    )
-                  }
-
-                  className="secondary-action"
-                >
-
-                  <FaTimesCircle />
-
-                  REFUSER / IGNORER
-
-                </button>
-
-              </>
-
-            )}
-
-
-            {isMine &&
-              !isDelivered &&
-              !isCancelled && (
-
-              <>
-
-                <button
-                  onClick={() =>
-                    startTracking(
-                      order._id
-                    )
-                  }
-
-                  className="tracking-action"
-                >
-
-                  <FaLocationArrow />
-
-                  DÉMARRER / ACTUALISER LE GPS
-
-                  <FaSatelliteDish />
-
-                </button>
-
-
-                <div className="two-actions">
-
-                  <button
-                    onClick={() =>
-                      finishDelivery(
-                        order._id
-                      )
-                    }
-
-                    className="delivered-action"
-                  >
-
-                    <FaCheckCircle />
-
-                    LIVRÉE
-
-                  </button>
-
-
-                  <button
-                    onClick={() =>
-                      cancelOrder(
-                        order._id
-                      )
-                    }
-
-                    className="cancel-action"
-                  >
-
-                    <FaTimesCircle />
-
-                    ANNULER
-
-                  </button>
-
-                </div>
-
-              </>
-
-            )}
-
-
-            {isDelivered && (
-
-              <button
-                onClick={() =>
-                  deleteOrder(
-                    order._id
-                  )
-                }
-
-                className="delete-action"
-              >
-
-                <FaTrashAlt />
-
-                SUPPRIMER DÉFINITIVEMENT
-
-              </button>
 
             )}
 
           </div>
 
-        </article>
+        )}
 
+
+        {/* ACTIONS */}
+
+        <div className="actions">
+
+          {/* AVAILABLE */}
+
+          {isAvailable && (
+
+            <>
+
+              <button
+                className="accept-button"
+                onClick={() =>
+                  acceptOrder(
+                    order._id
+                  )
+                }
+              >
+
+                <FaTruck />
+
+                ACCEPTER
+
+                <FaChevronRight />
+
+              </button>
+
+
+              <button
+                className="refuse-button"
+                onClick={() =>
+                  refuseOrder(
+                    order._id
+                  )
+                }
+              >
+
+                <FaBan />
+
+                REFUSER
+
+              </button>
+
+            </>
+
+          )}
+
+
+          {/* MY ORDER */}
+
+          {isMine &&
+            !isDelivered &&
+            !isCancelled && (
+
+            <>
+
+              <button
+                className="gps-button"
+                onClick={() => {
+
+                  startDriverGPS(
+                    order._id
+                  );
+
+                  setIsTracking(true);
+
+                  notify(
+        "GPS activé",
+        "success"
       );
 
-    };
+                }}
+              >
+
+                <FaLocationArrow />
+
+                GPS EN DIRECT
+
+                <FaSatelliteDish />
+
+              </button>
 
 
-  // =====================================================
+              <div className="action-grid">
+
+                <button
+                  className="done-button"
+                  onClick={() =>
+                    finishDelivery(
+                      order._id
+                    )
+                  }
+                >
+
+                  <FaCheckCircle />
+
+                  LIVRÉE
+
+                </button>
+
+
+                <button
+                  className="cancel-button"
+                  onClick={() =>
+                    cancelOrder(
+                      order._id
+                    )
+                  }
+                >
+
+                  <FaTimesCircle />
+
+                  ANNULER
+
+                </button>
+
+              </div>
+
+            </>
+
+          )}
+
+
+          {/* DELIVERED */}
+
+          {isDelivered && (
+
+            <button
+              className="delete-button"
+              onClick={() =>
+                deleteOrder(
+                  order._id
+                )
+              }
+            >
+
+              <FaTrashAlt />
+
+              SUPPRIMER
+
+            </button>
+
+          )}
+
+        </div>
+
+      </article>
+
+    );
+
+  };
+
+
+  // =========================================================
   // MAIN
-  // =====================================================
+  // =========================================================
 
   return (
+    <>
+      {notification && (
+        <div
+          role="alert"
+          aria-live="polite"
+          onClick={closeNotification}
+          style={{
+            position: "fixed",
+            top: "18px",
+            right: "18px",
+            zIndex: 999999,
+            width: "min(390px, calc(100vw - 28px))",
+            background: "rgba(255,255,255,0.97)",
+            backdropFilter: "blur(22px)",
+            WebkitBackdropFilter: "blur(22px)",
+            border: "1px solid rgba(148,163,184,0.18)",
+            borderRadius: "18px",
+            boxShadow: "0 20px 55px rgba(15,23,42,0.18)",
+            padding: "13px 14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            cursor: "pointer",
+            animation: "driverNotificationIn .32s cubic-bezier(.2,.8,.2,1)",
+            overflow: "hidden"
+          }}
+        >
+          <div
+            style={{
+              width: "42px",
+              height: "42px",
+              minWidth: "42px",
+              borderRadius: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "18px",
+              background:
+                notification.type === "success"
+                  ? "linear-gradient(135deg,#dcfce7,#bbf7d0)"
+                  : notification.type === "error"
+                    ? "linear-gradient(135deg,#fee2e2,#fecaca)"
+                    : "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+              color:
+                notification.type === "success"
+                  ? "#15803d"
+                  : notification.type === "error"
+                    ? "#dc2626"
+                    : "#2563eb"
+            }}
+          >
+            {notification.type === "success"
+              ? <FaCheckCircle />
+              : notification.type === "error"
+                ? <FaExclamationTriangle />
+                : <FaSatelliteDish />}
+          </div>
+
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div
+              style={{
+                fontSize: "12px",
+                fontWeight: "900",
+                color: "#0f172a",
+                marginBottom: "3px"
+              }}
+            >
+              {notification.title}
+            </div>
+
+            <div
+              style={{
+                fontSize: "12px",
+                lineHeight: 1.45,
+                color: "#64748b",
+                fontWeight: "600",
+                wordBreak: "break-word"
+              }}
+            >
+              {notification.message}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              closeNotification();
+            }}
+            aria-label="Fermer"
+            style={{
+              width: "28px",
+              height: "28px",
+              minWidth: "28px",
+              border: "none",
+              borderRadius: "9px",
+              background: "#f1f5f9",
+              color: "#64748b",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "900"
+            }}
+          >
+            ×
+          </button>
+
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              bottom: 0,
+              height: "3px",
+              width: "100%",
+              background:
+                notification.type === "success"
+                  ? "#22c55e"
+                  : notification.type === "error"
+                    ? "#ef4444"
+                    : "#3b82f6",
+              transformOrigin: "left",
+              animation: "driverNotificationProgress 4.5s linear forwards"
+            }}
+          />
+        </div>
+      )}
+
+      <style>{`
+        @keyframes driverNotificationIn {
+          from {
+            opacity: 0;
+            transform: translate3d(25px,-8px,0) scale(.96);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0,0,0) scale(1);
+          }
+        }
+
+        @keyframes driverNotificationProgress {
+          from { transform: scaleX(1); }
+          to { transform: scaleX(0); }
+        }
+
+        @media (max-width: 600px) {
+          .driver-page {
+            padding-top: 76px;
+          }
+        }
+      `}</style>
 
     <div className="driver-page">
 
-      {/* BACKGROUND */}
+      {/* BACKGROUND ICONS */}
 
-      <div className="background-decoration">
+      <div className="background-icons">
 
-        <FaTruck className="bg-icon bg-truck" />
+        <FaTruck />
 
-        <FaBoxOpen className="bg-icon bg-box" />
+        <FaBoxOpen />
 
-        <FaMapMarkerAlt className="bg-icon bg-map" />
+        <FaMapMarkerAlt />
 
-        <FaMotorcycle className="bg-icon bg-bike" />
+        <FaMotorcycle />
 
-        <FaShippingFast className="bg-icon bg-shipping" />
+        <FaShippingFast />
 
       </div>
 
 
       <main className="driver-container">
 
-        {/* HEADER */}
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
         <header className="driver-header">
 
-          <div className="header-decoration">
-            <FaTruck />
-          </div>
+          <div className="header-main">
 
-          <div className="header-content">
+            <div className="brand">
 
-            <div className="header-top">
+              <div className="brand-icon">
 
-              <div className="brand-area">
-
-                <div className="brand-icon">
-                  <FaTruck />
-                </div>
-
-                <div>
-
-                  <span className="brand-small">
-                    KONAN SHOPPING
-                  </span>
-
-                  <h1>
-                    Centre Livreur
-                  </h1>
-
-                </div>
+                <FaTruck />
 
               </div>
 
+              <div>
 
-              <div className="online-status">
+                <small>
+                  KONAN SHOPPING
+                </small>
 
-                <FaCircle />
-
-                EN LIGNE
+                <h1>
+                  Centre Livreur
+                </h1>
 
               </div>
 
             </div>
 
 
-            <div className="driver-welcome">
+            <div className="online">
 
-              <div>
+              <FaCircle />
 
-                <div className="welcome-text">
-                  Bonjour{" "}
-                  {driver.name || "Livreur"}
-                </div>
+              EN LIGNE
 
-                <div className="welcome-subtitle">
-                  Gestion professionnelle de vos livraisons
-                </div>
+            </div>
 
-              </div>
+          </div>
 
-              <div className="driver-profile">
 
-                {driver.photo ? (
+          <div className="welcome">
 
-                  <img
-                    src={driver.photo}
-                    alt=""
-                  />
+            <div>
 
-                ) : (
+              <strong>
+                Bonjour{" "}
+                {driver.name ||
+                  "Livreur"}
+              </strong>
 
-                  <FaUser />
+              <span>
+                Gérez vos livraisons depuis votre centre.
+              </span>
 
-                )}
+            </div>
 
-              </div>
+
+            <div className="profile">
+
+              {driver.photo ? (
+
+                <img
+                  src={driver.photo}
+                  alt=""
+                />
+
+              ) : (
+
+                <FaUser />
+
+              )}
 
             </div>
 
@@ -1727,17 +2527,97 @@ export default function DriverTracking() {
         </header>
 
 
-        {/* STATS */}
+        {/* =================================================
+            TELEGRAM
+        ================================================= */}
 
-        <section className="stats-grid">
+        <section className="telegram-card">
 
-          <div className="stat-card stat-blue">
+          <div className="telegram-left">
 
-            <div className="stat-icon">
-              <FaExclamationTriangle />
+            <div className="telegram-icon">
+
+              <FaTelegramPlane />
+
             </div>
 
             <div>
+
+              <strong>
+                Notifications Telegram
+              </strong>
+
+              <span>
+
+                {telegramConnected
+
+                  ? telegramUsername
+                    ? `@${telegramUsername}`
+
+                    : "Telegram connecté"
+
+                  : "Recevez les nouvelles commandes immédiatement."
+
+                }
+
+              </span>
+
+            </div>
+
+          </div>
+
+
+          {telegramConnected ? (
+
+            <div className="telegram-connected">
+
+              <FaCheckCircle />
+
+              CONNECTÉ
+
+            </div>
+
+          ) : (
+
+            <button
+              className="telegram-button"
+              onClick={
+                connectTelegram
+              }
+              disabled={
+                connectingTelegram
+              }
+            >
+
+              <FaTelegramPlane />
+
+              {connectingTelegram
+                ? "CONNEXION..."
+                : "CONNECTER TELEGRAM"}
+
+            </button>
+
+          )}
+
+        </section>
+
+
+        {/* =================================================
+            STATS
+        ================================================= */}
+
+        <section className="stats">
+
+          <div className="stat">
+
+            <div className="stat-icon blue">
+
+              <FaClipboardList />
+
+            </div>
+
+            <div>
+
               <strong>
                 {availableOrders.length}
               </strong>
@@ -1745,37 +2625,45 @@ export default function DriverTracking() {
               <span>
                 DISPONIBLES
               </span>
+
             </div>
 
           </div>
 
 
-          <div className="stat-card stat-green">
+          <div className="stat">
 
-            <div className="stat-icon">
+            <div className="stat-icon green">
+
               <FaTruck />
+
             </div>
 
             <div>
+
               <strong>
                 {myActiveOrders.length}
               </strong>
 
               <span>
-                EN COURS
+                MES LIVRAISONS
               </span>
+
             </div>
 
           </div>
 
 
-          <div className="stat-card stat-purple">
+          <div className="stat">
 
-            <div className="stat-icon">
+            <div className="stat-icon purple">
+
               <FaTrophy />
+
             </div>
 
             <div>
+
               <strong>
                 {deliveredOrders.length}
               </strong>
@@ -1783,6 +2671,7 @@ export default function DriverTracking() {
               <span>
                 LIVRÉES
               </span>
+
             </div>
 
           </div>
@@ -1790,17 +2679,17 @@ export default function DriverTracking() {
         </section>
 
 
-        {/* GPS */}
+        {/* =================================================
+            GPS
+        ================================================= */}
 
         {isTracking && (
 
-          <section className="gps-live-banner">
+          <div className="gps-banner">
 
-            <div className="gps-live-left">
+            <div>
 
-              <div className="gps-live-icon">
-                <FaSatelliteDish />
-              </div>
+              <FaSatelliteDish />
 
               <div>
 
@@ -1816,127 +2705,158 @@ export default function DriverTracking() {
 
             </div>
 
-            <div className="live-badge">
-
+            <b>
               <FaCircle />
-
               LIVE
+            </b>
 
-            </div>
-
-          </section>
+          </div>
 
         )}
 
 
-        {/* FILTER */}
+        {/* =================================================
+            FILTER
+        ================================================= */}
 
-        <nav className="filter-nav">
+        <nav className="filters">
 
           {[
             {
-              id: "all",
-              label: "Toutes",
-              icon: <FaClipboardList />,
-              count: visibleOrders.length
+              id:
+                "all",
+              label:
+                "Toutes",
+              icon:
+                <FaClipboardList />,
+              count:
+                availableOrders.length +
+                myActiveOrders.length
             },
 
             {
-              id: "available",
-              label: "Disponibles",
-              icon: <FaExclamationTriangle />,
-              count: availableOrders.length
+              id:
+                "available",
+              label:
+                "Disponibles",
+              icon:
+                <FaExclamationTriangle />,
+              count:
+                availableOrders.length
             },
 
             {
-              id: "active",
-              label: "Mes livraisons",
-              icon: <FaTruck />,
-              count: myActiveOrders.length
+              id:
+                "active",
+              label:
+                "Mes livraisons",
+              icon:
+                <FaTruck />,
+              count:
+                myActiveOrders.length
             },
 
             {
-              id: "delivered",
-              label: "Livrées",
-              icon: <FaCheckCircle />,
-              count: deliveredOrders.length
+              id:
+                "delivered",
+              label:
+                "Livrées",
+              icon:
+                <FaCheckCircle />,
+              count:
+                deliveredOrders.length
             }
 
-          ].map(tab => (
+          ].map(
+            tab => (
 
-            <button
-              key={tab.id}
-
-              onClick={() =>
-                setActiveSection(
+              <button
+                key={
                   tab.id
-                )
-              }
+                }
 
-              className={
-                `filter-button ${
-                  activeSection === tab.id
-                    ? "filter-active"
-                    : ""
-                }`
-              }
-            >
+                className={
+                  activeSection ===
+                  tab.id
+                    ? "filter active"
+                    : "filter"
+                }
 
-              {tab.icon}
+                onClick={() =>
+                  setActiveSection(
+                    tab.id
+                  )
+                }
+              >
 
-              <span>
-                {tab.label}
-              </span>
+                {tab.icon}
 
-              <b>
-                {tab.count}
-              </b>
+                <span>
+                  {tab.label}
+                </span>
 
-            </button>
+                <b>
+                  {tab.count}
+                </b>
 
-          ))}
+              </button>
+
+            )
+          )}
 
         </nav>
 
 
-        {/* TITLE */}
+        {/* =================================================
+            TITLE
+        ================================================= */}
 
-        <div className="orders-title-row">
+        <div className="section-head">
 
           <div>
 
             <h2>
 
-              {activeSection === "available"
+              {activeSection ===
+                "available"
+
                 ? "Commandes disponibles"
 
-                : activeSection === "active"
+                : activeSection ===
+                  "active"
+
                 ? "Mes livraisons"
 
-                : activeSection === "delivered"
+                : activeSection ===
+                  "delivered"
+
                 ? "Livraisons terminées"
 
-                : "Centre des commandes"}
+                : "Centre des commandes"
+
+              }
 
             </h2>
 
             <span>
-              {displayedOrders.length} commande(s)
+
+              {displayedOrders.length}
+              {" "}
+              commande(s)
+
             </span>
 
           </div>
 
 
           <button
+            className="refresh"
             onClick={() =>
-              fetchOrders(true)
+              syncDriverCenter()
             }
-
             disabled={
               isRefreshing
             }
-
-            className="refresh-button"
           >
 
             <FaSyncAlt
@@ -1952,21 +2872,26 @@ export default function DriverTracking() {
         </div>
 
 
-        {/* ORDERS */}
+        {/* =================================================
+            ORDERS
+        ================================================= */}
 
-        <section className="orders-list">
+        <section className="orders">
 
-          {displayedOrders.length === 0 ? (
+          {displayedOrders.length ===
+          0 ? (
 
-            <div className="empty-state">
+            <div className="empty">
 
-              <div className="empty-icon">
+              <div>
 
-                {activeSection === "available"
+                {activeSection ===
+                  "available"
 
                   ? <FaBoxOpen />
 
-                  : activeSection === "active"
+                  : activeSection ===
+                    "active"
 
                   ? <FaMotorcycle />
 
@@ -1978,18 +2903,26 @@ export default function DriverTracking() {
 
               <h3>
 
-                {activeSection === "available"
+                {activeSection ===
+                  "available"
+
                   ? "Aucune commande disponible"
 
-                  : activeSection === "active"
+                  : activeSection ===
+                    "active"
+
                   ? "Aucune livraison en cours"
 
-                  : "Aucune commande"}
+                  : "Aucune commande"
+
+                }
 
               </h3>
 
               <p>
+
                 Les nouvelles commandes apparaîtront automatiquement ici.
+
               </p>
 
             </div>
@@ -1997,8 +2930,7 @@ export default function DriverTracking() {
           ) : (
 
             displayedOrders.map(
-              order =>
-                renderOrder(order)
+              renderOrder
             )
 
           )}
@@ -2009,35 +2941,36 @@ export default function DriverTracking() {
 
 
       {/* =====================================================
-          CSS COMPACT + RESPONSIVE
+          CSS
       ===================================================== */}
 
       <style>{`
 
         * {
-          box-sizing: border-box;
+          box-sizing:border-box;
         }
 
+        body {
+          margin:0;
+        }
 
         .driver-page {
 
-          min-height: 100vh;
+          min-height:100vh;
 
-          width: 100%;
+          width:100%;
 
-          overflow-x: hidden;
-
-          position: relative;
+          overflow-x:hidden;
 
           background:
             linear-gradient(
               180deg,
-              #eef4ff 0%,
-              #f8fbff 45%,
+              #f1f5ff 0%,
+              #f8fafc 45%,
               #ffffff 100%
             );
 
-          padding: 12px;
+          padding:12px;
 
           font-family:
             Inter,
@@ -2047,133 +2980,122 @@ export default function DriverTracking() {
             "Segoe UI",
             sans-serif;
 
-          color: #0f172a;
+          color:#0f172a;
+
+          position:relative;
 
         }
 
 
-        /* ================================================
-           BACKGROUND
-        ================================================ */
+        /* BACKGROUND */
 
-        .background-decoration {
+        .background-icons {
 
-          position: fixed;
+          position:fixed;
 
-          inset: 0;
+          inset:0;
 
-          pointer-events: none;
+          pointer-events:none;
 
-          overflow: hidden;
+          overflow:hidden;
 
-          z-index: 0;
+          z-index:0;
 
         }
 
-        .bg-icon {
+        .background-icons svg {
 
-          position: absolute;
+          position:absolute;
 
-          color: #2563eb;
+          color:#2563eb;
 
-          opacity: .035;
-
-        }
-
-        .bg-truck {
-
-          width: 110px;
-          height: 110px;
-
-          top: 5%;
-          left: 3%;
-
-          transform:
-            rotate(-12deg);
+          opacity:.025;
 
         }
 
-        .bg-box {
+        .background-icons svg:nth-child(1) {
 
-          width: 130px;
-          height: 130px;
+          width:150px;
 
-          top: 28%;
-          right: 2%;
+          height:150px;
 
-          transform:
-            rotate(15deg);
+          top:5%;
 
-        }
+          left:2%;
 
-        .bg-map {
-
-          width: 110px;
-          height: 110px;
-
-          top: 58%;
-          left: 2%;
+          transform:rotate(-12deg);
 
         }
 
-        .bg-bike {
+        .background-icons svg:nth-child(2) {
 
-          width: 120px;
-          height: 120px;
+          width:130px;
 
-          bottom: 5%;
-          right: 5%;
+          height:130px;
 
-          transform:
-            rotate(-8deg);
+          top:35%;
 
-        }
+          right:2%;
 
-        .bg-shipping {
-
-          width: 90px;
-          height: 90px;
-
-          bottom: 30%;
-          left: 42%;
+          transform:rotate(15deg);
 
         }
 
+        .background-icons svg:nth-child(3) {
 
-        /* ================================================
-           CONTAINER
-        ================================================ */
+          width:120px;
+
+          height:120px;
+
+          bottom:25%;
+
+          left:2%;
+
+        }
+
+        .background-icons svg:nth-child(4) {
+
+          width:140px;
+
+          height:140px;
+
+          bottom:5%;
+
+          right:5%;
+
+        }
+
+        .background-icons svg:nth-child(5) {
+
+          width:100px;
+
+          height:100px;
+
+          top:60%;
+
+          left:45%;
+
+        }
+
 
         .driver-container {
 
-          width: 100%;
+          width:100%;
 
-          max-width: 1180px;
+          max-width:1200px;
 
-          margin: 0 auto;
+          margin:auto;
 
-          position: relative;
+          position:relative;
 
-          z-index: 1;
+          z-index:1;
 
         }
 
 
-        /* ================================================
-           HEADER
-        ================================================ */
+        /* HEADER */
 
         .driver-header {
-
-          position: relative;
-
-          overflow: hidden;
-
-          border-radius: 20px;
-
-          padding: 16px;
-
-          color: white;
 
           background:
             linear-gradient(
@@ -2183,264 +3105,215 @@ export default function DriverTracking() {
               #6d28d9
             );
 
+          border-radius:20px;
+
+          padding:17px;
+
+          color:white;
+
           box-shadow:
-            0 14px 35px
-            rgba(37,99,235,.16);
+            0 15px 35px
+            rgba(37,99,235,.15);
 
-          margin-bottom: 10px;
-
-        }
-
-        .header-decoration {
-
-          position: absolute;
-
-          right: -30px;
-
-          top: -50px;
-
-          width: 180px;
-
-          height: 180px;
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: center;
-
-          font-size: 120px;
-
-          opacity: .09;
-
-          transform:
-            rotate(12deg);
+          margin-bottom:9px;
 
         }
 
-        .header-content {
+        .header-main {
 
-          position: relative;
+          display:flex;
 
-          z-index: 2;
+          align-items:center;
 
-        }
+          justify-content:space-between;
 
-        .header-top {
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: space-between;
-
-          gap: 10px;
+          gap:10px;
 
         }
 
-        .brand-area {
+        .brand {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 10px;
+          gap:10px;
 
-          min-width: 0;
+          min-width:0;
 
         }
 
         .brand-icon {
 
-          width: 43px;
-          height: 43px;
+          width:43px;
 
-          flex-shrink: 0;
+          height:43px;
 
-          display: flex;
+          flex-shrink:0;
 
-          align-items: center;
-          justify-content: center;
+          display:flex;
 
-          border-radius: 13px;
+          align-items:center;
+
+          justify-content:center;
+
+          border-radius:13px;
 
           background:
             rgba(255,255,255,.15);
 
-          border:
-            1px solid
-            rgba(255,255,255,.20);
-
-          font-size: 20px;
-
-          backdrop-filter:
-            blur(10px);
+          font-size:20px;
 
         }
 
-        .brand-small {
+        .brand small {
 
-          display: block;
+          display:block;
 
-          font-size: 8px;
+          font-size:8px;
 
-          font-weight: 800;
+          font-weight:900;
 
-          letter-spacing: 1.3px;
+          letter-spacing:1.4px;
 
-          opacity: .78;
-
-        }
-
-        .brand-area h1 {
-
-          margin: 2px 0 0;
-
-          font-size: 21px;
-
-          font-weight: 950;
-
-          letter-spacing: -.6px;
+          opacity:.75;
 
         }
 
-        .online-status {
+        .brand h1 {
 
-          flex-shrink: 0;
+          margin:2px 0 0;
 
-          display: flex;
+          font-size:21px;
 
-          align-items: center;
+          font-weight:950;
 
-          gap: 5px;
+        }
 
-          padding: 7px 9px;
+        .online {
 
-          border-radius: 999px;
+          display:flex;
+
+          align-items:center;
+
+          gap:5px;
+
+          padding:7px 9px;
+
+          border-radius:999px;
 
           background:
-            rgba(255,255,255,.14);
+            rgba(255,255,255,.13);
 
-          border:
-            1px solid
+          font-size:8px;
+
+          font-weight:900;
+
+          white-space:nowrap;
+
+        }
+
+        .online svg {
+
+          color:#4ade80;
+
+          font-size:6px;
+
+        }
+
+        .welcome {
+
+          margin-top:13px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:10px;
+
+        }
+
+        .welcome strong {
+
+          display:block;
+
+          font-size:13px;
+
+        }
+
+        .welcome span {
+
+          display:block;
+
+          margin-top:3px;
+
+          font-size:9px;
+
+          opacity:.75;
+
+        }
+
+        .profile {
+
+          width:40px;
+
+          height:40px;
+
+          border-radius:50%;
+
+          overflow:hidden;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          flex-shrink:0;
+
+          background:
             rgba(255,255,255,.15);
-
-          font-size: 8px;
-
-          font-weight: 900;
-
-        }
-
-        .online-status svg {
-
-          font-size: 6px;
-
-          color: #4ade80;
-
-        }
-
-        .driver-welcome {
-
-          margin-top: 15px;
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: space-between;
-
-          gap: 10px;
-
-        }
-
-        .welcome-text {
-
-          font-size: 13px;
-
-          font-weight: 850;
-
-        }
-
-        .welcome-subtitle {
-
-          margin-top: 3px;
-
-          font-size: 9px;
-
-          opacity: .78;
-
-        }
-
-        .driver-profile {
-
-          width: 40px;
-          height: 40px;
-
-          flex-shrink: 0;
-
-          border-radius: 50%;
-
-          overflow: hidden;
-
-          display: flex;
-
-          align-items: center;
-          justify-content: center;
-
-          background:
-            rgba(255,255,255,.18);
 
           border:
             2px solid
-            rgba(255,255,255,.35);
-
-          font-size: 15px;
+            rgba(255,255,255,.3);
 
         }
 
-        .driver-profile img {
+        .profile img {
 
-          width: 100%;
-          height: 100%;
+          width:100%;
 
-          object-fit: cover;
+          height:100%;
 
-        }
-
-
-        /* ================================================
-           STATS COMPACT
-        ================================================ */
-
-        .stats-grid {
-
-          display: grid;
-
-          grid-template-columns:
-            repeat(3, 1fr);
-
-          gap: 8px;
-
-          margin-bottom: 10px;
+          object-fit:cover;
 
         }
 
-        .stat-card {
 
-          background: white;
+        /* TELEGRAM */
 
-          border:
-            1px solid #e7edf6;
+        .telegram-card {
 
-          border-radius: 14px;
+          display:flex;
 
-          padding: 10px;
+          align-items:center;
 
-          display: flex;
+          justify-content:space-between;
 
-          align-items: center;
+          gap:10px;
 
-          gap: 8px;
+          padding:9px 11px;
+
+          margin-bottom:9px;
+
+          background:white;
+
+          border:1px solid #e3eaf4;
+
+          border-radius:14px;
 
           box-shadow:
             0 7px 20px
@@ -2448,292 +3321,409 @@ export default function DriverTracking() {
 
         }
 
-        .stat-icon {
+        .telegram-left {
 
-          width: 34px;
-          height: 34px;
+          display:flex;
 
-          flex-shrink: 0;
+          align-items:center;
 
-          display: flex;
+          gap:8px;
 
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 10px;
-
-          font-size: 14px;
+          min-width:0;
 
         }
 
-        .stat-card strong {
+        .telegram-icon {
 
-          display: block;
+          width:34px;
 
-          font-size: 18px;
+          height:34px;
 
-          font-weight: 950;
+          flex-shrink:0;
 
-          line-height: 1;
+          display:flex;
 
-        }
+          align-items:center;
 
-        .stat-card span {
+          justify-content:center;
 
-          display: block;
+          border-radius:10px;
 
-          margin-top: 3px;
-
-          color: #64748b;
-
-          font-size: 7px;
-
-          font-weight: 900;
-
-          letter-spacing: .4px;
-
-        }
-
-        .stat-blue .stat-icon {
-          background: #dbeafe;
-          color: #2563eb;
-        }
-
-        .stat-blue strong {
-          color: #2563eb;
-        }
-
-        .stat-green .stat-icon {
-          background: #dcfce7;
-          color: #16a34a;
-        }
-
-        .stat-green strong {
-          color: #16a34a;
-        }
-
-        .stat-purple .stat-icon {
-          background: #ede9fe;
-          color: #7c3aed;
-        }
-
-        .stat-purple strong {
-          color: #7c3aed;
-        }
-
-
-        /* ================================================
-           GPS
-        ================================================ */
-
-        .gps-live-banner {
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: space-between;
-
-          gap: 10px;
-
-          padding: 10px 12px;
-
-          margin-bottom: 10px;
-
-          border-radius: 14px;
+          color:white;
 
           background:
             linear-gradient(
               135deg,
-              #dcfce7,
-              #bbf7d0
+              #229ed9,
+              #168ac1
             );
 
-          border:
-            1px solid #86efac;
+          font-size:15px;
 
         }
 
-        .gps-live-left {
+        .telegram-left strong {
 
-          display: flex;
+          display:block;
 
-          align-items: center;
+          font-size:9px;
 
-          gap: 8px;
-
-          min-width: 0;
+          font-weight:950;
 
         }
 
-        .gps-live-icon {
+        .telegram-left span {
 
-          width: 32px;
-          height: 32px;
+          display:block;
 
-          flex-shrink: 0;
+          margin-top:2px;
 
-          display: flex;
+          color:#64748b;
 
-          align-items: center;
-          justify-content: center;
+          font-size:7px;
 
-          border-radius: 10px;
+        }
 
-          color: white;
+        .telegram-button {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          gap:5px;
+
+          border:0;
+
+          border-radius:9px;
+
+          padding:8px 10px;
+
+          color:white;
 
           background:
             linear-gradient(
               135deg,
-              #16a34a,
-              #22c55e
+              #229ed9,
+              #168ac1
             );
 
-          font-size: 12px;
+          font-size:7px;
+
+          font-weight:950;
+
+          cursor:pointer;
+
+          white-space:nowrap;
 
         }
 
-        .gps-live-left strong {
+        .telegram-button:disabled {
 
-          display: block;
+          opacity:.55;
 
-          color: #166534;
-
-          font-size: 9px;
-
-          font-weight: 950;
+          cursor:not-allowed;
 
         }
 
-        .gps-live-left span {
+        .telegram-connected {
 
-          display: block;
+          display:flex;
 
-          color: #15803d;
+          align-items:center;
 
-          font-size: 7px;
+          gap:5px;
 
-          margin-top: 2px;
+          padding:7px 9px;
 
-        }
+          border-radius:999px;
 
-        .live-badge {
+          background:#dcfce7;
 
-          display: flex;
+          color:#15803d;
 
-          align-items: center;
+          font-size:7px;
 
-          gap: 4px;
+          font-weight:950;
 
-          padding: 5px 8px;
-
-          flex-shrink: 0;
-
-          border-radius: 999px;
-
-          color: white;
-
-          background: #22c55e;
-
-          font-size: 7px;
-
-          font-weight: 950;
+          white-space:nowrap;
 
         }
 
-        .live-badge svg {
-          font-size: 5px;
-        }
 
+        /* STATS */
 
-        /* ================================================
-           FILTER
-        ================================================ */
+        .stats {
 
-        .filter-nav {
+          display:grid;
 
-          display: flex;
+          grid-template-columns:
+            repeat(3,1fr);
 
-          gap: 6px;
+          gap:7px;
 
-          overflow-x: auto;
-
-          padding:
-            1px 1px 5px;
-
-          margin-bottom: 8px;
-
-          scrollbar-width: none;
+          margin-bottom:9px;
 
         }
 
-        .filter-nav::-webkit-scrollbar {
-          display: none;
-        }
+        .stat {
 
-        .filter-button {
+          background:white;
 
-          flex-shrink: 0;
+          border:1px solid #e5eaf2;
 
-          display: flex;
+          border-radius:13px;
 
-          align-items: center;
+          padding:9px;
 
-          gap: 5px;
+          display:flex;
 
-          border:
-            1px solid #e4eaf2;
+          align-items:center;
 
-          background: white;
-
-          color: #475569;
-
-          padding: 7px 10px;
-
-          border-radius: 999px;
-
-          font-size: 8px;
-
-          font-weight: 900;
-
-          cursor: pointer;
-
-          transition: .2s ease;
+          gap:8px;
 
           box-shadow:
-            0 4px 12px
+            0 6px 18px
             rgba(15,23,42,.035);
 
         }
 
-        .filter-button b {
+        .stat-icon {
 
-          min-width: 16px;
+          width:32px;
 
-          height: 16px;
+          height:32px;
 
-          display: flex;
+          border-radius:9px;
 
-          align-items: center;
-          justify-content: center;
+          display:flex;
 
-          border-radius: 999px;
+          align-items:center;
 
-          background: #f1f5f9;
+          justify-content:center;
 
-          font-size: 7px;
+          flex-shrink:0;
+
+          font-size:13px;
 
         }
 
-        .filter-button svg {
-          font-size: 9px;
+        .stat-icon.blue {
+
+          background:#dbeafe;
+
+          color:#2563eb;
+
         }
 
-        .filter-active {
+        .stat-icon.green {
 
-          border-color: transparent;
+          background:#dcfce7;
 
-          color: white;
+          color:#16a34a;
+
+        }
+
+        .stat-icon.purple {
+
+          background:#ede9fe;
+
+          color:#7c3aed;
+
+        }
+
+        .stat strong {
+
+          display:block;
+
+          font-size:17px;
+
+          line-height:1;
+
+          font-weight:950;
+
+        }
+
+        .stat span {
+
+          display:block;
+
+          margin-top:3px;
+
+          color:#64748b;
+
+          font-size:6px;
+
+          font-weight:950;
+
+        }
+
+
+        /* GPS */
+
+        .gps-banner {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:10px;
+
+          margin-bottom:9px;
+
+          padding:9px 11px;
+
+          border-radius:13px;
+
+          background:#dcfce7;
+
+          border:1px solid #86efac;
+
+        }
+
+        .gps-banner > div {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:8px;
+
+        }
+
+        .gps-banner > div > svg {
+
+          color:#16a34a;
+
+          font-size:16px;
+
+        }
+
+        .gps-banner strong {
+
+          display:block;
+
+          color:#166534;
+
+          font-size:8px;
+
+          font-weight:950;
+
+        }
+
+        .gps-banner span {
+
+          display:block;
+
+          color:#15803d;
+
+          margin-top:2px;
+
+          font-size:7px;
+
+        }
+
+        .gps-banner b {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:4px;
+
+          padding:5px 7px;
+
+          color:white;
+
+          background:#22c55e;
+
+          border-radius:999px;
+
+          font-size:6px;
+
+        }
+
+
+        /* FILTER */
+
+        .filters {
+
+          display:flex;
+
+          gap:5px;
+
+          overflow-x:auto;
+
+          scrollbar-width:none;
+
+          padding-bottom:3px;
+
+          margin-bottom:8px;
+
+        }
+
+        .filters::-webkit-scrollbar {
+
+          display:none;
+
+        }
+
+        .filter {
+
+          flex-shrink:0;
+
+          display:flex;
+
+          align-items:center;
+
+          gap:4px;
+
+          padding:7px 9px;
+
+          border:1px solid #e2e8f0;
+
+          border-radius:999px;
+
+          background:white;
+
+          color:#475569;
+
+          font-size:7px;
+
+          font-weight:950;
+
+          cursor:pointer;
+
+        }
+
+        .filter b {
+
+          min-width:15px;
+
+          height:15px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          border-radius:50%;
+
+          background:#f1f5f9;
+
+          font-size:6px;
+
+        }
+
+        .filter.active {
+
+          color:white;
+
+          border-color:transparent;
 
           background:
             linear-gradient(
@@ -2742,93 +3732,82 @@ export default function DriverTracking() {
               #4f46e5
             );
 
-          box-shadow:
-            0 6px 15px
-            rgba(37,99,235,.15);
-
         }
 
-        .filter-active b {
+        .filter.active b {
 
-          color: #2563eb;
+          color:#2563eb;
 
-          background: white;
+          background:white;
 
         }
 
 
-        /* ================================================
-           TITLE
-        ================================================ */
+        /* SECTION */
 
-        .orders-title-row {
+        .section-head {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          justify-content: space-between;
+          justify-content:space-between;
 
-          gap: 8px;
+          gap:10px;
 
-          margin-bottom: 8px;
+          margin-bottom:8px;
 
         }
 
-        .orders-title-row h2 {
+        .section-head h2 {
 
-          margin: 0;
+          margin:0;
 
-          font-size: 16px;
+          font-size:15px;
 
-          font-weight: 950;
-
-          letter-spacing: -.4px;
+          font-weight:950;
 
         }
 
-        .orders-title-row span {
+        .section-head span {
 
-          display: block;
+          display:block;
 
-          color: #64748b;
+          margin-top:2px;
 
-          font-size: 8px;
+          color:#64748b;
 
-          margin-top: 3px;
-
-        }
-
-        .refresh-button {
-
-          width: 34px;
-          height: 34px;
-
-          flex-shrink: 0;
-
-          display: flex;
-
-          align-items: center;
-          justify-content: center;
-
-          border:
-            1px solid #e2e8f0;
-
-          background: white;
-
-          color: #2563eb;
-
-          border-radius: 10px;
-
-          cursor: pointer;
+          font-size:7px;
 
         }
 
-        .refresh-button:disabled {
+        .refresh {
 
-          opacity: .5;
+          width:33px;
 
-          cursor: not-allowed;
+          height:33px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          border:1px solid #e2e8f0;
+
+          border-radius:10px;
+
+          background:white;
+
+          color:#2563eb;
+
+          cursor:pointer;
+
+        }
+
+        .refresh:disabled {
+
+          opacity:.5;
 
         }
 
@@ -2842,133 +3821,111 @@ export default function DriverTracking() {
         @keyframes spin {
 
           from {
-            transform: rotate(0deg);
+            transform:rotate(0deg);
           }
 
           to {
-            transform: rotate(360deg);
+            transform:rotate(360deg);
           }
 
         }
 
 
-        /* ================================================
-           ORDERS LIST
-        ================================================ */
+        /* ORDERS */
 
-        .orders-list {
+        .orders {
 
-          display: grid;
+          display:grid;
 
           grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+            repeat(2,minmax(0,1fr));
 
-          gap: 10px;
+          gap:9px;
 
         }
 
 
-        /* ================================================
-           COMPACT ORDER CARD
-        ================================================ */
+        /* CARD */
 
-        .driver-order-card {
+        .order-card {
 
-          position: relative;
+          min-width:0;
 
-          overflow: hidden;
-
-          min-width: 0;
+          padding:10px;
 
           background:
-            rgba(255,255,255,.97);
+            rgba(255,255,255,.98);
 
-          border:
-            1px solid #e5eaf1;
+          border:1px solid #e3e8f0;
 
-          border-radius: 17px;
-
-          padding: 11px;
+          border-radius:15px;
 
           box-shadow:
             0 7px 20px
             rgba(15,23,42,.045);
 
-          transition:
-            transform .18s ease,
-            box-shadow .18s ease;
-
-        }
-
-        .driver-order-card:hover {
-
-          transform:
-            translateY(-1px);
-
-          box-shadow:
-            0 12px 25px
-            rgba(15,23,42,.07);
-
         }
 
         .available-card {
 
-          border:
-            1px solid
+          border-color:
             rgba(37,99,235,.18);
 
-          box-shadow:
-            0 10px 25px
-            rgba(37,99,235,.07);
+        }
+
+        .mine-card {
+
+          border-color:
+            rgba(22,163,74,.18);
 
         }
 
 
-        /* ================================================
-           ORDER HEADER
-        ================================================ */
+        /* ORDER TOP */
 
-        .order-header {
+        .order-top {
 
-          display: flex;
+          display:flex;
 
-          align-items: flex-start;
+          align-items:flex-start;
 
-          justify-content: space-between;
+          justify-content:space-between;
 
-          gap: 7px;
+          gap:6px;
 
         }
 
-        .order-client {
+        .client-block {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 7px;
+          gap:7px;
 
-          min-width: 0;
+          min-width:0;
 
         }
 
-        .order-main-icon {
+        .order-icon {
 
-          width: 35px;
-          height: 35px;
+          width:33px;
 
-          flex-shrink: 0;
+          height:33px;
 
-          display: flex;
+          flex-shrink:0;
 
-          align-items: center;
-          justify-content: center;
+          display:flex;
 
-          border-radius: 10px;
+          align-items:center;
 
-          color: white;
+          justify-content:center;
 
-          font-size: 14px;
+          border-radius:9px;
+
+          color:white;
+
+          font-size:13px;
 
         }
 
@@ -2980,10 +3937,6 @@ export default function DriverTracking() {
               #2563eb,
               #4f46e5
             );
-
-          box-shadow:
-            0 6px 14px
-            rgba(37,99,235,.16);
 
         }
 
@@ -2998,123 +3951,107 @@ export default function DriverTracking() {
 
         }
 
-        .order-client-text {
-          min-width: 0;
-        }
+        .client-block h3 {
 
-        .order-client-text h2 {
+          max-width:170px;
 
-          margin: 0;
+          margin:0;
 
-          color: #0f172a;
+          overflow:hidden;
 
-          font-size: 12px;
+          text-overflow:ellipsis;
 
-          font-weight: 900;
+          white-space:nowrap;
 
-          overflow: hidden;
+          font-size:11px;
 
-          text-overflow: ellipsis;
-
-          white-space: nowrap;
+          font-weight:950;
 
         }
 
-        .order-client-text span {
+        .client-block span {
 
-          display: block;
+          display:block;
 
-          color: #64748b;
+          margin-top:2px;
 
-          font-size: 7px;
+          color:#64748b;
 
-          margin-top: 2px;
-
-          overflow: hidden;
-
-          text-overflow: ellipsis;
-
-          white-space: nowrap;
+          font-size:6px;
 
         }
 
 
-        /* ================================================
-           STATUS
-        ================================================ */
+        /* STATUS */
 
-        .order-status {
+        .status-pill {
 
-          flex-shrink: 0;
+          flex-shrink:0;
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 3px;
+          gap:3px;
 
-          padding: 5px 7px;
+          padding:5px 6px;
 
-          border-radius: 999px;
+          border-radius:999px;
 
-          font-size: 6px;
+          font-size:5px;
 
-          font-weight: 950;
+          font-weight:950;
 
         }
 
-        .status-delivered {
+        .status-pill.available {
 
-          color: #15803d;
+          color:#92400e;
 
-          background: #dcfce7;
-
-        }
-
-        .status-cancelled {
-
-          color: #b91c1c;
-
-          background: #fee2e2;
+          background:#fef3c7;
 
         }
 
-        .status-active {
+        .status-pill.active {
 
-          color: #1d4ed8;
+          color:#1d4ed8;
 
-          background: #dbeafe;
-
-        }
-
-        .status-available {
-
-          color: #92400e;
-
-          background: #fef3c7;
+          background:#dbeafe;
 
         }
 
+        .status-pill.delivered {
 
-        /* ================================================
-           TOTAL
-        ================================================ */
+          color:#15803d;
 
-        .order-total-box {
+          background:#dcfce7;
 
-          display: flex;
+        }
 
-          align-items: center;
+        .status-pill.cancelled {
 
-          justify-content: space-between;
+          color:#b91c1c;
 
-          gap: 7px;
+          background:#fee2e2;
 
-          margin-top: 8px;
+        }
 
-          padding: 9px;
 
-          border-radius: 12px;
+        /* TOTAL */
+
+        .total-box {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          margin-top:7px;
+
+          padding:8px;
+
+          border-radius:10px;
 
           background:
             linear-gradient(
@@ -3125,155 +4062,132 @@ export default function DriverTracking() {
 
         }
 
-        .small-label {
+        .total-box small {
 
-          color: #64748b;
+          display:block;
 
-          font-size: 6px;
+          color:#64748b;
 
-          font-weight: 900;
+          font-size:5px;
 
-          letter-spacing: .4px;
-
-        }
-
-        .order-total {
-
-          margin-top: 2px;
-
-          color: #4f46e5;
-
-          font-size: 15px;
-
-          font-weight: 950;
+          font-weight:950;
 
         }
 
-        .order-mini-info {
+        .total-box strong {
 
-          display: flex;
+          display:block;
 
-          flex-direction: column;
+          margin-top:2px;
 
-          align-items: flex-end;
+          color:#4f46e5;
 
-          gap: 3px;
+          font-size:14px;
 
-          color: #64748b;
-
-          font-size: 7px;
+          font-weight:950;
 
         }
 
-        .order-mini-info span {
+        .mini-data {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 3px;
+          gap:5px;
+
+          color:#64748b;
+
+          font-size:7px;
 
         }
 
-        .order-mini-info svg {
+        .mini-data span {
 
-          color: #2563eb;
+          display:flex;
 
-          font-size: 7px;
+          align-items:center;
+
+          gap:3px;
 
         }
 
 
-        /* ================================================
-           INFO
-        ================================================ */
+        /* DESTINATION */
 
-        .order-info-grid {
+        .destination-box {
 
-          display: grid;
+          margin-top:7px;
 
-          grid-template-columns: 1fr;
+          padding:8px;
 
-          gap: 6px;
+          border:1px solid #edf1f6;
 
-          margin-top: 7px;
+          border-radius:10px;
 
-        }
-
-        .info-panel {
-
-          padding: 9px;
-
-          border:
-            1px solid #edf1f6;
-
-          border-radius: 12px;
-
-          background: #f8fafc;
+          background:#f8fafc;
 
         }
 
-        .info-label {
+        .label {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 4px;
+          gap:4px;
 
-          color: #64748b;
+          color:#64748b;
 
-          font-size: 6px;
+          font-size:5px;
 
-          font-weight: 950;
+          font-weight:950;
 
-          letter-spacing: .4px;
-
-        }
-
-        .info-label svg {
-
-          color: #2563eb;
-
-          font-size: 8px;
+          letter-spacing:.3px;
 
         }
 
-        .client-address {
+        .label svg {
 
-          margin-top: 5px;
+          color:#2563eb;
 
-          color: #0f172a;
-
-          font-size: 9px;
-
-          font-weight: 700;
-
-          line-height: 1.35;
+          font-size:8px;
 
         }
 
-        .maps-button {
+        .destination-box p {
 
-          width: 100%;
+          margin:5px 0 0;
 
-          margin-top: 7px;
+          color:#0f172a;
 
-          display: flex;
+          font-size:8px;
 
-          align-items: center;
+          font-weight:700;
 
-          justify-content: center;
+          line-height:1.35;
 
-          gap: 5px;
+        }
 
-          padding: 8px;
+        .map-button {
 
-          border-radius: 9px;
+          margin-top:6px;
 
-          text-decoration: none;
+          width:100%;
 
-          color: white;
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          gap:5px;
+
+          padding:7px;
+
+          border-radius:8px;
+
+          color:white;
 
           background:
             linear-gradient(
@@ -3282,40 +4196,38 @@ export default function DriverTracking() {
               #4f46e5
             );
 
-          font-size: 7px;
+          text-decoration:none;
 
-          font-weight: 900;
+          font-size:6px;
 
-        }
-
-        .button-arrow {
-
-          margin-left: auto;
-
-          font-size: 6px;
+          font-weight:950;
 
         }
 
+        .map-button svg:last-child {
 
-        /* ================================================
-           PHONE
-        ================================================ */
+          margin-left:auto;
+
+        }
+
+
+        /* PHONE */
 
         .phone-button {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 7px;
+          gap:7px;
 
-          padding: 8px;
+          margin-top:6px;
 
-          border-radius: 11px;
+          padding:7px;
 
-          text-decoration: none;
+          border-radius:9px;
 
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3324,106 +4236,108 @@ export default function DriverTracking() {
               #22c55e
             );
 
+          text-decoration:none;
+
         }
 
-        .phone-icon {
+        .phone-symbol {
 
-          width: 29px;
-          height: 29px;
+          width:27px;
 
-          display: flex;
+          height:27px;
 
-          align-items: center;
-          justify-content: center;
+          display:flex;
 
-          flex-shrink: 0;
+          align-items:center;
 
-          border-radius: 8px;
+          justify-content:center;
+
+          border-radius:7px;
 
           background:
-            rgba(255,255,255,.16);
+            rgba(255,255,255,.15);
 
-          font-size: 10px;
-
-        }
-
-        .phone-content {
-
-          min-width: 0;
-
-          flex: 1;
+          font-size:9px;
 
         }
 
-        .phone-content span {
+        .phone-button small {
 
-          display: block;
+          display:block;
 
-          font-size: 6px;
+          font-size:5px;
 
-          font-weight: 900;
+          opacity:.8;
 
-          opacity: .8;
+          font-weight:950;
 
         }
 
-        .phone-content strong {
+        .phone-button strong {
 
-          display: block;
+          display:block;
 
-          margin-top: 1px;
+          margin-top:1px;
 
-          font-size: 9px;
-
-          overflow: hidden;
-
-          text-overflow: ellipsis;
-
-          white-space: nowrap;
+          font-size:8px;
 
         }
 
         .phone-button > svg {
 
-          font-size: 7px;
+          margin-left:auto;
+
+          font-size:7px;
 
         }
 
 
-        /* ================================================
-           ETA
-        ================================================ */
+        /* ETA */
 
-        .eta-grid {
+        .eta-row {
 
-          display: grid;
+          display:grid;
 
           grid-template-columns:
             1fr 1fr;
 
-          gap: 6px;
+          gap:5px;
 
-          margin-top: 7px;
-
-        }
-
-        .eta-card {
-
-          display: flex;
-
-          align-items: center;
-
-          gap: 6px;
-
-          padding: 8px;
-
-          border-radius: 11px;
+          margin-top:6px;
 
         }
 
-        .eta-purple {
+        .eta-box {
 
-          color: white;
+          display:flex;
+
+          align-items:center;
+
+          gap:6px;
+
+          padding:7px;
+
+          border:1px solid #e2e8f0;
+
+          border-radius:9px;
+
+          background:white;
+
+        }
+
+        .eta-box > svg {
+
+          color:#2563eb;
+
+          font-size:11px;
+
+        }
+
+        .eta-box.purple {
+
+          border:0;
+
+          color:white;
 
           background:
             linear-gradient(
@@ -3434,257 +4348,182 @@ export default function DriverTracking() {
 
         }
 
-        .eta-white {
+        .eta-box.purple > svg {
 
-          color: #0f172a;
-
-          background: white;
-
-          border:
-            1px solid #e2e8f0;
+          color:white;
 
         }
 
-        .eta-icon {
+        .eta-box small {
 
-          width: 28px;
-          height: 28px;
+          display:block;
 
-          flex-shrink: 0;
+          font-size:5px;
 
-          display: flex;
+          font-weight:950;
 
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 8px;
-
-          background:
-            rgba(255,255,255,.15);
-
-          font-size: 10px;
+          opacity:.7;
 
         }
 
-        .road-icon {
+        .eta-box strong {
 
-          color: #2563eb;
+          display:block;
 
-          background: #dbeafe;
+          margin-top:1px;
 
-        }
+          font-size:11px;
 
-        .eta-card span {
-
-          display: block;
-
-          font-size: 6px;
-
-          font-weight: 900;
-
-          opacity: .75;
-
-        }
-
-        .eta-card strong {
-
-          display: block;
-
-          margin-top: 1px;
-
-          font-size: 13px;
-
-          font-weight: 950;
+          font-weight:950;
 
         }
 
 
-        /* ================================================
-           PRODUCTS
-        ================================================ */
+        /* PRODUCTS */
 
-        .products-section {
+        .products {
 
-          margin-top: 8px;
+          margin-top:7px;
 
         }
 
-        .section-label {
+        .product-row {
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          gap: 4px;
+          gap:6px;
 
-          margin-bottom: 5px;
+          padding:4px;
 
-          color: #64748b;
+          margin-top:4px;
 
-          font-size: 6px;
+          border-radius:8px;
 
-          font-weight: 950;
+          background:#f8fafc;
 
-          letter-spacing: .4px;
-
-        }
-
-        .section-label svg {
-
-          color: #2563eb;
-
-          font-size: 8px;
+          border:1px solid #edf1f6;
 
         }
 
-        .products-list {
+        .product-row img,
+        .no-image {
 
-          display: flex;
+          width:31px;
 
-          flex-direction: column;
+          height:31px;
 
-          gap: 4px;
+          flex-shrink:0;
 
-        }
+          border-radius:6px;
 
-        .product-item {
+          object-fit:cover;
 
-          display: flex;
-
-          align-items: center;
-
-          gap: 6px;
-
-          padding: 5px;
-
-          border:
-            1px solid #edf1f6;
-
-          border-radius: 9px;
-
-          background: #f8fafc;
+          background:#e2e8f0;
 
         }
 
-        .product-item img {
+        .no-image {
 
-          width: 34px;
-          height: 34px;
+          display:flex;
 
-          flex-shrink: 0;
+          align-items:center;
 
-          object-fit: cover;
+          justify-content:center;
 
-          border-radius: 7px;
+          color:#94a3b8;
 
-          background: #e2e8f0;
-
-        }
-
-        .product-info {
-
-          min-width: 0;
+          font-size:9px;
 
         }
 
-        .product-info strong {
+        .product-row strong {
 
-          display: block;
+          display:block;
 
-          color: #111827;
+          max-width:190px;
 
-          font-size: 8px;
+          overflow:hidden;
 
-          font-weight: 850;
+          text-overflow:ellipsis;
 
-          overflow: hidden;
+          white-space:nowrap;
 
-          text-overflow: ellipsis;
-
-          white-space: nowrap;
+          font-size:7px;
 
         }
 
-        .product-info span {
+        .product-row span {
 
-          display: block;
+          display:block;
 
-          margin-top: 2px;
+          margin-top:1px;
 
-          color: #64748b;
+          color:#64748b;
 
-          font-size: 6px;
+          font-size:5px;
+
+        }
+
+        .more-products {
+
+          margin-top:4px;
+
+          color:#64748b;
+
+          font-size:6px;
+
+          text-align:center;
 
         }
 
 
-        /* ================================================
-           ACTIONS
-        ================================================ */
+        /* ACTIONS */
 
-        .order-actions {
+        .actions {
 
-          margin-top: 8px;
+          display:flex;
 
-          display: flex;
+          flex-direction:column;
 
-          flex-direction: column;
+          gap:5px;
 
-          gap: 5px;
+          margin-top:7px;
 
         }
 
-        .primary-action,
-        .tracking-action,
-        .delivered-action,
-        .cancel-action,
-        .delete-action,
-        .secondary-action {
+        .actions button {
 
-          border: none;
+          min-height:34px;
 
-          min-height: 36px;
+          border:0;
 
-          border-radius: 10px;
+          border-radius:9px;
 
-          display: flex;
+          display:flex;
 
-          align-items: center;
+          align-items:center;
 
-          justify-content: center;
+          justify-content:center;
 
-          gap: 5px;
+          gap:5px;
 
-          font-family: inherit;
+          font-family:inherit;
 
-          font-size: 7px;
+          font-size:6px;
 
-          font-weight: 950;
+          font-weight:950;
 
-          cursor: pointer;
-
-          transition:
-            transform .15s ease;
+          cursor:pointer;
 
         }
 
-        .primary-action:active,
-        .tracking-action:active,
-        .delivered-action:active,
-        .cancel-action:active,
-        .delete-action:active,
-        .secondary-action:active {
+        .accept-button {
 
-          transform:
-            scale(.98);
+          width:100%;
 
-        }
-
-        .primary-action {
-
-          width: 100%;
-
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3693,36 +4532,31 @@ export default function DriverTracking() {
               #4f46e5
             );
 
-          box-shadow:
-            0 7px 17px
-            rgba(37,99,235,.16);
+        }
+
+        .accept-button svg:last-child {
+
+          margin-left:auto;
 
         }
 
-        .primary-action svg:last-child {
+        .refuse-button {
 
-          margin-left: auto;
+          width:100%;
 
-        }
+          color:#64748b;
 
-        .secondary-action {
+          background:white;
 
-          width: 100%;
-
-          color: #64748b;
-
-          background: white;
-
-          border:
-            1px solid #e2e8f0;
+          border:1px solid #e2e8f0 !important;
 
         }
 
-        .tracking-action {
+        .gps-button {
 
-          width: 100%;
+          width:100%;
 
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3731,32 +4565,28 @@ export default function DriverTracking() {
               #7c4dff
             );
 
-          box-shadow:
-            0 7px 17px
-            rgba(91,61,245,.15);
+        }
+
+        .gps-button svg:last-child {
+
+          margin-left:auto;
 
         }
 
-        .tracking-action svg:last-child {
+        .action-grid {
 
-          margin-left: auto;
-
-        }
-
-        .two-actions {
-
-          display: grid;
+          display:grid;
 
           grid-template-columns:
             1fr 1fr;
 
-          gap: 5px;
+          gap:5px;
 
         }
 
-        .delivered-action {
+        .done-button {
 
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3767,9 +4597,9 @@ export default function DriverTracking() {
 
         }
 
-        .cancel-action {
+        .cancel-button {
 
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3780,11 +4610,11 @@ export default function DriverTracking() {
 
         }
 
-        .delete-action {
+        .delete-button {
 
-          width: 100%;
+          width:100%;
 
-          color: white;
+          color:white;
 
           background:
             linear-gradient(
@@ -3796,95 +4626,81 @@ export default function DriverTracking() {
         }
 
 
-        /* ================================================
-           EMPTY
-        ================================================ */
+        /* EMPTY */
 
-        .empty-state {
+        .empty {
 
           grid-column:
             1 / -1;
 
-          padding:
-            40px 20px;
+          padding:45px 20px;
 
-          text-align: center;
+          text-align:center;
 
-          border-radius: 18px;
+          background:white;
 
-          background: white;
+          border:1px solid #e5eaf2;
 
-          border:
-            1px solid #e7edf5;
-
-          box-shadow:
-            0 10px 28px
-            rgba(15,23,42,.04);
+          border-radius:17px;
 
         }
 
-        .empty-icon {
+        .empty > div {
 
-          width: 58px;
-          height: 58px;
+          width:55px;
 
-          margin:
-            0 auto 12px;
+          height:55px;
 
-          display: flex;
+          margin:auto;
 
-          align-items: center;
-          justify-content: center;
+          display:flex;
 
-          border-radius: 18px;
+          align-items:center;
 
-          color: #2563eb;
+          justify-content:center;
 
-          background: #eff6ff;
+          border-radius:17px;
 
-          font-size: 23px;
+          color:#2563eb;
 
-        }
+          background:#eff6ff;
 
-        .empty-state h3 {
-
-          margin: 0;
-
-          color: #0f172a;
-
-          font-size: 14px;
-
-          font-weight: 950;
+          font-size:22px;
 
         }
 
-        .empty-state p {
+        .empty h3 {
 
-          max-width: 350px;
+          margin:11px 0 4px;
 
-          margin:
-            6px auto 0;
+          font-size:13px;
 
-          color: #64748b;
+          font-weight:950;
 
-          font-size: 9px;
+        }
 
-          line-height: 1.5;
+        .empty p {
+
+          margin:0 auto;
+
+          max-width:350px;
+
+          color:#64748b;
+
+          font-size:8px;
+
+          line-height:1.5;
 
         }
 
 
-        /* ================================================
-           TABLET
-        ================================================ */
+        /* TABLET */
 
-        @media (max-width: 900px) {
+        @media (
+          max-width:900px
+        ) {
 
-          .driver-page {
-            padding: 10px;
-          }
-
-          .orders-list {
+          .orders {
 
             grid-template-columns:
               1fr;
@@ -3892,379 +4708,210 @@ export default function DriverTracking() {
           }
 
           .driver-container {
-            max-width: 720px;
+
+            max-width:720px;
+
           }
 
         }
 
 
-        /* ================================================
-           MOBILE
-        ================================================ */
+        /* MOBILE */
 
-        @media (max-width: 600px) {
+        @media (
+          max-width:600px
+        ) {
 
           .driver-page {
 
-            padding: 7px;
-
-            padding-bottom: 20px;
+            padding:7px;
 
           }
 
           .driver-header {
 
-            border-radius: 17px;
+            padding:13px;
 
-            padding: 13px;
+            border-radius:16px;
 
           }
 
           .brand-icon {
 
-            width: 39px;
-            height: 39px;
+            width:38px;
 
-            border-radius: 11px;
+            height:38px;
 
-            font-size: 18px;
-
-          }
-
-          .brand-small {
-            font-size: 7px;
-          }
-
-          .brand-area h1 {
-
-            font-size: 18px;
+            font-size:17px;
 
           }
 
-          .online-status {
+          .brand h1 {
 
-            padding: 6px 7px;
-
-            font-size: 7px;
+            font-size:17px;
 
           }
 
-          .driver-welcome {
+          .brand small {
 
-            margin-top: 12px;
-
-          }
-
-          .welcome-text {
-
-            font-size: 11px;
+            font-size:6px;
 
           }
 
-          .welcome-subtitle {
+          .online {
 
-            font-size: 8px;
+            padding:6px 7px;
 
-          }
-
-          .driver-profile {
-
-            width: 36px;
-            height: 36px;
+            font-size:6px;
 
           }
 
+          .telegram-card {
 
-          .stats-grid {
+            align-items:flex-start;
 
-            gap: 5px;
+            padding:9px;
 
           }
 
-          .stat-card {
+          .telegram-button {
 
-            padding: 8px 5px;
+            padding:8px;
 
-            flex-direction: column;
+            font-size:6px;
 
-            justify-content: center;
+          }
 
-            gap: 4px;
+          .telegram-left strong {
 
-            text-align: center;
+            font-size:8px;
 
-            border-radius: 12px;
+          }
+
+          .telegram-left span {
+
+            font-size:6px;
+
+          }
+
+          .stats {
+
+            gap:4px;
+
+          }
+
+          .stat {
+
+            flex-direction:column;
+
+            text-align:center;
+
+            justify-content:center;
+
+            gap:4px;
+
+            padding:7px 4px;
 
           }
 
           .stat-icon {
 
-            width: 29px;
-            height: 29px;
+            width:28px;
 
-            border-radius: 9px;
+            height:28px;
 
-            font-size: 12px;
-
-          }
-
-          .stat-card strong {
-
-            font-size: 16px;
+            font-size:11px;
 
           }
 
-          .stat-card span {
+          .stat strong {
 
-            font-size: 6px;
-
-          }
-
-
-          .gps-live-banner {
-
-            padding: 9px;
-
-            border-radius: 13px;
+            font-size:15px;
 
           }
 
-          .gps-live-icon {
+          .stat span {
 
-            width: 30px;
-            height: 30px;
-
-          }
-
-          .gps-live-left strong {
-            font-size: 8px;
-          }
-
-          .gps-live-left span {
-            font-size: 7px;
-          }
-
-          .live-badge {
-            font-size: 7px;
-          }
-
-
-          .filter-button {
-
-            padding: 7px 8px;
-
-            font-size: 7px;
+            font-size:5px;
 
           }
 
+          .orders {
 
-          .orders-title-row h2 {
-
-            font-size: 14px;
-
-          }
-
-
-          .driver-order-card {
-
-            border-radius: 15px;
-
-            padding: 9px;
+            grid-template-columns:1fr;
 
           }
 
+          .order-card {
 
-          .order-main-icon {
-
-            width: 32px;
-            height: 32px;
-
-            border-radius: 9px;
-
-            font-size: 12px;
-
-          }
-
-          .order-client-text h2 {
-
-            font-size: 11px;
-
-          }
-
-          .order-status {
-
-            padding: 5px 6px;
-
-            font-size: 5px;
-
-          }
-
-
-          .order-total {
-
-            font-size: 14px;
-
-          }
-
-
-          .eta-card {
-
-            padding: 7px;
-
-          }
-
-          .eta-icon {
-
-            width: 25px;
-            height: 25px;
-
-          }
-
-          .eta-card strong {
-
-            font-size: 12px;
-
-          }
-
-
-          .primary-action,
-          .tracking-action,
-          .delivered-action,
-          .cancel-action,
-          .delete-action,
-          .secondary-action {
-
-            min-height: 35px;
-
-            font-size: 7px;
+            padding:9px;
 
           }
 
         }
 
 
-        /* ================================================
-           VERY SMALL PHONES
-        ================================================ */
+        /* SMALL MOBILE */
 
-        @media (max-width: 380px) {
+        @media (
+          max-width:380px
+        ) {
 
           .driver-page {
 
-            padding: 5px;
+            padding:5px;
 
           }
 
           .driver-header {
 
-            padding: 11px;
+            padding:11px;
 
           }
 
-          .brand-area {
+          .brand h1 {
 
-            gap: 7px;
-
-          }
-
-          .brand-icon {
-
-            width: 36px;
-            height: 36px;
-
-            font-size: 16px;
+            font-size:16px;
 
           }
 
-          .brand-area h1 {
+          .telegram-button {
 
-            font-size: 16px;
-
-          }
-
-          .online-status {
-
-            padding: 5px 6px;
+            padding:7px;
 
           }
 
-          .stats-grid {
+          .telegram-button {
 
-            gap: 4px;
-
-          }
-
-          .stat-card {
-
-            padding: 7px 3px;
+            font-size:5px;
 
           }
 
-          .stat-card strong {
+          .order-card {
 
-            font-size: 15px;
-
-          }
-
-          .driver-order-card {
-
-            padding: 8px;
-
-          }
-
-          .two-actions {
-
-            gap: 4px;
-
-          }
-
-          .primary-action,
-          .tracking-action,
-          .delivered-action,
-          .cancel-action,
-          .delete-action,
-          .secondary-action {
-
-            font-size: 6px;
+            padding:8px;
 
           }
 
         }
 
 
-        /* ================================================
-           DESKTOP LARGE
-        ================================================ */
+        /* LARGE DESKTOP */
 
-        @media (min-width: 1200px) {
+        @media (
+          min-width:1200px
+        ) {
 
           .driver-page {
 
-            padding: 18px;
+            padding:18px;
 
           }
 
-          .driver-header {
-
-            padding: 20px;
-
-          }
-
-          .orders-list {
+          .orders {
 
             grid-template-columns:
-              repeat(
-                2,
-                minmax(0, 1fr)
-              );
-
-            gap: 12px;
-
-          }
-
-          .driver-order-card {
-
-            padding: 12px;
+              repeat(3,minmax(0,1fr));
 
           }
 
@@ -4273,6 +4920,8 @@ export default function DriverTracking() {
       `}</style>
 
     </div>
+
+  </>
 
   );
 
