@@ -307,7 +307,7 @@ const orders = [
 
   {
     icon: <FaTruck />,
-    title: "Expédiées",
+    title: "En livraison",
     count: shippedOrders,
     path: "/orders/shipped",
   },

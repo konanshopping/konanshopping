@@ -38,7 +38,7 @@ import {
 // 🌐 API
 // ======================================================
 
-const API = "https://konanshopping.com/api";
+const API = "https://konanshopping.com";
 
 
 // ======================================================

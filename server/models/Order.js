@@ -1,86 +1,326 @@
 const mongoose = require("mongoose");
 
+
+// ======================================================
+// 📦 ORDER SCHEMA — KONAN SHOPPING
+// ======================================================
+
 const OrderSchema = new mongoose.Schema({
 
-userId: {
+
+  // ====================================================
+  // 👤 CLIENT
+  // ====================================================
+
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
 
-  customerName: String,
-
-  phone: String,
-
-  address: String,
-
-  city: String,
-
-  district: String,
-
-  shipping: Number,
-
- items: [
-  {
-    productId: String,
-
-    name: String,
-
-    image: String,
-
-    price: Number,
-
-    quantity: Number,
+  customerName: {
+    type: String,
+    default: "",
   },
-],
 
-  total: Number,
+  phone: {
+    type: String,
+    default: "",
+  },
 
-driverLocation: {
+  address: {
+    type: String,
+    default: "",
+  },
 
-  lat: {
+  city: {
+    type: String,
+    default: "",
+  },
+
+  district: {
+    type: String,
+    default: "",
+  },
+
+  shipping: {
     type: Number,
-    default: 4.0511,
+    default: 0,
   },
 
-  lng: {
+
+  // ====================================================
+  // 📦 PRODUITS
+  // ====================================================
+
+  items: [
+
+    {
+
+      productId: {
+        type: String,
+        default: "",
+      },
+
+      name: {
+        type: String,
+        default: "",
+      },
+
+      image: {
+        type: String,
+        default: "",
+      },
+
+      price: {
+        type: Number,
+        default: 0,
+      },
+
+      quantity: {
+        type: Number,
+        default: 1,
+      },
+
+    },
+
+  ],
+
+
+  // ====================================================
+  // 💰 TOTAL
+  // ====================================================
+
+  total: {
     type: Number,
-    default: 9.7679,
+    default: 0,
   },
 
-},
 
-driverId: {
+  // ====================================================
+  // 💳 MODE DE PAIEMENT
+  // ====================================================
 
-  type:
-    mongoose.Schema.Types.ObjectId,
+  paymentMethod: {
+    type: String,
+    default: "Paiement à la livraison",
+  },
 
-  ref: "Driver",
 
-},
+  // ====================================================
+  // 📍 POSITION DU LIVREUR
+  // ====================================================
 
-driver: {
+  driverLocation: {
 
-  name: String,
+    lat: {
+      type: Number,
+      default: 4.0511,
+    },
 
-  phone: String,
+    lng: {
+      type: Number,
+      default: 9.7679,
+    },
 
-  photo: String,
+    updatedAt: {
+      type: Date,
+      default: null,
+    },
 
-},
+  },
+
+
+  // ====================================================
+  // 🚚 LIVREUR ASSIGNÉ — NOUVEAU SYSTÈME
+  // ====================================================
+
+  assignedDriver: {
+
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Driver",
+      default: null,
+    },
+
+    name: {
+      type: String,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      default: "",
+    },
+
+    photo: {
+      type: String,
+      default: "",
+    },
+
+    vehicle: {
+      type: String,
+      default: "",
+    },
+
+    plate: {
+      type: String,
+      default: "",
+    },
+
+  },
+
+
+  // ====================================================
+  // 🔗 ANCIEN DRIVER ID
+  // ====================================================
+  //
+  // On le conserve pour éviter de casser
+  // les anciennes parties de ton application.
+  //
+  // ====================================================
+
+  driverId: {
+
+    type:
+      mongoose.Schema.Types.ObjectId,
+
+    ref:
+      "Driver",
+
+    default:
+      null,
+
+  },
+
+
+  // ====================================================
+  // 🚚 ANCIEN OBJET DRIVER
+  // ====================================================
+  //
+  // Compatibilité avec ton ancien système.
+  //
+  // ====================================================
+
+  driver: {
+
+    name: {
+      type: String,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      default: "",
+    },
+
+    photo: {
+      type: String,
+      default: "",
+    },
+
+    vehicle: {
+      type: String,
+      default: "",
+    },
+
+    plate: {
+      type: String,
+      default: "",
+    },
+
+  },
+
+
+  // ====================================================
+  // 🔐 QR UNIQUE DE LA COMMANDE
+  // ====================================================
+
+  deliveryQrToken: {
+
+    type: String,
+
+    unique: true,
+
+    sparse: true,
+
+    index: true,
+
+  },
+
+
+  // ====================================================
+  // 📷 QR UTILISÉ
+  // ====================================================
+
+  deliveryQrUsedAt: {
+
+    type: Date,
+
+    default: null,
+
+  },
+
+
+  // ====================================================
+  // 🕐 DATE D'ACCEPTATION
+  // ====================================================
+
+  acceptedAt: {
+
+    type: Date,
+
+    default: null,
+
+  },
+
+
+  // ====================================================
+  // ✅ DATE DE LIVRAISON
+  // ====================================================
+
+  deliveredAt: {
+
+    type: Date,
+
+    default: null,
+
+  },
+
+
+  // ====================================================
+  // 📦 STATUT
+  // ====================================================
 
   status: {
+
     type: String,
+
     default: "En attente",
+
   },
 
+
+  // ====================================================
+  // 📅 DATE DE CRÉATION
+  // ====================================================
+
   createdAt: {
+
     type: Date,
+
     default: Date.now,
+
   },
 
 });
 
-module.exports = mongoose.model(
-  "Order",
-  OrderSchema
-);
+
+// ======================================================
+// 📤 EXPORT
+// ======================================================
+
+module.exports =
+  mongoose.model(
+    "Order",
+    OrderSchema
+  );

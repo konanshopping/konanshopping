@@ -596,7 +596,7 @@ export default function ShippedOrders() {
 
     <FaShippingFast />
 
-    Expédiée
+    En livraison
 
   </div>
 

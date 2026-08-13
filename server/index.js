@@ -1678,6 +1678,13 @@ userId: req.body.userId,
 
   total: req.body.total,
 
+    // ==========================================
+  // 🔐 QR UNIQUE DE LA COMMANDE
+  // ==========================================
+
+  deliveryQrToken:
+    crypto.randomBytes(32).toString("hex"),
+
   status: "En attente",
 
   location: {
@@ -1688,15 +1695,7 @@ userId: req.body.userId,
 
   },
 
-  driver: {
-
-  name: req.body.driverName,
-
-  phone: req.body.driverPhone,
-
-  photo: req.body.driverPhoto,
-
-},
+   
 
 });
 
@@ -4989,14 +4988,14 @@ app.put(
             _id:
               req.params.orderId,
 
-            // SEUL LE LIVREUR QUI POSSÈDE
-            // LA COMMANDE PEUT L'ANNULER
+            // SEUL LE LIVREUR ASSIGNÉ
+            // PEUT ANNULER
 
             "assignedDriver.id":
               driverId,
 
-            // La commande doit être
-            // actuellement en livraison
+            // LA COMMANDE DOIT ÊTRE
+            // EN LIVRAISON
 
             status:
               "En livraison"
@@ -5004,24 +5003,29 @@ app.put(
           },
 
           {
+
+            // ==========================================
+            // 🔄 REMETTRE LA COMMANDE DISPONIBLE
+            // ==========================================
+
             $set: {
 
-              // Retour dans les commandes
-              // disponibles
-
               status:
-                "En attente",
-
-              cancelledAt:
-                new Date()
+                "En attente"
 
             },
 
-            // SUPPRESSION DU LIVREUR
+            // ==========================================
+            // 🧹 SUPPRIMER L'ANCIEN LIVREUR
+            // ET L'ANCIENNE ANNULATION
+            // ==========================================
 
             $unset: {
 
               assignedDriver:
+                "",
+
+              cancelledAt:
                 ""
 
             }
@@ -5036,7 +5040,7 @@ app.put(
 
 
       // ================================================
-      // COMMANDE NON TROUVÉE
+      // ❌ COMMANDE NON TROUVÉE
       // ================================================
 
       if (!order) {
@@ -5053,21 +5057,45 @@ app.put(
       }
 
 
+      // ================================================
+      // 📋 LOG
+      // ================================================
+
       console.log(
+
         `🔄 Commande ${order._id} remise à disposition par le livreur ${driverId}`
+
       );
 
-// ================================================
-// 📲 TELEGRAM — COMMANDE REDEVENUE DISPONIBLE
-// ================================================
-
-await notifyDriversOrderAvailableAgain(
-  order,
-  driverId
-);
 
       // ================================================
-      // RÉPONSE
+      // 📲 TELEGRAM
+      // → INFORMER LES LIVREURS
+      // ================================================
+
+      try {
+
+        await notifyDriversOrderAvailableAgain(
+          order,
+          driverId
+        );
+
+      } catch (telegramError) {
+
+        console.error(
+          "⚠️ Erreur notification Telegram :",
+          telegramError.message
+        );
+
+        // IMPORTANT :
+        // Une erreur Telegram ne doit PAS
+        // empêcher l'annulation de la commande.
+
+      }
+
+
+      // ================================================
+      // ✅ RÉPONSE
       // ================================================
 
       return res.json({

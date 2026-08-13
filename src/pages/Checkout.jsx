@@ -525,11 +525,6 @@ console.log("Réponse Monetbil :", res.data);
 
 console.log(location);
 
-const driver = JSON.parse(
-  localStorage.getItem("driver")
-);
-
-
 await axios.post(
 
   "https://konanshopping.com/api/orders",
@@ -565,19 +560,6 @@ await axios.post(
     shipping,
 
     status: "En attente",
-
-    // =====================
-    // DRIVER
-    // =====================
-
-    driverName:
-driver?.name || "",
-
-driverPhone:
-driver?.phone || "",
-
-driverPhoto:
-driver?.photo || "",
 
   }
 

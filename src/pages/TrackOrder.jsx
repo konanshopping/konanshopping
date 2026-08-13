@@ -1,4 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import axios from "axios";
 
 import {
@@ -25,9 +30,16 @@ import {
   FaTimesCircle,
   FaCircle,
   FaUser,
-  FaCar,
+  FaShoppingBag,
+  FaMap,
+  FaShieldAlt,
+  FaQrcode,
+  FaCreditCard,
   FaMapMarkerAlt,
-  FaSatelliteDish,
+  FaLocationArrow,
+  FaHome,
+  FaInfoCircle,
+  FaBox,
 } from "react-icons/fa";
 
 import L from "leaflet";
@@ -36,21 +48,27 @@ import "leaflet/dist/leaflet.css";
 
 import { useParams } from "react-router-dom";
 
+import {
+  QRCodeSVG,
+} from "qrcode.react";
+
 
 // ======================================================
 // 🌐 API
 // ======================================================
 
-const API = "https://konanshopping.com";
+const API =
+  "https://konanshopping.com";
 
 
 // ======================================================
-// 📍 LEAFLET FIX
+// 🗺️ LEAFLET
 // ======================================================
 
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
+
   iconRetinaUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
 
@@ -59,48 +77,76 @@ L.Icon.Default.mergeOptions({
 
   shadowUrl:
     "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+
 });
 
 
 // ======================================================
-// 🚚 DRIVER ICON
+// 🚚 ICÔNE LIVREUR
 // ======================================================
 
-const driverIcon = new L.Icon({
-  iconUrl:
-    "https://cdn-icons-png.flaticon.com/512/854/854894.png",
+const driverIcon =
+  new L.Icon({
 
-  iconSize: [42, 42],
+    iconUrl:
+      "https://cdn-icons-png.flaticon.com/512/854/854894.png",
 
-  iconAnchor: [21, 21],
+    iconSize: [
+      44,
+      44,
+    ],
 
-  popupAnchor: [0, -20],
-});
+    iconAnchor: [
+      22,
+      22,
+    ],
+
+    popupAnchor: [
+      0,
+      -22,
+    ],
+
+  });
 
 
 // ======================================================
-// 📍 CUSTOMER ICON
+// 📍 ICÔNE CLIENT
 // ======================================================
 
-const customerIcon = new L.Icon({
-  iconUrl:
-    "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+const customerIcon =
+  new L.Icon({
 
-  iconSize: [40, 40],
+    iconUrl:
+      "https://cdn-icons-png.flaticon.com/512/684/684908.png",
 
-  iconAnchor: [20, 40],
+    iconSize: [
+      42,
+      42,
+    ],
 
-  popupAnchor: [0, -40],
-});
+    iconAnchor: [
+      21,
+      42,
+    ],
+
+    popupAnchor: [
+      0,
+      -42,
+    ],
+
+  });
 
 
 // ======================================================
 // 🗺️ RECENTER MAP
 // ======================================================
 
-function RecenterMap({ position }) {
+function RecenterMap({
+  position,
+}) {
 
-  const map = useMap();
+  const map =
+    useMap();
 
   useEffect(() => {
 
@@ -113,20 +159,25 @@ function RecenterMap({ position }) {
 
     map.flyTo(
       position,
-      window.innerWidth < 768 ? 16 : 15,
+      window.innerWidth < 768
+        ? 15
+        : 14,
       {
         duration: 1.2,
       }
     );
 
-  }, [map, position]);
+  }, [
+    map,
+    position,
+  ]);
 
   return null;
 }
 
 
 // ======================================================
-// 📏 DISTANCE GPS
+// 📏 CALCUL DISTANCE
 // ======================================================
 
 function calculateDistance(
@@ -139,29 +190,45 @@ function calculateDistance(
   const R = 6371;
 
   const dLat =
-    (lat2 - lat1) *
+    (
+      lat2 - lat1
+    ) *
     Math.PI /
     180;
 
   const dLon =
-    (lon2 - lon1) *
+    (
+      lon2 - lon1
+    ) *
     Math.PI /
     180;
 
   const a =
-    Math.sin(dLat / 2) *
-    Math.sin(dLat / 2) +
+    Math.sin(
+      dLat / 2
+    ) *
+    Math.sin(
+      dLat / 2
+    ) +
 
     Math.cos(
-      lat1 * Math.PI / 180
+      lat1 *
+      Math.PI /
+      180
     ) *
 
     Math.cos(
-      lat2 * Math.PI / 180
+      lat2 *
+      Math.PI /
+      180
     ) *
 
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
+    Math.sin(
+      dLon / 2
+    ) *
+    Math.sin(
+      dLon / 2
+    );
 
   const c =
     2 *
@@ -180,26 +247,28 @@ function calculateDistance(
 
 export default function TrackOrder() {
 
-  const { id } = useParams();
+  const {
+    id,
+  } = useParams();
 
 
   // ====================================================
-  // 📦 ORDER
+  // 📦 COMMANDE
   // ====================================================
 
   const [
     order,
-    setOrder
+    setOrder,
   ] = useState(null);
 
 
   // ====================================================
-  // 📍 DRIVER POSITION
+  // 📍 POSITION LIVREUR
   // ====================================================
 
   const [
     driverPosition,
-    setDriverPosition
+    setDriverPosition,
   ] = useState(null);
 
 
@@ -209,195 +278,277 @@ export default function TrackOrder() {
 
   const [
     loading,
-    setLoading
+    setLoading,
   ] = useState(true);
 
 
   // ====================================================
-  // ❌ ERROR
+  // ❌ ERREUR
   // ====================================================
 
   const [
     error,
-    setError
+    setError,
   ] = useState("");
 
 
   // ====================================================
-  // 🕐 LAST GPS UPDATE
-  // ====================================================
-
-  const [
-    lastGpsUpdate,
-    setLastGpsUpdate
-  ] = useState(null);
-
-
-  // ====================================================
-  // 📡 GPS LIVE
+  // 📡 GPS
   // ====================================================
 
   const [
     gpsOnline,
-    setGpsOnline
+    setGpsOnline,
   ] = useState(false);
 
 
-  // ====================================================
-  // 📍 CUSTOMER POSITION
-  // ====================================================
-
-  const customerPosition = useMemo(() => {
-
-    const lat =
-      Number(order?.location?.lat);
-
-    const lng =
-      Number(order?.location?.lng);
-
-    if (
-      Number.isFinite(lat) &&
-      Number.isFinite(lng)
-    ) {
-
-      return [
-        lat,
-        lng
-      ];
-
-    }
-
-    return [
-      4.0511,
-      9.7679
-    ];
-
-  }, [order]);
+  const [
+    lastGpsUpdate,
+    setLastGpsUpdate,
+  ] = useState(null);
 
 
   // ====================================================
-  // 📦 FETCH ORDER
+  // 📱 RESPONSIVE
+  // ====================================================
+
+  const [
+    isMobile,
+    setIsMobile,
+  ] = useState(
+    window.innerWidth < 768
+  );
+
+
+  useEffect(() => {
+
+    const handleResize = () => {
+
+      setIsMobile(
+        window.innerWidth < 768
+      );
+
+    };
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+
+    };
+
+  }, []);
+
+
+  // ====================================================
+  // 📦 CHARGER COMMANDE
   // ====================================================
 
   useEffect(() => {
 
     let mounted = true;
 
-    const fetchOrder = async () => {
+    const fetchOrder =
+      async () => {
 
-      try {
+        try {
 
-        const res =
-          await axios.get(
-            `${API}/api/order/${id}`
-          );
+          let response;
 
-        if (!mounted) {
-          return;
-        }
+          try {
 
-        const data = res.data;
+            response =
+              await axios.get(
+                `${API}/api/order/${id}`,
+                {
+                  timeout: 10000,
+                }
+              );
 
-        setOrder(data);
+          } catch {
 
-        setError("");
-
-
-        // ==========================================
-        // 📍 DRIVER LOCATION
-        // ==========================================
-
-        const gps =
-          data?.driverLocation;
-
-        if (
-          gps &&
-          Number.isFinite(
-            Number(gps.lat)
-          ) &&
-          Number.isFinite(
-            Number(gps.lng)
-          )
-        ) {
-
-          setDriverPosition([
-            Number(gps.lat),
-            Number(gps.lng)
-          ]);
-
-          setLastGpsUpdate(
-            gps.updatedAt || null
-          );
-
-
-          // ======================================
-          // 📡 GPS LIVE
-          // ======================================
-
-          if (gps.updatedAt) {
-
-            const age =
-              Date.now() -
-              new Date(
-                gps.updatedAt
-              ).getTime();
-
-            setGpsOnline(
-              age < 30000
-            );
-
-          } else {
-
-            setGpsOnline(true);
+            response =
+              await axios.get(
+                `${API}/order/${id}`,
+                {
+                  timeout: 10000,
+                }
+              );
 
           }
 
-        } else {
 
-          setDriverPosition(null);
+          if (!mounted) {
+            return;
+          }
 
-          setGpsOnline(false);
 
-          setLastGpsUpdate(null);
+          // =================================================
+          // 📦 NORMALISER LA RÉPONSE API
+          // =================================================
+          //
+          // Le backend peut répondre soit :
+          //
+          // { success: true, order: {...} }
+          //
+          // soit directement :
+          //
+          // { ...order }
+          //
+          // On récupère donc toujours le véritable objet
+          // commande avant de faire setOrder().
+          // =================================================
 
-        }
+          const data =
+            response.data?.order ||
+            response.data?.data ||
+            response.data;
 
-      } catch (err) {
 
-        console.error(
-          "❌ TRACK ORDER ERROR:",
-          err
-        );
+          if (!data || !data._id) {
 
-        if (mounted) {
+            throw new Error(
+              "Réponse commande invalide"
+            );
 
-          setError(
-            "Impossible de récupérer le suivi de cette commande."
+          }
+
+
+          console.log(
+            "📦 TRACK ORDER — COMMANDE :",
+            data
           );
 
+
+          console.log(
+            "🚚 TRACK ORDER — LIVREUR :",
+            data?.assignedDriver
+          );
+
+
+          setOrder(data);
+
+          setError("");
+
+
+          // =================================================
+          // 📍 GPS LIVREUR
+          // =================================================
+
+          const gps =
+            data?.driverLocation;
+
+
+          if (
+            gps &&
+            Number.isFinite(
+              Number(gps.lat)
+            ) &&
+            Number.isFinite(
+              Number(gps.lng)
+            )
+          ) {
+
+            setDriverPosition([
+
+              Number(
+                gps.lat
+              ),
+
+              Number(
+                gps.lng
+              ),
+
+            ]);
+
+
+            setLastGpsUpdate(
+              gps.updatedAt ||
+              null
+            );
+
+
+            if (
+              gps.updatedAt
+            ) {
+
+              const age =
+                Date.now() -
+                new Date(
+                  gps.updatedAt
+                ).getTime();
+
+              setGpsOnline(
+                age < 30000
+              );
+
+            } else {
+
+              setGpsOnline(
+                true
+              );
+
+            }
+
+          } else {
+
+            setDriverPosition(
+              null
+            );
+
+            setGpsOnline(
+              false
+            );
+
+            setLastGpsUpdate(
+              null
+            );
+
+          }
+
+        } catch (err) {
+
+          console.error(
+            "❌ TRACK ORDER :",
+            err
+          );
+
+          if (mounted) {
+
+            setError(
+              "Impossible de récupérer le suivi de cette commande."
+            );
+
+          }
+
+        } finally {
+
+          if (mounted) {
+
+            setLoading(
+              false
+            );
+
+          }
+
         }
 
-      } finally {
+      };
 
-        if (mounted) {
-          setLoading(false);
-        }
-
-      }
-
-    };
-
-
-    // ============================================
-    // PREMIER CHARGEMENT
-    // ============================================
 
     fetchOrder();
 
 
-    // ============================================
-    // 🔄 GPS LIVE
-    // ============================================
+    // ===================================================
+    // 🔄 ACTUALISATION
+    // ===================================================
 
     const interval =
       setInterval(
@@ -410,114 +561,383 @@ export default function TrackOrder() {
 
       mounted = false;
 
-      clearInterval(interval);
+      clearInterval(
+        interval
+      );
 
     };
 
-  }, [id]);
+  }, [
+    id,
+  ]);
 
 
   // ====================================================
-  // 🚚 ASSIGNED DRIVER
+  // 🚚 LIVREUR NORMALISÉ
   // ====================================================
 
   const assignedDriver =
-    order?.assignedDriver || null;
+    useMemo(() => {
+
+      const assigned =
+        order?.assignedDriver;
+
+      const driver =
+        order?.driver;
+
+
+      // Nouveau système
+      if (
+        assigned &&
+        typeof assigned ===
+        "object"
+      ) {
+
+        return {
+
+          id:
+            assigned.id ||
+            assigned._id ||
+            order?.driverId ||
+            "",
+
+          name:
+            assigned.name ||
+            driver?.name ||
+            "",
+
+          phone:
+            assigned.phone ||
+            assigned.telephone ||
+            driver?.phone ||
+            "",
+
+          photo:
+            assigned.photo ||
+            assigned.image ||
+            driver?.photo ||
+            driver?.image ||
+            "",
+
+          vehicle:
+            assigned.vehicle ||
+            assigned.driverVehicle ||
+            driver?.vehicle ||
+            "",
+
+          plate:
+            assigned.plate ||
+            assigned.licensePlate ||
+            driver?.plate ||
+            driver?.licensePlate ||
+            "",
+
+        };
+
+      }
+
+
+      // Ancien système
+      if (
+        driver &&
+        typeof driver ===
+        "object"
+      ) {
+
+        return {
+
+          id:
+            order?.driverId ||
+            "",
+
+          name:
+            driver.name ||
+            "",
+
+          phone:
+            driver.phone ||
+            driver.telephone ||
+            "",
+
+          photo:
+            driver.photo ||
+            driver.image ||
+            "",
+
+          vehicle:
+            driver.vehicle ||
+            "",
+
+          plate:
+            driver.plate ||
+            driver.licensePlate ||
+            "",
+
+        };
+
+      }
+
+
+      // Dernier fallback
+      if (
+        order?.driverId ||
+        order?.driverName ||
+        order?.driverPhone
+      ) {
+
+        return {
+
+          id:
+            order.driverId ||
+            "",
+
+          name:
+            order.driverName ||
+            "",
+
+          phone:
+            order.driverPhone ||
+            "",
+
+          photo:
+            order.driverPhoto ||
+            "",
+
+          vehicle:
+            order.driverVehicle ||
+            "",
+
+          plate:
+            order.driverPlate ||
+            "",
+
+        };
+
+      }
+
+
+      return null;
+
+    }, [
+      order,
+    ]);
+
+
+  // ====================================================
+  // 📸 PHOTO
+  // ====================================================
+
+  const driverPhoto =
+    assignedDriver?.photo ||
+    "";
+
+
+  // ====================================================
+  // 📞 TÉLÉPHONE
+  // ====================================================
+
+  const driverPhone =
+    assignedDriver?.phone ||
+    "";
+
+
+  // ====================================================
+  // 📍 POSITION CLIENT
+  // ====================================================
+
+  const customerPosition =
+    useMemo(() => {
+
+      const lat =
+        Number(
+          order?.location?.lat
+        );
+
+      const lng =
+        Number(
+          order?.location?.lng
+        );
+
+
+      if (
+        Number.isFinite(lat) &&
+        Number.isFinite(lng)
+      ) {
+
+        return [
+          lat,
+          lng,
+        ];
+
+      }
+
+
+      return [
+        4.0511,
+        9.7679,
+      ];
+
+    }, [
+      order,
+    ]);
 
 
   // ====================================================
   // 📏 DISTANCE
   // ====================================================
 
-  const realDistance = useMemo(() => {
+  const realDistance =
+    useMemo(() => {
 
-    if (!driverPosition) {
-      return null;
-    }
+      if (
+        !driverPosition
+      ) {
 
-    return calculateDistance(
-      driverPosition[0],
-      driverPosition[1],
-      customerPosition[0],
-      customerPosition[1]
-    );
+        return null;
 
-  }, [
-    driverPosition,
-    customerPosition
-  ]);
+      }
+
+      return calculateDistance(
+
+        driverPosition[0],
+
+        driverPosition[1],
+
+        customerPosition[0],
+
+        customerPosition[1]
+
+      );
+
+    }, [
+
+      driverPosition,
+
+      customerPosition,
+
+    ]);
 
 
   // ====================================================
-  // 🚗 SPEED ESTIMATION
+  // 🏍️ VITESSE
   // ====================================================
 
-  const liveSpeed = useMemo(() => {
+  const liveSpeed =
+    useMemo(() => {
 
-    if (realDistance === null) {
-      return 0;
-    }
+      if (
+        realDistance === null
+      ) {
 
-    if (realDistance > 8) {
-      return 55;
-    }
+        return 0;
 
-    if (realDistance > 5) {
-      return 45;
-    }
+      }
 
-    if (realDistance > 2) {
-      return 35;
-    }
+      if (
+        realDistance > 8
+      ) {
 
-    if (realDistance > 1) {
-      return 25;
-    }
+        return 55;
 
-    return 12;
+      }
 
-  }, [realDistance]);
+      if (
+        realDistance > 5
+      ) {
+
+        return 45;
+
+      }
+
+      if (
+        realDistance > 2
+      ) {
+
+        return 35;
+
+      }
+
+      if (
+        realDistance > 1
+      ) {
+
+        return 25;
+
+      }
+
+      return 12;
+
+    }, [
+      realDistance,
+    ]);
 
 
   // ====================================================
   // ⏱️ ETA
   // ====================================================
 
-  const estimatedTime = useMemo(() => {
+  const estimatedTime =
+    useMemo(() => {
 
-    if (realDistance === null) {
-      return "--";
-    }
+      if (
+        realDistance === null
+      ) {
 
-    if (realDistance <= 0.05) {
-      return "Arrivé";
-    }
+        return "--";
 
-    const minutes =
-      Math.round(
-        (realDistance / liveSpeed) * 60
-      );
+      }
 
-    if (minutes <= 1) {
-      return "1 min";
-    }
+      if (
+        realDistance <= 0.05
+      ) {
 
-    if (minutes < 60) {
-      return `${minutes} min`;
-    }
+        return "Arrivé";
 
-    return `${(
-      minutes / 60
-    ).toFixed(1)} h`;
+      }
 
-  }, [
-    realDistance,
-    liveSpeed
-  ]);
+      const minutes =
+        Math.round(
+          (
+            realDistance /
+            liveSpeed
+          ) *
+          60
+        );
+
+
+      if (
+        minutes <= 1
+      ) {
+
+        return "1 min";
+
+      }
+
+
+      if (
+        minutes < 60
+      ) {
+
+        return `${minutes} min`;
+
+      }
+
+
+      return `${(
+        minutes / 60
+      ).toFixed(1)} h`;
+
+    }, [
+
+      realDistance,
+
+      liveSpeed,
+
+    ]);
 
 
   // ====================================================
-  // 📊 DISTANCE TEXT
+  // 📏 DISTANCE TEXTE
   // ====================================================
 
   const distanceText =
@@ -527,99 +947,238 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 📈 PROGRESS
+  // 📈 PROGRESSION
   // ====================================================
 
-  const progress = useMemo(() => {
+  const progress =
+    useMemo(() => {
 
-    if (realDistance === null) {
-      return 0;
-    }
+      if (
+        realDistance === null
+      ) {
 
-    const maxDistance = 10;
+        return 0;
 
-    return Math.min(
-      100,
-      Math.max(
-        0,
+      }
+
+      const maxDistance =
+        10;
+
+      return Math.min(
+        100,
+        Math.max(
+          0,
+          (
+            (
+              maxDistance -
+              realDistance
+            ) /
+            maxDistance
+          ) *
+          100
+        )
+      );
+
+    }, [
+      realDistance,
+    ]);
+
+
+  // ====================================================
+  // 💰 TOTAL PRODUITS
+  // ====================================================
+
+  const productsTotal =
+    useMemo(() => {
+
+      if (
+        !Array.isArray(
+          order?.items
+        )
+      ) {
+
+        return 0;
+
+      }
+
+      return order.items.reduce(
         (
-          (maxDistance - realDistance) /
-          maxDistance
-        ) * 100
-      )
-    );
+          total,
+          item
+        ) => {
 
-  }, [realDistance]);
+          return (
+            total +
+            (
+              Number(
+                item.price
+              ) || 0
+            ) *
+            (
+              Number(
+                item.quantity
+              ) || 0
+            )
+          );
+
+        },
+        0
+      );
+
+    }, [
+      order?.items,
+    ]);
 
 
   // ====================================================
-  // 🎨 STATUS
+  // 🔐 QR — IMPORTANT
   // ====================================================
 
-  const statusInfo = useMemo(() => {
+  /*
+   * Aucun faux QR.
+   *
+   * Le QR doit obligatoirement
+   * venir du backend.
+   */
 
-    switch (order?.status) {
-
-      case "Livrée":
-
-        return {
-          label: "Livrée",
-          color: "#16A34A",
-          bg: "#DCFCE7",
-        };
-
-
-      case "Annulée":
-
-        return {
-          label: "Annulée",
-          color: "#DC2626",
-          bg: "#FEE2E2",
-        };
+  const qrValue =
+    order?.deliveryQrToken ||
+    "";
 
 
-      case "En livraison":
+  // ====================================================
+  // 📋 RÉFÉRENCE
+  // ====================================================
 
-        return {
-          label: "En livraison",
-          color: "#2563EB",
-          bg: "#DBEAFE",
-        };
-
-
-      case "Préparation":
-
-        return {
-          label: "Préparation",
-          color: "#D97706",
-          bg: "#FEF3C7",
-        };
+  const orderReference =
+    order?._id
+      ? `KS-${String(
+          order._id
+        ).slice(-8).toUpperCase()}`
+      : "KS";
 
 
-      case "Confirmée":
+  // ====================================================
+  // 💳 PAIEMENT
+  // ====================================================
 
-        return {
-          label: "Confirmée",
-          color: "#7C3AED",
-          bg: "#EDE9FE",
-        };
+  const paymentMethod =
+    order?.paymentMethod ||
+    "Paiement à la livraison";
 
 
-      default:
+  // ====================================================
+  // 📊 STATUT
+  // ====================================================
 
-        return {
-          label:
-            order?.status ||
-            "En attente",
+  const statusInfo =
+    useMemo(() => {
 
-          color: "#64748B",
+      switch (
+        order?.status
+      ) {
 
-          bg: "#F1F5F9",
-        };
+        case "Livrée":
 
-    }
+          return {
 
-  }, [order?.status]);
+            label:
+              "Livrée",
+
+            color:
+              "#16A34A",
+
+            bg:
+              "#DCFCE7",
+
+          };
+
+
+        case "En livraison":
+
+          return {
+
+            label:
+              "En livraison",
+
+            color:
+              "#2563EB",
+
+            bg:
+              "#DBEAFE",
+
+          };
+
+
+        case "Préparation":
+
+          return {
+
+            label:
+              "Préparation",
+
+            color:
+              "#D97706",
+
+            bg:
+              "#FEF3C7",
+
+          };
+
+
+        case "Confirmée":
+
+          return {
+
+            label:
+              "Confirmée",
+
+            color:
+              "#7C3AED",
+
+            bg:
+              "#EDE9FE",
+
+          };
+
+
+        case "Annulée":
+
+          return {
+
+            label:
+              "Annulée",
+
+            color:
+              "#DC2626",
+
+            bg:
+              "#FEE2E2",
+
+          };
+
+
+        default:
+
+          return {
+
+            label:
+              order?.status ||
+              "En attente",
+
+            color:
+              "#64748B",
+
+            bg:
+              "#F1F5F9",
+
+          };
+
+      }
+
+    }, [
+      order?.status,
+    ]);
 
 
   // ====================================================
@@ -627,44 +1186,30 @@ export default function TrackOrder() {
   // ====================================================
 
   const gpsStatus =
-    order?.status !== "En livraison"
+    order?.status !==
+    "En livraison"
+
       ? "GPS en attente"
+
       : gpsOnline
+
         ? "GPS en direct"
+
         : "GPS hors ligne";
 
 
   // ====================================================
-  // 🕐 GPS TIME
+  // 🕐 DERNIÈRE POSITION
   // ====================================================
 
-  const gpsTime = useMemo(() => {
-
-    if (!lastGpsUpdate) {
-      return "";
-    }
-
-    const date =
-      new Date(lastGpsUpdate);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return "";
-    }
-
-    return date.toLocaleTimeString(
-      "fr-FR",
-      {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }
-    );
-
-  }, [lastGpsUpdate]);
+  const gpsTime =
+    lastGpsUpdate
+      ? new Date(
+          lastGpsUpdate
+        ).toLocaleTimeString(
+          "fr-FR"
+        )
+      : "";
 
 
   // ====================================================
@@ -679,45 +1224,62 @@ export default function TrackOrder() {
         style={{
           minHeight: "100vh",
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
+          justifyContent: "center",
           flexDirection: "column",
-          gap: "14px",
+          gap: "15px",
           background: "#F8FAFC",
-          fontFamily: "'Inter',sans-serif",
           padding: "20px",
-          boxSizing: "border-box",
+          fontFamily:
+            "'Inter',sans-serif",
         }}
       >
 
         <div
           style={{
-            width: "62px",
-            height: "62px",
-            borderRadius: "18px",
+            width: "65px",
+            height: "65px",
+            borderRadius: "20px",
             background:
               "linear-gradient(135deg,#2563EB,#1D4ED8)",
+            color: "#FFFFFF",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#FFFFFF",
-            fontSize: "25px",
+            fontSize: "27px",
             boxShadow:
-              "0 12px 30px rgba(37,99,235,.25)",
+              "0 15px 35px rgba(37,99,235,.25)",
           }}
         >
+
           <FaTruck />
+
         </div>
+
 
         <strong
           style={{
             color: "#0F172A",
-            fontSize: "18px",
+            fontSize: "17px",
             textAlign: "center",
           }}
         >
+
           Chargement du suivi...
+
         </strong>
+
+
+        <span
+          style={{
+            color: "#64748B",
+            fontSize: "12px",
+          }}
+        >
+
+          📡 Connexion au suivi en direct
+
+        </span>
 
       </div>
 
@@ -727,10 +1289,13 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // ❌ ERROR
+  // ❌ ERREUR
   // ====================================================
 
-  if (error || !order) {
+  if (
+    error ||
+    !order
+  ) {
 
     return (
 
@@ -738,56 +1303,63 @@ export default function TrackOrder() {
         style={{
           minHeight: "100vh",
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
+          justifyContent: "center",
           padding: "20px",
           background: "#F8FAFC",
-          fontFamily: "'Inter',sans-serif",
-          boxSizing: "border-box",
+          fontFamily:
+            "'Inter',sans-serif",
         }}
       >
 
         <div
           style={{
             width: "100%",
-            maxWidth: "420px",
+            maxWidth: "430px",
             background: "#FFFFFF",
             borderRadius: "24px",
-            padding: "30px",
+            padding: "30px 22px",
             textAlign: "center",
-            boxShadow:
-              "0 15px 40px rgba(15,23,42,.08)",
             border:
               "1px solid #E2E8F0",
+            boxShadow:
+              "0 15px 40px rgba(15,23,42,.08)",
           }}
         >
 
           <FaTimesCircle
             style={{
               color: "#EF4444",
-              fontSize: "42px",
+              fontSize: "46px",
               marginBottom: "15px",
             }}
           />
+
 
           <h2
             style={{
               margin: 0,
               color: "#0F172A",
+              fontSize: "20px",
             }}
           >
+
             Suivi indisponible
+
           </h2>
+
 
           <p
             style={{
               color: "#64748B",
-              fontSize: "14px",
-              lineHeight: "1.6",
+              lineHeight: 1.6,
+              fontSize: "13px",
             }}
           >
+
             {error ||
-              "Cette commande est introuvable."}
+              "Commande introuvable."}
+
           </p>
 
         </div>
@@ -800,7 +1372,7 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 🖥️ INTERFACE
+  // 🖥️ PAGE PRINCIPALE
   // ====================================================
 
   return (
@@ -812,11 +1384,11 @@ export default function TrackOrder() {
         maxWidth: "100vw",
         overflowX: "hidden",
         background:
-          "linear-gradient(180deg,#FFFFFF,#F8FAFC)",
+          "linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%)",
         padding:
-          window.innerWidth < 768
+          isMobile
             ? "10px"
-            : "20px",
+            : "22px",
         boxSizing: "border-box",
         fontFamily:
           "'Inter',sans-serif",
@@ -824,27 +1396,31 @@ export default function TrackOrder() {
     >
 
 
-      {/* ================================================= */}
-      {/* HEADER */}
-      {/* ================================================= */}
+      {/* =================================================
+          HEADER
+      ================================================= */}
 
-      <div
+      <section
         style={{
           background: "#FFFFFF",
-          borderRadius: "20px",
+          border:
+            "1px solid #E2E8F0",
+          borderRadius:
+            isMobile
+              ? "18px"
+              : "24px",
           padding:
-            window.innerWidth < 768
+            isMobile
               ? "13px"
               : "18px",
-          marginBottom: "14px",
-          border:
-            "1px solid #E5E7EB",
+          marginBottom: "12px",
           boxShadow:
-            "0 10px 30px rgba(15,23,42,.06)",
+            "0 8px 25px rgba(15,23,42,.05)",
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent:
+            "space-between",
           alignItems: "center",
-          gap: "12px",
+          gap: "10px",
           flexWrap: "wrap",
         }}
       >
@@ -853,7 +1429,7 @@ export default function TrackOrder() {
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "11px",
+            gap: "10px",
             minWidth: 0,
             flex: 1,
           }}
@@ -862,40 +1438,30 @@ export default function TrackOrder() {
           <div
             style={{
               width:
-                window.innerWidth < 768
-                  ? "48px"
+                isMobile
+                  ? "46px"
                   : "56px",
-
               height:
-                window.innerWidth < 768
-                  ? "48px"
+                isMobile
+                  ? "46px"
                   : "56px",
-
+              flexShrink: 0,
               borderRadius: "15px",
-
               background:
                 "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-              display: "flex",
-
-              alignItems: "center",
-
-              justifyContent: "center",
-
               color: "#FFFFFF",
-
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               fontSize:
-                window.innerWidth < 768
-                  ? "20px"
+                isMobile
+                  ? "19px"
                   : "23px",
-
-              flexShrink: 0,
-
-              boxShadow:
-                "0 8px 20px rgba(37,99,235,.2)",
             }}
           >
+
             <FaTruck />
+
           </div>
 
 
@@ -910,51 +1476,67 @@ export default function TrackOrder() {
                 margin: 0,
                 color: "#0F172A",
                 fontSize:
-                  window.innerWidth < 768
+                  isMobile
                     ? "17px"
                     : "22px",
-                fontWeight: "900",
-                lineHeight: 1.2,
+                fontWeight: 900,
               }}
             >
+
               Suivi de livraison
+
             </h1>
 
-            <p
+
+            <div
               style={{
-                margin: "4px 0 0",
+                marginTop: "3px",
                 color: "#64748B",
                 fontSize:
-                  window.innerWidth < 768
+                  isMobile
                     ? "10px"
                     : "12px",
               }}
             >
-              Commande #
-              {String(order._id).slice(-8)}
-            </p>
+
+              📦 Commande{" "}
+
+              <strong
+                style={{
+                  color: "#2563EB",
+                }}
+              >
+
+                {orderReference}
+
+              </strong>
+
+            </div>
 
           </div>
 
         </div>
 
 
-        {/* STATUS */}
-
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "7px",
-            background: statusInfo.bg,
-            color: statusInfo.color,
-            border:
-              `1px solid ${statusInfo.color}30`,
-            padding: "7px 11px",
-            borderRadius: "999px",
-            fontSize: "11px",
-            fontWeight: "900",
-            flexShrink: 0,
+            gap: "6px",
+            background:
+              statusInfo.bg,
+            color:
+              statusInfo.color,
+            padding:
+              "8px 11px",
+            borderRadius:
+              "999px",
+            fontSize:
+              isMobile
+                ? "9px"
+                : "11px",
+            fontWeight: 900,
+            whiteSpace: "nowrap",
           }}
         >
 
@@ -968,33 +1550,379 @@ export default function TrackOrder() {
 
         </div>
 
-      </div>
+      </section>
 
 
-      {/* ================================================= */}
-      {/* DRIVER CARD */}
-      {/* ================================================= */}
+      {/* =================================================
+          INFORMATIONS COMMANDE
+      ================================================= */}
 
-      {assignedDriver && (
+      <section
+        style={{
+          background: "#FFFFFF",
+          border:
+            "1px solid #E2E8F0",
+          borderRadius:
+            isMobile
+              ? "20px"
+              : "24px",
+          padding:
+            isMobile
+              ? "14px"
+              : "20px",
+          marginBottom: "12px",
+          boxShadow:
+            "0 8px 25px rgba(15,23,42,.05)",
+        }}
+      >
 
         <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            marginBottom: "14px",
+          }}
+        >
+
+          <div
+            style={{
+              width: "42px",
+              height: "42px",
+              borderRadius: "13px",
+              background: "#EFF6FF",
+              color: "#2563EB",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+
+            <FaShoppingBag />
+
+          </div>
+
+
+          <div>
+
+            <h2
+              style={{
+                margin: 0,
+                color: "#0F172A",
+                fontSize:
+                  isMobile
+                    ? "17px"
+                    : "20px",
+                fontWeight: 900,
+              }}
+            >
+
+              📦 Votre commande
+
+            </h2>
+
+
+            <span
+              style={{
+                color: "#64748B",
+                fontSize: "10px",
+              }}
+            >
+
+              {order.items?.length || 0}
+              {" "}article(s)
+
+            </span>
+
+          </div>
+
+        </div>
+
+
+        {(order.items || []).map(
+          (
+            item,
+            index
+          ) => (
+
+            <div
+              key={
+                item.productId ||
+                item._id ||
+                index
+              }
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "9px",
+                padding: "9px",
+                marginBottom: "7px",
+                background: "#F8FAFC",
+                border:
+                  "1px solid #E2E8F0",
+                borderRadius: "14px",
+              }}
+            >
+
+              <img
+                src={
+                  item.image ||
+                  "/logo.jpg"
+                }
+                alt={
+                  item.name ||
+                  "Produit"
+                }
+                style={{
+                  width:
+                    isMobile
+                      ? "50px"
+                      : "62px",
+                  height:
+                    isMobile
+                      ? "50px"
+                      : "62px",
+                  borderRadius: "11px",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+                onError={(e) => {
+
+                  e.currentTarget.src =
+                    "/logo.jpg";
+
+                }}
+              />
+
+
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                }}
+              >
+
+                <strong
+                  style={{
+                    display: "block",
+                    color: "#0F172A",
+                    fontSize:
+                      isMobile
+                        ? "12px"
+                        : "14px",
+                    overflow: "hidden",
+                    textOverflow:
+                      "ellipsis",
+                    whiteSpace:
+                      "nowrap",
+                  }}
+                >
+
+                  {item.name}
+
+                </strong>
+
+
+                <span
+                  style={{
+                    color: "#64748B",
+                    fontSize: "10px",
+                  }}
+                >
+
+                  📦 Quantité :
+                  {" "}
+                  {item.quantity}
+
+                </span>
+
+              </div>
+
+
+              <strong
+                style={{
+                  color: "#0F172A",
+                  fontSize:
+                    isMobile
+                      ? "11px"
+                      : "14px",
+                  whiteSpace:
+                    "nowrap",
+                }}
+              >
+
+                {Number(
+                  item.price || 0
+                ).toLocaleString(
+                  "fr-FR"
+                )}
+
+                {" "}FCFA
+
+              </strong>
+
+            </div>
+
+          )
+        )}
+
+
+        <div
+          style={{
+            marginTop: "13px",
+            paddingTop: "13px",
+            borderTop:
+              "1px solid #E2E8F0",
+          }}
+        >
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent:
+                "space-between",
+              marginBottom: "7px",
+              color: "#64748B",
+              fontSize: "11px",
+            }}
+          >
+
+            <span>
+              🛒 Produits
+            </span>
+
+            <strong
+              style={{
+                color: "#0F172A",
+              }}
+            >
+
+              {productsTotal.toLocaleString(
+                "fr-FR"
+              )} FCFA
+
+            </strong>
+
+          </div>
+
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent:
+                "space-between",
+              marginBottom: "9px",
+              color: "#64748B",
+              fontSize: "11px",
+            }}
+          >
+
+            <span>
+              🚚 Livraison
+            </span>
+
+            <strong
+              style={{
+                color: "#0F172A",
+              }}
+            >
+
+              {Number(
+                order.shipping || 0
+              ).toLocaleString(
+                "fr-FR"
+              )} FCFA
+
+            </strong>
+
+          </div>
+
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent:
+                "space-between",
+              alignItems: "center",
+              gap: "10px",
+              padding: "13px",
+              background: "#EFF6FF",
+              borderRadius: "14px",
+              color: "#1D4ED8",
+            }}
+          >
+
+            <strong>
+              💰 TOTAL
+            </strong>
+
+            <strong
+              style={{
+                fontSize:
+                  isMobile
+                    ? "16px"
+                    : "20px",
+              }}
+            >
+
+              {Number(
+                order.total || 0
+              ).toLocaleString(
+                "fr-FR"
+              )} FCFA
+
+            </strong>
+
+          </div>
+
+
+          <div
+            style={{
+              marginTop: "9px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              color: "#64748B",
+              fontSize: "10px",
+            }}
+          >
+
+            <FaCreditCard />
+
+            💳 {paymentMethod}
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =================================================
+          LIVREUR
+      ================================================= */}
+
+      {assignedDriver ? (
+
+        <section
           style={{
             background:
               "linear-gradient(135deg,#EFF6FF,#FFFFFF)",
             border:
               "1px solid #BFDBFE",
-            borderRadius: "18px",
+            borderRadius:
+              isMobile
+                ? "20px"
+                : "24px",
             padding:
-              window.innerWidth < 768
-                ? "12px"
-                : "16px",
-            marginBottom: "14px",
+              isMobile
+                ? "15px"
+                : "20px",
+            marginBottom: "12px",
             boxShadow:
-              "0 8px 22px rgba(37,99,235,.08)",
+              "0 10px 28px rgba(37,99,235,.08)",
           }}
         >
-
-          {/* HEADER LIVREUR */}
 
           <div
             style={{
@@ -1004,72 +1932,85 @@ export default function TrackOrder() {
             }}
           >
 
-            {/* PHOTO */}
-
-            <div
-              style={{
-                position: "relative",
-                flexShrink: 0,
-              }}
-            >
+            {driverPhoto ? (
 
               <img
-                src={
-                  assignedDriver.photo ||
-                  "/logo.jpg"
-                }
+                src={driverPhoto}
                 alt={
                   assignedDriver.name ||
                   "Livreur"
                 }
                 onError={(e) => {
-                  e.currentTarget.src =
-                    "/logo.jpg";
+
+                  e.currentTarget.style.display =
+                    "none";
+
+                  if (
+                    e.currentTarget
+                      .nextElementSibling
+                  ) {
+
+                    e.currentTarget
+                      .nextElementSibling
+                      .style.display =
+                      "flex";
+
+                  }
+
                 }}
                 style={{
                   width:
-                    window.innerWidth < 768
-                      ? "58px"
-                      : "68px",
+                    isMobile
+                      ? "68px"
+                      : "82px",
                   height:
-                    window.innerWidth < 768
-                      ? "58px"
-                      : "68px",
+                    isMobile
+                      ? "68px"
+                      : "82px",
                   borderRadius: "50%",
                   objectFit: "cover",
                   border:
-                    "3px solid #DBEAFE",
-                  boxShadow:
-                    "0 8px 20px rgba(37,99,235,.15)",
+                    "4px solid #DBEAFE",
+                  flexShrink: 0,
                 }}
               />
 
-              <span
-                style={{
-                  position: "absolute",
-                  right: "2px",
-                  bottom: "2px",
-                  width: "14px",
-                  height: "14px",
-                  borderRadius: "50%",
-                  background:
-                    gpsOnline
-                      ? "#22C55E"
-                      : "#94A3B8",
-                  border:
-                    "2px solid white",
-                }}
-              />
+            ) : null}
+
+
+            <div
+              style={{
+                display:
+                  driverPhoto
+                    ? "none"
+                    : "flex",
+                width:
+                  isMobile
+                    ? "68px"
+                    : "82px",
+                height:
+                  isMobile
+                    ? "68px"
+                    : "82px",
+                borderRadius: "50%",
+                background: "#DBEAFE",
+                color: "#2563EB",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "29px",
+                flexShrink: 0,
+              }}
+            >
+
+              <FaUser />
 
             </div>
 
 
-            {/* NOM */}
-
             <div
               style={{
-                flex: 1,
                 minWidth: 0,
+                flex: 1,
               }}
             >
 
@@ -1077,31 +2018,40 @@ export default function TrackOrder() {
                 style={{
                   color: "#64748B",
                   fontSize: "9px",
-                  fontWeight: "900",
-                  textTransform: "uppercase",
-                  letterSpacing: ".7px",
+                  fontWeight: 900,
+                  textTransform:
+                    "uppercase",
                 }}
               >
-                Votre livreur
+
+                🚚 Votre livreur
+
               </div>
+
 
               <h2
                 style={{
-                  margin: "3px 0",
+                  margin:
+                    "3px 0 5px",
                   color: "#0F172A",
                   fontSize:
-                    window.innerWidth < 768
-                      ? "17px"
-                      : "20px",
-                  fontWeight: "900",
+                    isMobile
+                      ? "18px"
+                      : "22px",
+                  fontWeight: 900,
                   overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  textOverflow:
+                    "ellipsis",
+                  whiteSpace:
+                    "nowrap",
                 }}
               >
+
                 {assignedDriver.name ||
-                  "Livreur Konan"}
+                  "Livreur assigné"}
+
               </h2>
+
 
               <div
                 style={{
@@ -1113,7 +2063,7 @@ export default function TrackOrder() {
                       ? "#16A34A"
                       : "#64748B",
                   fontSize: "10px",
-                  fontWeight: "800",
+                  fontWeight: 800,
                 }}
               >
 
@@ -1130,233 +2080,435 @@ export default function TrackOrder() {
           </div>
 
 
-          {/* INFORMATIONS */}
+          {/* INFOS */}
 
           <div
             style={{
               display: "grid",
-
               gridTemplateColumns:
-                window.innerWidth < 600
+                isMobile
                   ? "1fr 1fr"
                   : "repeat(3,1fr)",
-
               gap: "8px",
-
-              marginTop: "13px",
+              marginTop: "14px",
             }}
           >
 
-            {/* TELEPHONE */}
-
             <div
               style={{
-                background: "#F8FAFC",
-                borderRadius: "12px",
+                background: "#FFFFFF",
                 padding: "10px",
+                borderRadius: "13px",
                 border:
                   "1px solid #E2E8F0",
               }}
             >
 
-              <div
+              <small
                 style={{
                   color: "#94A3B8",
                   fontSize: "8px",
-                  fontWeight: "800",
+                  fontWeight: 900,
                 }}
               >
-                <FaPhoneAlt /> TÉLÉPHONE
-              </div>
 
-              <div
+                📞 TÉLÉPHONE
+
+              </small>
+
+
+              <strong
                 style={{
-                  marginTop: "5px",
+                  display: "block",
+                  marginTop: "4px",
                   color: "#0F172A",
                   fontSize: "11px",
-                  fontWeight: "900",
+                  wordBreak:
+                    "break-word",
                 }}
               >
-                {assignedDriver.phone ||
+
+                {driverPhone ||
                   "Non renseigné"}
-              </div>
+
+              </strong>
 
             </div>
 
 
-            {/* VEHICULE */}
-
             <div
               style={{
-                background: "#F8FAFC",
-                borderRadius: "12px",
+                background: "#FFFFFF",
                 padding: "10px",
+                borderRadius: "13px",
                 border:
                   "1px solid #E2E8F0",
               }}
             >
 
-              <div
+              <small
                 style={{
                   color: "#94A3B8",
                   fontSize: "8px",
-                  fontWeight: "800",
+                  fontWeight: 900,
                 }}
               >
-                <FaMotorcycle /> VÉHICULE
-              </div>
 
-              <div
+                🏍️ VÉHICULE
+
+              </small>
+
+
+              <strong
                 style={{
-                  marginTop: "5px",
+                  display: "block",
+                  marginTop: "4px",
                   color: "#0F172A",
                   fontSize: "11px",
-                  fontWeight: "900",
-                  textTransform: "capitalize",
                 }}
               >
+
                 {assignedDriver.vehicle ||
                   "Non renseigné"}
-              </div>
+
+              </strong>
 
             </div>
 
 
-            {/* PLAQUE */}
-
             <div
               style={{
-                background: "#F8FAFC",
-                borderRadius: "12px",
+                background: "#FFFFFF",
                 padding: "10px",
+                borderRadius: "13px",
                 border:
                   "1px solid #E2E8F0",
+                gridColumn:
+                  isMobile
+                    ? "1 / -1"
+                    : "auto",
               }}
             >
 
-              <div
+              <small
                 style={{
                   color: "#94A3B8",
                   fontSize: "8px",
-                  fontWeight: "800",
+                  fontWeight: 900,
                 }}
               >
-                <FaTruck /> PLAQUE
-              </div>
 
-              <div
+                🔢 PLAQUE
+
+              </small>
+
+
+              <strong
                 style={{
-                  marginTop: "5px",
+                  display: "block",
+                  marginTop: "4px",
                   color: "#0F172A",
                   fontSize: "11px",
-                  fontWeight: "900",
                 }}
               >
+
                 {assignedDriver.plate ||
                   "Non renseignée"}
-              </div>
+
+              </strong>
 
             </div>
 
           </div>
 
 
-          {/* APPELER */}
+          {/* APPEL */}
 
-          {assignedDriver.phone && (
+          {driverPhone && (
 
             <a
-              href={`tel:${assignedDriver.phone}`}
+              href={
+                `tel:${driverPhone}`
+              }
               style={{
                 marginTop: "10px",
                 width: "100%",
-                boxSizing: "border-box",
+                boxSizing:
+                  "border-box",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent:
+                  "center",
                 gap: "8px",
-                textDecoration: "none",
+                textDecoration:
+                  "none",
                 background:
                   "linear-gradient(135deg,#16A34A,#22C55E)",
                 color: "#FFFFFF",
-                padding: "11px",
-                borderRadius: "12px",
+                padding: "13px",
+                borderRadius: "14px",
                 fontSize: "12px",
-                fontWeight: "900",
-                boxShadow:
-                  "0 8px 18px rgba(22,163,74,.18)",
+                fontWeight: 900,
               }}
             >
 
               <FaPhoneAlt />
 
-              Appeler le livreur
+              📞 Appeler le livreur
 
             </a>
 
           )}
 
-        </div>
+        </section>
 
-      )}
+      ) : (
 
-
-      {/* ================================================= */}
-      {/* NO DRIVER */}
-      {/* ================================================= */}
-
-      {!assignedDriver &&
-        order.status !== "Livrée" && (
-
-        <div
+        <section
           style={{
             background: "#FFFFFF",
             border:
               "1px solid #E2E8F0",
             borderRadius: "18px",
-            padding: "14px",
-            marginBottom: "14px",
+            padding: "15px",
+            marginBottom: "12px",
             display: "flex",
             alignItems: "center",
             gap: "10px",
             color: "#64748B",
             fontSize: "12px",
-            fontWeight: "700",
+            fontWeight: 700,
           }}
         >
 
           <FaBoxOpen
             style={{
               color: "#2563EB",
-              fontSize: "20px",
+              fontSize: "22px",
+              flexShrink: 0,
             }}
           />
 
-          Votre commande est en attente
-          d'un livreur.
+          <span>
 
-        </div>
+            ⏳ Aucun livreur n'est encore
+            assigné à cette commande.
+
+            <br />
+
+            <small
+              style={{
+                display: "block",
+                marginTop: "4px",
+                color: "#94A3B8",
+                fontWeight: 500,
+              }}
+            >
+
+              Le premier livreur disponible
+              qui accepte la commande
+              sera affiché ici.
+
+            </small>
+
+          </span>
+
+        </section>
 
       )}
 
 
-      {/* ================================================= */}
-      {/* STATS */}
-      {/* ================================================= */}
+      {/* =================================================
+          QR CODE
+      ================================================= */}
 
-      <div
+      {order.status ===
+        "En livraison" &&
+        qrValue && (
+
+        <section
+          style={{
+            background:
+              "linear-gradient(145deg,#FFFFFF,#F8FAFC)",
+            border:
+              "1px solid #CBD5E1",
+            borderRadius:
+              isMobile
+                ? "22px"
+                : "28px",
+            padding:
+              isMobile
+                ? "20px 14px"
+                : "28px",
+            marginBottom: "12px",
+            textAlign: "center",
+            boxShadow:
+              "0 12px 35px rgba(15,23,42,.08)",
+          }}
+        >
+
+          <div
+            style={{
+              width: "54px",
+              height: "54px",
+              margin:
+                "0 auto 11px",
+              borderRadius: "16px",
+              background:
+                "linear-gradient(135deg,#2563EB,#4F46E5)",
+              color: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "22px",
+            }}
+          >
+
+            <FaQrcode />
+
+          </div>
+
+
+          <h2
+            style={{
+              margin: 0,
+              color: "#0F172A",
+              fontSize:
+                isMobile
+                  ? "19px"
+                  : "24px",
+              fontWeight: 900,
+            }}
+          >
+
+            🔐 QR de livraison
+
+          </h2>
+
+
+          <p
+            style={{
+              margin:
+                "8px auto 17px",
+              maxWidth: "390px",
+              color: "#64748B",
+              fontSize:
+                isMobile
+                  ? "12px"
+                  : "14px",
+              lineHeight: 1.6,
+            }}
+          >
+
+            📱 Présentez ce code au livreur
+            lors de la réception.
+
+            <br />
+
+            <strong
+              style={{
+                color: "#1D4ED8",
+              }}
+            >
+
+              🔒 Le scan est nécessaire
+              pour confirmer la livraison.
+
+            </strong>
+
+          </p>
+
+
+          <div
+            style={{
+              width: "fit-content",
+              maxWidth: "100%",
+              margin: "0 auto",
+              padding:
+                isMobile
+                  ? "12px"
+                  : "18px",
+              background: "#FFFFFF",
+              borderRadius: "20px",
+              border:
+                "1px solid #E2E8F0",
+              boxShadow:
+                "0 10px 25px rgba(15,23,42,.08)",
+              boxSizing: "border-box",
+            }}
+          >
+
+            <QRCodeSVG
+              value={qrValue}
+              size={
+                isMobile
+                  ? 210
+                  : 260
+              }
+              level="H"
+              includeMargin={true}
+            />
+
+          </div>
+
+
+          <div
+            style={{
+              marginTop: "15px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent:
+                "center",
+              gap: "7px",
+              color: "#2563EB",
+              fontSize: "10px",
+              fontWeight: 800,
+            }}
+          >
+
+            <FaShieldAlt />
+
+            🔒 QR sécurisé • Commande unique
+
+          </div>
+
+
+          <div
+            style={{
+              marginTop: "11px",
+              padding: "11px",
+              borderRadius: "13px",
+              background: "#EFF6FF",
+              color: "#1E40AF",
+              fontSize: "10px",
+              lineHeight: 1.5,
+            }}
+          >
+
+            📌 Gardez cette page ouverte
+            lorsque le livreur arrive.
+
+          </div>
+
+        </section>
+
+      )}
+
+
+      {/* =================================================
+          STATISTIQUES
+      ================================================= */}
+
+      <section
         style={{
           display: "grid",
-
           gridTemplateColumns:
-            "repeat(3,1fr)",
-
+            "repeat(3,minmax(0,1fr))",
           gap:
-            window.innerWidth < 768
-              ? "8px"
+            isMobile
+              ? "7px"
               : "12px",
-
-          marginBottom: "14px",
+          marginBottom: "12px",
         }}
       >
 
@@ -1369,43 +2521,50 @@ export default function TrackOrder() {
             color: "#FFFFFF",
             borderRadius: "16px",
             padding:
-              window.innerWidth < 768
+              isMobile
                 ? "11px"
                 : "15px",
-            boxShadow:
-              "0 9px 22px rgba(37,99,235,.18)",
           }}
         >
 
           <FaClock
             style={{
-              fontSize: "12px",
+              fontSize:
+                isMobile
+                  ? "13px"
+                  : "17px",
             }}
           />
+
 
           <div
             style={{
               marginTop: "5px",
               fontSize:
-                window.innerWidth < 768
-                  ? "17px"
-                  : "23px",
-              fontWeight: "900",
+                isMobile
+                  ? "14px"
+                  : "22px",
+              fontWeight: 900,
             }}
           >
+
             {estimatedTime}
+
           </div>
 
-          <div
+
+          <small
             style={{
-              marginTop: "2px",
-              fontSize: "8px",
-              opacity: .8,
-              fontWeight: "700",
+              fontSize:
+                isMobile
+                  ? "8px"
+                  : "10px",
             }}
           >
-            ETA
-          </div>
+
+            ⏱️ ETA
+
+          </small>
 
         </div>
 
@@ -1419,7 +2578,7 @@ export default function TrackOrder() {
               "1px solid #E2E8F0",
             borderRadius: "16px",
             padding:
-              window.innerWidth < 768
+              isMobile
                 ? "11px"
                 : "15px",
           }}
@@ -1428,39 +2587,49 @@ export default function TrackOrder() {
           <FaRoute
             style={{
               color: "#2563EB",
-              fontSize: "12px",
+              fontSize:
+                isMobile
+                  ? "13px"
+                  : "17px",
             }}
           />
+
 
           <div
             style={{
               marginTop: "5px",
               color: "#0F172A",
               fontSize:
-                window.innerWidth < 768
-                  ? "17px"
-                  : "23px",
-              fontWeight: "900",
+                isMobile
+                  ? "14px"
+                  : "22px",
+              fontWeight: 900,
             }}
           >
+
             {distanceText}
+
           </div>
 
-          <div
+
+          <small
             style={{
-              marginTop: "2px",
               color: "#64748B",
-              fontSize: "8px",
-              fontWeight: "700",
+              fontSize:
+                isMobile
+                  ? "8px"
+                  : "10px",
             }}
           >
-            Distance
-          </div>
+
+            📍 Distance
+
+          </small>
 
         </div>
 
 
-        {/* SPEED */}
+        {/* VITESSE */}
 
         <div
           style={{
@@ -1469,7 +2638,7 @@ export default function TrackOrder() {
               "1px solid #E2E8F0",
             borderRadius: "16px",
             padding:
-              window.innerWidth < 768
+              isMobile
                 ? "11px"
                 : "15px",
           }}
@@ -1478,49 +2647,59 @@ export default function TrackOrder() {
           <FaMotorcycle
             style={{
               color: "#7C3AED",
-              fontSize: "12px",
+              fontSize:
+                isMobile
+                  ? "13px"
+                  : "17px",
             }}
           />
+
 
           <div
             style={{
               marginTop: "5px",
               color: "#0F172A",
               fontSize:
-                window.innerWidth < 768
-                  ? "17px"
-                  : "23px",
-              fontWeight: "900",
+                isMobile
+                  ? "14px"
+                  : "22px",
+              fontWeight: 900,
             }}
           >
+
             {liveSpeed || "--"}
+
           </div>
 
-          <div
+
+          <small
             style={{
-              marginTop: "2px",
               color: "#64748B",
-              fontSize: "8px",
-              fontWeight: "700",
+              fontSize:
+                isMobile
+                  ? "8px"
+                  : "10px",
             }}
           >
-            km/h
-          </div>
+
+            🏍️ km/h
+
+          </small>
 
         </div>
 
-      </div>
+      </section>
 
 
-      {/* ================================================= */}
-      {/* MAP */}
-      {/* ================================================= */}
+      {/* =================================================
+          CARTE
+      ================================================= */}
 
-      <div
+      <section
         style={{
           background: "#FFFFFF",
           borderRadius:
-            window.innerWidth < 768
+            isMobile
               ? "20px"
               : "28px",
           overflow: "hidden",
@@ -1529,44 +2708,93 @@ export default function TrackOrder() {
           boxShadow:
             "0 12px 35px rgba(15,23,42,.08)",
           position: "relative",
+          marginBottom: "12px",
         }}
       >
 
-        {/* GPS BADGE */}
+        {/* CARTE HEADER */}
 
         <div
           style={{
             position: "absolute",
-            top: "12px",
-            right: "12px",
+            top: "11px",
+            left: "11px",
+            right: "11px",
             zIndex: 999,
             display: "flex",
+            justifyContent:
+              "space-between",
             alignItems: "center",
-            gap: "6px",
-            background: "#0F172A",
-            color: "#FFFFFF",
-            padding: "7px 10px",
-            borderRadius: "999px",
-            fontSize: "9px",
-            fontWeight: "900",
-            boxShadow:
-              "0 6px 18px rgba(15,23,42,.2)",
+            gap: "7px",
+            pointerEvents: "none",
           }}
         >
 
-          <FaCircle
+          <div
             style={{
-              color:
-                gpsOnline
-                  ? "#22C55E"
-                  : "#94A3B8",
-              fontSize: "6px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              background:
+                "rgba(255,255,255,.96)",
+              color: "#0F172A",
+              padding:
+                "7px 10px",
+              borderRadius:
+                "999px",
+              fontSize:
+                isMobile
+                  ? "8px"
+                  : "10px",
+              fontWeight: 900,
+              boxShadow:
+                "0 6px 18px rgba(15,23,42,.15)",
             }}
-          />
+          >
 
-          {gpsOnline
-            ? "GPS EN DIRECT"
-            : "GPS EN ATTENTE"}
+            <FaMap
+              style={{
+                color: "#2563EB",
+              }}
+            />
+
+            📍 Suivi en direct
+
+          </div>
+
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              background: "#0F172A",
+              color: "#FFFFFF",
+              padding:
+                "7px 9px",
+              borderRadius:
+                "999px",
+              fontSize:
+                isMobile
+                  ? "8px"
+                  : "9px",
+              fontWeight: 900,
+            }}
+          >
+
+            <FaCircle
+              style={{
+                color:
+                  gpsOnline
+                    ? "#22C55E"
+                    : "#94A3B8",
+                fontSize: "5px",
+              }}
+            />
+
+            {gpsStatus}
+
+          </div>
 
         </div>
 
@@ -1576,22 +2804,22 @@ export default function TrackOrder() {
             driverPosition ||
             customerPosition
           }
-
           zoom={
-            window.innerWidth < 768
-              ? 15
-              : 14
+            isMobile
+              ? 14
+              : 13
           }
-
           zoomControl={false}
-
           style={{
             width: "100%",
             height:
-              window.innerWidth < 768
-                ? "58vh"
-                : "72vh",
-            minHeight: "430px",
+              isMobile
+                ? "56vh"
+                : "650px",
+            minHeight:
+              isMobile
+                ? "420px"
+                : "520px",
           }}
         >
 
@@ -1602,12 +2830,11 @@ export default function TrackOrder() {
             }
           />
 
+
           <ZoomControl
             position="bottomright"
           />
 
-
-          {/* MAP */}
 
           <TileLayer
             attribution="
@@ -1619,7 +2846,7 @@ export default function TrackOrder() {
           />
 
 
-          {/* ROUTE */}
+          {/* TRAJET */}
 
           {driverPosition && (
 
@@ -1633,11 +2860,12 @@ export default function TrackOrder() {
                 pathOptions={{
                   color: "#60A5FA",
                   weight:
-                    window.innerWidth < 768
-                      ? 12
+                    isMobile
+                      ? 11
                       : 18,
                   opacity: .20,
-                  lineCap: "round",
+                  lineCap:
+                    "round",
                 }}
               />
 
@@ -1650,12 +2878,14 @@ export default function TrackOrder() {
                 pathOptions={{
                   color: "#2563EB",
                   weight:
-                    window.innerWidth < 768
-                      ? 5
+                    isMobile
+                      ? 4
                       : 7,
                   opacity: 1,
-                  lineCap: "round",
-                  lineJoin: "round",
+                  lineCap:
+                    "round",
+                  lineJoin:
+                    "round",
                 }}
               />
 
@@ -1664,21 +2894,26 @@ export default function TrackOrder() {
           )}
 
 
-          {/* DRIVER AREA */}
+          {/* ZONE GPS */}
 
           {driverPosition && (
 
             <Circle
-              center={driverPosition}
+              center={
+                driverPosition
+              }
               radius={
-                window.innerWidth < 768
+                isMobile
                   ? 100
                   : 160
               }
               pathOptions={{
-                color: "#2563EB",
-                fillColor: "#2563EB",
-                fillOpacity: .12,
+                color:
+                  "#2563EB",
+                fillColor:
+                  "#2563EB",
+                fillOpacity:
+                  .10,
                 weight: 2,
               }}
             />
@@ -1686,12 +2921,14 @@ export default function TrackOrder() {
           )}
 
 
-          {/* DRIVER */}
+          {/* LIVREUR */}
 
           {driverPosition && (
 
             <Marker
-              position={driverPosition}
+              position={
+                driverPosition
+              }
               icon={driverIcon}
             >
 
@@ -1699,7 +2936,8 @@ export default function TrackOrder() {
 
                 <div
                   style={{
-                    minWidth: "210px",
+                    minWidth:
+                      "215px",
                     fontFamily:
                       "Inter,sans-serif",
                   }}
@@ -1707,50 +2945,92 @@ export default function TrackOrder() {
 
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
+                      display:
+                        "flex",
+                      alignItems:
+                        "center",
+                      gap: "9px",
                     }}
                   >
 
-                    <img
-                      src={
-                        assignedDriver?.photo ||
-                        "/logo.jpg"
-                      }
-                      alt="Livreur"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "/logo.jpg";
-                      }}
-                      style={{
-                        width: "52px",
-                        height: "52px",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                        border:
-                          "3px solid #DBEAFE",
-                      }}
-                    />
+                    {driverPhoto ? (
+
+                      <img
+                        src={
+                          driverPhoto
+                        }
+                        alt="Livreur"
+                        style={{
+                          width:
+                            "50px",
+                          height:
+                            "50px",
+                          borderRadius:
+                            "50%",
+                          objectFit:
+                            "cover",
+                        }}
+                      />
+
+                    ) : (
+
+                      <div
+                        style={{
+                          width:
+                            "50px",
+                          height:
+                            "50px",
+                          borderRadius:
+                            "50%",
+                          background:
+                            "#DBEAFE",
+                          color:
+                            "#2563EB",
+                          display:
+                            "flex",
+                          alignItems:
+                            "center",
+                          justifyContent:
+                            "center",
+                          fontSize:
+                            "20px",
+                        }}
+                      >
+
+                        <FaUser />
+
+                      </div>
+
+                    )}
+
 
                     <div>
 
                       <strong
                         style={{
-                          color: "#0F172A",
-                          fontSize: "15px",
+                          color:
+                            "#0F172A",
+                          fontSize:
+                            "14px",
                         }}
                       >
+
                         {assignedDriver?.name ||
-                          "Livreur Konan"}
+                          "Livreur"}
+
                       </strong>
+
 
                       <div
                         style={{
-                          color: "#16A34A",
-                          fontSize: "11px",
-                          fontWeight: "800",
-                          marginTop: "3px",
+                          color:
+                            "#16A34A",
+                          fontSize:
+                            "10px",
+                          fontWeight:
+                            800,
+                          marginTop:
+                            "3px",
                         }}
                       >
 
@@ -1768,18 +3048,23 @@ export default function TrackOrder() {
 
                   <div
                     style={{
-                      marginTop: "12px",
-                      paddingTop: "10px",
+                      marginTop:
+                        "11px",
+                      paddingTop:
+                        "9px",
                       borderTop:
                         "1px solid #E2E8F0",
-                      color: "#475569",
-                      fontSize: "12px",
-                      lineHeight: "1.8",
+                      color:
+                        "#475569",
+                      fontSize:
+                        "11px",
+                      lineHeight:
+                        1.8,
                     }}
                   >
 
                     📞{" "}
-                    {assignedDriver?.phone ||
+                    {driverPhone ||
                       "Téléphone non renseigné"}
 
                     <br />
@@ -1796,19 +3081,13 @@ export default function TrackOrder() {
 
                     <br />
 
-                    📍 Distance :
-                    {" "}
-                    <strong>
-                      {distanceText}
-                    </strong>
+                    📍{" "}
+                    {distanceText}
 
                     <br />
 
-                    ⏱️ ETA :
-                    {" "}
-                    <strong>
-                      {estimatedTime}
-                    </strong>
+                    ⏱️{" "}
+                    {estimatedTime}
 
                   </div>
 
@@ -1821,57 +3100,81 @@ export default function TrackOrder() {
           )}
 
 
-          {/* CUSTOMER */}
+          {/* CLIENT */}
 
           <Marker
-            position={customerPosition}
-            icon={customerIcon}
+            position={
+              customerPosition
+            }
+            icon={
+              customerIcon
+            }
           >
 
             <Popup>
 
               <div
                 style={{
-                  minWidth: "200px",
-                  fontFamily:
-                    "Inter,sans-serif",
+                  minWidth:
+                    "200px",
                 }}
               >
 
                 <strong
                   style={{
-                    color: "#0F172A",
-                    fontSize: "15px",
+                    color:
+                      "#0F172A",
+                    fontSize:
+                      "14px",
                   }}
                 >
-                  📍 Destination
+
+                  <FaMapMarkerAlt
+                    style={{
+                      color:
+                        "#EF4444",
+                    }}
+                  />
+
+                  {" "}
+                  Destination
+
                 </strong>
+
 
                 <p
                   style={{
-                    color: "#64748B",
-                    fontSize: "12px",
-                    lineHeight: "1.5",
-                    marginBottom: "5px",
+                    color:
+                      "#64748B",
+                    fontSize:
+                      "11px",
+                    lineHeight:
+                      1.5,
                   }}
                 >
+
                   {order.address ||
                     "Adresse de livraison"}
+
                 </p>
 
-                <div
+
+                <strong
                   style={{
-                    color: "#64748B",
-                    fontSize: "11px",
-                    fontWeight: "700",
+                    color:
+                      "#64748B",
+                    fontSize:
+                      "10px",
                   }}
                 >
 
-                  {order.city}
-                  {" • "}
-                  {order.district}
+                  🏙️ {order.city}
 
-                </div>
+                  {" • "}
+
+                  📌 {order.district}
+
+                </strong>
 
               </div>
 
@@ -1881,29 +3184,27 @@ export default function TrackOrder() {
 
         </MapContainer>
 
-      </div>
+      </section>
 
 
-      {/* ================================================= */}
-      {/* PROGRESS */}
-      {/* ================================================= */}
+      {/* =================================================
+          PROGRESSION
+      ================================================= */}
 
       {order.status ===
         "En livraison" && (
 
-        <div
+        <section
           style={{
-            marginTop: "14px",
             background: "#FFFFFF",
             border:
               "1px solid #E2E8F0",
             borderRadius: "18px",
             padding:
-              window.innerWidth < 768
-                ? "13px"
+              isMobile
+                ? "14px"
                 : "17px",
-            boxShadow:
-              "0 8px 20px rgba(15,23,42,.04)",
+            marginBottom: "12px",
           }}
         >
 
@@ -1914,37 +3215,33 @@ export default function TrackOrder() {
                 "space-between",
               alignItems: "center",
               marginBottom: "9px",
+              color: "#475569",
+              fontSize: "11px",
+              fontWeight: 800,
             }}
           >
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                color: "#475569",
-                fontSize: "11px",
-                fontWeight: "800",
-              }}
-            >
+            <span>
 
-              <FaChartLine
-                style={{
-                  color: "#2563EB",
-                }}
-              />
+              <FaChartLine />
 
-              Progression
+              {" "}
+              📈 Progression
 
-            </div>
+            </span>
+
 
             <strong
               style={{
-                color: "#2563EB",
-                fontSize: "12px",
+                color:
+                  "#2563EB",
               }}
             >
-              {Math.round(progress)}%
+
+              {Math.round(
+                progress
+              )}%
+
             </strong>
 
           </div>
@@ -1953,19 +3250,24 @@ export default function TrackOrder() {
           <div
             style={{
               height: "9px",
-              background: "#E2E8F0",
-              borderRadius: "999px",
-              overflow: "hidden",
+              background:
+                "#E2E8F0",
+              borderRadius:
+                "999px",
+              overflow:
+                "hidden",
             }}
           >
 
             <div
               style={{
-                width: `${progress}%`,
+                width:
+                  `${progress}%`,
                 height: "100%",
                 background:
                   "linear-gradient(90deg,#2563EB,#3B82F6)",
-                borderRadius: "999px",
+                borderRadius:
+                  "999px",
                 transition:
                   "width .5s ease",
               }}
@@ -1978,14 +3280,18 @@ export default function TrackOrder() {
 
             <div
               style={{
-                marginTop: "8px",
-                color: "#94A3B8",
-                fontSize: "9px",
-                textAlign: "right",
+                marginTop:
+                  "8px",
+                color:
+                  "#94A3B8",
+                fontSize:
+                  "9px",
+                textAlign:
+                  "right",
               }}
             >
 
-              Dernière position :
+              📡 Dernière position :
               {" "}
               {gpsTime}
 
@@ -1993,29 +3299,30 @@ export default function TrackOrder() {
 
           )}
 
-        </div>
+        </section>
 
       )}
 
 
-      {/* ================================================= */}
-      {/* ✅ DELIVERY COMPLETED */}
-      {/* ================================================= */}
+      {/* =================================================
+          COMMANDE LIVRÉE
+      ================================================= */}
 
       {order.status ===
         "Livrée" && (
 
-        <div
+        <section
           style={{
-            marginTop: "14px",
             background:
               "linear-gradient(135deg,#DCFCE7,#F0FDF4)",
             border:
               "1px solid #86EFAC",
-            borderRadius: "18px",
-            padding: "16px",
-            boxShadow:
-              "0 8px 20px rgba(22,163,74,.08)",
+            borderRadius:
+              "20px",
+            padding:
+              isMobile
+                ? "17px"
+                : "20px",
           }}
         >
 
@@ -2029,33 +3336,47 @@ export default function TrackOrder() {
 
             <FaCheckCircle
               style={{
-                color: "#16A34A",
-                fontSize: "25px",
+                color:
+                  "#16A34A",
+                fontSize:
+                  "29px",
                 flexShrink: 0,
               }}
             />
 
+
             <div>
 
-              <div
+              <strong
                 style={{
-                  color: "#166534",
-                  fontSize: "16px",
-                  fontWeight: "900",
+                  color:
+                    "#166534",
+                  fontSize:
+                    isMobile
+                      ? "17px"
+                      : "19px",
                 }}
               >
-                Commande livrée
-              </div>
+
+                ✅ Commande livrée
+
+              </strong>
+
 
               <div
                 style={{
-                  color: "#15803D",
-                  fontSize: "11px",
-                  marginTop: "3px",
+                  color:
+                    "#15803D",
+                  fontSize:
+                    "12px",
+                  marginTop:
+                    "4px",
                 }}
               >
-                Votre commande a été livrée
-                avec succès.
+
+                Votre commande a été
+                livrée avec succès.
+
               </div>
 
             </div>
@@ -2063,71 +3384,119 @@ export default function TrackOrder() {
           </div>
 
 
-          {/* LIVREUR QUI A LIVRÉ */}
-
           {assignedDriver && (
 
             <div
               style={{
-                marginTop: "13px",
-                paddingTop: "12px",
+                marginTop:
+                  "15px",
+                paddingTop:
+                  "13px",
                 borderTop:
                   "1px solid #BBF7D0",
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
+                display:
+                  "flex",
+                alignItems:
+                  "center",
+                gap:
+                  "10px",
               }}
             >
 
-              <img
-                src={
-                  assignedDriver.photo ||
-                  "/logo.jpg"
-                }
-                alt="Livreur"
-                onError={(e) => {
-                  e.currentTarget.src =
-                    "/logo.jpg";
-                }}
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border:
-                    "2px solid #86EFAC",
-                }}
-              />
+              {driverPhoto ? (
+
+                <img
+                  src={
+                    driverPhoto
+                  }
+                  alt="Livreur"
+                  style={{
+                    width:
+                      "52px",
+                    height:
+                      "52px",
+                    borderRadius:
+                      "50%",
+                    objectFit:
+                      "cover",
+                    border:
+                      "2px solid #86EFAC",
+                  }}
+                />
+
+              ) : (
+
+                <div
+                  style={{
+                    width:
+                      "52px",
+                    height:
+                      "52px",
+                    borderRadius:
+                      "50%",
+                    background:
+                      "#DCFCE7",
+                    color:
+                      "#16A34A",
+                    display:
+                      "flex",
+                    alignItems:
+                      "center",
+                    justifyContent:
+                      "center",
+                    fontSize:
+                      "20px",
+                  }}
+                >
+
+                  <FaUser />
+
+                </div>
+
+              )}
+
 
               <div>
 
-                <div
+                <small
                   style={{
-                    color: "#166534",
-                    fontSize: "9px",
-                    fontWeight: "800",
-                    textTransform:
-                      "uppercase",
+                    color:
+                      "#166534",
+                    fontWeight:
+                      800,
+                    fontSize:
+                      "9px",
                   }}
                 >
-                  Livrée par
-                </div>
+
+                  LIVRÉE PAR
+
+                </small>
+
 
                 <strong
                   style={{
-                    color: "#14532D",
-                    fontSize: "14px",
+                    display:
+                      "block",
+                    color:
+                      "#14532D",
+                    fontSize:
+                      "14px",
                   }}
                 >
+
                   {assignedDriver.name ||
-                    "Livreur Konan"}
+                    "Livreur"}
+
                 </strong>
 
-                <div
+
+                <span
                   style={{
-                    color: "#15803D",
-                    fontSize: "10px",
-                    marginTop: "3px",
+                    color:
+                      "#15803D",
+                    fontSize:
+                      "10px",
                   }}
                 >
 
@@ -2138,7 +3507,7 @@ export default function TrackOrder() {
                     ? ` • ${assignedDriver.plate}`
                     : ""}
 
-                </div>
+                </span>
 
               </div>
 
@@ -2146,45 +3515,7 @@ export default function TrackOrder() {
 
           )}
 
-        </div>
-
-      )}
-
-
-      {/* ================================================= */}
-      {/* ❌ CANCELLED */}
-      {/* ================================================= */}
-
-      {order.status ===
-        "Annulée" && (
-
-        <div
-          style={{
-            marginTop: "14px",
-            background: "#FEF2F2",
-            border:
-              "1px solid #FECACA",
-            borderRadius: "18px",
-            padding: "16px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            color: "#991B1B",
-            fontSize: "13px",
-            fontWeight: "800",
-          }}
-        >
-
-          <FaTimesCircle
-            style={{
-              fontSize: "22px",
-            }}
-          />
-
-          Cette commande a été
-          annulée.
-
-        </div>
+        </section>
 
       )}
 
