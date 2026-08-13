@@ -185,6 +185,36 @@ export default function DriverTracking() {
 
 
   // ====================================================
+  // 🔑 ID DU LIVREUR ASSIGNÉ
+  // ====================================================
+
+  const getAssignedDriverId = (order) => {
+
+    if (!order) {
+      return "";
+    }
+
+    const assignedDriver =
+      order.assignedDriver;
+
+    if (!assignedDriver) {
+      return "";
+    }
+
+    if (typeof assignedDriver === "string") {
+      return assignedDriver;
+    }
+
+    return String(
+      assignedDriver.id ||
+      assignedDriver._id ||
+      ""
+    );
+
+  };
+
+
+  // ====================================================
   // 🖼️ PHOTO LIVREUR
   // ====================================================
 
@@ -672,16 +702,7 @@ export default function DriverTracking() {
             order => {
 
               const assignedId =
-                typeof order.assignedDriver ===
-                "string"
-
-                  ? order.assignedDriver
-
-                  : (
-                      order.assignedDriver?.id ||
-                      order.assignedDriver?._id ||
-                      ""
-                    );
+                getAssignedDriverId(order);
 
               return (
                 String(assignedId) ===
@@ -994,17 +1015,7 @@ export default function DriverTracking() {
       // ==================================================
 
       const assignedId =
-
-        typeof currentOrder.assignedDriver ===
-        "string"
-
-          ? currentOrder.assignedDriver
-
-          : (
-              currentOrder.assignedDriver?.id ||
-              currentOrder.assignedDriver?._id ||
-              ""
-            );
+        getAssignedDriverId(currentOrder);
 
 
       if (
@@ -1118,7 +1129,10 @@ export default function DriverTracking() {
               ),
 
             vehicle:
-              driver.vehicle || ""
+              driver.vehicle || "",
+
+            plate:
+              driver.plate || ""
 
           };
 
@@ -1997,13 +2011,8 @@ export default function DriverTracking() {
 
           !assignedId &&
 
-          [
-            "En attente",
-            "Confirmée",
-            "Préparation"
-          ].includes(
-            order.status
-          ) &&
+          order.status ===
+            "En attente" &&
 
           order.status !==
             "Livrée" &&
@@ -2099,17 +2108,7 @@ export default function DriverTracking() {
     ) => {
 
       const assignedDriverId =
-
-        typeof order.assignedDriver ===
-        "string"
-
-          ? order.assignedDriver
-
-          : (
-              order.assignedDriver?.id ||
-              order.assignedDriver?._id ||
-              ""
-            );
+        getAssignedDriverId(order);
 
 
       const isMine =
@@ -2118,14 +2117,9 @@ export default function DriverTracking() {
 
 
       const isAvailable =
-        !order.assignedDriver &&
-        [
-          "En attente",
-          "Confirmée",
-          "Préparation"
-        ].includes(
-          order.status
-        );
+        !assignedDriverId &&
+        order.status ===
+          "En attente";
 
 
       const isDelivered =

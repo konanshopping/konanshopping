@@ -11,7 +11,8 @@ import {
   FaHeadset
 } from "react-icons/fa";
 
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function UserLogin() {
 
@@ -824,6 +825,101 @@ else {
   </p>
 
 </div>
+
+      {/* PROFESSIONAL NOTIFICATIONS */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3500}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastClassName="konan-toast"
+        bodyClassName="konan-toast-body"
+      />
+
+      <style>{`
+        .konan-toast {
+          min-height: 72px !important;
+          padding: 0 10px 0 0 !important;
+          border-radius: 16px !important;
+          background: rgba(255,255,255,.98) !important;
+          color: #0f172a !important;
+          border: 1px solid #e5e7eb !important;
+          border-left: 5px solid #2563eb !important;
+          box-shadow: 0 18px 45px rgba(15,23,42,.16) !important;
+          overflow: hidden !important;
+          font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+        }
+
+        .konan-toast.Toastify__toast--success {
+          border-left-color: #16a34a !important;
+        }
+
+        .konan-toast.Toastify__toast--error {
+          border-left-color: #dc2626 !important;
+        }
+
+        .konan-toast .Toastify__toast-icon {
+          width: 28px !important;
+          margin-left: 12px !important;
+          margin-right: 4px !important;
+        }
+
+        .konan-toast-body {
+          padding: 15px 8px 15px 0 !important;
+          margin: 0 !important;
+          font-size: 14px !important;
+          font-weight: 650 !important;
+          line-height: 1.45 !important;
+          color: #0f172a !important;
+        }
+
+        .konan-toast .Toastify__close-button {
+          color: #64748b !important;
+          opacity: .7 !important;
+          align-self: center !important;
+        }
+
+        .konan-toast .Toastify__close-button:hover {
+          opacity: 1 !important;
+        }
+
+        .konan-toast .Toastify__progress-bar {
+          height: 3px !important;
+        }
+
+        .konan-toast.Toastify__toast--success .Toastify__progress-bar {
+          background: #16a34a !important;
+        }
+
+        .konan-toast.Toastify__toast--error .Toastify__progress-bar {
+          background: #dc2626 !important;
+        }
+
+        @media (max-width: 768px) {
+          .Toastify__toast-container {
+            width: calc(100% - 20px) !important;
+            left: 10px !important;
+            right: 10px !important;
+            top: 10px !important;
+            padding: 0 !important;
+          }
+
+          .konan-toast {
+            width: 100% !important;
+            min-height: 68px !important;
+            border-radius: 15px !important;
+          }
+
+          .konan-toast-body {
+            font-size: 13px !important;
+          }
+        }
+      `}</style>
 
     </div>
     </div>

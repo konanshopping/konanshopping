@@ -1646,60 +1646,244 @@ app.post("/orders", async (req, res) => {
 
   try {
 
-    const order = new Order({
+    // ======================================================
+// 📦 CRÉER LA COMMANDE
+// ======================================================
 
-  customerName: req.body.customerName,
+const order = new Order({
 
-userId: req.body.userId,
+  // ====================================================
+  // 👤 CLIENT
+  // ====================================================
 
-  phone: req.body.phone,
+  customerName:
+    req.body.customerName || "",
 
-  address: req.body.address,
+  userId:
+    req.body.userId || null,
 
-  city: req.body.city,
+  phone:
+    req.body.phone || "",
 
-  district: req.body.district,
+  address:
+    req.body.address || "",
 
-  shipping: req.body.shipping,
+  city:
+    req.body.city || "",
 
-  items: req.body.items.map(item => ({
+  district:
+    req.body.district || "",
 
-  productId: item._id,
 
-  name: item.name,
+  // ====================================================
+  // 🚚 LIVRAISON
+  // ====================================================
 
-  image: item.image,
+  shipping:
+    Number(
+      req.body.shipping || 0
+    ),
 
-  price: item.price,
 
-  quantity: item.quantity,
+  // ====================================================
+  // 📦 PRODUITS
+  // ====================================================
 
-})),
+  items:
+    (req.body.items || []).map(
+      (item) => ({
 
-  total: req.body.total,
+        productId:
+          item._id || "",
 
-    // ==========================================
-  // 🔐 QR UNIQUE DE LA COMMANDE
-  // ==========================================
+        name:
+          item.name || "",
 
-  deliveryQrToken:
-    crypto.randomBytes(32).toString("hex"),
+        image:
+          item.image || "",
 
-  status: "En attente",
+        price:
+          Number(
+            item.price || 0
+          ),
+
+        quantity:
+          Number(
+            item.quantity || 1
+          ),
+
+      })
+    ),
+
+
+  // ====================================================
+  // 💰 TOTAL
+  // ====================================================
+
+  total:
+    Number(
+      req.body.total || 0
+    ),
+
+
+  // ====================================================
+  // 💳 PAIEMENT
+  // ====================================================
+
+  paymentMethod:
+    req.body.paymentMethod ||
+    "Paiement à la livraison",
+
+
+  // ====================================================
+  // 📍 POSITION DU CLIENT
+  // ====================================================
 
   location: {
 
-    lat: req.body.lat,
+    lat:
+      Number.isFinite(
+        Number(req.body.lat)
+      )
+        ? Number(req.body.lat)
+        : null,
 
-    lng: req.body.lng,
+    lng:
+      Number.isFinite(
+        Number(req.body.lng)
+      )
+        ? Number(req.body.lng)
+        : null,
 
   },
 
-   
+
+  // ====================================================
+  // 🚚 LIVREUR
+  // ====================================================
+  //
+  // IMPORTANT :
+  // AUCUN LIVREUR N'EST ASSIGNÉ À LA CRÉATION.
+  //
+  // ====================================================
+
+  assignedDriver: {
+
+    id: null,
+
+    name: "",
+
+    phone: "",
+
+    photo: "",
+
+    vehicle: "",
+
+    plate: "",
+
+  },
+
+
+  // ====================================================
+  // 📍 GPS LIVREUR
+  // ====================================================
+
+  driverLocation: {
+
+    lat: null,
+
+    lng: null,
+
+    updatedAt: null,
+
+  },
+
+
+  // ====================================================
+  // 🔐 QR UNIQUE DE LA COMMANDE
+  // ====================================================
+
+  deliveryQrToken:
+    crypto
+      .randomBytes(32)
+      .toString("hex"),
+
+
+  // ====================================================
+  // 📷 QR PAS ENCORE UTILISÉ
+  // ====================================================
+
+  deliveryQrUsedAt:
+    null,
+
+
+  // ====================================================
+  // 🕐 PAS ENCORE ACCEPTÉE
+  // ====================================================
+
+  acceptedAt:
+    null,
+
+
+  // ====================================================
+  // 📦 STATUT
+  // ====================================================
+
+  status:
+    "En attente",
 
 });
 
-  await order.save();
+
+// ======================================================
+// 💾 ENREGISTRER
+// ======================================================
+
+await order.save();
+
+
+// ======================================================
+// 🧪 DEBUG
+// ======================================================
+
+console.log(
+  "=========================================="
+);
+
+console.log(
+  "🛒 NOUVELLE COMMANDE"
+);
+
+console.log(
+  "📦 ID :",
+  order._id
+);
+
+console.log(
+  "📊 STATUS :",
+  order.status
+);
+
+console.log(
+  "🚚 LIVREUR :",
+  order.assignedDriver
+);
+
+console.log(
+  "🔐 QR :",
+  order.deliveryQrToken
+    ? "GÉNÉRÉ ✅"
+    : "ABSENT ❌"
+);
+
+console.log(
+  "📍 CLIENT :",
+  order.location
+);
+
+console.log(
+  "=========================================="
+);
 
   // ===============================
 // 🚚 NOTIFICATION TELEGRAM LIVREURS
@@ -3890,6 +4074,11 @@ app.get("/ai/test", (req, res) => {
 
 app.use("/orders", orderRoutes);
 
+// ======================================================
+// 📦 TRACK ORDER CLIENT
+// 🚚 RÉCUPÉRER LA COMMANDE + LIVREUR + GPS + QR
+// ======================================================
+
 app.get(
   "/order/:id",
 
@@ -3897,72 +4086,233 @@ app.get(
 
     try {
 
+      console.log(
+        "======================================"
+      );
+
+      console.log(
+        "📦 TRACK ORDER"
+      );
+
+      console.log(
+        "🆔 Commande :",
+        req.params.id
+      );
+
+
+      // ==================================================
+      // 🔎 RECHERCHER LA COMMANDE
+      // ==================================================
+
       const order =
         await Order.findById(
           req.params.id
         );
 
+
+      // ==================================================
+      // ❌ COMMANDE INTROUVABLE
+      // ==================================================
+
       if (!order) {
 
+        console.log(
+          "❌ Commande introuvable"
+        );
+
         return res.status(404).json({
+
+          success: false,
+
           error:
-            "Commande introuvable",
+            "Commande introuvable"
+
         });
 
       }
 
-      res.json(order);
+
+      // ==================================================
+      // 🚚 LIVREUR ASSIGNÉ
+      // ==================================================
+
+      let assignedDriver = null;
+
+
+      if (order.assignedDriver) {
+
+        assignedDriver = {
+
+          id:
+            order.assignedDriver.id
+              ? String(
+                  order.assignedDriver.id
+                )
+              : "",
+
+          name:
+            order.assignedDriver.name ||
+            "",
+
+          phone:
+            order.assignedDriver.phone ||
+            "",
+
+          photo:
+            order.assignedDriver.photo ||
+            "",
+
+          vehicle:
+            order.assignedDriver.vehicle ||
+            "",
+
+          plate:
+            order.assignedDriver.plate ||
+            ""
+
+        };
+
+      }
+
+
+      // ==================================================
+      // 📦 OBJET TRACKING
+      // ==================================================
+
+      const trackingOrder = {
+
+        _id:
+          order._id,
+
+        userId:
+          order.userId,
+
+        customerName:
+          order.customerName,
+
+        phone:
+          order.phone,
+
+        address:
+          order.address,
+
+        city:
+          order.city,
+
+        district:
+          order.district,
+
+        shipping:
+          order.shipping,
+
+        items:
+          order.items,
+
+        total:
+          order.total,
+
+        status:
+          order.status,
+
+
+        // ==================================================
+        // 🚚 LIVREUR
+        // ==================================================
+
+        assignedDriver:
+          assignedDriver,
+
+
+        // ==================================================
+        // 📍 POSITION DU LIVREUR
+        // ==================================================
+
+        driverLocation:
+          order.driverLocation || null,
+
+
+        // ==================================================
+        // 🔐 QR CODE
+        // ==================================================
+
+        deliveryQrToken:
+          order.deliveryQrToken || null,
+
+        deliveryQrUsedAt:
+          order.deliveryQrUsedAt || null,
+
+
+        // ==================================================
+        // 🕐 DATES
+        // ==================================================
+
+        acceptedAt:
+          order.acceptedAt || null,
+
+        deliveredAt:
+          order.deliveredAt || null,
+
+        createdAt:
+          order.createdAt
+
+      };
+
+
+      // ==================================================
+      // 🧪 LOGS
+      // ==================================================
+
+      console.log(
+        "📊 STATUS :",
+        trackingOrder.status
+      );
+
+      console.log(
+        "🚚 DRIVER :",
+        trackingOrder.assignedDriver
+      );
+
+      console.log(
+        "📍 GPS :",
+        trackingOrder.driverLocation
+      );
+
+      console.log(
+        "🔐 QR :",
+        trackingOrder.deliveryQrToken
+          ? "PRÉSENT ✅"
+          : "ABSENT ❌"
+      );
+
+
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
+
+      return res.json({
+
+        success: true,
+
+        order:
+          trackingOrder
+
+      });
+
 
     } catch (error) {
 
-      console.log(error);
+      console.error(
+        "❌ TRACK ORDER ERROR :",
+        error
+      );
 
-      res.status(500).json({
+      return res.status(500).json({
+
+        success: false,
+
         error:
-          "Erreur serveur",
-      });
+          "Erreur serveur"
 
-    }
-
-  }
-);
-
-// =========================
-// UPDATE ORDER STATUS
-// =========================
-
-app.put(
-  "/update-order-status/:id",
-
-  async (req, res) => {
-
-    try {
-
-      const updatedOrder =
-        await Order.findByIdAndUpdate(
-
-          req.params.id,
-
-          {
-            status:
-              req.body.status,
-          },
-
-          {
-            new: true,
-          }
-
-        );
-
-      res.json(updatedOrder);
-
-    } catch (err) {
-
-      console.log(err);
-
-      res.status(500).json({
-        error:
-          "Erreur serveur",
       });
 
     }
@@ -4240,6 +4590,7 @@ app.post(
 
 // ======================================================
 // 🚚 ACCEPTER UNE COMMANDE
+// 🔒 PREMIER LIVREUR QUI CLIQUE = LIVREUR ASSIGNÉ
 // ======================================================
 
 app.put(
@@ -4249,17 +4600,13 @@ app.put(
     try {
 
       const {
-        driverId,
-        driverName,
-        driverPhone,
-        driverPhoto,
-        driverVehicle
+        driverId
       } = req.body;
 
 
-      // ============================================
-      // VALIDATION LIVREUR
-      // ============================================
+      // ==================================================
+      // 🔐 VALIDATION
+      // ==================================================
 
       if (!driverId) {
 
@@ -4275,9 +4622,116 @@ app.put(
       }
 
 
-      // ============================================
-      // ACCEPTATION ATOMIQUE
-      // ============================================
+      // ==================================================
+      // 👨‍🚚 RÉCUPÉRER LE VRAI LIVREUR
+      // ==================================================
+
+      const driver =
+        await Driver.findById(
+          driverId
+        );
+
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+
+      // ==================================================
+      // 🧪 DEBUG LIVREUR
+      // ==================================================
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "🚚 LIVREUR QUI ESSAIE D'ACCEPTER"
+      );
+
+      console.log(
+        "🆔 ID :",
+        driver._id
+      );
+
+      console.log(
+        "👤 NOM :",
+        driver.name
+      );
+
+      console.log(
+        "📞 TÉLÉPHONE :",
+        driver.phone
+      );
+
+      console.log(
+        "📷 PHOTO :",
+        driver.photo
+      );
+
+      console.log(
+        "🏍️ VÉHICULE :",
+        driver.vehicle
+      );
+
+      console.log(
+        "🔢 PLAQUE :",
+        driver.plate
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ==================================================
+      // 🚚 OBJET LIVREUR
+      // ==================================================
+
+      const assignedDriver = {
+
+        id:
+          driver._id,
+
+        name:
+          driver.name || "",
+
+        phone:
+          driver.phone || "",
+
+        photo:
+          driver.photo || "",
+
+        vehicle:
+          driver.vehicle || "",
+
+        plate:
+          driver.plate || ""
+
+      };
+
+
+      // ==================================================
+      // 🔒 ACCEPTATION ATOMIQUE
+      // ==================================================
+      //
+      // IMPORTANT :
+      // Le premier livreur qui exécute cette requête
+      // gagne.
+      //
+      // Si un autre livreur a déjà pris la commande,
+      // cette requête retourne null.
+      //
+      // ==================================================
 
       const order =
         await Order.findOneAndUpdate(
@@ -4287,18 +4741,19 @@ app.put(
             _id:
               req.params.id,
 
-            // La commande doit être disponible
-
             status: {
-              $in: [
-                "En attente",
-                "Confirmée",
-                "Préparation"
-              ]
-            },
 
-            // Aucun livreur ne doit déjà
-            // être assigné
+              $in: [
+
+                "En attente",
+
+                "Confirmée",
+
+                "Préparation"
+
+              ]
+
+            },
 
             $or: [
 
@@ -4310,6 +4765,11 @@ app.put(
               {
                 assignedDriver:
                   null
+              },
+
+              {
+                "assignedDriver.id":
+                  null
               }
 
             ]
@@ -4320,27 +4780,25 @@ app.put(
 
             $set: {
 
+              // ========================================
+              // 📦 STATUT
+              // ========================================
+
               status:
                 "En livraison",
 
-              assignedDriver: {
 
-                id:
-                  driverId,
+              // ========================================
+              // 🚚 LIVREUR
+              // ========================================
 
-                name:
-                  driverName || "",
+              assignedDriver:
+                assignedDriver,
 
-                phone:
-                  driverPhone || "",
 
-                photo:
-                  driverPhoto || "",
-
-                vehicle:
-                  driverVehicle || ""
-
-              },
+              // ========================================
+              // 🕐 ACCEPTATION
+              // ========================================
 
               acceptedAt:
                 new Date()
@@ -4356,9 +4814,9 @@ app.put(
         );
 
 
-      // ============================================
-      // COMMANDE NON DISPONIBLE
-      // ============================================
+      // ==================================================
+      // ❌ COMMANDE DÉJÀ PRISE
+      // ==================================================
 
       if (!order) {
 
@@ -4382,6 +4840,11 @@ app.put(
         }
 
 
+        console.log(
+          `⚠️ Commande ${req.params.id} déjà prise`
+        );
+
+
         return res.status(409).json({
 
           success: false,
@@ -4389,24 +4852,53 @@ app.put(
           message:
             "Cette commande a déjà été prise par un autre livreur.",
 
-          alreadyAssigned: true,
+          alreadyAssigned:
+            true,
 
           assignedDriver:
-            existingOrder.assignedDriver || null
+            existingOrder.assignedDriver ||
+            null
 
         });
 
       }
 
 
-      // ============================================
-      // SUCCÈS
-      // ============================================
+      // ==================================================
+      // 🧪 CONFIRMATION
+      // ==================================================
 
       console.log(
-        `🚚 Commande ${order._id} acceptée par ${driverName}`
+        "=========================================="
       );
 
+      console.log(
+        "✅ COMMANDE ACCEPTÉE"
+      );
+
+      console.log(
+        "📦 COMMANDE :",
+        order._id
+      );
+
+      console.log(
+        "📊 STATUS :",
+        order.status
+      );
+
+      console.log(
+        "🚚 ASSIGNED DRIVER :",
+        order.assignedDriver
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
 
       return res.json({
 
@@ -4433,7 +4925,10 @@ app.put(
         success: false,
 
         message:
-          "Erreur serveur lors de l'acceptation"
+          "Erreur serveur lors de l'acceptation",
+
+        error:
+          err.message
 
       });
 
@@ -4448,12 +4943,17 @@ app.put(
 
 app.get(
   "/driver-orders",
+
   async (req, res) => {
 
     try {
 
       const orders =
         await Order.find({
+
+          // ============================================
+          // 📦 COMMANDES QUI PEUVENT ÊTRE ACCEPTÉES
+          // ============================================
 
           status: {
             $in: [
@@ -4463,27 +4963,80 @@ app.get(
             ]
           },
 
+          // ============================================
+          // 🚚 AUCUN LIVREUR RÉELLEMENT ASSIGNÉ
+          // ============================================
+
           $or: [
 
+            // Anciennes commandes
             {
-              assignedDriver:
-                { $exists: false }
+              assignedDriver: {
+                $exists: false
+              }
             },
 
+            // assignedDriver = null
             {
-              assignedDriver:
-                null
+              assignedDriver: null
+            },
+
+            // Nouveau système :
+            // assignedDriver existe mais
+            // aucun ID de livreur
+            {
+              "assignedDriver.id": null
             }
 
           ]
 
         })
+
         .sort({
           createdAt: -1
         });
 
 
-      res.json({
+      // ============================================
+      // 🧪 DEBUG
+      // ============================================
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "📦 COMMANDES DISPONIBLES :",
+        orders.length
+      );
+
+      orders.forEach(
+        (order) => {
+
+          console.log(
+            "🛒",
+            order._id.toString(),
+            "| STATUS:",
+            order.status,
+            "| DRIVER:",
+            order.assignedDriver?.id
+              ? order.assignedDriver.id.toString()
+              : "AUCUN"
+          );
+
+        }
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ============================================
+      // 📤 RÉPONSE
+      // ============================================
+
+      return res.json({
 
         success: true,
 
@@ -4494,7 +5047,6 @@ app.get(
 
       });
 
-
     } catch (err) {
 
       console.error(
@@ -4502,13 +5054,224 @@ app.get(
         err
       );
 
-
-      res.status(500).json({
+      return res.status(500).json({
 
         success: false,
 
         message:
-          "Erreur récupération commandes"
+          "Erreur récupération commandes",
+
+        error:
+          err.message
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// 🚚 COMMANDES DU LIVREUR CONNECTÉ
+// ======================================================
+// Retourne uniquement les commandes appartenant
+// à ce livreur.
+//
+// Statuts récupérés :
+// 🟠 En livraison
+// 🟢 Livrée
+// ======================================================
+
+app.get(
+  "/driver/my-orders/:driverId",
+
+  async (req, res) => {
+
+    try {
+
+      const {
+        driverId
+      } = req.params;
+
+
+      // ==================================================
+      // 🔐 VALIDATION
+      // ==================================================
+
+      if (!driverId) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "ID du livreur manquant"
+
+        });
+
+      }
+
+
+      // ==================================================
+      // 👨‍🚚 VÉRIFIER QUE LE LIVREUR EXISTE
+      // ==================================================
+
+      const driver =
+        await Driver.findById(
+          driverId
+        );
+
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+
+      // ==================================================
+      // 📦 RÉCUPÉRER SES COMMANDES
+      // ==================================================
+
+      const orders =
+        await Order.find({
+
+          // ==============================================
+          // 🚚 LIVREUR ASSIGNÉ
+          // ==============================================
+
+          "assignedDriver.id":
+            driver._id,
+
+
+          // ==============================================
+          // 📦 COMMANDES DU LIVREUR
+          // ==============================================
+
+          status: {
+
+            $in: [
+
+              "En livraison",
+
+              "Livrée"
+
+            ]
+
+          }
+
+        })
+
+        .sort({
+
+          createdAt: -1
+
+        });
+
+
+      // ==================================================
+      // 🧪 DEBUG
+      // ==================================================
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "🚚 COMMANDES DU LIVREUR"
+      );
+
+      console.log(
+        "👤 LIVREUR :",
+        driver.name
+      );
+
+      console.log(
+        "🆔 ID :",
+        driver._id
+      );
+
+      console.log(
+        "📦 COMMANDES :",
+        orders.length
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ==================================================
+      // 📊 COMPTEURS
+      // ==================================================
+
+      const enLivraison =
+        orders.filter(
+          (order) =>
+            order.status ===
+            "En livraison"
+        ).length;
+
+
+      const livrees =
+        orders.filter(
+          (order) =>
+            order.status ===
+            "Livrée"
+        ).length;
+
+
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
+
+      return res.json({
+
+        success: true,
+
+        count:
+          orders.length,
+
+        statistics: {
+
+          enLivraison,
+
+          livrees,
+
+          total:
+            orders.length
+
+        },
+
+        orders
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ DRIVER MY ORDERS ERROR:",
+        err
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur récupération commandes du livreur",
+
+        error:
+          err.message
 
       });
 

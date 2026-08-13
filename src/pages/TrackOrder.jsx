@@ -36,10 +36,6 @@ import {
   FaQrcode,
   FaCreditCard,
   FaMapMarkerAlt,
-  FaLocationArrow,
-  FaHome,
-  FaInfoCircle,
-  FaBox,
 } from "react-icons/fa";
 
 import L from "leaflet";
@@ -391,19 +387,7 @@ export default function TrackOrder() {
 
 
           // =================================================
-          // 📦 NORMALISER LA RÉPONSE API
-          // =================================================
-          //
-          // Le backend peut répondre soit :
-          //
-          // { success: true, order: {...} }
-          //
-          // soit directement :
-          //
-          // { ...order }
-          //
-          // On récupère donc toujours le véritable objet
-          // commande avant de faire setOrder().
+          // 📦 NORMALISER LA RÉPONSE
           // =================================================
 
           const data =
@@ -412,25 +396,79 @@ export default function TrackOrder() {
             response.data;
 
 
-          if (!data || !data._id) {
+          // =================================================
+          // 🧪 DEBUG
+          // =================================================
+
+          console.log(
+            "======================================"
+          );
+
+          console.log(
+            "📡 RÉPONSE COMPLÈTE DU SERVEUR :",
+            response.data
+          );
+
+          console.log(
+            "📦 COMMANDE :",
+            data
+          );
+
+          console.log(
+            "🚚 LIVREUR ASSIGNÉ :",
+            data?.assignedDriver
+          );
+
+          console.log(
+            "🆔 ID LIVREUR ASSIGNÉ :",
+            data?.assignedDriver?.id
+          );
+
+          console.log(
+            "👤 NOM LIVREUR :",
+            data?.assignedDriver?.name
+          );
+
+          console.log(
+            "📞 TÉLÉPHONE :",
+            data?.assignedDriver?.phone
+          );
+
+          console.log(
+            "🏍️ VÉHICULE :",
+            data?.assignedDriver?.vehicle
+          );
+
+          console.log(
+            "🔢 PLAQUE :",
+            data?.assignedDriver?.plate
+          );
+
+          console.log(
+            "🔐 QR :",
+            data?.deliveryQrToken
+          );
+
+          console.log(
+            "📊 STATUT :",
+            data?.status
+          );
+
+          console.log(
+            "======================================"
+          );
+
+
+          if (
+            !data ||
+            !data._id
+          ) {
 
             throw new Error(
               "Réponse commande invalide"
             );
 
           }
-
-
-          console.log(
-            "📦 TRACK ORDER — COMMANDE :",
-            data
-          );
-
-
-          console.log(
-            "🚚 TRACK ORDER — LIVREUR :",
-            data?.assignedDriver
-          );
 
 
           setOrder(data);
@@ -573,7 +611,22 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 🚚 LIVREUR NORMALISÉ
+  // 🚚 LIVREUR RÉELLEMENT ASSIGNÉ
+  // ====================================================
+  //
+  // SOURCE UNIQUE DE VÉRITÉ :
+  //
+  // Order.assignedDriver
+  //
+  // Ce livreur est celui qui a réellement
+  // accepté la commande dans DriverTracking.
+  //
+  // Aucun fallback vers :
+  // order.driver
+  // order.driverId
+  // order.driverName
+  // order.driverPhone
+  //
   // ====================================================
 
   const assignedDriver =
@@ -582,144 +635,49 @@ export default function TrackOrder() {
       const assigned =
         order?.assignedDriver;
 
-      const driver =
-        order?.driver;
 
+      // =================================================
+      // ❌ AUCUN LIVREUR
+      // =================================================
 
-      // Nouveau système
       if (
-        assigned &&
-        typeof assigned ===
-        "object"
+        !assigned ||
+        !assigned.id
       ) {
 
-        return {
-
-          id:
-            assigned.id ||
-            assigned._id ||
-            order?.driverId ||
-            "",
-
-          name:
-            assigned.name ||
-            driver?.name ||
-            "",
-
-          phone:
-            assigned.phone ||
-            assigned.telephone ||
-            driver?.phone ||
-            "",
-
-          photo:
-            assigned.photo ||
-            assigned.image ||
-            driver?.photo ||
-            driver?.image ||
-            "",
-
-          vehicle:
-            assigned.vehicle ||
-            assigned.driverVehicle ||
-            driver?.vehicle ||
-            "",
-
-          plate:
-            assigned.plate ||
-            assigned.licensePlate ||
-            driver?.plate ||
-            driver?.licensePlate ||
-            "",
-
-        };
+        return null;
 
       }
 
 
-      // Ancien système
-      if (
-        driver &&
-        typeof driver ===
-        "object"
-      ) {
+      // =================================================
+      // 🚚 LIVREUR RÉEL
+      // =================================================
 
-        return {
+      return {
 
-          id:
-            order?.driverId ||
-            "",
+        id:
+          assigned.id,
 
-          name:
-            driver.name ||
-            "",
+        name:
+          assigned.name || "",
 
-          phone:
-            driver.phone ||
-            driver.telephone ||
-            "",
+        phone:
+          assigned.phone || "",
 
-          photo:
-            driver.photo ||
-            driver.image ||
-            "",
+        photo:
+          assigned.photo || "",
 
-          vehicle:
-            driver.vehicle ||
-            "",
+        vehicle:
+          assigned.vehicle || "",
 
-          plate:
-            driver.plate ||
-            driver.licensePlate ||
-            "",
+        plate:
+          assigned.plate || "",
 
-        };
-
-      }
-
-
-      // Dernier fallback
-      if (
-        order?.driverId ||
-        order?.driverName ||
-        order?.driverPhone
-      ) {
-
-        return {
-
-          id:
-            order.driverId ||
-            "",
-
-          name:
-            order.driverName ||
-            "",
-
-          phone:
-            order.driverPhone ||
-            "",
-
-          photo:
-            order.driverPhoto ||
-            "",
-
-          vehicle:
-            order.driverVehicle ||
-            "",
-
-          plate:
-            order.driverPlate ||
-            "",
-
-        };
-
-      }
-
-
-      return null;
+      };
 
     }, [
-      order,
+      order?.assignedDriver,
     ]);
 
 
@@ -1031,15 +989,8 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 🔐 QR — IMPORTANT
+  // 🔐 QR
   // ====================================================
-
-  /*
-   * Aucun faux QR.
-   *
-   * Le QR doit obligatoirement
-   * venir du backend.
-   */
 
   const qrValue =
     order?.deliveryQrToken ||

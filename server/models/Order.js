@@ -1,12 +1,10 @@
 const mongoose = require("mongoose");
 
-
 // ======================================================
 // 📦 ORDER SCHEMA — KONAN SHOPPING
 // ======================================================
 
 const OrderSchema = new mongoose.Schema({
-
 
   // ====================================================
   // 👤 CLIENT
@@ -15,6 +13,7 @@ const OrderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    default: null,
   },
 
   customerName: {
@@ -53,7 +52,6 @@ const OrderSchema = new mongoose.Schema({
   // ====================================================
 
   items: [
-
     {
 
       productId: {
@@ -82,7 +80,6 @@ const OrderSchema = new mongoose.Schema({
       },
 
     },
-
   ],
 
 
@@ -97,12 +94,36 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // 💳 MODE DE PAIEMENT
+  // 💳 PAIEMENT
   // ====================================================
 
   paymentMethod: {
     type: String,
     default: "Paiement à la livraison",
+  },
+
+
+  // ====================================================
+  // 📍 POSITION DU CLIENT
+  // ====================================================
+  //
+  // Cette position sert à afficher la destination
+  // du client sur la carte.
+  //
+  // ====================================================
+
+  location: {
+
+    lat: {
+      type: Number,
+      default: null,
+    },
+
+    lng: {
+      type: Number,
+      default: null,
+    },
+
   },
 
 
@@ -114,12 +135,12 @@ const OrderSchema = new mongoose.Schema({
 
     lat: {
       type: Number,
-      default: 4.0511,
+      default: null,
     },
 
     lng: {
       type: Number,
-      default: 9.7679,
+      default: null,
     },
 
     updatedAt: {
@@ -131,7 +152,7 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // 🚚 LIVREUR ASSIGNÉ — NOUVEAU SYSTÈME
+  // 🚚 LIVREUR ASSIGNÉ
   // ====================================================
 
   assignedDriver: {
@@ -171,68 +192,7 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // 🔗 ANCIEN DRIVER ID
-  // ====================================================
-  //
-  // On le conserve pour éviter de casser
-  // les anciennes parties de ton application.
-  //
-  // ====================================================
-
-  driverId: {
-
-    type:
-      mongoose.Schema.Types.ObjectId,
-
-    ref:
-      "Driver",
-
-    default:
-      null,
-
-  },
-
-
-  // ====================================================
-  // 🚚 ANCIEN OBJET DRIVER
-  // ====================================================
-  //
-  // Compatibilité avec ton ancien système.
-  //
-  // ====================================================
-
-  driver: {
-
-    name: {
-      type: String,
-      default: "",
-    },
-
-    phone: {
-      type: String,
-      default: "",
-    },
-
-    photo: {
-      type: String,
-      default: "",
-    },
-
-    vehicle: {
-      type: String,
-      default: "",
-    },
-
-    plate: {
-      type: String,
-      default: "",
-    },
-
-  },
-
-
-  // ====================================================
-  // 🔐 QR UNIQUE DE LA COMMANDE
+  // 🔐 QR UNIQUE
   // ====================================================
 
   deliveryQrToken: {
@@ -262,7 +222,7 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // 🕐 DATE D'ACCEPTATION
+  // 🕐 ACCEPTATION
   // ====================================================
 
   acceptedAt: {
@@ -275,7 +235,7 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // ✅ DATE DE LIVRAISON
+  // ✅ LIVRAISON
   // ====================================================
 
   deliveredAt: {
@@ -301,7 +261,7 @@ const OrderSchema = new mongoose.Schema({
 
 
   // ====================================================
-  // 📅 DATE DE CRÉATION
+  // 📅 CRÉATION
   // ====================================================
 
   createdAt: {
@@ -314,10 +274,6 @@ const OrderSchema = new mongoose.Schema({
 
 });
 
-
-// ======================================================
-// 📤 EXPORT
-// ======================================================
 
 module.exports =
   mongoose.model(
