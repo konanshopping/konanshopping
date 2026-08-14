@@ -33,11 +33,24 @@ export default function OrderDetails() {
 
       .then((res) => {
 
-        console.log(res.data);
+  console.log(
+    "📦 ORDER DETAILS RESPONSE :",
+    res.data
+  );
 
-        setOrder(res.data);
+  const data =
+    res.data?.order ||
+    res.data?.data ||
+    res.data;
 
-      })
+  console.log(
+    "📦 ORDER DETAILS COMMANDE :",
+    data
+  );
+
+  setOrder(data);
+
+})
 
       .catch((err) => {
 
@@ -731,10 +744,10 @@ export default function OrderDetails() {
   {/* BUTTON */}
 
   <button
-    onClick={() =>
-      window.location.href =
-      `/track-order/${order._id}`
-    }
+   onClick={() =>
+  window.location.href =
+  `/track-order/${order._id}`
+}
     style={{
       background:
         "linear-gradient(135deg,#4F46E5,#7C3AED)",

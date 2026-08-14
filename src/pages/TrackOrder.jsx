@@ -36,13 +36,21 @@ import {
   FaQrcode,
   FaCreditCard,
   FaMapMarkerAlt,
+  FaLocationArrow,
+  FaHome,
+  FaInfoCircle,
+  FaBox,
+  FaArrowLeft,
 } from "react-icons/fa";
 
 import L from "leaflet";
 
 import "leaflet/dist/leaflet.css";
 
-import { useParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 import {
   QRCodeSVG,
@@ -55,6 +63,93 @@ import {
 
 const API =
   "https://konanshopping.com";
+
+
+// ======================================================
+// 🧩 NORMALISER ID
+// ======================================================
+
+const normalizeId = (
+  value
+) => {
+
+  if (!value) {
+    return "";
+  }
+
+  if (
+    typeof value === "object" &&
+    value.$oid
+  ) {
+
+    return String(
+      value.$oid
+    );
+
+  }
+
+  return String(
+    value
+  );
+
+};
+
+
+// ======================================================
+// 🖼️ URL IMAGE
+// ======================================================
+
+const getImageUrl = (
+  value
+) => {
+
+  if (!value) {
+    return "";
+  }
+
+  const url =
+    String(
+      value
+    ).trim();
+
+  if (!url) {
+    return "";
+  }
+
+  if (
+    url.startsWith(
+      "https://"
+    )
+  ) {
+
+    return url;
+
+  }
+
+  if (
+    url.startsWith(
+      "http://localhost:5000"
+    )
+  ) {
+
+    return url.replace(
+      "http://localhost:5000",
+      API
+    );
+
+  }
+
+  if (
+    url.startsWith("/")
+  ) {
+
+    return `${API}${url}`;
+
+  }
+
+  return url;
+
+};
 
 
 // ======================================================
@@ -150,7 +245,9 @@ function RecenterMap({
       !position ||
       position.length !== 2
     ) {
+
       return;
+
     }
 
     map.flyTo(
@@ -169,6 +266,7 @@ function RecenterMap({
   ]);
 
   return null;
+
 }
 
 
@@ -230,10 +328,13 @@ function calculateDistance(
     2 *
     Math.atan2(
       Math.sqrt(a),
-      Math.sqrt(1 - a)
+      Math.sqrt(
+        1 - a
+      )
     );
 
   return R * c;
+
 }
 
 
@@ -244,8 +345,47 @@ function calculateDistance(
 export default function TrackOrder() {
 
   const {
-    id,
+    id: routeId,
   } = useParams();
+
+  const navigate =
+    useNavigate();
+
+
+  // ====================================================
+  // 🆔 ID COMMANDE
+  // ====================================================
+
+  const orderId =
+    normalizeId(
+      routeId ||
+      (() => {
+
+        const parts =
+          window.location.pathname
+            .split("/")
+            .filter(Boolean);
+
+        const index =
+          parts.indexOf(
+            "track-order"
+          );
+
+        if (
+          index >= 0 &&
+          parts[index + 1]
+        ) {
+
+          return parts[
+            index + 1
+          ];
+
+        }
+
+        return "";
+
+      })()
+    );
 
 
   // ====================================================
@@ -279,7 +419,7 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // ❌ ERREUR
+  // ❌ ERROR
   // ====================================================
 
   const [
@@ -289,7 +429,7 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 📡 GPS
+  // 📡 GPS ONLINE
   // ====================================================
 
   const [
@@ -298,6 +438,10 @@ export default function TrackOrder() {
   ] = useState(false);
 
 
+  // ====================================================
+  // 🕐 LAST GPS
+  // ====================================================
+
   const [
     lastGpsUpdate,
     setLastGpsUpdate,
@@ -305,26 +449,32 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 📱 RESPONSIVE
+  // 📱 MOBILE
   // ====================================================
 
   const [
     isMobile,
     setIsMobile,
   ] = useState(
+    typeof window !== "undefined" &&
     window.innerWidth < 768
   );
 
 
+  // ====================================================
+  // 📱 RESPONSIVE
+  // ====================================================
+
   useEffect(() => {
 
-    const handleResize = () => {
+    const handleResize =
+      () => {
 
-      setIsMobile(
-        window.innerWidth < 768
-      );
+        setIsMobile(
+          window.innerWidth < 768
+        );
 
-    };
+      };
 
     window.addEventListener(
       "resize",
@@ -354,31 +504,41 @@ export default function TrackOrder() {
     const fetchOrder =
       async () => {
 
-        try {
+        if (
+          !orderId ||
+          orderId === "undefined" ||
+          orderId === "null"
+        ) {
 
-          let response;
+          if (mounted) {
 
-          try {
+            setError(
+              "Identifiant de commande manquant."
+            );
 
-            response =
-              await axios.get(
-                `${API}/api/order/${id}`,
-                {
-                  timeout: 10000,
-                }
-              );
-
-          } catch {
-
-            response =
-              await axios.get(
-                `${API}/order/${id}`,
-                {
-                  timeout: 10000,
-                }
-              );
+            setLoading(
+              false
+            );
 
           }
+
+          return;
+
+        }
+
+        try {
+
+          const response =
+            await axios.get(
+
+              `${API}/api/order/${orderId}`,
+
+              {
+                timeout:
+                  10000,
+              }
+
+            );
 
 
           if (!mounted) {
@@ -387,70 +547,53 @@ export default function TrackOrder() {
 
 
           // =================================================
-          // 📦 NORMALISER LA RÉPONSE
+          // 📦 RÉPONSE BACKEND
           // =================================================
+
+          const raw =
+            response?.data;
 
           const data =
-            response.data?.order ||
-            response.data?.data ||
-            response.data;
+            raw?.order ||
+            raw?.data ||
+            raw;
 
-
-          // =================================================
-          // 🧪 DEBUG
-          // =================================================
 
           console.log(
             "======================================"
           );
 
           console.log(
-            "📡 RÉPONSE COMPLÈTE DU SERVEUR :",
-            response.data
+            "📡 TRACK ORDER"
           );
 
           console.log(
-            "📦 COMMANDE :",
+            "🆔 ORDER ID :",
+            orderId
+          );
+
+          console.log(
+            "📦 ORDER :",
             data
           );
 
           console.log(
-            "🚚 LIVREUR ASSIGNÉ :",
+            "🚚 DRIVER :",
             data?.assignedDriver
           );
 
           console.log(
-            "🆔 ID LIVREUR ASSIGNÉ :",
-            data?.assignedDriver?.id
+            "📍 DRIVER GPS :",
+            data?.driverLocation
           );
 
           console.log(
-            "👤 NOM LIVREUR :",
-            data?.assignedDriver?.name
+            "📍 CLIENT GPS :",
+            data?.location
           );
 
           console.log(
-            "📞 TÉLÉPHONE :",
-            data?.assignedDriver?.phone
-          );
-
-          console.log(
-            "🏍️ VÉHICULE :",
-            data?.assignedDriver?.vehicle
-          );
-
-          console.log(
-            "🔢 PLAQUE :",
-            data?.assignedDriver?.plate
-          );
-
-          console.log(
-            "🔐 QR :",
-            data?.deliveryQrToken
-          );
-
-          console.log(
-            "📊 STATUT :",
+            "📊 STATUS :",
             data?.status
           );
 
@@ -460,18 +603,32 @@ export default function TrackOrder() {
 
 
           if (
-            !data ||
-            !data._id
+            !data
           ) {
 
             throw new Error(
-              "Réponse commande invalide"
+              "Commande introuvable."
             );
 
           }
 
 
-          setOrder(data);
+          const normalizedOrder =
+            {
+
+              ...data,
+
+              _id:
+                data?._id ||
+                data?.id ||
+                orderId,
+
+            };
+
+
+          setOrder(
+            normalizedOrder
+          );
 
           setError("");
 
@@ -481,49 +638,59 @@ export default function TrackOrder() {
           // =================================================
 
           const gps =
-            data?.driverLocation;
+            normalizedOrder
+              ?.driverLocation;
+
+
+          const lat =
+            Number(
+              gps?.lat
+            );
+
+          const lng =
+            Number(
+              gps?.lng
+            );
 
 
           if (
-            gps &&
             Number.isFinite(
-              Number(gps.lat)
+              lat
             ) &&
             Number.isFinite(
-              Number(gps.lng)
+              lng
             )
           ) {
 
             setDriverPosition([
-
-              Number(
-                gps.lat
-              ),
-
-              Number(
-                gps.lng
-              ),
-
+              lat,
+              lng,
             ]);
 
 
             setLastGpsUpdate(
-              gps.updatedAt ||
+              gps?.updatedAt ||
               null
             );
 
 
             if (
-              gps.updatedAt
+              gps?.updatedAt
             ) {
 
-              const age =
-                Date.now() -
+              const updated =
                 new Date(
                   gps.updatedAt
                 ).getTime();
 
+              const age =
+                Date.now() -
+                updated;
+
               setGpsOnline(
+                Number.isFinite(
+                  age
+                ) &&
                 age < 30000
               );
 
@@ -554,17 +721,30 @@ export default function TrackOrder() {
         } catch (err) {
 
           console.error(
-            "❌ TRACK ORDER :",
+            "❌ TRACK ORDER ERROR:",
+            err?.response?.data ||
             err
           );
 
-          if (mounted) {
 
-            setError(
-              "Impossible de récupérer le suivi de cette commande."
-            );
-
+          if (!mounted) {
+            return;
           }
+
+
+          setError(
+
+            err?.response?.data
+              ?.message ||
+
+            err?.response?.data
+              ?.error ||
+
+            err?.message ||
+
+            "Impossible de récupérer le suivi de cette commande."
+
+          );
 
         } finally {
 
@@ -584,65 +764,47 @@ export default function TrackOrder() {
     fetchOrder();
 
 
-    // ===================================================
-    // 🔄 ACTUALISATION
-    // ===================================================
+    // =================================================
+    // 🔄 SYNCHRONISATION GPS
+    // =================================================
 
     const interval =
-      setInterval(
-        fetchOrder,
-        3000
-      );
+      orderId
+        ? setInterval(
+            fetchOrder,
+            3000
+          )
+        : null;
 
 
     return () => {
 
       mounted = false;
 
-      clearInterval(
-        interval
-      );
+      if (interval) {
+
+        clearInterval(
+          interval
+        );
+
+      }
 
     };
 
   }, [
-    id,
+    orderId,
   ]);
 
 
   // ====================================================
-  // 🚚 LIVREUR RÉELLEMENT ASSIGNÉ
-  // ====================================================
-  //
-  // SOURCE UNIQUE DE VÉRITÉ :
-  //
-  // Order.assignedDriver
-  //
-  // Ce livreur est celui qui a réellement
-  // accepté la commande dans DriverTracking.
-  //
-  // Aucun fallback vers :
-  // order.driver
-  // order.driverId
-  // order.driverName
-  // order.driverPhone
-  //
+  // 🚚 LIVREUR
   // ====================================================
 
   const assignedDriver =
     useMemo(() => {
 
-      const assigned =
-        order?.assignedDriver;
-
-
-      // =================================================
-      // ❌ AUCUN LIVREUR
-      // =================================================
-
       if (
-        !assigned ||
-        !assigned.id
+        !order?.assignedDriver
       ) {
 
         return null;
@@ -650,53 +812,74 @@ export default function TrackOrder() {
       }
 
 
-      // =================================================
-      // 🚚 LIVREUR RÉEL
-      // =================================================
+      const assigned =
+        order.assignedDriver;
+
+
+      if (
+        typeof assigned ===
+        "string"
+      ) {
+
+        return {
+
+          id:
+            assigned,
+
+          name:
+            "",
+
+          phone:
+            "",
+
+          photo:
+            "",
+
+          vehicle:
+            "",
+
+          plate:
+            "",
+
+        };
+
+      }
+
 
       return {
 
         id:
-          assigned.id,
+          normalizeId(
+            assigned.id ||
+            assigned._id
+          ),
 
         name:
-          assigned.name || "",
+          assigned.name ||
+          "",
 
         phone:
-          assigned.phone || "",
+          assigned.phone ||
+          "",
 
         photo:
-          assigned.photo || "",
+          getImageUrl(
+            assigned.photo
+          ),
 
         vehicle:
-          assigned.vehicle || "",
+          assigned.vehicle ||
+          "",
 
         plate:
-          assigned.plate || "",
+          assigned.plate ||
+          "",
 
       };
 
     }, [
-      order?.assignedDriver,
+      order,
     ]);
-
-
-  // ====================================================
-  // 📸 PHOTO
-  // ====================================================
-
-  const driverPhoto =
-    assignedDriver?.photo ||
-    "";
-
-
-  // ====================================================
-  // 📞 TÉLÉPHONE
-  // ====================================================
-
-  const driverPhone =
-    assignedDriver?.phone ||
-    "";
 
 
   // ====================================================
@@ -730,10 +913,10 @@ export default function TrackOrder() {
       }
 
 
-      return [
-        4.0511,
-        9.7679,
-      ];
+      // IMPORTANT :
+      // aucune position fictive.
+
+      return null;
 
     }, [
       order,
@@ -741,93 +924,49 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 📏 DISTANCE
+  // 📏 DISTANCE RÉELLE
   // ====================================================
 
   const realDistance =
     useMemo(() => {
 
       if (
-        !driverPosition
+        !driverPosition ||
+        !customerPosition
       ) {
 
         return null;
 
       }
 
+
       return calculateDistance(
 
         driverPosition[0],
-
         driverPosition[1],
 
         customerPosition[0],
-
         customerPosition[1]
 
       );
 
     }, [
-
       driverPosition,
-
       customerPosition,
-
     ]);
 
 
   // ====================================================
-  // 🏍️ VITESSE
+  // 🏍️ VITESSE RÉELLE
   // ====================================================
 
   const liveSpeed =
-    useMemo(() => {
-
-      if (
-        realDistance === null
-      ) {
-
-        return 0;
-
-      }
-
-      if (
-        realDistance > 8
-      ) {
-
-        return 55;
-
-      }
-
-      if (
-        realDistance > 5
-      ) {
-
-        return 45;
-
-      }
-
-      if (
-        realDistance > 2
-      ) {
-
-        return 35;
-
-      }
-
-      if (
-        realDistance > 1
-      ) {
-
-        return 25;
-
-      }
-
-      return 12;
-
-    }, [
-      realDistance,
-    ]);
+    Number(
+      order?.driverLocation?.speed ??
+      order?.driverLocation?.speedKmh ??
+      order?.driverSpeed ??
+      0
+    );
 
 
   // ====================================================
@@ -845,6 +984,7 @@ export default function TrackOrder() {
 
       }
 
+
       if (
         realDistance <= 0.05
       ) {
@@ -852,6 +992,17 @@ export default function TrackOrder() {
         return "Arrivé";
 
       }
+
+
+      if (
+        !liveSpeed ||
+        liveSpeed <= 0
+      ) {
+
+        return "--";
+
+      }
+
 
       const minutes =
         Math.round(
@@ -886,11 +1037,8 @@ export default function TrackOrder() {
       ).toFixed(1)} h`;
 
     }, [
-
       realDistance,
-
       liveSpeed,
-
     ]);
 
 
@@ -919,21 +1067,13 @@ export default function TrackOrder() {
 
       }
 
-      const maxDistance =
-        10;
 
       return Math.min(
-        100,
+        95,
         Math.max(
-          0,
-          (
-            (
-              maxDistance -
-              realDistance
-            ) /
-            maxDistance
-          ) *
-          100
+          5,
+          100 -
+          realDistance * 8
         )
       );
 
@@ -943,7 +1083,38 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 💰 TOTAL PRODUITS
+  // 🕐 GPS TIME
+  // ====================================================
+
+  const gpsTime =
+    lastGpsUpdate
+      ? new Date(
+          lastGpsUpdate
+        ).toLocaleTimeString(
+          "fr-FR",
+          {
+            hour:
+              "2-digit",
+            minute:
+              "2-digit",
+            second:
+              "2-digit",
+          }
+        )
+      : null;
+
+
+  // ====================================================
+  // 🔐 QR
+  // ====================================================
+
+  const qrToken =
+    order?.deliveryQrToken ||
+    "";
+
+
+  // ====================================================
+  // 💰 PRODUITS TOTAL
   // ====================================================
 
   const productsTotal =
@@ -958,6 +1129,7 @@ export default function TrackOrder() {
         return 0;
 
       }
+
 
       return order.items.reduce(
         (
@@ -989,15 +1161,6 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 🔐 QR
-  // ====================================================
-
-  const qrValue =
-    order?.deliveryQrToken ||
-    "";
-
-
-  // ====================================================
   // 📋 RÉFÉRENCE
   // ====================================================
 
@@ -1005,21 +1168,14 @@ export default function TrackOrder() {
     order?._id
       ? `KS-${String(
           order._id
-        ).slice(-8).toUpperCase()}`
+        ).slice(
+          -8
+        ).toUpperCase()}`
       : "KS";
 
 
   // ====================================================
-  // 💳 PAIEMENT
-  // ====================================================
-
-  const paymentMethod =
-    order?.paymentMethod ||
-    "Paiement à la livraison";
-
-
-  // ====================================================
-  // 📊 STATUT
+  // 📊 STATUS
   // ====================================================
 
   const statusInfo =
@@ -1033,14 +1189,17 @@ export default function TrackOrder() {
 
           return {
 
-            label:
-              "Livrée",
-
             color:
               "#16A34A",
 
             bg:
               "#DCFCE7",
+
+            icon:
+              <FaCheckCircle />,
+
+            label:
+              "Commande livrée",
 
           };
 
@@ -1049,14 +1208,17 @@ export default function TrackOrder() {
 
           return {
 
-            label:
-              "En livraison",
-
             color:
               "#2563EB",
 
             bg:
               "#DBEAFE",
+
+            icon:
+              <FaTruck />,
+
+            label:
+              "En livraison",
 
           };
 
@@ -1065,14 +1227,17 @@ export default function TrackOrder() {
 
           return {
 
-            label:
-              "Préparation",
-
             color:
               "#D97706",
 
             bg:
               "#FEF3C7",
+
+            icon:
+              <FaBox />,
+
+            label:
+              "Préparation",
 
           };
 
@@ -1081,30 +1246,17 @@ export default function TrackOrder() {
 
           return {
 
-            label:
-              "Confirmée",
-
             color:
               "#7C3AED",
 
             bg:
               "#EDE9FE",
 
-          };
-
-
-        case "Annulée":
-
-          return {
+            icon:
+              <FaCheckCircle />,
 
             label:
-              "Annulée",
-
-            color:
-              "#DC2626",
-
-            bg:
-              "#FEE2E2",
+              "Commande confirmée",
 
           };
 
@@ -1113,15 +1265,17 @@ export default function TrackOrder() {
 
           return {
 
-            label:
-              order?.status ||
-              "En attente",
-
             color:
               "#64748B",
 
             bg:
               "#F1F5F9",
+
+            icon:
+              <FaClock />,
+
+            label:
+              "Commande en attente",
 
           };
 
@@ -1133,37 +1287,6 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 📡 GPS STATUS
-  // ====================================================
-
-  const gpsStatus =
-    order?.status !==
-    "En livraison"
-
-      ? "GPS en attente"
-
-      : gpsOnline
-
-        ? "GPS en direct"
-
-        : "GPS hors ligne";
-
-
-  // ====================================================
-  // 🕐 DERNIÈRE POSITION
-  // ====================================================
-
-  const gpsTime =
-    lastGpsUpdate
-      ? new Date(
-          lastGpsUpdate
-        ).toLocaleTimeString(
-          "fr-FR"
-        )
-      : "";
-
-
-  // ====================================================
   // ⏳ LOADING
   // ====================================================
 
@@ -1172,65 +1295,112 @@ export default function TrackOrder() {
     return (
 
       <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: "15px",
-          background: "#F8FAFC",
-          padding: "20px",
-          fontFamily:
-            "'Inter',sans-serif",
-        }}
+        className="track-loading"
       >
 
         <div
-          style={{
-            width: "65px",
-            height: "65px",
-            borderRadius: "20px",
-            background:
-              "linear-gradient(135deg,#2563EB,#1D4ED8)",
-            color: "#FFFFFF",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "27px",
-            boxShadow:
-              "0 15px 35px rgba(37,99,235,.25)",
-          }}
+          className="loading-card"
         >
 
-          <FaTruck />
+          <div
+            className="loading-logo"
+          >
+
+            <FaTruck />
+
+          </div>
+
+          <h2>
+            Suivi de votre commande
+          </h2>
+
+          <p>
+            Récupération des informations...
+          </p>
+
+          <div
+            className="loader"
+          />
 
         </div>
 
+        <style>{`
 
-        <strong
-          style={{
-            color: "#0F172A",
-            fontSize: "17px",
-            textAlign: "center",
-          }}
-        >
+          .track-loading {
+            min-height:100vh;
+            width:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:
+              linear-gradient(
+                180deg,
+                #eff6ff,
+                #ffffff
+              );
+            padding:20px;
+            font-family:
+              Inter,
+              system-ui,
+              sans-serif;
+          }
 
-          Chargement du suivi...
+          .loading-card {
+            width:100%;
+            max-width:420px;
+            background:#fff;
+            border-radius:24px;
+            padding:35px 25px;
+            text-align:center;
+            box-shadow:
+              0 20px 60px
+              rgba(15,23,42,.10);
+          }
 
-        </strong>
+          .loading-logo {
+            width:70px;
+            height:70px;
+            margin:auto;
+            border-radius:20px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#2563EB;
+            color:white;
+            font-size:28px;
+          }
 
+          .loading-card h2 {
+            margin:
+              20px 0 8px;
+            color:#0F172A;
+            font-size:20px;
+          }
 
-        <span
-          style={{
-            color: "#64748B",
-            fontSize: "12px",
-          }}
-        >
+          .loading-card p {
+            margin:0;
+            color:#64748B;
+            font-size:13px;
+          }
 
-          📡 Connexion au suivi en direct
+          .loader {
+            width:34px;
+            height:34px;
+            border:3px solid #DBEAFE;
+            border-top-color:#2563EB;
+            border-radius:50%;
+            margin:25px auto 0;
+            animation:
+              trackSpin .8s linear infinite;
+          }
 
-        </span>
+          @keyframes trackSpin {
+            to {
+              transform:rotate(360deg);
+            }
+          }
+
+        `}</style>
 
       </div>
 
@@ -1251,69 +1421,107 @@ export default function TrackOrder() {
     return (
 
       <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "20px",
-          background: "#F8FAFC",
-          fontFamily:
-            "'Inter',sans-serif",
-        }}
+        className="track-error"
       >
 
         <div
-          style={{
-            width: "100%",
-            maxWidth: "430px",
-            background: "#FFFFFF",
-            borderRadius: "24px",
-            padding: "30px 22px",
-            textAlign: "center",
-            border:
-              "1px solid #E2E8F0",
-            boxShadow:
-              "0 15px 40px rgba(15,23,42,.08)",
-          }}
+          className="error-card"
         >
 
-          <FaTimesCircle
-            style={{
-              color: "#EF4444",
-              fontSize: "46px",
-              marginBottom: "15px",
-            }}
-          />
-
-
-          <h2
-            style={{
-              margin: 0,
-              color: "#0F172A",
-              fontSize: "20px",
-            }}
+          <div
+            className="error-icon"
           >
 
-            Suivi indisponible
+            <FaTimesCircle />
 
+          </div>
+
+          <h2>
+            Impossible de suivre la commande
           </h2>
 
-
-          <p
-            style={{
-              color: "#64748B",
-              lineHeight: 1.6,
-              fontSize: "13px",
-            }}
-          >
-
+          <p>
             {error ||
               "Commande introuvable."}
-
           </p>
 
+          <button
+            onClick={() =>
+              navigate(-1)
+            }
+          >
+
+            <FaArrowLeft />
+
+            Retour
+
+          </button>
+
         </div>
+
+        <style>{`
+
+          .track-error {
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            background:#F8FAFC;
+            font-family:
+              Inter,
+              system-ui,
+              sans-serif;
+          }
+
+          .error-card {
+            width:100%;
+            max-width:440px;
+            background:white;
+            border-radius:24px;
+            padding:30px 22px;
+            text-align:center;
+            box-shadow:
+              0 20px 50px
+              rgba(15,23,42,.08);
+          }
+
+          .error-icon {
+            width:65px;
+            height:65px;
+            margin:auto;
+            border-radius:50%;
+            background:#FEE2E2;
+            color:#DC2626;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:28px;
+          }
+
+          .error-card h2 {
+            color:#0F172A;
+            font-size:19px;
+            margin:18px 0 8px;
+          }
+
+          .error-card p {
+            color:#64748B;
+            font-size:13px;
+            line-height:1.6;
+          }
+
+          .error-card button {
+            border:none;
+            background:#2563EB;
+            color:white;
+            padding:13px 20px;
+            border-radius:12px;
+            font-weight:800;
+            cursor:pointer;
+          }
+
+        `}</style>
 
       </div>
 
@@ -1323,146 +1531,69 @@ export default function TrackOrder() {
 
 
   // ====================================================
-  // 🖥️ PAGE PRINCIPALE
+  // 🚚 PHOTO / PHONE
+  // ====================================================
+
+  const driverPhoto =
+    assignedDriver?.photo ||
+    "";
+
+  const driverPhone =
+    assignedDriver?.phone ||
+    "";
+
+
+  // ====================================================
+  // RENDER
   // ====================================================
 
   return (
 
     <div
-      style={{
-        minHeight: "100vh",
-        width: "100%",
-        maxWidth: "100vw",
-        overflowX: "hidden",
-        background:
-          "linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%)",
-        padding:
-          isMobile
-            ? "10px"
-            : "22px",
-        boxSizing: "border-box",
-        fontFamily:
-          "'Inter',sans-serif",
-      }}
+      className="track-order-page"
     >
-
 
       {/* =================================================
           HEADER
       ================================================= */}
 
-      <section
-        style={{
-          background: "#FFFFFF",
-          border:
-            "1px solid #E2E8F0",
-          borderRadius:
-            isMobile
-              ? "18px"
-              : "24px",
-          padding:
-            isMobile
-              ? "13px"
-              : "18px",
-          marginBottom: "12px",
-          boxShadow:
-            "0 8px 25px rgba(15,23,42,.05)",
-          display: "flex",
-          justifyContent:
-            "space-between",
-          alignItems: "center",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
+      <header
+        className="track-header"
       >
 
+        <button
+          className="back-button"
+          onClick={() =>
+            navigate(-1)
+          }
+        >
+
+          <FaArrowLeft />
+
+        </button>
+
+
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            minWidth: 0,
-            flex: 1,
-          }}
+          className="header-title"
         >
 
           <div
-            style={{
-              width:
-                isMobile
-                  ? "46px"
-                  : "56px",
-              height:
-                isMobile
-                  ? "46px"
-                  : "56px",
-              flexShrink: 0,
-              borderRadius: "15px",
-              background:
-                "linear-gradient(135deg,#2563EB,#1D4ED8)",
-              color: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize:
-                isMobile
-                  ? "19px"
-                  : "23px",
-            }}
+            className="header-icon"
           >
 
             <FaTruck />
 
           </div>
 
+          <div>
 
-          <div
-            style={{
-              minWidth: 0,
-            }}
-          >
+            <strong>
+              Suivi de commande
+            </strong>
 
-            <h1
-              style={{
-                margin: 0,
-                color: "#0F172A",
-                fontSize:
-                  isMobile
-                    ? "17px"
-                    : "22px",
-                fontWeight: 900,
-              }}
-            >
-
-              Suivi de livraison
-
-            </h1>
-
-
-            <div
-              style={{
-                marginTop: "3px",
-                color: "#64748B",
-                fontSize:
-                  isMobile
-                    ? "10px"
-                    : "12px",
-              }}
-            >
-
-              📦 Commande{" "}
-
-              <strong
-                style={{
-                  color: "#2563EB",
-                }}
-              >
-
-                {orderReference}
-
-              </strong>
-
-            </div>
+            <span>
+              {orderReference}
+            </span>
 
           </div>
 
@@ -1470,34 +1601,169 @@ export default function TrackOrder() {
 
 
         <div
+          className="header-status"
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
             background:
               statusInfo.bg,
             color:
               statusInfo.color,
-            padding:
-              "8px 11px",
-            borderRadius:
-              "999px",
-            fontSize:
-              isMobile
-                ? "9px"
-                : "11px",
-            fontWeight: 900,
-            whiteSpace: "nowrap",
           }}
         >
 
-          <FaCircle
-            style={{
-              fontSize: "6px",
-            }}
-          />
+          {statusInfo.icon}
 
-          {statusInfo.label}
+        </div>
+
+      </header>
+
+
+      {/* =================================================
+          STATUS
+      ================================================= */}
+
+      <section
+        className="status-card"
+      >
+
+        <div
+          className="status-top"
+        >
+
+          <div
+            className="status-icon"
+            style={{
+              background:
+                statusInfo.bg,
+              color:
+                statusInfo.color,
+            }}
+          >
+
+            {statusInfo.icon}
+
+          </div>
+
+          <div>
+
+            <span>
+              ÉTAT DE LA COMMANDE
+            </span>
+
+            <h1
+              style={{
+                color:
+                  statusInfo.color,
+              }}
+            >
+              {statusInfo.label}
+            </h1>
+
+          </div>
+
+        </div>
+
+
+        <div
+          className="progress-wrapper"
+        >
+
+          <div
+            className="progress-line"
+          >
+
+            <div
+              className="progress-fill"
+              style={{
+                width:
+                  `${
+                    order.status ===
+                    "Livrée"
+                      ? 100
+                      : progress
+                  }%`,
+              }}
+            />
+
+          </div>
+
+
+          <div
+            className="progress-points"
+          >
+
+            <div
+              className={
+                "point active"
+              }
+            >
+              <FaCheckCircle />
+              <span>
+                Commandée
+              </span>
+            </div>
+
+            <div
+              className={
+                [
+                  "point",
+                  [
+                    "Confirmée",
+                    "Préparation",
+                    "En livraison",
+                    "Livrée",
+                  ].includes(
+                    order.status
+                  )
+                    ? "active"
+                    : "",
+                ].join(" ")
+              }
+            >
+              <FaBox />
+              <span>
+                Préparation
+              </span>
+            </div>
+
+            <div
+              className={
+                [
+                  "point",
+                  [
+                    "En livraison",
+                    "Livrée",
+                  ].includes(
+                    order.status
+                  )
+                    ? "active"
+                    : "",
+                ].join(" ")
+              }
+            >
+              <FaTruck />
+              <span>
+                Livraison
+              </span>
+            </div>
+
+            <div
+              className={
+                [
+                  "point",
+                  order.status ===
+                  "Livrée"
+                    ? "active"
+                    : "",
+                ].join(" ")
+              }
+            >
+              <FaCheckCircle />
+              <span>
+                Livrée
+              </span>
+            </div>
+
+          </div>
 
         </div>
 
@@ -1505,1970 +1771,3053 @@ export default function TrackOrder() {
 
 
       {/* =================================================
-          INFORMATIONS COMMANDE
+          CONTENU
       ================================================= */}
 
-      <section
-        style={{
-          background: "#FFFFFF",
-          border:
-            "1px solid #E2E8F0",
-          borderRadius:
-            isMobile
-              ? "20px"
-              : "24px",
-          padding:
-            isMobile
-              ? "14px"
-              : "20px",
-          marginBottom: "12px",
-          boxShadow:
-            "0 8px 25px rgba(15,23,42,.05)",
-        }}
+      <main
+        className="track-content"
       >
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "14px",
-          }}
+        {/* =================================================
+            MAP
+        ================================================= */}
+
+        <section
+          className="map-card"
         >
 
           <div
-            style={{
-              width: "42px",
-              height: "42px",
-              borderRadius: "13px",
-              background: "#EFF6FF",
-              color: "#2563EB",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="map-header"
           >
 
-            <FaShoppingBag />
+            <div>
+
+              <strong>
+                <FaMap />
+                {" "}
+                Suivi GPS
+              </strong>
+
+              <span>
+
+                {gpsOnline
+                  ? "Position du livreur en direct"
+                  : "Position GPS en attente"}
+
+              </span>
+
+            </div>
+
+
+            <div
+              className={
+                gpsOnline
+                  ? "gps-badge online"
+                  : "gps-badge"
+              }
+            >
+
+              <FaCircle />
+
+              {gpsOnline
+                ? " EN DIRECT"
+                : " HORS LIGNE"}
+
+            </div>
+
+          </div>
+
+
+          <div
+            className="map-container"
+          >
+
+            {(driverPosition ||
+              customerPosition) ? (
+
+              <MapContainer
+                center={
+                  driverPosition ||
+                  customerPosition
+                }
+                zoom={
+                  isMobile
+                    ? 15
+                    : 14
+                }
+                scrollWheelZoom={
+                  true
+                }
+                zoomControl={false}
+                style={{
+                  width:
+                    "100%",
+                  height:
+                    "100%",
+                }}
+              >
+
+                <TileLayer
+                  attribution="&copy; OpenStreetMap contributors"
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+
+                <ZoomControl
+                  position="bottomright"
+                />
+
+
+                <RecenterMap
+                  position={
+                    driverPosition ||
+                    customerPosition
+                  }
+                />
+
+
+                {/* =========================================
+                    TRAJET
+                ========================================= */}
+
+                {driverPosition &&
+                  customerPosition && (
+
+                  <>
+
+                    <Polyline
+                      positions={[
+                        driverPosition,
+                        customerPosition,
+                      ]}
+                      pathOptions={{
+                        color:
+                          "#60A5FA",
+                        weight:
+                          isMobile
+                            ? 10
+                            : 17,
+                        opacity:
+                          0.20,
+                        lineCap:
+                          "round",
+                      }}
+                    />
+
+                    <Polyline
+                      positions={[
+                        driverPosition,
+                        customerPosition,
+                      ]}
+                      pathOptions={{
+                        color:
+                          "#2563EB",
+                        weight:
+                          isMobile
+                            ? 4
+                            : 6,
+                        opacity:
+                          1,
+                        lineCap:
+                          "round",
+                      }}
+                    />
+
+                    <Circle
+                      center={
+                        driverPosition
+                      }
+                      radius={
+                        isMobile
+                          ? 100
+                          : 160
+                      }
+                      pathOptions={{
+                        color:
+                          "#2563EB",
+                        fillColor:
+                          "#2563EB",
+                        fillOpacity:
+                          0.10,
+                        weight:
+                          2,
+                      }}
+                    />
+
+                  </>
+
+                )}
+
+
+                {/* =========================================
+                    LIVREUR
+                ========================================= */}
+
+                {driverPosition && (
+
+                  <Marker
+                    position={
+                      driverPosition
+                    }
+                    icon={
+                      driverIcon
+                    }
+                  >
+
+                    <Popup>
+
+                      <div
+                        className="driver-popup"
+                      >
+
+                        {driverPhoto ? (
+
+                          <img
+                            src={
+                              driverPhoto
+                            }
+                            alt="Livreur"
+                            onError={(
+                              event
+                            ) => {
+
+                              event.currentTarget.style.display =
+                                "none";
+
+                            }}
+                          />
+
+                        ) : (
+
+                          <div
+                            className="popup-avatar"
+                          >
+
+                            <FaUser />
+
+                          </div>
+
+                        )}
+
+
+                        <div>
+
+                          <strong>
+                            {assignedDriver?.name ||
+                              "Livreur"}
+                          </strong>
+
+                          <span>
+                            <FaCheckCircle />
+                            {" "}
+                            {gpsOnline
+                              ? "Position active"
+                              : "Position en attente"}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    </Popup>
+
+                  </Marker>
+
+                )}
+
+
+                {/* =========================================
+                    CLIENT
+                ========================================= */}
+
+                {customerPosition && (
+
+                  <Marker
+                    position={
+                      customerPosition
+                    }
+                    icon={
+                      customerIcon
+                    }
+                  >
+
+                    <Popup>
+
+                      <strong>
+                        📍 Adresse de livraison
+                      </strong>
+
+                      <div
+                        style={{
+                          marginTop:
+                            "6px",
+                          fontSize:
+                            "12px",
+                        }}
+                      >
+
+                        {order.address ||
+                          order.district ||
+                          order.city ||
+                          "Adresse client"}
+
+                      </div>
+
+                    </Popup>
+
+                  </Marker>
+
+                )}
+
+              </MapContainer>
+
+            ) : (
+
+              <div
+                className="no-gps"
+              >
+
+                <FaMapMarkerAlt />
+
+                <strong>
+                  Position GPS indisponible
+                </strong>
+
+                <span>
+                  La position apparaîtra dès que
+                  le livreur commencera à transmettre
+                  sa localisation.
+                </span>
+
+              </div>
+
+            )}
+
+          </div>
+
+        </section>
+
+
+        {/* =================================================
+            INFORMATIONS LIVRAISON
+        ================================================= */}
+
+        <section
+          className="metrics-grid"
+        >
+
+          <InfoBox
+            icon={
+              <FaRoute />
+            }
+            label="DISTANCE"
+            value={
+              distanceText
+            }
+          />
+
+          <InfoBox
+            icon={
+              <FaClock />
+            }
+            label="TEMPS ESTIMÉ"
+            value={
+              estimatedTime
+            }
+          />
+
+          <InfoBox
+            icon={
+              <FaSignal />
+            }
+            label="GPS"
+            value={
+              gpsOnline
+                ? "En direct"
+                : "En attente"
+            }
+          />
+
+          <InfoBox
+            icon={
+              <FaChartLine />
+            }
+            label="VITESSE"
+            value={
+              liveSpeed > 0
+                ? `${liveSpeed} km/h`
+                : "--"
+            }
+          />
+
+        </section>
+
+
+        {/* =================================================
+            LIVREUR
+        ================================================= */}
+
+        {assignedDriver ? (
+
+          <section
+            className="driver-card"
+          >
+
+            <div
+              className="driver-card-header"
+            >
+
+              <div>
+
+                <span>
+                  VOTRE LIVREUR
+                </span>
+
+                <h2>
+                  <FaMotorcycle />
+                  {" "}
+                  Livreur assigné
+                </h2>
+
+              </div>
+
+
+              <div
+                className="driver-live"
+              >
+
+                <FaCircle />
+
+                ACTIF
+
+              </div>
+
+            </div>
+
+
+            <div
+              className="driver-main"
+            >
+
+              <div
+                className="driver-photo"
+              >
+
+                {driverPhoto ? (
+
+                  <img
+                    src={
+                      driverPhoto
+                    }
+                    alt={
+                      assignedDriver.name ||
+                      "Livreur"
+                    }
+                    onError={(
+                      event
+                    ) => {
+
+                      event.currentTarget.style.display =
+                        "none";
+
+                    }}
+                  />
+
+                ) : (
+
+                  <FaUser />
+
+                )}
+
+              </div>
+
+
+              <div
+                className="driver-info"
+              >
+
+                <h3>
+                  {assignedDriver.name ||
+                    "Livreur Konan Shopping"}
+                </h3>
+
+                <p>
+                  <FaMotorcycle />
+                  {" "}
+                  {assignedDriver.vehicle ||
+                    "Véhicule non renseigné"}
+                </p>
+
+                {assignedDriver.plate && (
+
+                  <p>
+                    <FaShieldAlt />
+                    {" "}
+                    Plaque :
+                    {" "}
+                    {assignedDriver.plate}
+                  </p>
+
+                )}
+
+              </div>
+
+            </div>
+
+
+            {driverPhone && (
+
+              <a
+                className="call-driver"
+                href={`tel:${driverPhone}`}
+              >
+
+                <FaPhoneAlt />
+
+                Appeler le livreur
+
+              </a>
+
+            )}
+
+          </section>
+
+        ) : (
+
+          <section
+            className="no-driver-card"
+          >
+
+            <div>
+              <FaBoxOpen />
+            </div>
+
+            <div>
+
+              <strong>
+                Aucun livreur assigné
+              </strong>
+
+              <p>
+                Le premier livreur disponible
+                qui acceptera la commande sera
+                automatiquement affiché ici.
+              </p>
+
+            </div>
+
+          </section>
+
+        )}
+
+
+        {/* =================================================
+            COMMANDE
+        ================================================= */}
+
+        <section
+          className="order-card"
+        >
+
+          <div
+            className="section-title"
+          >
+
+            <div>
+              <FaShoppingBag />
+            </div>
+
+            <div>
+
+              <span>
+                VOTRE COMMANDE
+              </span>
+
+              <h2>
+                {orderReference}
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div
+            className="products-list"
+          >
+
+            {Array.isArray(
+              order.items
+            ) &&
+              order.items.map(
+                (
+                  item,
+                  index
+                ) => (
+
+                  <div
+                    className="product-row"
+                    key={
+                      item.productId ||
+                      item._id ||
+                      index
+                    }
+                  >
+
+                    <div
+                      className="product-image"
+                    >
+
+                      {item.image ? (
+
+                        <img
+                          src={
+                            getImageUrl(
+                              item.image
+                            )
+                          }
+                          alt={
+                            item.name ||
+                            "Produit"
+                          }
+                        />
+
+                      ) : (
+
+                        <FaBox />
+
+                      )}
+
+                    </div>
+
+
+                    <div
+                      className="product-info"
+                    >
+
+                      <strong>
+                        {item.name ||
+                          "Produit"}
+                      </strong>
+
+                      <span>
+                        Quantité :
+                        {" "}
+                        x{
+                          item.quantity ||
+                          1
+                        }
+                      </span>
+
+                    </div>
+
+
+                    <strong
+                      className="product-price"
+                    >
+
+                      {Number(
+                        item.price ||
+                        0
+                      ).toLocaleString(
+                        "fr-FR"
+                      )}
+                      {" "}
+                      FCFA
+
+                    </strong>
+
+                  </div>
+
+                )
+              )}
+
+          </div>
+
+
+          <div
+            className="total-row"
+          >
+
+            <div>
+
+              <span>
+                Sous-total produits
+              </span>
+
+              <strong>
+                {productsTotal.toLocaleString(
+                  "fr-FR"
+                )}
+                {" "}
+                FCFA
+              </strong>
+
+            </div>
+
+
+            <div>
+
+              <span>
+                Livraison
+              </span>
+
+              <strong>
+                {Number(
+                  order.shipping ||
+                  0
+                ).toLocaleString(
+                  "fr-FR"
+                )}
+                {" "}
+                FCFA
+              </strong>
+
+            </div>
+
+
+            <div
+              className="grand-total"
+            >
+
+              <span>
+                TOTAL
+              </span>
+
+              <strong>
+                {Number(
+                  order.total ||
+                  0
+                ).toLocaleString(
+                  "fr-FR"
+                )}
+                {" "}
+                FCFA
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div
+            className="payment-info"
+          >
+
+            <FaCreditCard />
+
+            <span>
+              Paiement :
+            </span>
+
+            <strong>
+              {order.paymentMethod ||
+                "Paiement à la livraison"}
+            </strong>
+
+          </div>
+
+        </section>
+
+
+        {/* =================================================
+            ADRESSE
+        ================================================= */}
+
+        <section
+          className="address-card"
+        >
+
+          <div
+            className="address-icon"
+          >
+
+            <FaHome />
 
           </div>
 
 
           <div>
 
-            <h2
-              style={{
-                margin: 0,
-                color: "#0F172A",
-                fontSize:
-                  isMobile
-                    ? "17px"
-                    : "20px",
-                fontWeight: 900,
-              }}
+            <span>
+              ADRESSE DE LIVRAISON
+            </span>
+
+            <strong>
+              {order.address ||
+                "Adresse non renseignée"}
+            </strong>
+
+            <p>
+
+              {order.district &&
+                `${order.district}, `}
+
+              {order.city ||
+                ""}
+
+            </p>
+
+          </div>
+
+        </section>
+
+
+        {/* =================================================
+            QR CODE
+        ================================================= */}
+
+        {qrToken &&
+          order.status ===
+          "En livraison" && (
+
+          <section
+            className="qr-card"
+          >
+
+            <div
+              className="qr-icon"
             >
 
-              📦 Votre commande
+              <FaQrcode />
 
+            </div>
+
+
+            <h2>
+              QR de livraison
             </h2>
 
 
-            <span
-              style={{
-                color: "#64748B",
-                fontSize: "10px",
-              }}
-            >
+            <p>
 
-              {order.items?.length || 0}
-              {" "}article(s)
+              Présentez ce code au livreur
+              lors de la réception.
 
-            </span>
+            </p>
 
-          </div>
-
-        </div>
-
-
-        {(order.items || []).map(
-          (
-            item,
-            index
-          ) => (
 
             <div
-              key={
-                item.productId ||
-                item._id ||
-                index
-              }
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                padding: "9px",
-                marginBottom: "7px",
-                background: "#F8FAFC",
-                border:
-                  "1px solid #E2E8F0",
-                borderRadius: "14px",
-              }}
+              className="qr-wrapper"
             >
 
-              <img
-                src={
-                  item.image ||
-                  "/logo.jpg"
+              <QRCodeSVG
+                value={
+                  qrToken
                 }
-                alt={
-                  item.name ||
-                  "Produit"
+                size={
+                  isMobile
+                    ? 190
+                    : 230
                 }
-                style={{
-                  width:
-                    isMobile
-                      ? "50px"
-                      : "62px",
-                  height:
-                    isMobile
-                      ? "50px"
-                      : "62px",
-                  borderRadius: "11px",
-                  objectFit: "cover",
-                  flexShrink: 0,
-                }}
-                onError={(e) => {
-
-                  e.currentTarget.src =
-                    "/logo.jpg";
-
-                }}
+                level="H"
               />
-
-
-              <div
-                style={{
-                  flex: 1,
-                  minWidth: 0,
-                }}
-              >
-
-                <strong
-                  style={{
-                    display: "block",
-                    color: "#0F172A",
-                    fontSize:
-                      isMobile
-                        ? "12px"
-                        : "14px",
-                    overflow: "hidden",
-                    textOverflow:
-                      "ellipsis",
-                    whiteSpace:
-                      "nowrap",
-                  }}
-                >
-
-                  {item.name}
-
-                </strong>
-
-
-                <span
-                  style={{
-                    color: "#64748B",
-                    fontSize: "10px",
-                  }}
-                >
-
-                  📦 Quantité :
-                  {" "}
-                  {item.quantity}
-
-                </span>
-
-              </div>
-
-
-              <strong
-                style={{
-                  color: "#0F172A",
-                  fontSize:
-                    isMobile
-                      ? "11px"
-                      : "14px",
-                  whiteSpace:
-                    "nowrap",
-                }}
-              >
-
-                {Number(
-                  item.price || 0
-                ).toLocaleString(
-                  "fr-FR"
-                )}
-
-                {" "}FCFA
-
-              </strong>
 
             </div>
 
-          )
+
+            <div
+              className="qr-security"
+            >
+
+              <FaShieldAlt />
+
+              Ce QR est unique à cette
+              commande.
+
+            </div>
+
+          </section>
+
         )}
 
 
-        <div
-          style={{
-            marginTop: "13px",
-            paddingTop: "13px",
-            borderTop:
-              "1px solid #E2E8F0",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              marginBottom: "7px",
-              color: "#64748B",
-              fontSize: "11px",
-            }}
-          >
-
-            <span>
-              🛒 Produits
-            </span>
-
-            <strong
-              style={{
-                color: "#0F172A",
-              }}
-            >
-
-              {productsTotal.toLocaleString(
-                "fr-FR"
-              )} FCFA
-
-            </strong>
-
-          </div>
-
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              marginBottom: "9px",
-              color: "#64748B",
-              fontSize: "11px",
-            }}
-          >
-
-            <span>
-              🚚 Livraison
-            </span>
-
-            <strong
-              style={{
-                color: "#0F172A",
-              }}
-            >
-
-              {Number(
-                order.shipping || 0
-              ).toLocaleString(
-                "fr-FR"
-              )} FCFA
-
-            </strong>
-
-          </div>
-
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              alignItems: "center",
-              gap: "10px",
-              padding: "13px",
-              background: "#EFF6FF",
-              borderRadius: "14px",
-              color: "#1D4ED8",
-            }}
-          >
-
-            <strong>
-              💰 TOTAL
-            </strong>
-
-            <strong
-              style={{
-                fontSize:
-                  isMobile
-                    ? "16px"
-                    : "20px",
-              }}
-            >
-
-              {Number(
-                order.total || 0
-              ).toLocaleString(
-                "fr-FR"
-              )} FCFA
-
-            </strong>
-
-          </div>
-
-
-          <div
-            style={{
-              marginTop: "9px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              color: "#64748B",
-              fontSize: "10px",
-            }}
-          >
-
-            <FaCreditCard />
-
-            💳 {paymentMethod}
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* =================================================
-          LIVREUR
-      ================================================= */}
-
-      {assignedDriver ? (
-
-        <section
-          style={{
-            background:
-              "linear-gradient(135deg,#EFF6FF,#FFFFFF)",
-            border:
-              "1px solid #BFDBFE",
-            borderRadius:
-              isMobile
-                ? "20px"
-                : "24px",
-            padding:
-              isMobile
-                ? "15px"
-                : "20px",
-            marginBottom: "12px",
-            boxShadow:
-              "0 10px 28px rgba(37,99,235,.08)",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
-
-            {driverPhoto ? (
-
-              <img
-                src={driverPhoto}
-                alt={
-                  assignedDriver.name ||
-                  "Livreur"
-                }
-                onError={(e) => {
-
-                  e.currentTarget.style.display =
-                    "none";
-
-                  if (
-                    e.currentTarget
-                      .nextElementSibling
-                  ) {
-
-                    e.currentTarget
-                      .nextElementSibling
-                      .style.display =
-                      "flex";
-
-                  }
-
-                }}
-                style={{
-                  width:
-                    isMobile
-                      ? "68px"
-                      : "82px",
-                  height:
-                    isMobile
-                      ? "68px"
-                      : "82px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border:
-                    "4px solid #DBEAFE",
-                  flexShrink: 0,
-                }}
-              />
-
-            ) : null}
-
-
-            <div
-              style={{
-                display:
-                  driverPhoto
-                    ? "none"
-                    : "flex",
-                width:
-                  isMobile
-                    ? "68px"
-                    : "82px",
-                height:
-                  isMobile
-                    ? "68px"
-                    : "82px",
-                borderRadius: "50%",
-                background: "#DBEAFE",
-                color: "#2563EB",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "29px",
-                flexShrink: 0,
-              }}
-            >
-
-              <FaUser />
-
-            </div>
-
-
-            <div
-              style={{
-                minWidth: 0,
-                flex: 1,
-              }}
-            >
-
-              <div
-                style={{
-                  color: "#64748B",
-                  fontSize: "9px",
-                  fontWeight: 900,
-                  textTransform:
-                    "uppercase",
-                }}
-              >
-
-                🚚 Votre livreur
-
-              </div>
-
-
-              <h2
-                style={{
-                  margin:
-                    "3px 0 5px",
-                  color: "#0F172A",
-                  fontSize:
-                    isMobile
-                      ? "18px"
-                      : "22px",
-                  fontWeight: 900,
-                  overflow: "hidden",
-                  textOverflow:
-                    "ellipsis",
-                  whiteSpace:
-                    "nowrap",
-                }}
-              >
-
-                {assignedDriver.name ||
-                  "Livreur assigné"}
-
-              </h2>
-
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  color:
-                    gpsOnline
-                      ? "#16A34A"
-                      : "#64748B",
-                  fontSize: "10px",
-                  fontWeight: 800,
-                }}
-              >
-
-                <FaSignal />
-
-                {gpsOnline
-                  ? "GPS en direct"
-                  : "GPS hors ligne"}
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-          {/* INFOS */}
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                isMobile
-                  ? "1fr 1fr"
-                  : "repeat(3,1fr)",
-              gap: "8px",
-              marginTop: "14px",
-            }}
-          >
-
-            <div
-              style={{
-                background: "#FFFFFF",
-                padding: "10px",
-                borderRadius: "13px",
-                border:
-                  "1px solid #E2E8F0",
-              }}
-            >
-
-              <small
-                style={{
-                  color: "#94A3B8",
-                  fontSize: "8px",
-                  fontWeight: 900,
-                }}
-              >
-
-                📞 TÉLÉPHONE
-
-              </small>
-
-
-              <strong
-                style={{
-                  display: "block",
-                  marginTop: "4px",
-                  color: "#0F172A",
-                  fontSize: "11px",
-                  wordBreak:
-                    "break-word",
-                }}
-              >
-
-                {driverPhone ||
-                  "Non renseigné"}
-
-              </strong>
-
-            </div>
-
-
-            <div
-              style={{
-                background: "#FFFFFF",
-                padding: "10px",
-                borderRadius: "13px",
-                border:
-                  "1px solid #E2E8F0",
-              }}
-            >
-
-              <small
-                style={{
-                  color: "#94A3B8",
-                  fontSize: "8px",
-                  fontWeight: 900,
-                }}
-              >
-
-                🏍️ VÉHICULE
-
-              </small>
-
-
-              <strong
-                style={{
-                  display: "block",
-                  marginTop: "4px",
-                  color: "#0F172A",
-                  fontSize: "11px",
-                }}
-              >
-
-                {assignedDriver.vehicle ||
-                  "Non renseigné"}
-
-              </strong>
-
-            </div>
-
-
-            <div
-              style={{
-                background: "#FFFFFF",
-                padding: "10px",
-                borderRadius: "13px",
-                border:
-                  "1px solid #E2E8F0",
-                gridColumn:
-                  isMobile
-                    ? "1 / -1"
-                    : "auto",
-              }}
-            >
-
-              <small
-                style={{
-                  color: "#94A3B8",
-                  fontSize: "8px",
-                  fontWeight: 900,
-                }}
-              >
-
-                🔢 PLAQUE
-
-              </small>
-
-
-              <strong
-                style={{
-                  display: "block",
-                  marginTop: "4px",
-                  color: "#0F172A",
-                  fontSize: "11px",
-                }}
-              >
-
-                {assignedDriver.plate ||
-                  "Non renseignée"}
-
-              </strong>
-
-            </div>
-
-          </div>
-
-
-          {/* APPEL */}
-
-          {driverPhone && (
-
-            <a
-              href={
-                `tel:${driverPhone}`
-              }
-              style={{
-                marginTop: "10px",
-                width: "100%",
-                boxSizing:
-                  "border-box",
-                display: "flex",
-                alignItems: "center",
-                justifyContent:
-                  "center",
-                gap: "8px",
-                textDecoration:
-                  "none",
-                background:
-                  "linear-gradient(135deg,#16A34A,#22C55E)",
-                color: "#FFFFFF",
-                padding: "13px",
-                borderRadius: "14px",
-                fontSize: "12px",
-                fontWeight: 900,
-              }}
-            >
-
-              <FaPhoneAlt />
-
-              📞 Appeler le livreur
-
-            </a>
-
-          )}
-
-        </section>
-
-      ) : (
-
-        <section
-          style={{
-            background: "#FFFFFF",
-            border:
-              "1px solid #E2E8F0",
-            borderRadius: "18px",
-            padding: "15px",
-            marginBottom: "12px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            color: "#64748B",
-            fontSize: "12px",
-            fontWeight: 700,
-          }}
-        >
-
-          <FaBoxOpen
-            style={{
-              color: "#2563EB",
-              fontSize: "22px",
-              flexShrink: 0,
-            }}
-          />
-
-          <span>
-
-            ⏳ Aucun livreur n'est encore
-            assigné à cette commande.
-
-            <br />
-
-            <small
-              style={{
-                display: "block",
-                marginTop: "4px",
-                color: "#94A3B8",
-                fontWeight: 500,
-              }}
-            >
-
-              Le premier livreur disponible
-              qui accepte la commande
-              sera affiché ici.
-
-            </small>
-
-          </span>
-
-        </section>
-
-      )}
-
-
-      {/* =================================================
-          QR CODE
-      ================================================= */}
-
-      {order.status ===
-        "En livraison" &&
-        qrValue && (
-
-        <section
-          style={{
-            background:
-              "linear-gradient(145deg,#FFFFFF,#F8FAFC)",
-            border:
-              "1px solid #CBD5E1",
-            borderRadius:
-              isMobile
-                ? "22px"
-                : "28px",
-            padding:
-              isMobile
-                ? "20px 14px"
-                : "28px",
-            marginBottom: "12px",
-            textAlign: "center",
-            boxShadow:
-              "0 12px 35px rgba(15,23,42,.08)",
-          }}
-        >
-
-          <div
-            style={{
-              width: "54px",
-              height: "54px",
-              margin:
-                "0 auto 11px",
-              borderRadius: "16px",
-              background:
-                "linear-gradient(135deg,#2563EB,#4F46E5)",
-              color: "#FFFFFF",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "22px",
-            }}
-          >
-
-            <FaQrcode />
-
-          </div>
-
-
-          <h2
-            style={{
-              margin: 0,
-              color: "#0F172A",
-              fontSize:
-                isMobile
-                  ? "19px"
-                  : "24px",
-              fontWeight: 900,
-            }}
-          >
-
-            🔐 QR de livraison
-
-          </h2>
-
-
-          <p
-            style={{
-              margin:
-                "8px auto 17px",
-              maxWidth: "390px",
-              color: "#64748B",
-              fontSize:
-                isMobile
-                  ? "12px"
-                  : "14px",
-              lineHeight: 1.6,
-            }}
-          >
-
-            📱 Présentez ce code au livreur
-            lors de la réception.
-
-            <br />
-
-            <strong
-              style={{
-                color: "#1D4ED8",
-              }}
-            >
-
-              🔒 Le scan est nécessaire
-              pour confirmer la livraison.
-
-            </strong>
-
-          </p>
-
-
-          <div
-            style={{
-              width: "fit-content",
-              maxWidth: "100%",
-              margin: "0 auto",
-              padding:
-                isMobile
-                  ? "12px"
-                  : "18px",
-              background: "#FFFFFF",
-              borderRadius: "20px",
-              border:
-                "1px solid #E2E8F0",
-              boxShadow:
-                "0 10px 25px rgba(15,23,42,.08)",
-              boxSizing: "border-box",
-            }}
-          >
-
-            <QRCodeSVG
-              value={qrValue}
-              size={
-                isMobile
-                  ? 210
-                  : 260
-              }
-              level="H"
-              includeMargin={true}
-            />
-
-          </div>
-
-
-          <div
-            style={{
-              marginTop: "15px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent:
-                "center",
-              gap: "7px",
-              color: "#2563EB",
-              fontSize: "10px",
-              fontWeight: 800,
-            }}
-          >
-
-            <FaShieldAlt />
-
-            🔒 QR sécurisé • Commande unique
-
-          </div>
-
-
-          <div
-            style={{
-              marginTop: "11px",
-              padding: "11px",
-              borderRadius: "13px",
-              background: "#EFF6FF",
-              color: "#1E40AF",
-              fontSize: "10px",
-              lineHeight: 1.5,
-            }}
-          >
-
-            📌 Gardez cette page ouverte
-            lorsque le livreur arrive.
-
-          </div>
-
-        </section>
-
-      )}
-
-
-      {/* =================================================
-          STATISTIQUES
-      ================================================= */}
-
-      <section
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(3,minmax(0,1fr))",
-          gap:
-            isMobile
-              ? "7px"
-              : "12px",
-          marginBottom: "12px",
-        }}
-      >
-
-        {/* ETA */}
-
-        <div
-          style={{
-            background:
-              "linear-gradient(135deg,#2563EB,#1D4ED8)",
-            color: "#FFFFFF",
-            borderRadius: "16px",
-            padding:
-              isMobile
-                ? "11px"
-                : "15px",
-          }}
-        >
-
-          <FaClock
-            style={{
-              fontSize:
-                isMobile
-                  ? "13px"
-                  : "17px",
-            }}
-          />
-
-
-          <div
-            style={{
-              marginTop: "5px",
-              fontSize:
-                isMobile
-                  ? "14px"
-                  : "22px",
-              fontWeight: 900,
-            }}
-          >
-
-            {estimatedTime}
-
-          </div>
-
-
-          <small
-            style={{
-              fontSize:
-                isMobile
-                  ? "8px"
-                  : "10px",
-            }}
-          >
-
-            ⏱️ ETA
-
-          </small>
-
-        </div>
-
-
-        {/* DISTANCE */}
-
-        <div
-          style={{
-            background: "#FFFFFF",
-            border:
-              "1px solid #E2E8F0",
-            borderRadius: "16px",
-            padding:
-              isMobile
-                ? "11px"
-                : "15px",
-          }}
-        >
-
-          <FaRoute
-            style={{
-              color: "#2563EB",
-              fontSize:
-                isMobile
-                  ? "13px"
-                  : "17px",
-            }}
-          />
-
-
-          <div
-            style={{
-              marginTop: "5px",
-              color: "#0F172A",
-              fontSize:
-                isMobile
-                  ? "14px"
-                  : "22px",
-              fontWeight: 900,
-            }}
-          >
-
-            {distanceText}
-
-          </div>
-
-
-          <small
-            style={{
-              color: "#64748B",
-              fontSize:
-                isMobile
-                  ? "8px"
-                  : "10px",
-            }}
-          >
-
-            📍 Distance
-
-          </small>
-
-        </div>
-
-
-        {/* VITESSE */}
-
-        <div
-          style={{
-            background: "#FFFFFF",
-            border:
-              "1px solid #E2E8F0",
-            borderRadius: "16px",
-            padding:
-              isMobile
-                ? "11px"
-                : "15px",
-          }}
-        >
-
-          <FaMotorcycle
-            style={{
-              color: "#7C3AED",
-              fontSize:
-                isMobile
-                  ? "13px"
-                  : "17px",
-            }}
-          />
-
-
-          <div
-            style={{
-              marginTop: "5px",
-              color: "#0F172A",
-              fontSize:
-                isMobile
-                  ? "14px"
-                  : "22px",
-              fontWeight: 900,
-            }}
-          >
-
-            {liveSpeed || "--"}
-
-          </div>
-
-
-          <small
-            style={{
-              color: "#64748B",
-              fontSize:
-                isMobile
-                  ? "8px"
-                  : "10px",
-            }}
-          >
-
-            🏍️ km/h
-
-          </small>
-
-        </div>
-
-      </section>
-
-
-      {/* =================================================
-          CARTE
-      ================================================= */}
-
-      <section
-        style={{
-          background: "#FFFFFF",
-          borderRadius:
-            isMobile
-              ? "20px"
-              : "28px",
-          overflow: "hidden",
-          border:
-            "1px solid #E2E8F0",
-          boxShadow:
-            "0 12px 35px rgba(15,23,42,.08)",
-          position: "relative",
-          marginBottom: "12px",
-        }}
-      >
-
-        {/* CARTE HEADER */}
-
-        <div
-          style={{
-            position: "absolute",
-            top: "11px",
-            left: "11px",
-            right: "11px",
-            zIndex: 999,
-            display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems: "center",
-            gap: "7px",
-            pointerEvents: "none",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              background:
-                "rgba(255,255,255,.96)",
-              color: "#0F172A",
-              padding:
-                "7px 10px",
-              borderRadius:
-                "999px",
-              fontSize:
-                isMobile
-                  ? "8px"
-                  : "10px",
-              fontWeight: 900,
-              boxShadow:
-                "0 6px 18px rgba(15,23,42,.15)",
-            }}
-          >
-
-            <FaMap
-              style={{
-                color: "#2563EB",
-              }}
-            />
-
-            📍 Suivi en direct
-
-          </div>
-
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              background: "#0F172A",
-              color: "#FFFFFF",
-              padding:
-                "7px 9px",
-              borderRadius:
-                "999px",
-              fontSize:
-                isMobile
-                  ? "8px"
-                  : "9px",
-              fontWeight: 900,
-            }}
-          >
-
-            <FaCircle
-              style={{
-                color:
-                  gpsOnline
-                    ? "#22C55E"
-                    : "#94A3B8",
-                fontSize: "5px",
-              }}
-            />
-
-            {gpsStatus}
-
-          </div>
-
-        </div>
-
-
-        <MapContainer
-          center={
-            driverPosition ||
-            customerPosition
-          }
-          zoom={
-            isMobile
-              ? 14
-              : 13
-          }
-          zoomControl={false}
-          style={{
-            width: "100%",
-            height:
-              isMobile
-                ? "56vh"
-                : "650px",
-            minHeight:
-              isMobile
-                ? "420px"
-                : "520px",
-          }}
-        >
-
-          <RecenterMap
-            position={
-              driverPosition ||
-              customerPosition
-            }
-          />
-
-
-          <ZoomControl
-            position="bottomright"
-          />
-
-
-          <TileLayer
-            attribution="
-              &copy; OpenStreetMap contributors
-            "
-            url="
-              https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=9JxhpJjsI1LkjTuEYlOC
-            "
-          />
-
-
-          {/* TRAJET */}
-
-          {driverPosition && (
-
-            <>
-
-              <Polyline
-                positions={[
-                  driverPosition,
-                  customerPosition,
-                ]}
-                pathOptions={{
-                  color: "#60A5FA",
-                  weight:
-                    isMobile
-                      ? 11
-                      : 18,
-                  opacity: .20,
-                  lineCap:
-                    "round",
-                }}
-              />
-
-
-              <Polyline
-                positions={[
-                  driverPosition,
-                  customerPosition,
-                ]}
-                pathOptions={{
-                  color: "#2563EB",
-                  weight:
-                    isMobile
-                      ? 4
-                      : 7,
-                  opacity: 1,
-                  lineCap:
-                    "round",
-                  lineJoin:
-                    "round",
-                }}
-              />
-
-            </>
-
-          )}
-
-
-          {/* ZONE GPS */}
-
-          {driverPosition && (
-
-            <Circle
-              center={
-                driverPosition
-              }
-              radius={
-                isMobile
-                  ? 100
-                  : 160
-              }
-              pathOptions={{
-                color:
-                  "#2563EB",
-                fillColor:
-                  "#2563EB",
-                fillOpacity:
-                  .10,
-                weight: 2,
-              }}
-            />
-
-          )}
-
-
-          {/* LIVREUR */}
-
-          {driverPosition && (
-
-            <Marker
-              position={
-                driverPosition
-              }
-              icon={driverIcon}
-            >
-
-              <Popup>
-
-                <div
-                  style={{
-                    minWidth:
-                      "215px",
-                    fontFamily:
-                      "Inter,sans-serif",
-                  }}
-                >
-
-                  <div
-                    style={{
-                      display:
-                        "flex",
-                      alignItems:
-                        "center",
-                      gap: "9px",
-                    }}
-                  >
-
-                    {driverPhoto ? (
-
-                      <img
-                        src={
-                          driverPhoto
-                        }
-                        alt="Livreur"
-                        style={{
-                          width:
-                            "50px",
-                          height:
-                            "50px",
-                          borderRadius:
-                            "50%",
-                          objectFit:
-                            "cover",
-                        }}
-                      />
-
-                    ) : (
-
-                      <div
-                        style={{
-                          width:
-                            "50px",
-                          height:
-                            "50px",
-                          borderRadius:
-                            "50%",
-                          background:
-                            "#DBEAFE",
-                          color:
-                            "#2563EB",
-                          display:
-                            "flex",
-                          alignItems:
-                            "center",
-                          justifyContent:
-                            "center",
-                          fontSize:
-                            "20px",
-                        }}
-                      >
-
-                        <FaUser />
-
-                      </div>
-
-                    )}
-
-
-                    <div>
-
-                      <strong
-                        style={{
-                          color:
-                            "#0F172A",
-                          fontSize:
-                            "14px",
-                        }}
-                      >
-
-                        {assignedDriver?.name ||
-                          "Livreur"}
-
-                      </strong>
-
-
-                      <div
-                        style={{
-                          color:
-                            "#16A34A",
-                          fontSize:
-                            "10px",
-                          fontWeight:
-                            800,
-                          marginTop:
-                            "3px",
-                        }}
-                      >
-
-                        <FaCheckCircle />
-
-                        {" "}
-                        En livraison
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-
-                  <div
-                    style={{
-                      marginTop:
-                        "11px",
-                      paddingTop:
-                        "9px",
-                      borderTop:
-                        "1px solid #E2E8F0",
-                      color:
-                        "#475569",
-                      fontSize:
-                        "11px",
-                      lineHeight:
-                        1.8,
-                    }}
-                  >
-
-                    📞{" "}
-                    {driverPhone ||
-                      "Téléphone non renseigné"}
-
-                    <br />
-
-                    🏍️{" "}
-                    {assignedDriver?.vehicle ||
-                      "Véhicule non renseigné"}
-
-                    <br />
-
-                    🔢{" "}
-                    {assignedDriver?.plate ||
-                      "Plaque non renseignée"}
-
-                    <br />
-
-                    📍{" "}
-                    {distanceText}
-
-                    <br />
-
-                    ⏱️{" "}
-                    {estimatedTime}
-
-                  </div>
-
-                </div>
-
-              </Popup>
-
-            </Marker>
-
-          )}
-
-
-          {/* CLIENT */}
-
-          <Marker
-            position={
-              customerPosition
-            }
-            icon={
-              customerIcon
+        {/* =================================================
+            GPS INFO
+        ================================================= */}
+
+        {order.status ===
+          "En livraison" && (
+
+          <section
+            className={
+              gpsOnline
+                ? "gps-info online"
+                : "gps-info"
             }
           >
-
-            <Popup>
-
-              <div
-                style={{
-                  minWidth:
-                    "200px",
-                }}
-              >
-
-                <strong
-                  style={{
-                    color:
-                      "#0F172A",
-                    fontSize:
-                      "14px",
-                  }}
-                >
-
-                  <FaMapMarkerAlt
-                    style={{
-                      color:
-                        "#EF4444",
-                    }}
-                  />
-
-                  {" "}
-                  Destination
-
-                </strong>
-
-
-                <p
-                  style={{
-                    color:
-                      "#64748B",
-                    fontSize:
-                      "11px",
-                    lineHeight:
-                      1.5,
-                  }}
-                >
-
-                  {order.address ||
-                    "Adresse de livraison"}
-
-                </p>
-
-
-                <strong
-                  style={{
-                    color:
-                      "#64748B",
-                    fontSize:
-                      "10px",
-                  }}
-                >
-
-                  🏙️ {order.city}
-
-                  {" • "}
-
-                  📌 {order.district}
-
-                </strong>
-
-              </div>
-
-            </Popup>
-
-          </Marker>
-
-        </MapContainer>
-
-      </section>
-
-
-      {/* =================================================
-          PROGRESSION
-      ================================================= */}
-
-      {order.status ===
-        "En livraison" && (
-
-        <section
-          style={{
-            background: "#FFFFFF",
-            border:
-              "1px solid #E2E8F0",
-            borderRadius: "18px",
-            padding:
-              isMobile
-                ? "14px"
-                : "17px",
-            marginBottom: "12px",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent:
-                "space-between",
-              alignItems: "center",
-              marginBottom: "9px",
-              color: "#475569",
-              fontSize: "11px",
-              fontWeight: 800,
-            }}
-          >
-
-            <span>
-
-              <FaChartLine />
-
-              {" "}
-              📈 Progression
-
-            </span>
-
-
-            <strong
-              style={{
-                color:
-                  "#2563EB",
-              }}
-            >
-
-              {Math.round(
-                progress
-              )}%
-
-            </strong>
-
-          </div>
-
-
-          <div
-            style={{
-              height: "9px",
-              background:
-                "#E2E8F0",
-              borderRadius:
-                "999px",
-              overflow:
-                "hidden",
-            }}
-          >
-
-            <div
-              style={{
-                width:
-                  `${progress}%`,
-                height: "100%",
-                background:
-                  "linear-gradient(90deg,#2563EB,#3B82F6)",
-                borderRadius:
-                  "999px",
-                transition:
-                  "width .5s ease",
-              }}
-            />
-
-          </div>
-
-
-          {gpsTime && (
-
-            <div
-              style={{
-                marginTop:
-                  "8px",
-                color:
-                  "#94A3B8",
-                fontSize:
-                  "9px",
-                textAlign:
-                  "right",
-              }}
-            >
-
-              📡 Dernière position :
-              {" "}
-              {gpsTime}
-
-            </div>
-
-          )}
-
-        </section>
-
-      )}
-
-
-      {/* =================================================
-          COMMANDE LIVRÉE
-      ================================================= */}
-
-      {order.status ===
-        "Livrée" && (
-
-        <section
-          style={{
-            background:
-              "linear-gradient(135deg,#DCFCE7,#F0FDF4)",
-            border:
-              "1px solid #86EFAC",
-            borderRadius:
-              "20px",
-            padding:
-              isMobile
-                ? "17px"
-                : "20px",
-          }}
-        >
-
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-
-            <FaCheckCircle
-              style={{
-                color:
-                  "#16A34A",
-                fontSize:
-                  "29px",
-                flexShrink: 0,
-              }}
-            />
-
 
             <div>
 
-              <strong
-                style={{
-                  color:
-                    "#166534",
-                  fontSize:
-                    isMobile
-                      ? "17px"
-                      : "19px",
-                }}
-              >
-
-                ✅ Commande livrée
-
-              </strong>
-
-
-              <div
-                style={{
-                  color:
-                    "#15803D",
-                  fontSize:
-                    "12px",
-                  marginTop:
-                    "4px",
-                }}
-              >
-
-                Votre commande a été
-                livrée avec succès.
-
-              </div>
+              <FaLocationArrow />
 
             </div>
+
+            <span>
+
+              {gpsOnline
+                ? "La position du livreur est synchronisée en direct."
+                : "En attente de la prochaine position GPS du livreur."}
+
+            </span>
+
+            {gpsTime && (
+
+              <small>
+                {gpsTime}
+              </small>
+
+            )}
+
+          </section>
+
+        )}
+
+
+        {/* =================================================
+            INFORMATIONS
+        ================================================= */}
+
+        <section
+          className="info-footer"
+        >
+
+          <FaInfoCircle />
+
+          <div>
+
+            <strong>
+              Suivi automatique
+            </strong>
+
+            <p>
+
+              Cette page actualise automatiquement
+              le statut et la position du livreur
+              toutes les 3 secondes.
+
+            </p>
 
           </div>
 
-
-          {assignedDriver && (
-
-            <div
-              style={{
-                marginTop:
-                  "15px",
-                paddingTop:
-                  "13px",
-                borderTop:
-                  "1px solid #BBF7D0",
-                display:
-                  "flex",
-                alignItems:
-                  "center",
-                gap:
-                  "10px",
-              }}
-            >
-
-              {driverPhoto ? (
-
-                <img
-                  src={
-                    driverPhoto
-                  }
-                  alt="Livreur"
-                  style={{
-                    width:
-                      "52px",
-                    height:
-                      "52px",
-                    borderRadius:
-                      "50%",
-                    objectFit:
-                      "cover",
-                    border:
-                      "2px solid #86EFAC",
-                  }}
-                />
-
-              ) : (
-
-                <div
-                  style={{
-                    width:
-                      "52px",
-                    height:
-                      "52px",
-                    borderRadius:
-                      "50%",
-                    background:
-                      "#DCFCE7",
-                    color:
-                      "#16A34A",
-                    display:
-                      "flex",
-                    alignItems:
-                      "center",
-                    justifyContent:
-                      "center",
-                    fontSize:
-                      "20px",
-                  }}
-                >
-
-                  <FaUser />
-
-                </div>
-
-              )}
-
-
-              <div>
-
-                <small
-                  style={{
-                    color:
-                      "#166534",
-                    fontWeight:
-                      800,
-                    fontSize:
-                      "9px",
-                  }}
-                >
-
-                  LIVRÉE PAR
-
-                </small>
-
-
-                <strong
-                  style={{
-                    display:
-                      "block",
-                    color:
-                      "#14532D",
-                    fontSize:
-                      "14px",
-                  }}
-                >
-
-                  {assignedDriver.name ||
-                    "Livreur"}
-
-                </strong>
-
-
-                <span
-                  style={{
-                    color:
-                      "#15803D",
-                    fontSize:
-                      "10px",
-                  }}
-                >
-
-                  {assignedDriver.vehicle ||
-                    "Véhicule"}
-
-                  {assignedDriver.plate
-                    ? ` • ${assignedDriver.plate}`
-                    : ""}
-
-                </span>
-
-              </div>
-
-            </div>
-
-          )}
-
         </section>
 
-      )}
+      </main>
+
+
+      {/* =================================================
+          CSS PROFESSIONNEL MOBILE
+      ================================================= */}
+
+      <style>{`
+
+        * {
+          box-sizing:border-box;
+        }
+
+        html,
+        body,
+        #root {
+          margin:0;
+          min-height:100%;
+          width:100%;
+        }
+
+        body {
+          background:#F8FAFC;
+          font-family:
+            Inter,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
+
+        button,
+        a {
+          font-family:inherit;
+        }
+
+
+        /* =================================================
+           PAGE
+        ================================================= */
+
+        .track-order-page {
+
+          width:100%;
+          min-height:100vh;
+
+          background:
+            linear-gradient(
+              180deg,
+              #EFF6FF 0%,
+              #F8FAFC 35%,
+              #FFFFFF 100%
+            );
+
+          padding:
+            12px;
+
+          overflow-x:hidden;
+
+          color:#0F172A;
+
+        }
+
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        .track-header {
+
+          width:100%;
+          max-width:1200px;
+
+          margin:
+            0 auto 12px;
+
+          padding:
+            13px;
+
+          display:flex;
+          align-items:center;
+
+          gap:10px;
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:18px;
+
+          box-shadow:
+            0 8px 25px
+            rgba(15,23,42,.06);
+
+        }
+
+
+        .back-button {
+
+          width:44px;
+          height:44px;
+
+          flex-shrink:0;
+
+          border:none;
+
+          border-radius:13px;
+
+          background:#EFF6FF;
+
+          color:#2563EB;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          font-size:16px;
+
+          cursor:pointer;
+
+          transition:.2s;
+
+        }
+
+        .back-button:active {
+          transform:scale(.94);
+        }
+
+
+        .header-title {
+
+          min-width:0;
+
+          flex:1;
+
+          display:flex;
+          align-items:center;
+
+          gap:10px;
+
+        }
+
+
+        .header-icon {
+
+          width:42px;
+          height:42px;
+
+          flex-shrink:0;
+
+          border-radius:12px;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          background:
+            linear-gradient(
+              135deg,
+              #2563EB,
+              #4F46E5
+            );
+
+          color:#FFFFFF;
+
+          font-size:18px;
+
+        }
+
+
+        .header-title strong {
+
+          display:block;
+
+          font-size:14px;
+
+          font-weight:900;
+
+          color:#0F172A;
+
+        }
+
+
+        .header-title span {
+
+          display:block;
+
+          margin-top:2px;
+
+          font-size:10px;
+
+          color:#64748B;
+
+          font-weight:700;
+
+        }
+
+
+        .header-status {
+
+          width:38px;
+          height:38px;
+
+          flex-shrink:0;
+
+          border-radius:12px;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+        }
+
+
+        /* =================================================
+           STATUS
+        ================================================= */
+
+        .status-card {
+
+          width:100%;
+          max-width:1200px;
+
+          margin:
+            0 auto 12px;
+
+          padding:17px;
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          box-shadow:
+            0 8px 30px
+            rgba(15,23,42,.06);
+
+        }
+
+
+        .status-top {
+
+          display:flex;
+          align-items:center;
+
+          gap:12px;
+
+        }
+
+
+        .status-icon {
+
+          width:48px;
+          height:48px;
+
+          flex-shrink:0;
+
+          border-radius:15px;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          font-size:21px;
+
+        }
+
+
+        .status-top span {
+
+          display:block;
+
+          color:#94A3B8;
+
+          font-size:8px;
+
+          font-weight:900;
+
+          letter-spacing:.7px;
+
+        }
+
+
+        .status-top h1 {
+
+          margin:
+            3px 0 0;
+
+          font-size:17px;
+
+          line-height:1.2;
+
+          font-weight:950;
+
+        }
+
+
+        .progress-wrapper {
+
+          margin-top:22px;
+
+          position:relative;
+
+        }
+
+
+        .progress-line {
+
+          position:absolute;
+
+          top:10px;
+
+          left:7%;
+
+          right:7%;
+
+          height:4px;
+
+          border-radius:10px;
+
+          background:#E2E8F0;
+
+          overflow:hidden;
+
+        }
+
+
+        .progress-fill {
+
+          height:100%;
+
+          background:
+            linear-gradient(
+              90deg,
+              #2563EB,
+              #4F46E5
+            );
+
+          border-radius:10px;
+
+          transition:
+            width .5s ease;
+
+        }
+
+
+        .progress-points {
+
+          position:relative;
+
+          display:flex;
+
+          justify-content:space-between;
+
+        }
+
+
+        .point {
+
+          width:25%;
+
+          display:flex;
+
+          flex-direction:column;
+
+          align-items:center;
+
+          gap:5px;
+
+          color:#CBD5E1;
+
+          font-size:13px;
+
+        }
+
+
+        .point.active {
+
+          color:#2563EB;
+
+        }
+
+
+        .point span {
+
+          color:#64748B;
+
+          font-size:8px;
+
+          font-weight:800;
+
+          text-align:center;
+
+        }
+
+
+        /* =================================================
+           CONTENT
+        ================================================= */
+
+        .track-content {
+
+          width:100%;
+          max-width:1200px;
+
+          margin:0 auto;
+
+        }
+
+
+        /* =================================================
+           MAP
+        ================================================= */
+
+        .map-card {
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          overflow:hidden;
+
+          box-shadow:
+            0 8px 30px
+            rgba(15,23,42,.06);
+
+          margin-bottom:12px;
+
+        }
+
+
+        .map-header {
+
+          padding:
+            13px 14px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:10px;
+
+        }
+
+
+        .map-header strong {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:7px;
+
+          color:#0F172A;
+
+          font-size:12px;
+
+          font-weight:950;
+
+        }
+
+
+        .map-header strong svg {
+
+          color:#2563EB;
+
+        }
+
+
+        .map-header span {
+
+          display:block;
+
+          margin-top:3px;
+
+          color:#94A3B8;
+
+          font-size:9px;
+
+          font-weight:600;
+
+        }
+
+
+        .gps-badge {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:4px;
+
+          white-space:nowrap;
+
+          padding:
+            6px 8px;
+
+          border-radius:9px;
+
+          background:#F1F5F9;
+
+          color:#64748B;
+
+          font-size:8px;
+
+          font-weight:900;
+
+        }
+
+
+        .gps-badge.online {
+
+          background:#DCFCE7;
+
+          color:#16A34A;
+
+        }
+
+
+        .gps-badge svg {
+
+          font-size:7px;
+
+        }
+
+
+        .map-container {
+
+          width:100%;
+
+          height:
+            min(58vh,420px);
+
+          min-height:320px;
+
+          position:relative;
+
+        }
+
+
+        .leaflet-container {
+
+          width:100%;
+          height:100%;
+
+          z-index:1;
+
+        }
+
+
+        .leaflet-control-zoom {
+
+          margin:
+            0 8px 8px 0 !important;
+
+        }
+
+
+        .leaflet-control-zoom a {
+
+          width:34px !important;
+          height:34px !important;
+
+          line-height:34px !important;
+
+        }
+
+
+        .no-gps {
+
+          height:100%;
+
+          display:flex;
+
+          flex-direction:column;
+
+          align-items:center;
+
+          justify-content:center;
+
+          text-align:center;
+
+          padding:30px;
+
+          background:
+            linear-gradient(
+              145deg,
+              #EFF6FF,
+              #F8FAFC
+            );
+
+          color:#64748B;
+
+        }
+
+
+        .no-gps svg {
+
+          color:#2563EB;
+
+          font-size:35px;
+
+          margin-bottom:12px;
+
+        }
+
+
+        .no-gps strong {
+
+          color:#0F172A;
+
+          font-size:14px;
+
+        }
+
+
+        .no-gps span {
+
+          max-width:300px;
+
+          margin-top:7px;
+
+          font-size:11px;
+
+          line-height:1.6;
+
+        }
+
+
+        /* =================================================
+           METRICS
+        ================================================= */
+
+        .metrics-grid {
+
+          display:grid;
+
+          grid-template-columns:
+            repeat(4,1fr);
+
+          gap:8px;
+
+          margin-bottom:12px;
+
+        }
+
+
+        /* =================================================
+           DRIVER
+        ================================================= */
+
+        .driver-card {
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          padding:15px;
+
+          margin-bottom:12px;
+
+          box-shadow:
+            0 8px 30px
+            rgba(15,23,42,.06);
+
+        }
+
+
+        .driver-card-header {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:10px;
+
+          margin-bottom:15px;
+
+        }
+
+
+        .driver-card-header span {
+
+          display:block;
+
+          color:#94A3B8;
+
+          font-size:8px;
+
+          font-weight:900;
+
+          letter-spacing:.6px;
+
+        }
+
+
+        .driver-card-header h2 {
+
+          margin:
+            4px 0 0;
+
+          display:flex;
+
+          align-items:center;
+
+          gap:6px;
+
+          font-size:15px;
+
+          font-weight:950;
+
+        }
+
+
+        .driver-card-header h2 svg {
+
+          color:#2563EB;
+
+        }
+
+
+        .driver-live {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:4px;
+
+          padding:
+            6px 8px;
+
+          border-radius:8px;
+
+          background:#DCFCE7;
+
+          color:#16A34A;
+
+          font-size:8px;
+
+          font-weight:900;
+
+        }
+
+
+        .driver-live svg {
+
+          font-size:6px;
+
+        }
+
+
+        .driver-main {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:13px;
+
+        }
+
+
+        .driver-photo {
+
+          width:72px;
+          height:72px;
+
+          flex-shrink:0;
+
+          border-radius:20px;
+
+          overflow:hidden;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          background:#DBEAFE;
+
+          color:#2563EB;
+
+          font-size:27px;
+
+        }
+
+
+        .driver-photo img {
+
+          width:100%;
+          height:100%;
+
+          object-fit:cover;
+
+        }
+
+
+        .driver-info {
+
+          min-width:0;
+
+        }
+
+
+        .driver-info h3 {
+
+          margin:0 0 7px;
+
+          font-size:16px;
+
+          font-weight:950;
+
+          color:#0F172A;
+
+          word-break:break-word;
+
+        }
+
+
+        .driver-info p {
+
+          margin:
+            4px 0;
+
+          color:#64748B;
+
+          font-size:10px;
+
+          font-weight:700;
+
+        }
+
+
+        .driver-info svg {
+
+          color:#2563EB;
+
+        }
+
+
+        .call-driver {
+
+          min-height:48px;
+
+          margin-top:15px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          gap:8px;
+
+          border-radius:13px;
+
+          text-decoration:none;
+
+          background:#2563EB;
+
+          color:#FFFFFF;
+
+          font-size:12px;
+
+          font-weight:900;
+
+          box-shadow:
+            0 8px 20px
+            rgba(37,99,235,.20);
+
+        }
+
+
+        .no-driver-card {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:12px;
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          padding:15px;
+
+          margin-bottom:12px;
+
+        }
+
+
+        .no-driver-card > div:first-child {
+
+          width:48px;
+          height:48px;
+
+          flex-shrink:0;
+
+          border-radius:14px;
+
+          background:#EFF6FF;
+
+          color:#2563EB;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          font-size:21px;
+
+        }
+
+
+        .no-driver-card strong {
+
+          font-size:13px;
+
+        }
+
+
+        .no-driver-card p {
+
+          margin:
+            4px 0 0;
+
+          color:#64748B;
+
+          font-size:10px;
+
+          line-height:1.5;
+
+        }
+
+
+        /* =================================================
+           ORDER
+        ================================================= */
+
+        .order-card {
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          padding:15px;
+
+          margin-bottom:12px;
+
+          box-shadow:
+            0 8px 30px
+            rgba(15,23,42,.06);
+
+        }
+
+
+        .section-title {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:10px;
+
+          margin-bottom:14px;
+
+        }
+
+
+        .section-title > div:first-child {
+
+          width:42px;
+          height:42px;
+
+          flex-shrink:0;
+
+          border-radius:13px;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          background:#EFF6FF;
+
+          color:#2563EB;
+
+        }
+
+
+        .section-title span {
+
+          display:block;
+
+          color:#94A3B8;
+
+          font-size:8px;
+
+          font-weight:900;
+
+          letter-spacing:.6px;
+
+        }
+
+
+        .section-title h2 {
+
+          margin:
+            3px 0 0;
+
+          color:#0F172A;
+
+          font-size:14px;
+
+          font-weight:950;
+
+        }
+
+
+        .products-list {
+
+          display:flex;
+
+          flex-direction:column;
+
+          gap:8px;
+
+        }
+
+
+        .product-row {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:9px;
+
+          padding:8px;
+
+          border:
+            1px solid #F1F5F9;
+
+          border-radius:13px;
+
+          background:#FAFCFF;
+
+        }
+
+
+        .product-image {
+
+          width:48px;
+          height:48px;
+
+          flex-shrink:0;
+
+          border-radius:11px;
+
+          overflow:hidden;
+
+          background:#EFF6FF;
+
+          color:#2563EB;
+
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+        }
+
+
+        .product-image img {
+
+          width:100%;
+          height:100%;
+
+          object-fit:cover;
+
+        }
+
+
+        .product-info {
+
+          min-width:0;
+
+          flex:1;
+
+        }
+
+
+        .product-info strong {
+
+          display:block;
+
+          color:#0F172A;
+
+          font-size:11px;
+
+          font-weight:900;
+
+          white-space:nowrap;
+
+          overflow:hidden;
+
+          text-overflow:ellipsis;
+
+        }
+
+
+        .product-info span {
+
+          display:block;
+
+          margin-top:4px;
+
+          color:#94A3B8;
+
+          font-size:9px;
+
+          font-weight:700;
+
+        }
+
+
+        .product-price {
+
+          color:#2563EB;
+
+          font-size:10px;
+
+          font-weight:950;
+
+          white-space:nowrap;
+
+        }
+
+
+        .total-row {
+
+          margin-top:13px;
+
+          padding-top:12px;
+
+          border-top:
+            1px solid #E2E8F0;
+
+        }
+
+
+        .total-row > div {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:10px;
+
+          margin:7px 0;
+
+        }
+
+
+        .total-row span {
+
+          color:#64748B;
+
+          font-size:10px;
+
+          font-weight:700;
+
+        }
+
+
+        .total-row strong {
+
+          color:#0F172A;
+
+          font-size:11px;
+
+          font-weight:900;
+
+        }
+
+
+        .total-row .grand-total {
+
+          margin-top:12px;
+
+          padding-top:12px;
+
+          border-top:
+            1px dashed #CBD5E1;
+
+        }
+
+
+        .grand-total span {
+
+          color:#0F172A;
+
+          font-size:11px;
+
+          font-weight:950;
+
+        }
+
+
+        .grand-total strong {
+
+          color:#2563EB;
+
+          font-size:18px;
+
+          font-weight:950;
+
+        }
+
+
+        .payment-info {
+
+          margin-top:12px;
+
+          padding:
+            10px 12px;
+
+          display:flex;
+
+          align-items:center;
+
+          gap:7px;
+
+          flex-wrap:wrap;
+
+          background:#EFF6FF;
+
+          border-radius:12px;
+
+          color:#475569;
+
+          font-size:9px;
+
+        }
+
+
+        .payment-info svg {
+
+          color:#2563EB;
+
+        }
+
+
+        .payment-info strong {
+
+          color:#1D4ED8;
+
+        }
+
+
+        /* =================================================
+           ADDRESS
+        ================================================= */
+
+        .address-card {
+
+          display:flex;
+
+          align-items:flex-start;
+
+          gap:11px;
+
+          padding:15px;
+
+          margin-bottom:12px;
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:20px;
+
+          box-shadow:
+            0 8px 30px
+            rgba(15,23,42,.05);
+
+        }
+
+
+        .address-icon {
+
+          width:42px;
+          height:42px;
+
+          flex-shrink:0;
+
+          border-radius:13px;
+
+          background:#FEF3C7;
+
+          color:#D97706;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+        }
+
+
+        .address-card span {
+
+          display:block;
+
+          color:#94A3B8;
+
+          font-size:8px;
+
+          font-weight:900;
+
+        }
+
+
+        .address-card strong {
+
+          display:block;
+
+          margin-top:4px;
+
+          color:#0F172A;
+
+          font-size:12px;
+
+          line-height:1.5;
+
+        }
+
+
+        .address-card p {
+
+          margin:
+            4px 0 0;
+
+          color:#64748B;
+
+          font-size:10px;
+
+        }
+
+
+        /* =================================================
+           QR
+        ================================================= */
+
+        .qr-card {
+
+          background:
+            linear-gradient(
+              145deg,
+              #FFFFFF,
+              #F8FAFC
+            );
+
+          border:
+            1px solid #CBD5E1;
+
+          border-radius:22px;
+
+          padding:
+            20px 14px;
+
+          text-align:center;
+
+          margin-bottom:12px;
+
+          box-shadow:
+            0 12px 35px
+            rgba(15,23,42,.07);
+
+        }
+
+
+        .qr-icon {
+
+          width:52px;
+          height:52px;
+
+          margin:
+            0 auto 10px;
+
+          border-radius:15px;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          background:
+            linear-gradient(
+              135deg,
+              #2563EB,
+              #4F46E5
+            );
+
+          color:#FFFFFF;
+
+          font-size:21px;
+
+        }
+
+
+        .qr-card h2 {
+
+          margin:0;
+
+          font-size:19px;
+
+          font-weight:950;
+
+        }
+
+
+        .qr-card p {
+
+          max-width:360px;
+
+          margin:
+            7px auto 15px;
+
+          color:#64748B;
+
+          font-size:11px;
+
+          line-height:1.6;
+
+        }
+
+
+        .qr-wrapper {
+
+          display:inline-flex;
+
+          padding:11px;
+
+          background:#FFFFFF;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:16px;
+
+          box-shadow:
+            0 8px 25px
+            rgba(15,23,42,.08);
+
+        }
+
+
+        .qr-security {
+
+          margin:
+            12px auto 0;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          gap:5px;
+
+          color:#16A34A;
+
+          font-size:9px;
+
+          font-weight:900;
+
+        }
+
+
+        /* =================================================
+           GPS INFO
+        ================================================= */
+
+        .gps-info {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:9px;
+
+          padding:
+            11px 13px;
+
+          margin-bottom:12px;
+
+          background:#F1F5F9;
+
+          border:
+            1px solid #E2E8F0;
+
+          border-radius:14px;
+
+          color:#64748B;
+
+          font-size:9px;
+
+          font-weight:800;
+
+        }
+
+
+        .gps-info.online {
+
+          background:#F0FDF4;
+
+          border-color:#BBF7D0;
+
+          color:#166534;
+
+        }
+
+
+        .gps-info > div {
+
+          width:30px;
+          height:30px;
+
+          flex-shrink:0;
+
+          border-radius:9px;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          background:#FFFFFF;
+
+          color:#2563EB;
+
+        }
+
+
+        .gps-info.online > div {
+
+          color:#16A34A;
+
+        }
+
+
+        .gps-info span {
+
+          flex:1;
+
+          line-height:1.4;
+
+        }
+
+
+        .gps-info small {
+
+          white-space:nowrap;
+
+          font-size:8px;
+
+        }
+
+
+        /* =================================================
+           FOOTER INFO
+        ================================================= */
+
+        .info-footer {
+
+          display:flex;
+
+          align-items:flex-start;
+
+          gap:9px;
+
+          padding:
+            13px;
+
+          margin-bottom:10px;
+
+          background:#EFF6FF;
+
+          border:
+            1px solid #DBEAFE;
+
+          border-radius:15px;
+
+          color:#1E40AF;
+
+        }
+
+
+        .info-footer > svg {
+
+          margin-top:2px;
+
+          flex-shrink:0;
+
+        }
+
+
+        .info-footer strong {
+
+          display:block;
+
+          font-size:10px;
+
+          font-weight:950;
+
+        }
+
+
+        .info-footer p {
+
+          margin:
+            4px 0 0;
+
+          color:#64748B;
+
+          font-size:9px;
+
+          line-height:1.5;
+
+        }
+
+
+        /* =================================================
+           POPUP
+        ================================================= */
+
+        .driver-popup {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:9px;
+
+          min-width:200px;
+
+        }
+
+
+        .driver-popup img,
+        .popup-avatar {
+
+          width:48px;
+          height:48px;
+
+          flex-shrink:0;
+
+          border-radius:50%;
+
+          object-fit:cover;
+
+        }
+
+
+        .popup-avatar {
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          background:#DBEAFE;
+
+          color:#2563EB;
+
+          font-size:19px;
+
+        }
+
+
+        .driver-popup strong {
+
+          display:block;
+
+          color:#0F172A;
+
+          font-size:12px;
+
+        }
+
+
+        .driver-popup span {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:4px;
+
+          margin-top:5px;
+
+          color:#16A34A;
+
+          font-size:9px;
+
+          font-weight:800;
+
+        }
+
+
+        /* =================================================
+           MOBILE
+        ================================================= */
+
+        @media (
+          max-width:767px
+        ) {
+
+          .track-order-page {
+
+            padding:
+              7px;
+
+          }
+
+
+          .track-header {
+
+            border-radius:15px;
+
+            padding:10px;
+
+          }
+
+
+          .status-card {
+
+            border-radius:16px;
+
+            padding:13px;
+
+          }
+
+
+          .map-card,
+          .driver-card,
+          .order-card,
+          .address-card,
+          .qr-card {
+
+            border-radius:17px;
+
+          }
+
+
+          .map-container {
+
+            height:
+              55vh;
+
+            min-height:
+              310px;
+
+          }
+
+
+          .metrics-grid {
+
+            grid-template-columns:
+              repeat(2,1fr);
+
+          }
+
+
+          .leaflet-control-zoom {
+
+            margin:
+              0 7px 7px 0 !important;
+
+          }
+
+
+          .leaflet-control-zoom a {
+
+            width:32px !important;
+
+            height:32px !important;
+
+            line-height:32px !important;
+
+          }
+
+
+          .product-price {
+
+            font-size:9px;
+
+          }
+
+        }
+
+
+        /* =================================================
+           PETIT MOBILE
+        ================================================= */
+
+        @media (
+          max-width:430px
+        ) {
+
+          .track-order-page {
+
+            padding:
+              5px;
+
+          }
+
+
+          .header-title strong {
+
+            font-size:13px;
+
+          }
+
+
+          .status-top h1 {
+
+            font-size:15px;
+
+          }
+
+
+          .point span {
+
+            font-size:7px;
+
+          }
+
+
+          .map-container {
+
+            height:
+              56vh;
+
+            min-height:
+              300px;
+
+          }
+
+
+          .driver-photo {
+
+            width:62px;
+
+            height:62px;
+
+          }
+
+
+          .driver-info h3 {
+
+            font-size:14px;
+
+          }
+
+
+          .product-image {
+
+            width:44px;
+
+            height:44px;
+
+          }
+
+
+          .product-price {
+
+            max-width:75px;
+
+            white-space:normal;
+
+            text-align:right;
+
+          }
+
+
+          .grand-total strong {
+
+            font-size:16px;
+
+          }
+
+
+          .gps-info {
+
+            align-items:flex-start;
+
+          }
+
+
+          .gps-info small {
+
+            display:none;
+
+          }
+
+        }
+
+
+        /* =================================================
+           TABLET / DESKTOP
+        ================================================= */
+
+        @media (
+          min-width:768px
+        ) {
+
+          .track-order-page {
+
+            padding:
+              18px;
+
+          }
+
+
+          .track-content {
+
+            display:grid;
+
+            grid-template-columns:
+              minmax(0,1.7fr)
+              minmax(320px,.9fr);
+
+            gap:14px;
+
+          }
+
+
+          .map-card {
+
+            grid-column:
+              1 / 2;
+
+            grid-row:
+              1 / span 4;
+
+          }
+
+
+          .metrics-grid {
+
+            grid-column:
+              2;
+
+          }
+
+
+          .driver-card,
+          .no-driver-card {
+
+            grid-column:
+              2;
+
+          }
+
+
+          .order-card {
+
+            grid-column:
+              2;
+
+          }
+
+
+          .address-card {
+
+            grid-column:
+              2;
+
+          }
+
+
+          .qr-card {
+
+            grid-column:
+              2;
+
+          }
+
+
+          .gps-info,
+          .info-footer {
+
+            grid-column:
+              1 / -1;
+
+          }
+
+
+          .map-container {
+
+            height:
+              620px;
+
+          }
+
+        }
+
+      `}</style>
+
+    </div>
+
+  );
+
+}
+
+
+// ======================================================
+// ℹ️ INFO BOX
+// ======================================================
+
+function InfoBox({
+  icon,
+  label,
+  value,
+}) {
+
+  return (
+
+    <div
+      style={{
+        background:
+          "#FFFFFF",
+        border:
+          "1px solid #E2E8F0",
+        borderRadius:
+          "14px",
+        padding:
+          "11px",
+        minWidth:
+          0,
+        boxShadow:
+          "0 5px 18px rgba(15,23,42,.04)",
+      }}
+    >
+
+      <small
+        style={{
+          display:
+            "flex",
+          alignItems:
+            "center",
+          gap:
+            "5px",
+          color:
+            "#94A3B8",
+          fontSize:
+            "8px",
+          fontWeight:
+            900,
+          whiteSpace:
+            "nowrap",
+        }}
+      >
+
+        {icon}
+
+        {label}
+
+      </small>
+
+
+      <strong
+        style={{
+          display:
+            "block",
+          marginTop:
+            "5px",
+          color:
+            "#0F172A",
+          fontSize:
+            "11px",
+          fontWeight:
+            950,
+          wordBreak:
+            "break-word",
+        }}
+      >
+
+        {value}
+
+      </strong>
 
     </div>
 
