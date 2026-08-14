@@ -5,6 +5,7 @@ import {
 } from "react";
 
 import axios from "axios";
+import { Html5Qrcode } from "html5-qrcode";
 
 import {
   FaTruck,
@@ -30,7 +31,10 @@ import {
   FaShippingFast,
   FaCircle,
   FaTelegramPlane,
-  FaBan
+  FaBan,
+  FaQrcode,
+  FaTimes,
+  FaShieldAlt
 } from "react-icons/fa";
 
 
@@ -182,6 +186,22 @@ export default function DriverTracking() {
   // avant que /api/orders confirme l'assignation.
   const locallyAcceptedRef =
     useRef({});
+
+  // ====================================================
+  // 📷 QR SCANNER
+  // ====================================================
+
+  const [qrScannerOpen, setQrScannerOpen] =
+    useState(false);
+
+  const [qrScanningOrderId, setQrScanningOrderId] =
+    useState(null);
+
+  const qrScannerRef =
+    useRef(null);
+
+  const qrStartingRef =
+    useRef(false);
 
 
   // ====================================================
@@ -904,7 +924,7 @@ export default function DriverTracking() {
         const response =
           await axios.post(
 
-            `${API}/driver/${driver._id}/telegram-connect`
+            `${API}/api/driver/${driver._id}/telegram-connect`
 
           );
 
@@ -1512,12 +1532,229 @@ export default function DriverTracking() {
 
 
   // ====================================================
+  // 📷 FERMER LE SCANNER QR
+  // ====================================================
+
+  const stopQrScanner = async () => {
+
+    try {
+
+      if (qrScannerRef.current) {
+
+        try {
+          await qrScannerRef.current.stop();
+        } catch {}
+
+        try {
+          await qrScannerRef.current.clear();
+        } catch {}
+
+      }
+
+    } catch (error) {
+
+      console.log(
+        "❌ QR STOP:",
+        error
+      );
+
+    } finally {
+
+      qrScannerRef.current = null;
+
+      qrStartingRef.current = false;
+
+      setQrScannerOpen(false);
+
+      setQrScanningOrderId(null);
+
+    }
+
+  };
+
+
+  // ====================================================
+  // 📷 OUVRIR LE SCANNER QR
+  // ====================================================
+
+  const startQrScanner =
+    async (
+      order
+    ) => {
+
+      if (!order?._id) {
+
+        notify(
+          "Commande invalide.",
+          "error",
+          "Scanner QR"
+        );
+
+        return;
+
+      }
+
+      if (
+        qrStartingRef.current ||
+        qrScannerRef.current
+      ) {
+        return;
+      }
+
+      if (order.status === "Livrée") {
+
+        notify(
+          "Cette commande est déjà livrée.",
+          "info",
+          "Scanner QR"
+        );
+
+        return;
+
+      }
+
+      const expectedToken =
+        String(
+          order.deliveryQrToken || ""
+        ).trim();
+
+      if (!expectedToken) {
+
+        notify(
+          "Cette commande ne possède pas de QR de livraison.",
+          "error",
+          "QR indisponible"
+        );
+
+        return;
+
+      }
+
+      try {
+
+        qrStartingRef.current = true;
+
+        setQrScanningOrderId(
+          String(order._id)
+        );
+
+        setQrScannerOpen(true);
+
+        await new Promise(
+          resolve =>
+            setTimeout(resolve, 180)
+        );
+
+        if (!document.getElementById("qr-reader")) {
+          throw new Error(
+            "Zone du scanner QR introuvable."
+          );
+        }
+
+        const scanner =
+          new Html5Qrcode("qr-reader");
+
+        qrScannerRef.current = scanner;
+
+        await scanner.start(
+          {
+            facingMode: "environment"
+          },
+          {
+            fps: 10,
+            qrbox: {
+              width: 240,
+              height: 240
+            },
+            aspectRatio: 1
+          },
+          async decodedText => {
+
+            const scannedToken =
+              String(decodedText || "").trim();
+
+            if (!scannedToken) {
+              return;
+            }
+
+            console.log(
+              "📷 QR SCANNÉ:",
+              scannedToken
+            );
+
+            if (
+              scannedToken !==
+              expectedToken
+            ) {
+
+              await stopQrScanner();
+
+              notify(
+                "Ce QR code ne correspond pas à cette commande.",
+                "error",
+                "QR incorrect"
+              );
+
+              return;
+
+            }
+
+            await stopQrScanner();
+
+            notify(
+              "QR vérifié. Validation de la livraison...",
+              "success",
+              "QR valide"
+            );
+
+            await finishDelivery(
+              order._id,
+              true
+            );
+
+          },
+          errorMessage => {
+
+            console.log(
+              "QR SEARCH:",
+              errorMessage
+            );
+
+          }
+        );
+
+      } catch (error) {
+
+        console.error(
+          "❌ QR SCANNER:",
+          error
+        );
+
+        await stopQrScanner();
+
+        notify(
+          "Impossible d'ouvrir la caméra. Vérifiez l'autorisation caméra de votre téléphone.",
+          "error",
+          "Caméra"
+        );
+
+      } finally {
+
+        qrStartingRef.current = false;
+
+      }
+
+    };
+
+
+  // ====================================================
   // ✅ LIVRER
   // ====================================================
 
   const finishDelivery =
     async (
-      orderId
+      orderId,
+      fromQr = false
     ) => {
 
       if (!driver?._id) {
@@ -2645,6 +2882,25 @@ export default function DriverTracking() {
                   </button>
 
 
+                  <button
+
+                    className="qr-scan-button"
+
+                    onClick={() =>
+                      startQrScanner(order)
+                    }
+
+                  >
+
+                    <FaQrcode />
+
+                    SCANNER LE QR
+
+                    <FaChevronRight />
+
+                  </button>
+
+
                   <div className="action-grid">
 
                     <button
@@ -2799,6 +3055,130 @@ export default function DriverTracking() {
 
       )}
 
+
+      {/* ================================================
+          📷 SCANNER QR
+      ================================================= */}
+
+      {qrScannerOpen && (
+
+        <div className="qr-scanner-overlay">
+
+          <div className="qr-scanner-card">
+
+            <div className="qr-scanner-header">
+
+              <div className="qr-scanner-title">
+
+                <div className="qr-scanner-title-icon">
+                  <FaQrcode />
+                </div>
+
+                <div>
+
+                  <strong>
+                    Scanner le QR
+                  </strong>
+
+                  <span>
+                    Vérification de la livraison
+                  </span>
+
+                </div>
+
+              </div>
+
+              <button
+                type="button"
+                className="qr-close-button"
+                onClick={stopQrScanner}
+                aria-label="Fermer le scanner"
+              >
+                <FaTimes />
+              </button>
+
+            </div>
+
+            <div className="qr-scanner-order">
+
+              <FaBoxOpen />
+
+              <div>
+
+                <small>
+                  COMMANDE EN COURS
+                </small>
+
+                <strong>
+                  #{String(
+                    qrScanningOrderId || ""
+                  ).slice(-8)}
+                </strong>
+
+              </div>
+
+            </div>
+
+            <div className="qr-camera-wrapper">
+
+              <div
+                id="qr-reader"
+                className="qr-reader"
+              />
+
+              <div
+                className="qr-frame"
+                aria-hidden="true"
+              >
+
+                <span className="corner top-left" />
+                <span className="corner top-right" />
+                <span className="corner bottom-left" />
+                <span className="corner bottom-right" />
+
+                <div className="qr-scan-line" />
+
+              </div>
+
+            </div>
+
+            <div className="qr-scanner-info">
+
+              <div className="qr-info-icon">
+                <FaShieldAlt />
+              </div>
+
+              <div>
+
+                <strong>
+                  Vérification sécurisée
+                </strong>
+
+                <span>
+                  Scannez uniquement le QR présenté par le client.
+                </span>
+
+              </div>
+
+            </div>
+
+            <button
+              type="button"
+              className="qr-cancel-button"
+              onClick={stopQrScanner}
+            >
+
+              <FaTimes />
+
+              FERMER LE SCANNER
+
+            </button>
+
+          </div>
+
+        </div>
+
+      )}
 
       {/* ================================================
           🚚 PAGE
@@ -5177,6 +5557,537 @@ export default function DriverTracking() {
 
         }
 
+        /* ============================================
+           QR SCANNER
+        ============================================= */
+
+        .qr-scan-button {
+
+          width:100%;
+
+          color:white;
+
+          background:
+            linear-gradient(
+              135deg,
+              #0f766e,
+              #14b8a6
+            );
+
+        }
+
+        .qr-scan-button svg:last-child {
+
+          margin-left:auto;
+
+          margin-right:12px;
+
+        }
+
+        .qr-scanner-overlay {
+
+          position:fixed;
+
+          inset:0;
+
+          z-index:1000000;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          padding:15px;
+
+          background:
+            rgba(2,6,23,.84);
+
+          backdrop-filter:
+            blur(10px);
+
+        }
+
+        .qr-scanner-card {
+
+          width:100%;
+
+          max-width:470px;
+
+          max-height:
+            calc(100vh - 30px);
+
+          overflow:auto;
+
+          padding:16px;
+
+          border-radius:22px;
+
+          background:#ffffff;
+
+          box-shadow:
+            0 30px 80px
+            rgba(0,0,0,.38);
+
+        }
+
+        .qr-scanner-header {
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:space-between;
+
+          gap:12px;
+
+          margin-bottom:12px;
+
+        }
+
+        .qr-scanner-title {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:10px;
+
+          min-width:0;
+
+        }
+
+        .qr-scanner-title-icon {
+
+          width:43px;
+
+          height:43px;
+
+          flex-shrink:0;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          border-radius:12px;
+
+          color:white;
+
+          background:
+            linear-gradient(
+              135deg,
+              #0f766e,
+              #14b8a6
+            );
+
+          font-size:19px;
+
+        }
+
+        .qr-scanner-title strong {
+
+          display:block;
+
+          color:#0f172a;
+
+          font-size:17px;
+
+          font-weight:950;
+
+        }
+
+        .qr-scanner-title span {
+
+          display:block;
+
+          margin-top:3px;
+
+          color:#64748b;
+
+          font-size:9px;
+
+          font-weight:700;
+
+        }
+
+        .qr-close-button {
+
+          width:38px;
+
+          height:38px;
+
+          flex-shrink:0;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          border:0;
+
+          border-radius:10px;
+
+          color:#475569;
+
+          background:#f1f5f9;
+
+          font-size:15px;
+
+          cursor:pointer;
+
+        }
+
+        .qr-scanner-order {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:9px;
+
+          padding:10px 12px;
+
+          margin-bottom:10px;
+
+          border:1px solid #e2e8f0;
+
+          border-radius:11px;
+
+          background:#f8fafc;
+
+        }
+
+        .qr-scanner-order > svg {
+
+          color:#2563eb;
+
+          font-size:17px;
+
+        }
+
+        .qr-scanner-order small {
+
+          display:block;
+
+          color:#64748b;
+
+          font-size:7px;
+
+          font-weight:950;
+
+        }
+
+        .qr-scanner-order strong {
+
+          display:block;
+
+          margin-top:2px;
+
+          color:#0f172a;
+
+          font-size:11px;
+
+          font-weight:950;
+
+        }
+
+        .qr-camera-wrapper {
+
+          position:relative;
+
+          width:100%;
+
+          overflow:hidden;
+
+          border-radius:17px;
+
+          background:#020617;
+
+        }
+
+        .qr-reader {
+
+          width:100%;
+
+          min-height:300px;
+
+        }
+
+        .qr-reader video {
+
+          width:100% !important;
+
+          height:auto !important;
+
+          min-height:300px;
+
+          display:block;
+
+          object-fit:cover;
+
+          border-radius:17px;
+
+        }
+
+        .qr-reader__dashboard {
+
+          padding:8px !important;
+
+          text-align:center !important;
+
+          background:#020617 !important;
+
+        }
+
+        .qr-reader__dashboard button {
+
+          min-height:36px;
+
+          padding:0 12px;
+
+          border:0;
+
+          border-radius:9px;
+
+          color:white;
+
+          background:#2563eb;
+
+          font-size:9px;
+
+          font-weight:900;
+
+        }
+
+        .qr-frame {
+
+          position:absolute;
+
+          top:50%;
+
+          left:50%;
+
+          width:240px;
+
+          height:240px;
+
+          transform:
+            translate(-50%,-50%);
+
+          pointer-events:none;
+
+        }
+
+        .corner {
+
+          position:absolute;
+
+          width:34px;
+
+          height:34px;
+
+          border-color:#22c55e;
+
+          filter:
+            drop-shadow(
+              0 0 5px
+              rgba(34,197,94,.7)
+            );
+
+        }
+
+        .corner.top-left {
+
+          top:0;
+          left:0;
+          border-top:4px solid;
+          border-left:4px solid;
+          border-radius:9px 0 0 0;
+
+        }
+
+        .corner.top-right {
+
+          top:0;
+          right:0;
+          border-top:4px solid;
+          border-right:4px solid;
+          border-radius:0 9px 0 0;
+
+        }
+
+        .corner.bottom-left {
+
+          bottom:0;
+          left:0;
+          border-bottom:4px solid;
+          border-left:4px solid;
+          border-radius:0 0 0 9px;
+
+        }
+
+        .corner.bottom-right {
+
+          right:0;
+          bottom:0;
+          border-bottom:4px solid;
+          border-right:4px solid;
+          border-radius:0 0 9px 0;
+
+        }
+
+        .qr-scan-line {
+
+          position:absolute;
+
+          left:8px;
+          right:8px;
+          top:12px;
+
+          height:2px;
+
+          border-radius:999px;
+
+          background:#22c55e;
+
+          box-shadow:
+            0 0 10px
+            rgba(34,197,94,.8);
+
+          animation:
+            qrScanLine
+            2s
+            ease-in-out
+            infinite;
+
+        }
+
+        @keyframes qrScanLine {
+
+          0%, 100% {
+            transform:translateY(0);
+            opacity:.65;
+          }
+
+          50% {
+            transform:translateY(214px);
+            opacity:1;
+          }
+
+        }
+
+        .qr-scanner-info {
+
+          display:flex;
+
+          align-items:center;
+
+          gap:10px;
+
+          margin-top:10px;
+
+          padding:11px;
+
+          border:1px solid #bbf7d0;
+
+          border-radius:11px;
+
+          background:#f0fdf4;
+
+        }
+
+        .qr-info-icon {
+
+          width:34px;
+
+          height:34px;
+
+          flex-shrink:0;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          border-radius:9px;
+
+          color:#15803d;
+
+          background:#dcfce7;
+
+          font-size:14px;
+
+        }
+
+        .qr-scanner-info strong {
+
+          display:block;
+
+          color:#166534;
+
+          font-size:10px;
+
+          font-weight:950;
+
+        }
+
+        .qr-scanner-info span {
+
+          display:block;
+
+          margin-top:2px;
+
+          color:#15803d;
+
+          font-size:8px;
+
+          line-height:1.4;
+
+          font-weight:700;
+
+        }
+
+        .qr-cancel-button {
+
+          width:100%;
+
+          min-height:43px;
+
+          margin-top:9px;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          gap:7px;
+
+          border:1px solid #e2e8f0;
+
+          border-radius:10px;
+
+          color:#475569;
+
+          background:#f8fafc;
+
+          font-size:9px;
+
+          font-weight:950;
+
+          cursor:pointer;
+
+        }
+
+
+        /* ============================================
+           DELETE
+        ============================================= */
+
         .delete-button {
 
           width:100%;
@@ -5892,6 +6803,50 @@ export default function DriverTracking() {
             left:10px;
 
             width:auto;
+
+          }
+
+        }
+
+
+        @media (
+          max-width:600px
+        ) {
+
+          .qr-scanner-overlay {
+            padding:8px;
+          }
+
+          .qr-scanner-card {
+            padding:12px;
+            border-radius:18px;
+          }
+
+          .qr-scanner-title strong {
+            font-size:15px;
+          }
+
+          .qr-reader,
+          .qr-reader video {
+            min-height:280px;
+          }
+
+          .qr-frame {
+            width:220px;
+            height:220px;
+          }
+
+          @keyframes qrScanLine {
+
+            0%, 100% {
+              transform:translateY(0);
+              opacity:.65;
+            }
+
+            50% {
+              transform:translateY(194px);
+              opacity:1;
+            }
 
           }
 

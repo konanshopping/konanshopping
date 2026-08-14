@@ -5589,6 +5589,7 @@ app.put(
 
 // ======================================================
 // ✅ LIVRER UNE COMMANDE
+// 📷 QR CODE OU BOUTON "LIVRÉE"
 // ======================================================
 
 app.put(
@@ -5598,9 +5599,14 @@ app.put(
     try {
 
       const {
-        driverId
+        driverId,
+        deliveryQrToken
       } = req.body;
 
+
+      // ==================================================
+      // 🔐 VÉRIFIER LE LIVREUR
+      // ==================================================
 
       if (!driverId) {
 
@@ -5616,42 +5622,28 @@ app.put(
       }
 
 
+      // ==================================================
+      // 🔎 RÉCUPÉRER LA COMMANDE
+      // ==================================================
+
       const order =
-        await Order.findOneAndUpdate(
+        await Order.findOne({
 
-          {
+          _id:
+            req.params.orderId,
 
-            _id:
-              req.params.orderId,
+          "assignedDriver.id":
+            driverId,
 
-            "assignedDriver.id":
-              driverId,
+          status:
+            "En livraison"
 
-            status:
-              "En livraison"
+        });
 
-          },
 
-          {
-
-            $set: {
-
-              status:
-                "Livrée",
-
-              deliveredAt:
-                new Date()
-
-            }
-
-          },
-
-          {
-            new: true
-          }
-
-        );
-
+      // ==================================================
+      // ❌ COMMANDE NON AUTORISÉE
+      // ==================================================
 
       if (!order) {
 
@@ -5667,17 +5659,130 @@ app.put(
       }
 
 
+      // ==================================================
+      // 📷 VÉRIFICATION QR CODE
+      // ==================================================
+
+      if (deliveryQrToken) {
+
+
+        // ================================================
+        // 🚫 QR DÉJÀ UTILISÉ
+        // ================================================
+
+        if (order.deliveryQrUsedAt) {
+
+          return res.status(400).json({
+
+            success: false,
+
+            message:
+              "Ce QR Code a déjà été utilisé."
+
+          });
+
+        }
+
+
+        // ================================================
+        // ❌ QR INCORRECT
+        // ================================================
+
+        if (
+          deliveryQrToken !==
+          order.deliveryQrToken
+        ) {
+
+          return res.status(400).json({
+
+            success: false,
+
+            message:
+              "QR Code invalide pour cette commande."
+
+          });
+
+        }
+
+      }
+
+
+      // ==================================================
+      // ✅ LIVRER LA COMMANDE
+      // ==================================================
+
+      order.status =
+        "Livrée";
+
+      order.deliveredAt =
+        new Date();
+
+
+      // ==================================================
+      // 📷 ENREGISTRER L'UTILISATION DU QR
+      // ==================================================
+
+      if (deliveryQrToken) {
+
+        order.deliveryQrUsedAt =
+          new Date();
+
+      }
+
+
+      // ==================================================
+      // 💾 SAUVEGARDER
+      // ==================================================
+
+      await order.save();
+
+
+      // ==================================================
+      // 🧪 LOG
+      // ==================================================
+
       console.log(
-        `✅ Commande ${order._id} livrée par ${driverId}`
+        "=========================================="
+      );
+
+      console.log(
+        "✅ COMMANDE LIVRÉE"
+      );
+
+      console.log(
+        "📦 COMMANDE :",
+        order._id
+      );
+
+      console.log(
+        "🚚 LIVREUR :",
+        driverId
+      );
+
+      console.log(
+        "📷 QR :",
+        deliveryQrToken
+          ? "UTILISÉ ✅"
+          : "NON UTILISÉ — BOUTON LIVRÉE ✅"
+      );
+
+      console.log(
+        "=========================================="
       );
 
 
-      res.json({
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
+
+      return res.json({
 
         success: true,
 
         message:
-          "Commande livrée avec succès",
+          deliveryQrToken
+            ? "Commande livrée avec QR Code ✅"
+            : "Commande livrée avec succès ✅",
 
         order
 
@@ -5692,7 +5797,7 @@ app.put(
       );
 
 
-      res.status(500).json({
+      return res.status(500).json({
 
         success: false,
 
