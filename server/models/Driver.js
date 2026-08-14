@@ -86,6 +86,42 @@ const DriverSchema = new mongoose.Schema({
 
   },
 
+ // ==========================================
+// 🗺️ HISTORIQUE DU TRAJET DU LIVREUR
+// ==========================================
+
+locationHistory: [
+
+  {
+
+    // 📍 Latitude
+    lat: {
+      type: Number,
+      required: true,
+    },
+
+    // 📍 Longitude
+    lng: {
+      type: Number,
+      required: true,
+    },
+
+    // 📦 COMMANDE ASSOCIÉE À CETTE POSITION
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+    },
+
+    // 🕐 Heure d'enregistrement
+    recordedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+  },
+
+],
 
 // ==========================================
 // 📲 TELEGRAM

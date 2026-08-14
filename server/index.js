@@ -5280,25 +5280,376 @@ app.get(
   }
 );
 
+// ======================================================
+// 🚚 LIVREURS + STATISTIQUES
+// ======================================================
+
 app.get("/drivers", async (req, res) => {
 
   try {
 
-    const drivers = await Driver.find();
+    // ================================================
+    // 👨‍🚚 RÉCUPÉRER LES LIVREURS
+    // ================================================
 
-    res.json(drivers);
+    const drivers =
+      await Driver.find()
+        .sort({
+          createdAt: -1
+        })
+        .lean();
+
+
+    // ================================================
+    // 📅 DÉBUT DE LA JOURNÉE
+    // ================================================
+
+    const startOfDay =
+      new Date();
+
+    startOfDay.setHours(
+      0,
+      0,
+      0,
+      0
+    );
+
+
+    // ================================================
+    // 📊 AJOUTER LES STATISTIQUES
+    // ================================================
+
+    const driversWithStats =
+      await Promise.all(
+
+        drivers.map(
+          async (driver) => {
+
+            const driverId =
+              driver._id;
+
+
+            // =========================================
+            // 📦 TOTAL DES COMMANDES LIVRÉES
+            // =========================================
+
+            const totalDelivered =
+              await Order.countDocuments({
+
+                "assignedDriver.id":
+                  driverId,
+
+                status:
+                  "Livrée"
+
+              });
+
+
+            // =========================================
+            // 📅 COMMANDES LIVRÉES AUJOURD'HUI
+            // =========================================
+
+            const deliveredToday =
+              await Order.countDocuments({
+
+                "assignedDriver.id":
+                  driverId,
+
+                status:
+                  "Livrée",
+
+                deliveredAt: {
+                  $gte:
+                    startOfDay
+                }
+
+              });
+
+
+            // =========================================
+            // 🚚 COMMANDES EN COURS
+            // =========================================
+
+            const inDelivery =
+              await Order.countDocuments({
+
+                "assignedDriver.id":
+                  driverId,
+
+                status:
+                  "En livraison"
+
+              });
+
+
+            // =========================================
+            // 🕐 DERNIÈRE LIVRAISON
+            // =========================================
+
+            const lastDeliveredOrder =
+              await Order.findOne({
+
+                "assignedDriver.id":
+                  driverId,
+
+                status:
+                  "Livrée",
+
+                deliveredAt: {
+                  $ne:
+                    null
+                }
+
+              })
+              .sort({
+                deliveredAt:
+                  -1
+              })
+              .select(
+                "_id deliveredAt"
+              )
+              .lean();
+
+
+            // =========================================
+            // 📤 LIVREUR + STATISTIQUES
+            // =========================================
+
+            return {
+
+              ...driver,
+
+              stats: {
+
+                totalDelivered,
+
+                deliveredToday,
+
+                inDelivery,
+
+                lastDeliveredAt:
+                  lastDeliveredOrder
+                    ?.deliveredAt ||
+                  null
+
+              }
+
+            };
+
+          }
+
+        )
+
+      );
+
+
+    // ================================================
+    // 📤 RÉPONSE
+    // ================================================
+
+    res.json(
+      driversWithStats
+    );
+
 
   } catch (err) {
 
-    console.log(err);
+    console.error(
+      "❌ DRIVERS ERROR:",
+      err
+    );
 
     res.status(500).json({
-      error: "Erreur serveur",
+
+      success: false,
+
+      error:
+        "Erreur serveur",
+
+      message:
+        err.message
+
     });
 
   }
 
 });
+
+// ======================================================
+// 🗺️ TRAJET DU LIVREUR POUR AUJOURD'HUI
+// ======================================================
+
+app.get(
+  "/driver/:driverId/today-route",
+  async (req, res) => {
+
+    try {
+
+      const {
+        driverId
+      } = req.params;
+
+
+      // ==========================================
+      // 🔐 VÉRIFIER LE LIVREUR
+      // ==========================================
+
+      const driver =
+        await Driver.findById(
+          driverId
+        ).lean();
+
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+
+      // ==========================================
+      // 📅 DÉBUT DE LA JOURNÉE
+      // ==========================================
+
+      const startOfDay =
+        new Date();
+
+      startOfDay.setHours(
+        0,
+        0,
+        0,
+        0
+      );
+
+
+      // ==========================================
+      // 📅 FIN DE LA JOURNÉE
+      // ==========================================
+
+      const endOfDay =
+        new Date();
+
+      endOfDay.setHours(
+        23,
+        59,
+        59,
+        999
+      );
+
+
+      // ==========================================
+      // 🗺️ HISTORIQUE GPS
+      // ==========================================
+
+      const history =
+        Array.isArray(
+          driver.locationHistory
+        )
+          ? driver.locationHistory
+              .filter((point) => {
+
+                const date =
+                  new Date(
+                    point.recordedAt ||
+                    point.timestamp
+                  );
+
+                return (
+                  date >= startOfDay &&
+                  date <= endOfDay
+                );
+
+              })
+              .sort(
+                (a, b) =>
+                  new Date(
+                    a.recordedAt ||
+                    a.timestamp
+                  ) -
+                  new Date(
+                    b.recordedAt ||
+                    b.timestamp
+                  )
+              )
+          : [];
+
+
+      // ==========================================
+      // 📤 RÉPONSE
+      // ==========================================
+
+      return res.json({
+
+        success: true,
+
+        driver: {
+
+          _id:
+            driver._id,
+
+          name:
+            driver.name,
+
+          photo:
+            driver.photo,
+
+          vehicle:
+            driver.vehicle,
+
+          plate:
+            driver.plate,
+
+          city:
+            driver.city
+
+        },
+
+        date:
+          startOfDay
+            .toLocaleDateString(
+              "fr-FR"
+            ),
+
+        count:
+          history.length,
+
+        route:
+          history
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ TODAY ROUTE ERROR:",
+        err
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur récupération du trajet",
+
+        error:
+          err.message
+
+      });
+
+    }
+
+  }
+);
 
 app.delete("/drivers/:id", async (req, res) => {
 
@@ -5487,7 +5838,43 @@ app.put(
 
 
       // ============================================
-      // VÉRIFIER LE LIVREUR
+      // 🔢 CONVERTIR LES COORDONNÉES
+      // ============================================
+
+      const latitude =
+        Number(lat);
+
+      const longitude =
+        Number(lng);
+
+
+      if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+      ) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Coordonnées GPS invalides"
+
+        });
+
+      }
+
+
+      // ============================================
+      // 🕐 DATE GPS
+      // ============================================
+
+      const now =
+        new Date();
+
+
+      // ============================================
+      // 🚚 VÉRIFIER LA COMMANDE
       // ============================================
 
       const order =
@@ -5510,16 +5897,20 @@ app.put(
 
             $set: {
 
+              // ====================================
+              // 📍 POSITION ACTUELLE DE LA COMMANDE
+              // ====================================
+
               driverLocation: {
 
                 lat:
-                  Number(lat),
+                  latitude,
 
                 lng:
-                  Number(lng),
+                  longitude,
 
                 updatedAt:
-                  new Date()
+                  now
 
               }
 
@@ -5535,7 +5926,7 @@ app.put(
 
 
       // ============================================
-      // PAS AUTORISÉ
+      // ❌ PAS AUTORISÉ
       // ============================================
 
       if (!order) {
@@ -5553,7 +5944,131 @@ app.put(
 
 
       // ============================================
-      // OK
+      // 👨‍🚚 RÉCUPÉRER LE LIVREUR
+      // ============================================
+
+      const driver =
+        await Driver.findById(
+          driverId
+        );
+
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+
+      // ============================================
+      // 📍 POSITION ACTUELLE DU LIVREUR
+      // ============================================
+
+      driver.currentLocation = {
+
+        lat:
+          latitude,
+
+        lng:
+          longitude,
+
+        updatedAt:
+          now
+
+      };
+
+
+      // ============================================
+      // 🗺️ AJOUTER AU TRAJET
+      // ============================================
+
+      if (
+        !Array.isArray(
+          driver.locationHistory
+        )
+      ) {
+
+        driver.locationHistory = [];
+
+      }
+
+
+      driver.locationHistory.push({
+
+  lat: latitude,
+
+  lng: longitude,
+
+  orderId: order._id,
+
+  recordedAt: now
+
+});
+
+
+      // ============================================
+      // 💾 SAUVEGARDER LE LIVREUR
+      // ============================================
+
+      await driver.save();
+
+
+      // ============================================
+      // 🧪 DEBUG
+      // ============================================
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "📍 GPS LIVREUR"
+      );
+
+      console.log(
+        "👨‍🚚 LIVREUR :",
+        driver.name
+      );
+
+      console.log(
+        "🆔 DRIVER ID :",
+        driver._id
+      );
+
+      console.log(
+        "📦 COMMANDE :",
+        order._id
+      );
+
+      console.log(
+        "📍 LAT :",
+        latitude
+      );
+
+      console.log(
+        "📍 LNG :",
+        longitude
+      );
+
+      console.log(
+        "🗺️ POINTS HISTORIQUE :",
+        driver.locationHistory.length
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ============================================
+      // 📤 RÉPONSE
       // ============================================
 
       return res.json({
@@ -5573,7 +6088,7 @@ app.put(
       );
 
 
-      res.status(500).json({
+      return res.status(500).json({
 
         success: false,
 
