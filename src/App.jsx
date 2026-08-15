@@ -1101,40 +1101,506 @@ if (
 />
 
     
-{/* HEADER */}
+{/* =========================================================
+    HEADER FIXE — KONAN SHOPPING
+========================================================= */}
 
 <div
   style={{
-    background: "white",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+
+    width: "100%",
+
+    background: "rgba(255,255,255,0.97)",
+
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+
+    borderBottom: "1px solid rgba(229,231,235,0.85)",
+
+    boxShadow:
+      "0 6px 24px rgba(15,23,42,0.07)",
+
+    zIndex: 9999,
+
+    boxSizing: "border-box",
 
     padding:
       window.innerWidth < 768
-        ? "10px"
-        : "12px 22px",
-
-    borderBottom:
-      "1px solid #ececec",
+        ? "8px 10px 9px"
+        : "10px 22px 12px",
   }}
 >
 
-  {/* TOP NAV */}
+  {/* =====================================================
+      TOP BAR
+  ===================================================== */}
 
   <div
     style={{
       display: "flex",
 
-      justifyContent:
-        "space-between",
-
       alignItems: "center",
 
-      gap: "12px",
+      justifyContent:
+        window.innerWidth < 768
+          ? "space-between"
+          : "space-between",
 
-      flexWrap: "nowrap",
+      gap:
+        window.innerWidth < 768
+          ? "8px"
+          : "14px",
+
+      width: "100%",
+
+      maxWidth: "1600px",
+
+      margin: "0 auto",
     }}
   >
 
-    {/* LOGO */}
+    {/* ===================================================
+        LOGO
+    =================================================== */}
+
+    <Link
+      to="/"
+      style={{
+        textDecoration: "none",
+
+        display: "flex",
+
+        alignItems: "center",
+
+        gap:
+          window.innerWidth < 768
+            ? "6px"
+            : "9px",
+
+        flexShrink: 0,
+      }}
+    >
+
+      <img
+        src="/logo.jpg"
+        alt="Konan Shopping"
+        translate="no"
+
+        style={{
+          width:
+            window.innerWidth < 768
+              ? "34px"
+              : "42px",
+
+          height:
+            window.innerWidth < 768
+              ? "34px"
+              : "42px",
+
+          objectFit: "cover",
+
+          borderRadius:
+            window.innerWidth < 768
+              ? "9px"
+              : "11px",
+
+          display: "block",
+
+          boxShadow:
+            "0 3px 10px rgba(75,46,131,0.12)",
+        }}
+      />
+
+      <div
+        style={{
+          lineHeight: "1",
+
+          display:
+            window.innerWidth < 768
+              ? "block"
+              : "block",
+        }}
+      >
+
+        <div
+          translate="no"
+          style={{
+            margin: 0,
+
+            fontSize:
+              window.innerWidth < 768
+                ? "10px"
+                : "13px",
+
+            color: "#1F1B4B",
+
+            fontWeight: "900",
+
+            lineHeight: "1.05",
+
+            letterSpacing: "-0.3px",
+          }}
+        >
+          KONAN
+        </div>
+
+        <div
+          translate="no"
+          style={{
+            margin: 0,
+
+            fontSize:
+              window.innerWidth < 768
+                ? "10px"
+                : "13px",
+
+            color: "#5B3CC4",
+
+            fontWeight: "900",
+
+            lineHeight: "1.05",
+
+            letterSpacing: "-0.3px",
+          }}
+        >
+          SHOPPING
+        </div>
+
+      </div>
+
+    </Link>
+
+
+    {/* ===================================================
+        DESKTOP SEARCH
+        Sur mobile elle descend sur la deuxième ligne
+    =================================================== */}
+
+    {window.innerWidth >= 768 && (
+
+      <div
+        style={{
+          flex: 1,
+
+          display: "flex",
+
+          justifyContent: "center",
+
+          minWidth: 0,
+
+          margin:
+            "0 15px",
+
+          position: "relative",
+
+          maxWidth: "620px",
+        }}
+      >
+
+        <div
+          style={{
+            width: "100%",
+
+            background: "#F8FAFC",
+
+            position: "relative",
+
+            borderRadius: "999px",
+
+            display: "flex",
+
+            alignItems: "center",
+
+            overflow: "hidden",
+
+            border:
+              "1px solid #E5E7EB",
+
+            boxShadow:
+              "0 2px 8px rgba(15,23,42,0.04)",
+          }}
+        >
+
+          <FaSearch
+            style={{
+              marginLeft: "16px",
+
+              color: "#94A3B8",
+
+              fontSize: "14px",
+
+              flexShrink: 0,
+            }}
+          />
+
+          <input
+            type="text"
+
+            placeholder={
+              placeholders[placeholderIndex]
+            }
+
+            value={search}
+
+            onChange={(e) => {
+
+              const value =
+                e.target.value;
+
+              setSearch(value);
+
+              if (value.trim()) {
+
+                const filtered =
+                  products.filter(
+                    (product) =>
+                      product.name
+                        .toLowerCase()
+                        .includes(
+                          value.toLowerCase()
+                        )
+                  );
+
+                setSuggestions(
+                  filtered.slice(0, 5)
+                );
+
+              } else {
+
+                setSuggestions([]);
+
+              }
+
+            }}
+
+            style={{
+              flex: 1,
+
+              minWidth: 0,
+
+              border: "none",
+
+              outline: "none",
+
+              padding:
+                "12px 12px",
+
+              fontSize: "14px",
+
+              background:
+                "transparent",
+
+              color: "#111827",
+
+              WebkitTextFillColor:
+                "#111827",
+
+              caretColor:
+                "#4B2E83",
+            }}
+          />
+
+          <button
+            type="button"
+
+            onClick={() => {
+
+              if (
+                search.trim()
+              ) {
+
+                setSuggestions([]);
+
+              }
+
+            }}
+
+            style={{
+              width: "44px",
+
+              height: "44px",
+
+              marginRight: "2px",
+
+              border: "none",
+
+              borderRadius:
+                "50%",
+
+              background:
+                "#4B2E83",
+
+              color: "#FFFFFF",
+
+              display: "flex",
+
+              alignItems:
+                "center",
+
+              justifyContent:
+                "center",
+
+              cursor: "pointer",
+
+              flexShrink: 0,
+            }}
+          >
+            <FaSearch />
+          </button>
+
+        </div>
+
+
+        {/* SUGGESTIONS */}
+
+        {suggestions.length > 0 && (
+
+          <div
+            style={{
+              position: "absolute",
+
+              top: "56px",
+
+              left: 0,
+
+              right: 0,
+
+              background: "#FFFFFF",
+
+              borderRadius: "18px",
+
+              border:
+                "1px solid #E5E7EB",
+
+              boxShadow:
+                "0 18px 45px rgba(15,23,42,0.14)",
+
+              zIndex: 10000,
+
+              overflow: "hidden",
+            }}
+          >
+
+            {suggestions.map(
+              (product) => (
+
+                <div
+                  key={product._id}
+
+                  onClick={() => {
+
+                    setSearch(
+                      product.name
+                    );
+
+                    setSuggestions([]);
+
+                    navigate(
+                      `/product/${product._id}`
+                    );
+
+                  }}
+
+                  style={{
+                    display: "flex",
+
+                    alignItems:
+                      "center",
+
+                    gap: "12px",
+
+                    padding:
+                      "11px 13px",
+
+                    cursor:
+                      "pointer",
+
+                    borderBottom:
+                      "1px solid #F1F5F9",
+                  }}
+                >
+
+                  <img
+                    src={product.image}
+                    alt=""
+
+                    style={{
+                      width: "42px",
+
+                      height: "42px",
+
+                      borderRadius: "10px",
+
+                      objectFit: "cover",
+
+                      flexShrink: 0,
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      minWidth: 0,
+                    }}
+                  >
+
+                    <div
+                      style={{
+                        fontSize: "13px",
+
+                        fontWeight: "700",
+
+                        color: "#111827",
+
+                        overflow:
+                          "hidden",
+
+                        textOverflow:
+                          "ellipsis",
+
+                        whiteSpace:
+                          "nowrap",
+                      }}
+                    >
+                      {product.name}
+                    </div>
+
+                    <div
+                      style={{
+                        fontSize: "11px",
+
+                        color: "#6B7280",
+
+                        marginTop: "3px",
+                      }}
+                    >
+                      {Number(
+                        product.price
+                      ).toLocaleString()} FCFA
+                    </div>
+
+                  </div>
+
+                </div>
+
+              )
+            )}
+
+          </div>
+
+        )}
+
+      </div>
+
+    )}
+
+
+    {/* ===================================================
+        ICONES
+    =================================================== */}
 
     <div
       style={{
@@ -1142,153 +1608,475 @@ if (
 
         alignItems: "center",
 
-        gap: "8px",
+        gap:
+          window.innerWidth < 768
+            ? "5px"
+            : "8px",
+
+        flexShrink: 0,
       }}
     >
 
-      <img
-        src="/logo.jpg"
-         alt=""
+      {/* FAVORIS */}
+
+      <Link
+        to="/favorites"
 
         style={{
-          width: "35px",
+          textDecoration: "none",
 
-          height: "35px",
-
-          objectFit: "cover",
-
-          borderRadius: "10px",
+          color: "#111827",
         }}
-      />
+      >
 
-      <div>
-
-        <h1
-        translate="no"
+        <div
           style={{
-            margin: 0,
-            fontSize: "11px",
-            color: "#1f1b4b",
-            fontWeight: "900",
-            lineHeight: "1.1",
+            width:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            height:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            borderRadius:
+              window.innerWidth < 768
+                ? "11px"
+                : "13px",
+
+            background: "#FFFFFF",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            position: "relative",
+
+            border:
+              "1px solid #F1F5F9",
+
+            boxShadow:
+              "0 3px 10px rgba(15,23,42,0.05)",
           }}
         >
-          KONAN
-        </h1>
 
-        <h2
-        translate="no"
+          <FaHeart
+            style={{
+              fontSize:
+                window.innerWidth < 768
+                  ? "16px"
+                  : "18px",
+            }}
+          />
+
+          {favoritesCount > 0 && (
+
+            <span
+              style={{
+                position: "absolute",
+
+                top: "-5px",
+
+                right: "-4px",
+
+                minWidth: "16px",
+
+                height: "16px",
+
+                padding: "0 3px",
+
+                borderRadius: "999px",
+
+                background:
+                  "#5B3CC4",
+
+                color: "#FFFFFF",
+
+                display: "flex",
+
+                justifyContent:
+                  "center",
+
+                alignItems:
+                  "center",
+
+                fontSize: "9px",
+
+                fontWeight: "800",
+
+                border:
+                  "2px solid white",
+              }}
+            >
+              {favoritesCount}
+            </span>
+
+          )}
+
+        </div>
+
+      </Link>
+
+
+      {/* PANIER */}
+
+      <Link
+        to="/checkout"
+
+        state={{
+          cart
+        }}
+
+        style={{
+          textDecoration:
+            "none",
+
+          color:
+            "#111827",
+        }}
+      >
+
+        <div
           style={{
-            margin: 0,
-            fontSize: "11px",
-            color: "#5b3cc4",
-            fontWeight: "900",
-            lineHeight: "1.1",
+            width:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            height:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            borderRadius:
+              window.innerWidth < 768
+                ? "11px"
+                : "13px",
+
+            background:
+              "#FFFFFF",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            position:
+              "relative",
+
+            border:
+              "1px solid #F1F5F9",
+
+            boxShadow:
+              "0 3px 10px rgba(15,23,42,0.05)",
           }}
         >
-          SHOPPING
-        </h2>
 
-      </div>
+          <FaShoppingCart
+            style={{
+              fontSize:
+                window.innerWidth < 768
+                  ? "16px"
+                  : "18px",
+            }}
+          />
+
+          <span
+            style={{
+              position:
+                "absolute",
+
+              top: "-5px",
+
+              right: "-4px",
+
+              minWidth: "16px",
+
+              height: "16px",
+
+              padding:
+                "0 3px",
+
+              borderRadius:
+                "999px",
+
+              background:
+                "#5B3CC4",
+
+              color:
+                "#FFFFFF",
+
+              display: "flex",
+
+              justifyContent:
+                "center",
+
+              alignItems:
+                "center",
+
+              fontSize: "9px",
+
+              fontWeight: "800",
+
+              border:
+                "2px solid white",
+            }}
+          >
+            {cart.reduce(
+              (total, item) =>
+                total +
+                (item.quantity || 1),
+              0
+            )}
+          </span>
+
+        </div>
+
+      </Link>
+
+
+      {/* COMPTE */}
+
+      <Link
+        to="/account"
+
+        style={{
+          textDecoration:
+            "none",
+
+          color:
+            "#111827",
+        }}
+      >
+
+        <div
+          style={{
+            width:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            height:
+              window.innerWidth < 768
+                ? "36px"
+                : "42px",
+
+            borderRadius:
+              window.innerWidth < 768
+                ? "11px"
+                : "13px",
+
+            background:
+              "#FFFFFF",
+
+            display: "flex",
+
+            justifyContent:
+              "center",
+
+            alignItems:
+              "center",
+
+            border:
+              "1px solid #F1F5F9",
+
+            boxShadow:
+              "0 3px 10px rgba(15,23,42,0.05)",
+          }}
+        >
+
+          <FaUserCircle
+            style={{
+              fontSize:
+                window.innerWidth < 768
+                  ? "18px"
+                  : "20px",
+            }}
+          />
+
+        </div>
+
+      </Link>
 
     </div>
 
-   {/* SEARCH */}
+  </div>
+
+
+  {/* =====================================================
+      RECHERCHE MOBILE
+  ===================================================== */}
+
+  {window.innerWidth < 768 && (
 
     <div
-  style={{
-    flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    minWidth: "0",
-    marginLeft: "8px",
-    marginRight: "8px",
-  }}
->
+      style={{
+        position:
+          "relative",
+
+        width: "100%",
+
+        marginTop: "8px",
+      }}
+    >
 
       <div
-style={{
-width:"100%",
-maxWidth:
-window.innerWidth < 768
-? "180px"
-: "350px",
-background:"white",
-position:"relative",
-borderRadius:"50px",
-display:"flex",
-alignItems:"center",
-overflow:"hidden",
-boxShadow:
-"0 3px 10px rgba(0,0,0,0.06)",
-}}
->
+        style={{
+          width: "100%",
+
+          height: "43px",
+
+          background:
+            "#F8FAFC",
+
+          border:
+            "1px solid #E5E7EB",
+
+          borderRadius:
+            "999px",
+
+          display: "flex",
+
+          alignItems:
+            "center",
+
+          overflow: "hidden",
+
+          boxShadow:
+            "0 2px 8px rgba(15,23,42,0.04)",
+        }}
+      >
+
+        <FaSearch
+          style={{
+            marginLeft: "14px",
+
+            color: "#94A3B8",
+
+            fontSize: "14px",
+
+            flexShrink: 0,
+          }}
+        />
 
         <input
           type="text"
 
-          placeholder={placeholders[placeholderIndex]}
+          placeholder={
+            placeholders[placeholderIndex]
+          }
 
           value={search}
 
           onChange={(e) => {
 
-const value =
-e.target.value;
+            const value =
+              e.target.value;
 
-setSearch(value);
+            setSearch(value);
 
-if(value.trim()){
+            if (
+              value.trim()
+            ) {
 
-const filtered =
+              const filtered =
+                products.filter(
+                  (product) =>
+                    product.name
+                      .toLowerCase()
+                      .includes(
+                        value.toLowerCase()
+                      )
+                );
 
-products.filter(product =>
+              setSuggestions(
+                filtered.slice(0, 5)
+              );
 
-product.name
-.toLowerCase()
-.includes(
-value.toLowerCase()
-)
+            } else {
 
-);
+              setSuggestions([]);
 
-setSuggestions(
-filtered.slice(0,5)
-);
+            }
 
-}
-
-else{
-
-setSuggestions([]);
-
-}
-
-}}
+          }}
 
           style={{
-  flex: 1,
-  border: "none",
-  outline: "none",
-  padding: "8px 12px",
-  fontSize: "13px",
-  background: "transparent",
+            flex: 1,
 
-  color: "#111827",
-  WebkitTextFillColor: "#111827",
-  caretColor: "#4B2E83",
-}}
-  />
+            minWidth: 0,
+
+            border: "none",
+
+            outline: "none",
+
+            padding:
+              "8px 10px",
+
+            fontSize: "13px",
+
+            background:
+              "transparent",
+
+            color: "#111827",
+
+            WebkitTextFillColor:
+              "#111827",
+
+            caretColor:
+              "#4B2E83",
+          }}
+        />
 
         <button
+          type="button"
+
+          onClick={() => {
+
+            if (
+              search.trim()
+            ) {
+
+              setSuggestions([]);
+
+            }
+
+          }}
+
           style={{
-            width: "38px",
-            height: "38px",
+            width: "42px",
+
+            height: "42px",
+
             border: "none",
-            background: "#4B2E83",
-            color: "white",
-            fontSize: "16px",
-            cursor: "pointer",
+
+            background:
+              "#4B2E83",
+
+            color:
+              "#FFFFFF",
+
+            display: "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            flexShrink: 0,
+
+            cursor:
+              "pointer",
           }}
         >
           <FaSearch />
@@ -1296,296 +2084,204 @@ setSuggestions([]);
 
       </div>
 
+
+      {/* SUGGESTIONS MOBILE */}
+
       {suggestions.length > 0 && (
 
-<div
-style={{
-position:"absolute",
-top:"55px",
-left:0,
-right:0,
-background:"#fff",
-borderRadius:"18px",
-boxShadow:
-"0 10px 30px rgba(0,0,0,.12)",
-zIndex:999,
-overflow:"hidden"
-}}
->
-
-{suggestions.map(product => (
-
-<div
-
-key={product._id}
-
-onClick={() => {
-
-setSearch(product.name);
-
-setSuggestions([]);
-
-navigate(`/product/${product._id}`);
-
-}}
-
-style={{
-display:"flex",
-alignItems:"center",
-gap:"10px",
-padding:"12px",
-cursor:"pointer",
-borderBottom:
-"1px solid #f3f4f6"
-}}
->
-
-<img
-src={product.image}
- alt=""
-style={{
-width:"40px",
-height:"40px",
-borderRadius:"10px",
-objectFit:"cover"
-}}
-/>
-
-<div>
-
-<div
-style={{
-fontSize:"13px",
-fontWeight:"700",
-color:"#111827"
-}}
->
-
-{product.name}
-
-</div>
-
-<div
-style={{
-fontSize:"11px",
-color:"#6b7280"
-}}
->
-
-{Number(
-product.price
-).toLocaleString()}
-FCFA
-
-</div>
-
-</div>
-
-</div>
-
-))}
-
-</div>
-
-)}
-
-    </div>
-
-{/* ICONS */}
-
-<div
-  style={{
-    display: "flex",
-    gap: "8px",
-    alignItems: "center",
-    flexShrink: 0,
-  }}
->
-
-  {/* FAVORIS */}
-
-  <Link
-    to="/favorites"
-    style={{
-      textDecoration: "none",
-      color: "#111827",
-    }}
-  >
-
-    <div
-      style={{
-        width: "38px",
-        height: "38px",
-        borderRadius: "12px",
-        background: "#FFFFFF",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-        boxShadow:
-          "0 2px 8px rgba(0,0,0,0.05)",
-      }}
-    >
-
-      <FaHeart
-        style={{
-          fontSize: "18px",
-        }}
-      />
-
-      {favoritesCount > 0 && (
-
-        <span
+        <div
           style={{
-            position: "absolute",
-            top: "-4px",
-            right: "-4px",
+            position:
+              "absolute",
 
-            width: "16px",
-            height: "16px",
+            top: "48px",
 
-            borderRadius: "50%",
+            left: 0,
 
-            background: "#5b3cc4",
+            right: 0,
 
-            color: "#fff",
+            background:
+              "#FFFFFF",
 
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
+            borderRadius:
+              "16px",
 
-            fontSize: "9px",
-            fontWeight: "700",
+            border:
+              "1px solid #E5E7EB",
 
             boxShadow:
-              "0 2px 8px rgba(91,60,196,0.3)",
+              "0 18px 40px rgba(15,23,42,0.16)",
+
+            zIndex:
+              10000,
+
+            overflow:
+              "hidden",
+
+            maxHeight:
+              "300px",
+
+            overflowY:
+              "auto",
           }}
         >
-          {favoritesCount}
-        </span>
+
+          {suggestions.map(
+            (product) => (
+
+              <div
+                key={product._id}
+
+                onClick={() => {
+
+                  setSearch(
+                    product.name
+                  );
+
+                  setSuggestions([]);
+
+                  navigate(
+                    `/product/${product._id}`
+                  );
+
+                }}
+
+                style={{
+                  display: "flex",
+
+                  alignItems:
+                    "center",
+
+                  gap: "10px",
+
+                  padding:
+                    "11px",
+
+                  cursor:
+                    "pointer",
+
+                  borderBottom:
+                    "1px solid #F1F5F9",
+                }}
+              >
+
+                <img
+                  src={product.image}
+
+                  alt=""
+
+                  style={{
+                    width: "42px",
+
+                    height: "42px",
+
+                    borderRadius:
+                      "10px",
+
+                    objectFit:
+                      "cover",
+
+                    flexShrink: 0,
+                  }}
+                />
+
+                <div
+                  style={{
+                    minWidth: 0,
+                  }}
+                >
+
+                  <div
+                    style={{
+                      fontSize:
+                        "13px",
+
+                      fontWeight:
+                        "700",
+
+                      color:
+                        "#111827",
+
+                      overflow:
+                        "hidden",
+
+                      textOverflow:
+                        "ellipsis",
+
+                      whiteSpace:
+                        "nowrap",
+                    }}
+                  >
+                    {product.name}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize:
+                        "11px",
+
+                      color:
+                        "#64748B",
+
+                      marginTop:
+                        "3px",
+                    }}
+                  >
+                    {Number(
+                      product.price
+                    ).toLocaleString()} FCFA
+                  </div>
+
+                </div>
+
+              </div>
+
+            )
+          )}
+
+        </div>
 
       )}
 
     </div>
 
-  </Link>
+  )}
 
-  {/* PANIER */}
 
-  <Link
-    to="/checkout"
-    state={{ cart }}
-    style={{
-      textDecoration: "none",
-      color: "#111827",
-    }}
-  >
-
-    <div
-      style={{
-        width: "38px",
-        height: "38px",
-        borderRadius: "12px",
-        background: "#FFFFFF",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        position: "relative",
-        boxShadow:
-          "0 2px 8px rgba(0,0,0,0.05)",
-      }}
-    >
-
-      <FaShoppingCart
-        style={{
-          fontSize: "18px",
-        }}
-      />
-
-      <span
-        style={{
-          position: "absolute",
-          top: "-4px",
-          right: "-4px",
-
-          width: "16px",
-          height: "16px",
-
-          borderRadius: "50%",
-
-          background: "#5b3cc4",
-
-          color: "#fff",
-
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-
-          fontSize: "9px",
-          fontWeight: "700",
-
-          boxShadow:
-            "0 2px 8px rgba(91,60,196,0.3)",
-        }}
-      >
-        {cart.reduce(
-          (total, item) =>
-            total + (item.quantity || 1),
-          0
-        )}
-      </span>
-
-    </div>
-
-  </Link>
-
-  {/* COMPTE */}
-
-  <Link
-    to="/account"
-    style={{
-      textDecoration: "none",
-      color: "#111827",
-    }}
-  >
-
-    <div
-      style={{
-        width: "38px",
-        height: "38px",
-        borderRadius: "12px",
-        background: "#FFFFFF",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        boxShadow:
-          "0 2px 8px rgba(0,0,0,0.05)",
-      }}
-    >
-
-      <FaUserCircle
-        style={{
-          fontSize: "18px",
-        }}
-      />
-
-    </div>
-
-  </Link>
-
-</div>
-
-  </div>
-
-  {/* TABS */}
+  {/* =====================================================
+      TABS / NAVIGATION
+  ===================================================== */}
 
   <div
     style={{
       display: "flex",
-      gap: "10px",
-      marginTop: "14px",
+
+      gap:
+        window.innerWidth < 768
+          ? "8px"
+          : "10px",
+
+      marginTop:
+        window.innerWidth < 768
+          ? "8px"
+          : "12px",
+
       overflowX: "auto",
-      paddingBottom: "4px",
+
+      overflowY: "hidden",
+
+      paddingBottom: "2px",
+
+      scrollbarWidth:
+        "none",
+
+      msOverflowStyle:
+        "none",
+
+      WebkitOverflowScrolling:
+        "touch",
+
+      width: "100%",
     }}
   >
 
@@ -1601,80 +2297,124 @@ FCFA
       },
 
       {
-  name: "Boutique",
-  link: "/boutique",
-},
+        name: "Boutique",
+        link: "/boutique",
+      },
 
-...(admin ? [
+      ...(admin
+        ? [
 
-  {
-    name: "Admin",
-    link: "/admin-login",
-  },
+            {
+              name: "Admin",
+              link:
+                "/admin-login",
+            },
 
-  {
-    name: "Livreur",
-    link: "/driver-login",
-  },
+            {
+              name: "Livreur",
+              link:
+                "/driver-login",
+            },
 
-  {
-    name: "Livreurs",
-    link: "/drivers",
-  },
+            {
+              name: "Livreurs",
+              link:
+                "/drivers",
+            },
 
-] : [])
+          ]
+        : []),
 
-].map((item, index) => (
+    ].map(
+      (item, index) => (
 
-  <Link
-  key={index}
+        <Link
+          key={index}
 
-  to={item.link}
+          to={item.link}
 
-  style={{
-    textDecoration: "none",
-  }}
->
-
-        <button
           style={{
-            border: "none",
+            textDecoration:
+              "none",
 
-            background:
-              index === 1
-                ? "#4B2E83"
-                : "#f3f4f6",
-
-            color:
-              index === 1
-                ? "white"
-                : "#111827",
-
-            padding: "8px 14px",
-
-            borderRadius: "12px",
-
-            fontWeight: "700",
-
-            fontSize: "11px",
-
-            cursor: "pointer",
-
-            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
-          {item.name}
-        </button>
 
-      </Link>
+          <button
+            type="button"
 
-    ))}
+            style={{
+              border: "none",
+
+              background:
+                index === 1
+                  ? "#4B2E83"
+                  : "#F3F4F6",
+
+              color:
+                index === 1
+                  ? "#FFFFFF"
+                  : "#111827",
+
+              padding:
+                window.innerWidth < 768
+                  ? "8px 14px"
+                  : "9px 16px",
+
+              borderRadius:
+                "999px",
+
+              fontWeight:
+                "800",
+
+              fontSize:
+                window.innerWidth < 768
+                  ? "11px"
+                  : "12px",
+
+              cursor:
+                "pointer",
+
+              whiteSpace:
+                "nowrap",
+
+              boxShadow:
+                index === 1
+                  ? "0 5px 14px rgba(75,46,131,0.20)"
+                  : "none",
+            }}
+          >
+            {item.name}
+          </button>
+
+        </Link>
+
+      )
+    )}
 
   </div>
 
 </div>
 
-{/* BIG SEARCH */}
+
+{/* =========================================================
+    ESPACE SOUS LE HEADER FIXE
+========================================================= */}
+
+<div
+  style={{
+    height:
+      window.innerWidth < 768
+        ? "148px"
+        : "105px",
+  }}
+/>
+
+
+{/* =========================================================
+    BIG SEARCH
+========================================================= */}
 
 <div
   style={{
