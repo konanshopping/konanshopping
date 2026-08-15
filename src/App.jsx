@@ -1419,10 +1419,11 @@ if (
             }}
           />
 
-          <button
+<button
   type="button"
-
-  onClick={async () => {
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
     if (!search.trim()) {
       return;
@@ -1430,45 +1431,25 @@ if (
 
     setSuggestions([]);
 
-    await searchProducts();
-
+    searchProducts();
   }}
-
   style={{
-    width: "44px",
-
-    height: "44px",
-
-    marginRight: "2px",
-
+    width: "42px",
+    height: "42px",
     border: "none",
-
-    borderRadius: "50%",
-
-    background:
-      "linear-gradient(135deg,#4B2E83,#6D28D9)",
-
+    background: "#4B2E83",
     color: "#FFFFFF",
-
     display: "flex",
-
     alignItems: "center",
-
     justifyContent: "center",
-
-    cursor: "pointer",
-
     flexShrink: 0,
-
-    boxShadow:
-      "0 4px 12px rgba(75,46,131,.18)",
+    cursor: "pointer",
+    touchAction: "manipulation",
+    WebkitTapHighlightColor: "transparent",
   }}
 >
   {loading ? (
-    <FaSpinner
-      className="spin"
-      size={13}
-    />
+    <FaSpinner className="spin" size={13} />
   ) : (
     <FaSearch size={14} />
   )}
