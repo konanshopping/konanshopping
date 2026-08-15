@@ -1377,6 +1377,21 @@ if (
 
             }}
 
+            onKeyDown={(e) => {
+
+  if (
+    e.key === "Enter" &&
+    search.trim()
+  ) {
+
+    setSuggestions([]);
+
+    searchProducts();
+
+  }
+
+}}
+
             style={{
               flex: 1,
 
@@ -1405,52 +1420,59 @@ if (
           />
 
           <button
-            type="button"
+  type="button"
 
-            onClick={() => {
+  onClick={async () => {
 
-              if (
-                search.trim()
-              ) {
+    if (!search.trim()) {
+      return;
+    }
 
-                setSuggestions([]);
+    setSuggestions([]);
 
-              }
+    await searchProducts();
 
-            }}
+  }}
 
-            style={{
-              width: "44px",
+  style={{
+    width: "44px",
 
-              height: "44px",
+    height: "44px",
 
-              marginRight: "2px",
+    marginRight: "2px",
 
-              border: "none",
+    border: "none",
 
-              borderRadius:
-                "50%",
+    borderRadius: "50%",
 
-              background:
-                "#4B2E83",
+    background:
+      "linear-gradient(135deg,#4B2E83,#6D28D9)",
 
-              color: "#FFFFFF",
+    color: "#FFFFFF",
 
-              display: "flex",
+    display: "flex",
 
-              alignItems:
-                "center",
+    alignItems: "center",
 
-              justifyContent:
-                "center",
+    justifyContent: "center",
 
-              cursor: "pointer",
+    cursor: "pointer",
 
-              flexShrink: 0,
-            }}
-          >
-            <FaSearch />
-          </button>
+    flexShrink: 0,
+
+    boxShadow:
+      "0 4px 12px rgba(75,46,131,.18)",
+  }}
+>
+  {loading ? (
+    <FaSpinner
+      className="spin"
+      size={13}
+    />
+  ) : (
+    <FaSearch size={14} />
+  )}
+</button>
 
         </div>
 
