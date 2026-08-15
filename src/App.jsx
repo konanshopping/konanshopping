@@ -614,25 +614,43 @@ const recognition =
     ? new SpeechRecognition()
     : null;
 
-recognition.lang = "fr-FR";
+if (recognition) {
+  recognition.lang = "fr-FR";
+}
 
 const startVoice = () => {
 
   if (!recognition) {
-    alert("Recherche vocale non supportée");
+
+    alert(
+      "La recherche vocale n'est pas supportée sur cet appareil."
+    );
+
     return;
+
   }
 
-  recognition.start();
+  try {
 
-  recognition.onresult = (event) => {
+    recognition.start();
 
-    const text =
-      event.results[0][0].transcript;
+    recognition.onresult = (event) => {
 
-    setSearch(text);
+      const text =
+        event.results[0][0].transcript;
 
-  };
+      setSearch(text);
+
+    };
+
+  } catch (err) {
+
+    console.log(
+      "Erreur recherche vocale :",
+      err
+    );
+
+  }
 
 };
 
@@ -2013,6 +2031,21 @@ if (
 
           }}
 
+          onKeyDown={(e) => {
+
+  if (
+    e.key === "Enter" &&
+    search.trim()
+  ) {
+
+    setSuggestions([]);
+
+    searchProducts();
+
+  }
+
+}}
+
           style={{
             flex: 1,
 
@@ -2041,49 +2074,62 @@ if (
         />
 
         <button
-          type="button"
+  type="button"
 
-          onClick={() => {
+  onClick={(e) => {
 
-            if (
-              search.trim()
-            ) {
+    e.preventDefault();
+    e.stopPropagation();
 
-              setSuggestions([]);
+    if (!search.trim()) {
+      return;
+    }
 
-            }
+    setSuggestions([]);
 
-          }}
+    searchProducts();
 
-          style={{
-            width: "42px",
+  }}
 
-            height: "42px",
+  style={{
+    width: "42px",
 
-            border: "none",
+    height: "42px",
 
-            background:
-              "#4B2E83",
+    border: "none",
 
-            color:
-              "#FFFFFF",
+    background: "#4B2E83",
 
-            display: "flex",
+    color: "#FFFFFF",
 
-            alignItems:
-              "center",
+    display: "flex",
 
-            justifyContent:
-              "center",
+    alignItems: "center",
 
-            flexShrink: 0,
+    justifyContent: "center",
 
-            cursor:
-              "pointer",
-          }}
-        >
-          <FaSearch />
-        </button>
+    flexShrink: 0,
+
+    cursor: "pointer",
+
+    touchAction: "manipulation",
+
+    WebkitTapHighlightColor: "transparent",
+
+    borderRadius: "0 999px 999px 0",
+  }}
+>
+  {loading ? (
+    <FaSpinner
+      className="spin"
+      size={13}
+    />
+  ) : (
+    <FaSearch
+      size={14}
+    />
+  )}
+</button>
 
       </div>
 
