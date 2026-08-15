@@ -442,64 +442,91 @@ export default function Drivers() {
 
 
   // ====================================================
-  // 📡 RÉCUPÉRER LES LIVREURS
-  // ====================================================
+// 📡 RÉCUPÉRER LES LIVREURS
+// ====================================================
 
-  const fetchDrivers =
-    async () => {
+const fetchDrivers =
+  async (
+    showLoading = true
+  ) => {
 
-      try {
+    try {
 
+      if (showLoading) {
         setLoading(true);
-
-        setError("");
-
-
-        const res =
-          await axios.get(
-            `${API}/api/drivers`
-          );
-
-
-        setDrivers(
-          Array.isArray(
-            res.data
-          )
-            ? res.data
-            : []
-        );
-
-
-      } catch (err) {
-
-        console.error(
-          "❌ ERREUR LIVREURS :",
-          err
-        );
-
-
-        setError(
-          "Impossible de récupérer les livreurs."
-        );
-
-      } finally {
-
-        setLoading(false);
-
       }
 
-    };
+      setError("");
+
+
+      const res =
+        await axios.get(
+          `${API}/api/drivers`
+        );
+
+
+      setDrivers(
+        Array.isArray(
+          res.data
+        )
+          ? res.data
+          : []
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ ERREUR LIVREURS :",
+        err
+      );
+
+
+      setError(
+        "Impossible de récupérer les livreurs."
+      );
+
+
+    } finally {
+
+      if (showLoading) {
+        setLoading(false);
+      }
+
+    }
+
+  };
 
 
   // ====================================================
-  // 🚀 CHARGEMENT INITIAL
-  // ====================================================
+// 🚀 CHARGEMENT INITIAL + ACTUALISATION AUTOMATIQUE
+// ====================================================
 
-  useEffect(() => {
+useEffect(() => {
 
-    fetchDrivers();
+  // Premier chargement
+  fetchDrivers(true);
 
-  }, []);
+
+  // Actualisation silencieuse
+  const interval =
+    setInterval(() => {
+
+      fetchDrivers(false);
+
+    }, 10000);
+
+
+  // Nettoyage
+  return () => {
+
+    clearInterval(
+      interval
+    );
+
+  };
+
+}, []);
 
 
   // ====================================================

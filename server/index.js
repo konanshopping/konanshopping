@@ -5301,6 +5301,52 @@ app.get("/drivers", async (req, res) => {
 
 
     // ================================================
+    // 🟢 / ⚫ VÉRIFIER L'ÉTAT RÉEL DES LIVREURS
+    // ================================================
+
+    const now =
+      Date.now();
+
+    // Après 2 minutes sans activité GPS
+    // le livreur est considéré hors ligne.
+    const ONLINE_TIMEOUT =
+      2 * 60 * 1000;
+
+
+    const driversWithOnlineStatus =
+      drivers.map(
+        (driver) => {
+
+          const lastOnline =
+            driver.lastOnlineAt
+              ? new Date(
+                  driver.lastOnlineAt
+                ).getTime()
+              : 0;
+
+
+          const isReallyOnline =
+            lastOnline > 0 &&
+            (
+              now -
+              lastOnline
+            ) < ONLINE_TIMEOUT;
+
+
+          return {
+
+            ...driver,
+
+            isOnline:
+              isReallyOnline,
+
+          };
+
+        }
+      );
+
+
+    // ================================================
     // 📅 DÉBUT DE LA JOURNÉE
     // ================================================
 
@@ -5322,7 +5368,7 @@ app.get("/drivers", async (req, res) => {
     const driversWithStats =
       await Promise.all(
 
-        drivers.map(
+        driversWithOnlineStatus.map(
           async (driver) => {
 
             const driverId =
@@ -5402,8 +5448,10 @@ app.get("/drivers", async (req, res) => {
 
               })
               .sort({
+
                 deliveredAt:
                   -1
+
               })
               .select(
                 "_id deliveredAt"
@@ -5458,6 +5506,7 @@ app.get("/drivers", async (req, res) => {
       "❌ DRIVERS ERROR:",
       err
     );
+
 
     res.status(500).json({
 
@@ -5966,6 +6015,13 @@ app.put(
 
       }
 
+      // ============================================
+// 🟢 LIVREUR ACTIF / EN LIGNE
+// ============================================
+
+driver.isOnline = true;
+
+driver.lastOnlineAt = now;
 
       // ============================================
       // 📍 POSITION ACTUELLE DU LIVREUR
@@ -6094,6 +6150,116 @@ app.put(
 
         message:
           "Erreur serveur GPS"
+
+      });
+
+    }
+
+  }
+);
+
+// ======================================================
+// 🟢 STATUT EN LIGNE DU LIVREUR
+// ======================================================
+
+app.put(
+  "/driver-online/:driverId",
+  async (req, res) => {
+
+    try {
+
+      const {
+        isOnline
+      } = req.body;
+
+
+      if (typeof isOnline !== "boolean") {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Statut en ligne invalide"
+
+        });
+
+      }
+
+
+      const driver =
+        await Driver.findByIdAndUpdate(
+
+          req.params.driverId,
+
+          {
+            $set: {
+
+              isOnline,
+
+              "currentLocation.updatedAt":
+                isOnline
+                  ? new Date()
+                  : null
+
+            }
+
+          },
+
+          {
+            new: true
+          }
+
+        );
+
+
+      if (!driver) {
+
+        return res.status(404).json({
+
+          success: false,
+
+          message:
+            "Livreur introuvable"
+
+        });
+
+      }
+
+
+      console.log(
+        `🚚 ${driver.name} → ${
+          isOnline
+            ? "🟢 EN LIGNE"
+            : "⚫ HORS LIGNE"
+        }`
+      );
+
+
+      return res.json({
+
+        success: true,
+
+        isOnline:
+          driver.isOnline
+
+      });
+
+
+    } catch (err) {
+
+      console.error(
+        "❌ DRIVER ONLINE ERROR:",
+        err
+      );
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur serveur"
 
       });
 

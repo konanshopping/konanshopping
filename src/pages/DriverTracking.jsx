@@ -1350,147 +1350,283 @@ export default function DriverTracking() {
 
 
   // ====================================================
-  // 📍 GPS LIVREUR
-  // ====================================================
+// 📍 GPS LIVREUR
+// ====================================================
 
-  const startDriverGPS =
-    (
-      orderId
-    ) => {
+const startDriverGPS =
+  (
+    orderId
+  ) => {
 
-      if (
-        !navigator.geolocation
-      ) {
+    if (
+      !navigator.geolocation
+    ) {
 
-        notify(
-          "La géolocalisation n'est pas disponible sur cet appareil.",
-          "error",
-          "GPS"
-        );
+      notify(
+        "La géolocalisation n'est pas disponible sur cet appareil.",
+        "error",
+        "GPS"
+      );
 
-        return;
+      return;
 
+    }
+
+
+    // ==================================================
+    // 👤 VÉRIFIER LE LIVREUR
+    // ==================================================
+
+    if (
+      !driver?._id
+    ) {
+
+      notify(
+        "Livreur non identifié.",
+        "error",
+        "GPS"
+      );
+
+      return;
+
+    }
+
+
+    // ==================================================
+    // 🟢 PASSER LE LIVREUR EN LIGNE
+    // ==================================================
+
+    axios.put(
+
+      `${API}/api/driver-online/${driver._id}`,
+
+      {
+        isOnline: true
       }
 
+    ).then(() => {
 
-      if (
-        watchIdsRef.current[orderId]
-      ) {
+      console.log(
+        "🟢 LIVREUR EN LIGNE"
+      );
+
+    }).catch(error => {
+
+      console.log(
+        "❌ STATUT ONLINE:",
+        error.response?.data ||
+        error.message
+      );
+
+    });
+
+
+    // ==================================================
+    // 🔄 GPS DÉJÀ ACTIF POUR CETTE COMMANDE
+    // ==================================================
+
+    if (
+      watchIdsRef.current[orderId]
+    ) {
+
+      try {
 
         navigator.geolocation.clearWatch(
           watchIdsRef.current[orderId]
         );
 
-      }
+      } catch {}
+
+    }
 
 
-      const watchId =
-        navigator.geolocation.watchPosition(
+    // ==================================================
+    // 📡 SURVEILLER LA POSITION
+    // ==================================================
 
-          async position => {
+    const watchId =
+      navigator.geolocation.watchPosition(
 
-            try {
+        async position => {
 
-              const lat =
-                position.coords.latitude;
+          try {
 
-              const lng =
-                position.coords.longitude;
+            const lat =
+              position.coords.latitude;
+
+            const lng =
+              position.coords.longitude;
 
 
-              await axios.put(
+            // ==========================================
+            // 📍 ENVOYER LA POSITION AU SERVEUR
+            // ==========================================
 
-                `${API}/api/order-location/${orderId}`,
+            await axios.put(
 
-                {
+              `${API}/api/order-location/${orderId}`,
 
-                  driverId:
-                    driver._id,
+              {
 
-                  lat,
+                driverId:
+                  driver._id,
 
-                  lng
+                lat,
 
-                }
+                lng
 
-              );
+              }
 
-            } catch (error) {
-
-              console.log(
-                "❌ GPS SERVEUR:",
-                error.response?.data ||
-                error.message
-              );
-
-            }
-
-          },
-
-          error => {
-
-            console.log(
-              "❌ GPS:",
-              error
             );
 
-          },
 
-          {
+            console.log(
+              "📍 GPS envoyé :",
+              lat,
+              lng
+            );
 
-            enableHighAccuracy:
-              true,
 
-            maximumAge:
-              0,
+          } catch (error) {
 
-            timeout:
-              10000
+            console.log(
+              "❌ GPS SERVEUR:",
+              error.response?.data ||
+              error.message
+            );
 
           }
 
-        );
+        },
 
 
-      watchIdsRef.current[
-        orderId
-      ] = watchId;
+        // =================================================
+        // ❌ ERREUR GPS
+        // =================================================
 
-    };
+        error => {
 
-
-  // ====================================================
-  // 🛑 STOP GPS
-  // ====================================================
-
-  const stopGPS =
-    (
-      orderId
-    ) => {
-
-      if (
-        watchIdsRef.current[
-          orderId
-        ]
-      ) {
-
-        try {
-
-          navigator.geolocation.clearWatch(
-            watchIdsRef.current[
-              orderId
-            ]
+          console.log(
+            "❌ GPS:",
+            error
           );
 
-        } catch {}
+        },
 
-        delete watchIdsRef.current[
-          orderId
-        ];
 
-      }
+        // =================================================
+        // ⚙️ OPTIONS GPS
+        // =================================================
 
-    };
+        {
+
+          enableHighAccuracy:
+            true,
+
+          maximumAge:
+            0,
+
+          timeout:
+            10000
+
+        }
+
+      );
+
+
+    // ==================================================
+    // 💾 ENREGISTRER LE WATCH ID
+    // ==================================================
+
+    watchIdsRef.current[
+      orderId
+    ] = watchId;
+
+  };
+
+
+// ====================================================
+// 🛑 STOP GPS
+// ====================================================
+
+const stopGPS =
+  (
+    orderId
+  ) => {
+
+    // ==================================================
+    // 🛑 ARRÊTER LE GPS DE CETTE COMMANDE
+    // ==================================================
+
+    if (
+      watchIdsRef.current[
+        orderId
+      ]
+    ) {
+
+      try {
+
+        navigator.geolocation.clearWatch(
+          watchIdsRef.current[
+            orderId
+          ]
+        );
+
+      } catch {}
+
+      delete watchIdsRef.current[
+        orderId
+      ];
+
+    }
+
+
+    // ==================================================
+    // 🔎 VÉRIFIER LES AUTRES GPS
+    // ==================================================
+
+    const activeGpsCount =
+      Object.keys(
+        watchIdsRef.current
+      ).length;
+
+
+    // ==================================================
+    // ⚫ PLUS AUCUN GPS ACTIF
+    // ==================================================
+
+    if (
+      activeGpsCount === 0 &&
+      driver?._id
+    ) {
+
+      axios.put(
+
+        `${API}/api/driver-online/${driver._id}`,
+
+        {
+          isOnline: false
+        }
+
+      ).then(() => {
+
+        console.log(
+          "⚫ LIVREUR HORS LIGNE"
+        );
+
+      }).catch(error => {
+
+        console.log(
+          "❌ STATUT OFFLINE:",
+          error.response?.data ||
+          error.message
+        );
+
+      });
+
+    }
+
+  };
 
 
   // ====================================================

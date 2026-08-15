@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import {
@@ -16,6 +17,8 @@ import {
 } from "react-icons/fa6";
 
 export default function ShippedOrders() {
+
+  const navigate = useNavigate();
 
   const [orders, setOrders] =
     useState([]);
@@ -220,7 +223,7 @@ export default function ShippedOrders() {
             lineHeight: "20px",
           }}
         >
-          Consultez toutes vos commandes déjà envoyées.
+          Consultez vos commandes en livraison et ouvrez leurs détails.
         </p>
 
       </div>
@@ -391,7 +394,7 @@ export default function ShippedOrders() {
         lineHeight: 1.2,
       }}
     >
-      Aucune commande expédiée
+      Aucune commande en livraison
     </h2>
 
     {/* TEXT */}
@@ -414,8 +417,8 @@ export default function ShippedOrders() {
         fontWeight: "500",
       }}
     >
-      Les commandes expédiées apparaîtront ici
-      automatiquement dès leur envoi.
+      Les commandes en livraison apparaîtront ici
+      automatiquement dès leur mise en livraison.
     </p>
 
   </div>
@@ -428,6 +431,17 @@ export default function ShippedOrders() {
 
 <div
   key={order._id}
+  onClick={() =>
+    navigate(`/order/${order._id}`)
+  }
+  role="button"
+  tabIndex={0}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      navigate(`/order/${order._id}`);
+    }
+  }}
   style={{
     background: "#FFFFFF",
 
@@ -446,6 +460,10 @@ export default function ShippedOrders() {
       "0 4px 12px rgba(15,23,42,0.05)",
 
     overflow: "hidden",
+
+    cursor: "pointer",
+    WebkitTapHighlightColor: "transparent",
+    transition: "transform 0.18s ease, box-shadow 0.18s ease",
   }}
 >
 

@@ -33,19 +33,9 @@ export default function PendingOrders() {
       );
 
       const filtered =
-        res.data.filter(
-
-          (o) =>
-
-            o.status ===
-              "En attente"
-
-            ||
-
-            o.status ===
-              "En livraison"
-
-        );
+  res.data.filter(
+    (o) => o.status === "En attente"
+  );
 
       setOrders(filtered);
 

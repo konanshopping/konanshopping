@@ -19,11 +19,13 @@ import {
   FaChevronDown,
   FaHeadset,
   FaShieldAlt,
+   FaClock
 } from "react-icons/fa";
 
 import {
   MdLocalShipping,
 } from "react-icons/md";
+import PendingOrders from "./PendingOrders";
 
 function MyOrders() {
 
@@ -344,7 +346,7 @@ function MyOrders() {
     gridTemplateColumns:
       window.innerWidth < 768
         ? "repeat(2,1fr)"
-        : "repeat(4,1fr)",
+        : "repeat(5,1fr)",
 
     gap:
       window.innerWidth < 768
@@ -355,505 +357,604 @@ function MyOrders() {
   }}
 >
 
-           {/* TOTAL */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-    border:
-      "1px solid #EEF2F7",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "12px"
-        : "18px",
-
-    display: "flex",
-
-    gap:
-      window.innerWidth < 768
-        ? "10px"
-        : "14px",
-
-    alignItems: "center",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "85px"
-        : "105px",
-
-    boxShadow:
-      "0 6px 18px rgba(0,0,0,0.04)",
-
-    transition:
-      "all .3s ease",
-  }}
->
+  {/* TOTAL */}
 
   <div
     style={{
-      width:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      height:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      borderRadius: "14px",
-
       background:
-        "#EEF2FF",
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+      border:
+        "1px solid #EEF2F7",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "18px",
 
       display: "flex",
 
-      justifyContent:
-        "center",
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "14px",
 
-      alignItems:
-        "center",
+      alignItems: "center",
 
-      flexShrink: 0,
+      minHeight:
+        window.innerWidth < 768
+          ? "85px"
+          : "105px",
+
+      boxShadow:
+        "0 6px 18px rgba(0,0,0,0.04)",
     }}
   >
 
-    <FaClipboardList
+    <div
       style={{
-        color: "#2563EB",
-
-        fontSize:
+        width:
           window.innerWidth < 768
-            ? "18px"
-            : "24px",
+            ? "42px"
+            : "52px",
+
+        height:
+          window.innerWidth < 768
+            ? "42px"
+            : "52px",
+
+        borderRadius: "14px",
+
+        background: "#EEF2FF",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
       }}
-    />
+    >
+
+      <FaClipboardList
+        style={{
+          color: "#2563EB",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "24px",
+        }}
+      />
+
+    </div>
+
+    <div>
+
+      <h2
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "30px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          margin: 0,
+
+          lineHeight: 1,
+        }}
+      >
+        {orders.length}
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          marginTop: "6px",
+
+          marginBottom: 0,
+
+          fontWeight: "500",
+        }}
+      >
+        Total commandes
+      </p>
+
+    </div>
 
   </div>
 
-  <div>
 
-    <h2
-      style={{
-        fontSize:
-          window.innerWidth < 768
-            ? "24px"
-            : "30px",
-
-        fontWeight: "900",
-
-        color: "#111827",
-
-        margin: 0,
-
-        lineHeight: 1,
-      }}
-    >
-      {orders.length}
-    </h2>
-
-    <p
-      style={{
-        color: "#6B7280",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "12px"
-            : "13px",
-
-        marginTop: "6px",
-
-        marginBottom: 0,
-
-        fontWeight: "500",
-      }}
-    >
-      Total commandes
-    </p>
-
-  </div>
-
-</div>
-
-{/* SHIPPED */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-    border:
-      "1px solid #EEF2F7",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "12px"
-        : "18px",
-
-    display: "flex",
-
-    gap:
-      window.innerWidth < 768
-        ? "10px"
-        : "14px",
-
-    alignItems: "center",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "85px"
-        : "105px",
-
-    boxShadow:
-      "0 6px 18px rgba(0,0,0,0.04)",
-
-    transition:
-      "all .3s ease",
-  }}
->
+  {/* PENDING */}
 
   <div
     style={{
-      width:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      height:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      borderRadius: "14px",
-
       background:
-        "#DBEAFE",
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+      border:
+        "1px solid #EEF2F7",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "18px",
 
       display: "flex",
 
-      justifyContent:
-        "center",
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "14px",
 
-      alignItems:
-        "center",
+      alignItems: "center",
 
-      flexShrink: 0,
+      minHeight:
+        window.innerWidth < 768
+          ? "85px"
+          : "105px",
+
+      boxShadow:
+        "0 6px 18px rgba(0,0,0,0.04)",
     }}
   >
 
-    <FaTruck
+    <div
       style={{
-        color: "#2563EB",
-
-        fontSize:
+        width:
           window.innerWidth < 768
-            ? "18px"
-            : "24px",
+            ? "42px"
+            : "52px",
+
+        height:
+          window.innerWidth < 768
+            ? "42px"
+            : "52px",
+
+        borderRadius: "14px",
+
+        background: "#FEF3C7",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
       }}
-    />
+    >
+
+      <FaClock
+        style={{
+          color: "#D97706",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "24px",
+        }}
+      />
+
+    </div>
+
+    <div>
+
+      <h2
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "30px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          margin: 0,
+
+          lineHeight: 1,
+        }}
+      >
+        {pendingOrders}
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          marginTop: "6px",
+
+          marginBottom: 0,
+
+          fontWeight: "500",
+        }}
+      >
+        En attente
+      </p>
+
+    </div>
 
   </div>
 
-  <div>
 
-    <h2
-      style={{
-        fontSize:
-          window.innerWidth < 768
-            ? "24px"
-            : "30px",
-
-        fontWeight: "900",
-
-        color: "#111827",
-
-        margin: 0,
-
-        lineHeight: 1,
-      }}
-    >
-      {shippedOrders}
-    </h2>
-
-    <p
-      style={{
-        color: "#6B7280",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "12px"
-            : "13px",
-
-        marginTop: "6px",
-
-        marginBottom: 0,
-
-        fontWeight: "500",
-      }}
-    >
-      En livraison
-    </p>
-
-  </div>
-
-</div>
-
-            {/* DELIVERED */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-    border:
-      "1px solid #EEF2F7",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "12px"
-        : "18px",
-
-    display: "flex",
-
-    gap:
-      window.innerWidth < 768
-        ? "10px"
-        : "14px",
-
-    alignItems: "center",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "85px"
-        : "105px",
-
-    boxShadow:
-      "0 6px 18px rgba(0,0,0,0.04)",
-
-    transition:
-      "all .3s ease",
-  }}
->
+  {/* SHIPPED */}
 
   <div
     style={{
-      width:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      height:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      borderRadius: "14px",
-
       background:
-        "#DCFCE7",
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+      border:
+        "1px solid #EEF2F7",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "18px",
 
       display: "flex",
 
-      justifyContent:
-        "center",
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "14px",
 
-      alignItems:
-        "center",
+      alignItems: "center",
 
-      flexShrink: 0,
+      minHeight:
+        window.innerWidth < 768
+          ? "85px"
+          : "105px",
+
+      boxShadow:
+        "0 6px 18px rgba(0,0,0,0.04)",
     }}
   >
 
-    <FaCheckCircle
+    <div
       style={{
-        color: "#16A34A",
-
-        fontSize:
+        width:
           window.innerWidth < 768
-            ? "18px"
-            : "24px",
+            ? "42px"
+            : "52px",
+
+        height:
+          window.innerWidth < 768
+            ? "42px"
+            : "52px",
+
+        borderRadius: "14px",
+
+        background: "#DBEAFE",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
       }}
-    />
+    >
+
+      <FaTruck
+        style={{
+          color: "#2563EB",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "24px",
+        }}
+      />
+
+    </div>
+
+    <div>
+
+      <h2
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "30px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          margin: 0,
+
+          lineHeight: 1,
+        }}
+      >
+        {shippedOrders}
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          marginTop: "6px",
+
+          marginBottom: 0,
+
+          fontWeight: "500",
+        }}
+      >
+        En livraison
+      </p>
+
+    </div>
 
   </div>
 
-  <div>
 
-    <h2
-      style={{
-        fontSize:
-          window.innerWidth < 768
-            ? "24px"
-            : "30px",
-
-        fontWeight: "900",
-
-        color: "#111827",
-
-        margin: 0,
-
-        lineHeight: 1,
-      }}
-    >
-      {deliveredOrders}
-    </h2>
-
-    <p
-      style={{
-        color: "#6B7280",
-
-        fontSize:
-          window.innerWidth < 768
-            ? "12px"
-            : "13px",
-
-        marginTop: "6px",
-
-        marginBottom: 0,
-
-        fontWeight: "500",
-      }}
-    >
-      Livrée
-    </p>
-
-  </div>
-
-</div>
-
-           {/* CANCELLED */}
-
-<div
-  style={{
-    background:
-      "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-    border:
-      "1px solid #EEF2F7",
-
-    borderRadius: "18px",
-
-    padding:
-      window.innerWidth < 768
-        ? "12px"
-        : "18px",
-
-    display: "flex",
-
-    gap:
-      window.innerWidth < 768
-        ? "10px"
-        : "14px",
-
-    alignItems: "center",
-
-    minHeight:
-      window.innerWidth < 768
-        ? "85px"
-        : "105px",
-
-    boxShadow:
-      "0 6px 18px rgba(0,0,0,0.04)",
-
-    transition:
-      "all .3s ease",
-  }}
->
+  {/* DELIVERED */}
 
   <div
     style={{
-      width:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      height:
-        window.innerWidth < 768
-          ? "42px"
-          : "52px",
-
-      borderRadius: "14px",
-
       background:
-        "#FEE2E2",
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+      border:
+        "1px solid #EEF2F7",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "18px",
 
       display: "flex",
 
-      justifyContent:
-        "center",
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "14px",
 
-      alignItems:
-        "center",
+      alignItems: "center",
 
-      flexShrink: 0,
+      minHeight:
+        window.innerWidth < 768
+          ? "85px"
+          : "105px",
+
+      boxShadow:
+        "0 6px 18px rgba(0,0,0,0.04)",
     }}
   >
 
-    <FaTimesCircle
+    <div
       style={{
-        color: "#DC2626",
-
-        fontSize:
+        width:
           window.innerWidth < 768
-            ? "18px"
-            : "24px",
+            ? "42px"
+            : "52px",
+
+        height:
+          window.innerWidth < 768
+            ? "42px"
+            : "52px",
+
+        borderRadius: "14px",
+
+        background: "#DCFCE7",
+
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
       }}
-    />
+    >
+
+      <FaCheckCircle
+        style={{
+          color: "#16A34A",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "24px",
+        }}
+      />
+
+    </div>
+
+    <div>
+
+      <h2
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "30px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          margin: 0,
+
+          lineHeight: 1,
+        }}
+      >
+        {deliveredOrders}
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          marginTop: "6px",
+
+          marginBottom: 0,
+
+          fontWeight: "500",
+        }}
+      >
+        Livrées
+      </p>
+
+    </div>
 
   </div>
 
-  <div>
 
-    <h2
+  {/* CANCELLED */}
+
+  <div
+    style={{
+      background:
+        "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
+
+      border:
+        "1px solid #EEF2F7",
+
+      borderRadius: "18px",
+
+      padding:
+        window.innerWidth < 768
+          ? "12px"
+          : "18px",
+
+      display: "flex",
+
+      gap:
+        window.innerWidth < 768
+          ? "10px"
+          : "14px",
+
+      alignItems: "center",
+
+      minHeight:
+        window.innerWidth < 768
+          ? "85px"
+          : "105px",
+
+      boxShadow:
+        "0 6px 18px rgba(0,0,0,0.04)",
+    }}
+  >
+
+    <div
       style={{
-        fontSize:
+        width:
           window.innerWidth < 768
-            ? "24px"
-            : "30px",
+            ? "42px"
+            : "52px",
 
-        fontWeight: "900",
+        height:
+          window.innerWidth < 768
+            ? "42px"
+            : "52px",
 
-        color: "#111827",
+        borderRadius: "14px",
 
-        margin: 0,
+        background: "#FEE2E2",
 
-        lineHeight: 1,
+        display: "flex",
+
+        justifyContent: "center",
+
+        alignItems: "center",
+
+        flexShrink: 0,
       }}
     >
-      {cancelledOrders}
-    </h2>
 
-    <p
-      style={{
-        color: "#6B7280",
+      <FaTimesCircle
+        style={{
+          color: "#DC2626",
 
-        fontSize:
-          window.innerWidth < 768
-            ? "12px"
-            : "13px",
+          fontSize:
+            window.innerWidth < 768
+              ? "18px"
+              : "24px",
+        }}
+      />
 
-        marginTop: "6px",
+    </div>
 
-        marginBottom: 0,
+    <div>
 
-        fontWeight: "500",
-      }}
-    >
-      Annulées
-    </p>
+      <h2
+        style={{
+          fontSize:
+            window.innerWidth < 768
+              ? "24px"
+              : "30px",
+
+          fontWeight: "900",
+
+          color: "#111827",
+
+          margin: 0,
+
+          lineHeight: 1,
+        }}
+      >
+        {cancelledOrders}
+      </h2>
+
+      <p
+        style={{
+          color: "#6B7280",
+
+          fontSize:
+            window.innerWidth < 768
+              ? "12px"
+              : "13px",
+
+          marginTop: "6px",
+
+          marginBottom: 0,
+
+          fontWeight: "500",
+        }}
+      >
+        Annulées
+      </p>
+
+    </div>
 
   </div>
-
-</div>
 
 </div>
 
@@ -899,8 +1000,13 @@ function MyOrders() {
         count: orders.length,
       },
 
+{
+  name: "En attente",
+  count: pendingOrders,
+},
+
       {
-        name: "Expédiées",
+        name: "En livraison",
         count: shippedOrders,
       },
 

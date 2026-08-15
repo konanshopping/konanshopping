@@ -393,3 +393,563 @@ p{
   }
 
 }
+
+/* =========================================================
+   KONAN SHOPPING
+   NOTIFICATIONS PROFESSIONNELLES
+   DESIGN TYPE DRIVER TRACKING
+========================================================= */
+
+.Toastify__toast-container{
+
+  z-index:999999 !important;
+
+  width:390px !important;
+
+  max-width:
+    calc(100vw - 24px) !important;
+
+  padding:0 !important;
+
+}
+
+
+/* =========================================================
+   NOTIFICATION PRINCIPALE
+========================================================= */
+
+.konan-toast{
+
+  position:relative !important;
+
+  min-height:78px !important;
+
+  margin-bottom:12px !important;
+
+  padding:0 !important;
+
+  border-radius:18px !important;
+
+  background:
+    rgba(255,255,255,.96) !important;
+
+  border:
+    1px solid
+    rgba(229,231,235,.95) !important;
+
+  color:#111827 !important;
+
+  box-shadow:
+    0 18px 45px
+    rgba(15,23,42,.14),
+
+    0 5px 15px
+    rgba(15,23,42,.06) !important;
+
+  overflow:hidden !important;
+
+  backdrop-filter:
+    blur(20px) !important;
+
+  -webkit-backdrop-filter:
+    blur(20px) !important;
+
+  font-family:
+    Inter,
+    Poppins,
+    Arial,
+    sans-serif !important;
+
+  animation:
+    konanNotificationIn
+    .4s
+    cubic-bezier(.22,1,.36,1)
+    both !important;
+
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.konan-toast-body{
+
+  width:100% !important;
+
+  min-height:78px !important;
+
+  margin:0 !important;
+
+  padding:
+    14px
+    48px
+    14px
+    14px !important;
+
+  display:flex !important;
+
+  align-items:center !important;
+
+  gap:12px !important;
+
+  color:#111827 !important;
+
+  font-size:13px !important;
+
+  line-height:1.4 !important;
+
+}
+
+
+/* =========================================================
+   ICÔNE
+========================================================= */
+
+.konan-toast
+.Toastify__toast-icon{
+
+  width:44px !important;
+
+  min-width:44px !important;
+
+  height:44px !important;
+
+  margin:0 !important;
+
+  border-radius:14px !important;
+
+  display:flex !important;
+
+  align-items:center !important;
+
+  justify-content:center !important;
+
+  flex-shrink:0 !important;
+
+}
+
+
+/* =========================================================
+   SUCCÈS
+========================================================= */
+
+.konan-toast.Toastify__toast--success{
+
+  border-left:
+    5px solid #22c55e !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #f0fdf4 100%
+    ) !important;
+
+}
+
+.konan-toast.Toastify__toast--success
+.Toastify__toast-icon{
+
+  background:#DCFCE7 !important;
+
+  color:#16A34A !important;
+
+}
+
+
+/* =========================================================
+   ERREUR
+========================================================= */
+
+.konan-toast.Toastify__toast--error{
+
+  border-left:
+    5px solid #EF4444 !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #FEF2F2 100%
+    ) !important;
+
+}
+
+.konan-toast.Toastify__toast--error
+.Toastify__toast-icon{
+
+  background:#FEE2E2 !important;
+
+  color:#DC2626 !important;
+
+}
+
+
+/* =========================================================
+   WARNING
+========================================================= */
+
+.konan-toast.Toastify__toast--warning{
+
+  border-left:
+    5px solid #F59E0B !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #FFFBEB 100%
+    ) !important;
+
+}
+
+.konan-toast.Toastify__toast--warning
+.Toastify__toast-icon{
+
+  background:#FEF3C7 !important;
+
+  color:#D97706 !important;
+
+}
+
+
+/* =========================================================
+   INFORMATION
+========================================================= */
+
+.konan-toast.Toastify__toast--info{
+
+  border-left:
+    5px solid #2563EB !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #EFF6FF 100%
+    ) !important;
+
+}
+
+.konan-toast.Toastify__toast--info
+.Toastify__toast-icon{
+
+  background:#DBEAFE !important;
+
+  color:#2563EB !important;
+
+}
+
+
+/* =========================================================
+   TEXTE
+========================================================= */
+
+.konan-toast
+.Toastify__toast-body > div:last-child{
+
+  color:#111827 !important;
+
+  font-weight:700 !important;
+
+  font-size:13px !important;
+
+  line-height:1.45 !important;
+
+}
+
+
+/* =========================================================
+   BOUTON FERMER
+========================================================= */
+
+.konan-toast
+.Toastify__close-button{
+
+  position:absolute !important;
+
+  top:12px !important;
+
+  right:12px !important;
+
+  width:25px !important;
+
+  height:25px !important;
+
+  border-radius:50% !important;
+
+  background:#F3F4F6 !important;
+
+  color:#64748B !important;
+
+  opacity:1 !important;
+
+  display:flex !important;
+
+  justify-content:center !important;
+
+  align-items:center !important;
+
+  padding:0 !important;
+
+  transition:
+    all .2s ease !important;
+
+}
+
+.konan-toast
+.Toastify__close-button:hover{
+
+  background:#E5E7EB !important;
+
+  color:#111827 !important;
+
+  transform:
+    scale(1.08) !important;
+
+}
+
+
+/* =========================================================
+   BARRE DE PROGRESSION
+========================================================= */
+
+.konan-toast
+.Toastify__progress-bar{
+
+  position:absolute !important;
+
+  left:0 !important;
+
+  bottom:0 !important;
+
+  height:4px !important;
+
+  width:100% !important;
+
+  border-radius:0 !important;
+
+  opacity:1 !important;
+
+}
+
+
+/* SUCCESS */
+
+.konan-toast.Toastify__toast--success
+.Toastify__progress-bar{
+
+  background:
+    linear-gradient(
+      90deg,
+      #22C55E,
+      #16A34A
+    ) !important;
+
+}
+
+
+/* ERROR */
+
+.konan-toast.Toastify__toast--error
+.Toastify__progress-bar{
+
+  background:
+    linear-gradient(
+      90deg,
+      #EF4444,
+      #DC2626
+    ) !important;
+
+}
+
+
+/* WARNING */
+
+.konan-toast.Toastify__toast--warning
+.Toastify__progress-bar{
+
+  background:
+    linear-gradient(
+      90deg,
+      #F59E0B,
+      #D97706
+    ) !important;
+
+}
+
+
+/* INFO */
+
+.konan-toast.Toastify__toast--info
+.Toastify__progress-bar{
+
+  background:
+    linear-gradient(
+      90deg,
+      #2563EB,
+      #1D4ED8
+    ) !important;
+
+}
+
+
+/* =========================================================
+   ANIMATION ENTRÉE
+========================================================= */
+
+@keyframes konanNotificationIn{
+
+  0%{
+
+    opacity:0;
+
+    transform:
+      translateX(35px)
+      scale(.96);
+
+  }
+
+  100%{
+
+    opacity:1;
+
+    transform:
+      translateX(0)
+      scale(1);
+
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+  .Toastify__toast-container{
+
+    width:
+      calc(100vw - 20px) !important;
+
+    max-width:none !important;
+
+    left:10px !important;
+
+    right:10px !important;
+
+    top:12px !important;
+
+    padding:0 !important;
+
+  }
+
+
+  .konan-toast{
+
+    width:100% !important;
+
+    min-height:72px !important;
+
+    margin-bottom:10px !important;
+
+    border-radius:16px !important;
+
+  }
+
+
+  .konan-toast-body{
+
+    min-height:72px !important;
+
+    padding:
+      12px
+      42px
+      12px
+      12px !important;
+
+    gap:10px !important;
+
+    font-size:12px !important;
+
+  }
+
+
+  .konan-toast
+  .Toastify__toast-icon{
+
+    width:38px !important;
+
+    min-width:38px !important;
+
+    height:38px !important;
+
+    border-radius:11px !important;
+
+  }
+
+
+  .konan-toast
+  .Toastify__close-button{
+
+    top:9px !important;
+
+    right:9px !important;
+
+    width:23px !important;
+
+    height:23px !important;
+
+  }
+
+
+  .konan-toast
+  .Toastify__toast-body > div:last-child{
+
+    font-size:12px !important;
+
+  }
+
+}
+
+
+/* =========================================================
+   PETITS ÉCRANS
+========================================================= */
+
+@media(max-width:380px){
+
+  .Toastify__toast-container{
+
+    width:
+      calc(100vw - 16px) !important;
+
+    left:8px !important;
+
+    right:8px !important;
+
+  }
+
+  .konan-toast-body{
+
+    padding-left:10px !important;
+
+    gap:8px !important;
+
+  }
+
+  .konan-toast
+  .Toastify__toast-icon{
+
+    width:34px !important;
+
+    min-width:34px !important;
+
+    height:34px !important;
+
+  }
+
+}

@@ -62,6 +62,11 @@ const DriverSchema = new mongoose.Schema({
     default: false,
   },
 
+  lastOnlineAt: {
+  type: Date,
+  default: null,
+},
+
 
   // ==========================================
   // 📍 POSITION ACTUELLE DU LIVREUR

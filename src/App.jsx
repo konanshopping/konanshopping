@@ -4836,9 +4836,18 @@ function App() {
       </Routes>
 
 <ToastContainer
-  position="top-center"
-  autoClose={2500}
-  theme="colored"
+  position="top-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="light"
+  toastClassName="konan-toast"
+  bodyClassName="konan-toast-body"
 />
 
 </BrowserRouter>
