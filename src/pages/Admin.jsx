@@ -31,6 +31,7 @@ import {
   FaPhone,
   FaClipboardCheck,
   FaUserCircle,
+  FaShareAlt
 } from "react-icons/fa";
 
 import {
@@ -496,6 +497,18 @@ return (
         </span>
 
       </button>
+
+      <button
+  onClick={() =>
+    navigate("/admin-social")
+  }
+>
+  <FaShareAlt />
+
+  <span>
+    Social Studio
+  </span>
+</button>
 
       <button
         onClick={() =>

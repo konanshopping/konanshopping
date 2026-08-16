@@ -56,6 +56,8 @@ import Community from "./pages/Community";
 import MyOrders
 from "./pages/Myorders";
 
+import AdminSocial from "./pages/AdminSocial";
+
 import Coupons from "./pages/Coupons";
 
 import { ToastContainer, toast } from "react-toastify";
@@ -5572,6 +5574,11 @@ function App() {
 <Route
   path="/admin-coupons"
   element={<AdminCoupons />}
+/>
+
+<Route
+  path="/admin-social"
+  element={<AdminSocial />}
 />
 
 <Route

@@ -40,6 +40,9 @@ const aiRoutes =
 
   const paymentRoutes = require("./routes/payment");
 
+  const socialRoutes =
+  require("./routes/socialRoutes");
+
 const Coupon =
   require("./models/Coupon");
 
@@ -47,6 +50,9 @@ const Coupon =
 
   const Visitor =
   require("./models/Visitor");
+
+  const SocialPost =
+  require("./models/SocialPost");
 
   const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
@@ -693,6 +699,48 @@ new CloudinaryStorage({
 
 const upload =
 multer({ storage });
+
+// ======================================================
+// 🎬 STOCKAGE VIDÉOS — RÉSEAUX SOCIAUX
+// ======================================================
+
+const videoStorage =
+  new CloudinaryStorage({
+
+    cloudinary,
+
+    params: {
+
+      folder:
+        "konanshopping/social/videos",
+
+      resource_type:
+        "video",
+
+      allowed_formats: [
+        "mp4",
+        "mov",
+        "webm",
+      ],
+
+    },
+
+  });
+
+const uploadSocialVideo =
+  multer({
+
+    storage:
+      videoStorage,
+
+    limits: {
+
+      fileSize:
+        100 * 1024 * 1024,
+
+    },
+
+  });
 
 const reviewStorage =
 new CloudinaryStorage({
@@ -4043,6 +4091,11 @@ app.use(
   productRoutes
 );
 
+app.use(
+  "/api/social",
+  socialRoutes
+);
+
 app.get("/ai/search", async (req, res) => {
 
   try {
@@ -7121,6 +7174,110 @@ app.put(
       console.log(err);
 
       res.status(500).json(err);
+
+    }
+
+  }
+);
+
+// ======================================================
+// 🎬 UPLOAD VIDÉO RÉSEAUX SOCIAUX
+// ======================================================
+
+app.post(
+  "/api/social/upload-video",
+
+  uploadSocialVideo.single("video"),
+
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "🎬 UPLOAD VIDÉO SOCIAL"
+      );
+
+      console.log(
+        "📁 FILE :",
+        req.file
+      );
+
+      if (!req.file) {
+
+        return res.status(400).json({
+
+          success: false,
+
+          message:
+            "Aucune vidéo reçue",
+
+        });
+
+      }
+
+      const videoUrl =
+        req.file.secure_url ||
+        req.file.path ||
+        "";
+
+      return res.json({
+
+        success: true,
+
+        message:
+          "Vidéo uploadée avec succès",
+
+        video: {
+
+          url:
+            videoUrl,
+
+          publicId:
+            req.file.public_id ||
+            null,
+
+          format:
+            req.file.format ||
+            null,
+
+          duration:
+            req.file.duration ||
+            null,
+
+          width:
+            req.file.width ||
+            null,
+
+          height:
+            req.file.height ||
+            null,
+
+        },
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ SOCIAL VIDEO UPLOAD ERROR:",
+        error
+      );
+
+      return res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur lors de l'upload de la vidéo",
+
+        error:
+          error.message,
+
+      });
 
     }
 

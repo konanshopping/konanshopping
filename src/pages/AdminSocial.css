@@ -1,0 +1,1930 @@
+/* =========================================================
+   KONAN SHOPPING — SOCIAL STUDIO
+========================================================= */
+
+.admin-social-page {
+  min-height: 100vh;
+
+  background: #f6f7fb;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+
+  color: #111827;
+
+  font-family: Arial, sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.admin-social-header {
+  max-width: 1500px;
+
+  margin: 0 auto 25px;
+
+  padding: 28px 30px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4b2e83,
+      #6d28d9
+    );
+
+  color: white;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 20px;
+
+  box-shadow:
+    0 15px 40px rgba(75, 46, 131, .18);
+}
+
+
+.admin-social-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 11px;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.14);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: .5px;
+
+  margin-bottom: 10px;
+}
+
+
+.admin-social-header h1 {
+  margin: 0;
+
+  font-size: 30px;
+
+  font-weight: 900;
+}
+
+
+.admin-social-header p {
+  margin: 8px 0 0;
+
+  opacity: .88;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+.admin-social-header-icon {
+  width: 65px;
+
+  height: 65px;
+
+  border-radius: 20px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background:
+    rgba(255,255,255,.12);
+
+  font-size: 28px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   ALERTS
+========================================================= */
+
+.social-alert {
+  max-width: 1500px;
+
+  margin: 0 auto 18px;
+
+  padding: 14px 16px;
+
+  border-radius: 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  box-sizing: border-box;
+}
+
+
+.social-alert.error {
+  background: #fef2f2;
+
+  color: #b91c1c;
+
+  border: 1px solid #fecaca;
+}
+
+
+.social-alert.success {
+  background: #ecfdf5;
+
+  color: #047857;
+
+  border: 1px solid #a7f3d0;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.admin-social-grid {
+  max-width: 1500px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    390px;
+
+  gap: 22px;
+
+  align-items: start;
+}
+
+
+.social-main-column {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 20px;
+
+  min-width: 0;
+}
+
+
+.social-sidebar {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 20px;
+
+  position: sticky;
+
+  top: 20px;
+
+  min-width: 0;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.social-card {
+  background: #ffffff;
+
+  border: 1px solid #e8eaf0;
+
+  border-radius: 22px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 6px 22px rgba(15,23,42,.045);
+
+  box-sizing: border-box;
+}
+
+
+.social-card-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+
+.social-card-header h2 {
+  margin: 0;
+
+  font-size: 18px;
+
+  font-weight: 900;
+}
+
+
+.social-card-header p {
+  margin: 5px 0 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+.social-card-header > svg {
+  color: #4b2e83;
+
+  font-size: 18px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+.video-upload-zone {
+  width: 100%;
+
+  min-height: 300px;
+
+  border: 2px dashed #d9d4ed;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #faf9ff,
+      #ffffff
+    );
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: .25s ease;
+
+  padding: 30px;
+
+  box-sizing: border-box;
+}
+
+
+.video-upload-zone:hover {
+  border-color: #6d28d9;
+
+  background: #faf8ff;
+
+  transform: translateY(-2px);
+}
+
+
+.upload-icon {
+  width: 68px;
+
+  height: 68px;
+
+  border-radius: 20px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  background: #f1edff;
+
+  color: #5b3cc4;
+
+  font-size: 30px;
+
+  margin-bottom: 15px;
+}
+
+
+.video-upload-zone h3 {
+  margin: 0;
+
+  font-size: 17px;
+
+  font-weight: 900;
+}
+
+
+.video-upload-zone p {
+  margin: 8px 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+
+.video-upload-zone span {
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   VIDEO PREVIEW
+========================================================= */
+
+.video-preview-container {
+  overflow: hidden;
+
+  border-radius: 18px;
+
+  background: #111827;
+}
+
+
+.social-video-preview {
+  width: 100%;
+
+  max-height: 550px;
+
+  display: block;
+
+  background: #000;
+
+  object-fit: contain;
+}
+
+
+.video-info {
+  background: #ffffff;
+
+  padding: 13px 15px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 15px;
+}
+
+
+.video-info > div {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.video-info strong {
+  font-size: 12px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.video-info span {
+  color: #6b7280;
+
+  font-size: 11px;
+}
+
+
+.remove-video-button {
+  border: none;
+
+  background: #fef2f2;
+
+  color: #dc2626;
+
+  padding: 9px 11px;
+
+  border-radius: 10px;
+
+  font-weight: 700;
+
+  font-size: 11px;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.social-field {
+  position: relative;
+
+  margin-bottom: 18px;
+}
+
+
+.social-field:last-child {
+  margin-bottom: 0;
+}
+
+
+.social-field label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 7px;
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+  color: #374151;
+}
+
+
+.social-field input,
+.social-field textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e5e7eb;
+
+  background: #f9fafb;
+
+  border-radius: 13px;
+
+  padding: 12px 13px;
+
+  outline: none;
+
+  color: #111827;
+
+  font-size: 13px;
+
+  font-family: inherit;
+
+  transition: .2s ease;
+}
+
+
+.social-field input:focus,
+.social-field textarea:focus {
+  border-color: #6d28d9;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 3px rgba(109,40,217,.08);
+}
+
+
+.social-field textarea {
+  resize: vertical;
+
+  min-height: 120px;
+
+  line-height: 1.5;
+}
+
+
+.field-counter {
+  text-align: right;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+
+  margin-top: 4px;
+}
+
+
+.social-field small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   PLATEFORMES
+========================================================= */
+
+.platform-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+
+.platform-card {
+  width: 100%;
+
+  border: 1px solid #e5e7eb;
+
+  background: #ffffff;
+
+  border-radius: 15px;
+
+  padding: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition: .2s ease;
+
+  box-sizing: border-box;
+}
+
+
+.platform-card:hover {
+  transform: translateY(-1px);
+
+  border-color: #d8d1ed;
+}
+
+
+.platform-card.selected {
+  border-color: #6d28d9;
+
+  background: #faf8ff;
+
+  box-shadow:
+    0 5px 15px rgba(75,46,131,.08);
+}
+
+
+.platform-icon {
+  width: 38px;
+
+  height: 38px;
+
+  border-radius: 11px;
+
+  background: #f5f5f7;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 18px;
+
+  flex-shrink: 0;
+}
+
+
+.platform-info {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+
+  min-width: 0;
+}
+
+
+.platform-info strong {
+  font-size: 13px;
+}
+
+
+.platform-info span {
+  color: #9ca3af;
+
+  font-size: 10px;
+}
+
+
+.platform-check {
+  width: 22px;
+
+  height: 22px;
+
+  border-radius: 50%;
+
+  border: 2px solid #e5e7eb;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #6d28d9;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+}
+
+
+.platform-check.active {
+  border-color: #6d28d9;
+
+  color: #6d28d9;
+}
+
+
+.selected-count {
+  margin-top: 12px;
+
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   PUBLICATION
+========================================================= */
+
+.publish-mode {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 11px;
+
+  padding: 13px;
+
+  border-radius: 14px;
+
+  background: #f8fafc;
+
+  border: 1px solid #eef0f4;
+
+  margin-bottom: 15px;
+}
+
+
+.publish-mode-icon {
+  width: 35px;
+
+  height: 35px;
+
+  border-radius: 10px;
+
+  background: #eee9ff;
+
+  color: #5b3cc4;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+
+.publish-mode div:last-child {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+}
+
+
+.publish-mode strong {
+  font-size: 12px;
+}
+
+
+.publish-mode span {
+  color: #6b7280;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+.publish-button {
+  width: 100%;
+
+  min-height: 48px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4b2e83,
+      #6d28d9
+    );
+
+  color: #ffffff;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  box-shadow:
+    0 8px 20px rgba(75,46,131,.22);
+
+  transition: .25s ease;
+}
+
+
+.publish-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 25px rgba(75,46,131,.28);
+}
+
+
+.publish-button:disabled {
+  opacity: .65;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   SECURITY
+========================================================= */
+
+.social-security {
+  padding: 15px;
+
+  border-radius: 16px;
+
+  background: #ecfdf5;
+
+  border: 1px solid #d1fae5;
+
+  display: flex;
+
+  gap: 10px;
+
+  color: #047857;
+}
+
+
+.social-security > svg {
+  margin-top: 2px;
+
+  flex-shrink: 0;
+}
+
+
+.social-security div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+}
+
+
+.social-security strong {
+  font-size: 12px;
+}
+
+
+.social-security span {
+  color: #047857;
+
+  opacity: .8;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.publication-preview {
+  max-width: 520px;
+
+  margin: 0 auto;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  background: #111827;
+
+  box-shadow:
+    0 12px 30px rgba(15,23,42,.12);
+}
+
+
+.publication-preview > video {
+  width: 100%;
+
+  max-height: 520px;
+
+  display: block;
+
+  background: #000;
+}
+
+
+.preview-empty {
+  height: 260px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  color: #9ca3af;
+}
+
+
+.preview-empty svg {
+  font-size: 30px;
+}
+
+
+.preview-empty span {
+  font-size: 12px;
+}
+
+
+.preview-content {
+  background: #ffffff;
+
+  padding: 15px;
+}
+
+
+.preview-content strong {
+  font-size: 13px;
+
+  color: #111827;
+}
+
+
+.preview-content p {
+  margin: 7px 0 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+.preview-hashtags {
+  margin-top: 8px;
+
+  color: #5b3cc4;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   SPINNER
+========================================================= */
+
+.social-spinner {
+  width: 14px;
+
+  height: 14px;
+
+  border: 2px solid rgba(255,255,255,.4);
+
+  border-top-color: #ffffff;
+
+  border-radius: 50%;
+
+  animation:
+    socialSpin .7s linear infinite;
+}
+
+
+@keyframes socialSpin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   =========================================================
+   📚 HISTORIQUE DES PUBLICATIONS
+   =========================================================
+========================================================= */
+
+.social-history-card {
+  max-width: 1500px;
+
+  margin: 22px auto 0;
+
+  background: #ffffff;
+
+  border: 1px solid #e8eaf0;
+
+  border-radius: 22px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 6px 22px rgba(15,23,42,.045);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER HISTORIQUE
+========================================================= */
+
+.social-history-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+
+.social-history-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+.social-history-title svg {
+  color: #5b3cc4;
+
+  font-size: 18px;
+}
+
+
+.social-history-title h2 {
+  margin: 0;
+
+  font-size: 18px;
+
+  font-weight: 900;
+
+  color: #111827;
+}
+
+
+.social-history-header p {
+  margin: 6px 0 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+
+.social-history-count {
+  min-width: 36px;
+
+  height: 36px;
+
+  padding: 0 10px;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f1edff;
+
+  color: #5b3cc4;
+
+  font-weight: 900;
+
+  font-size: 13px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LOADING / VIDE
+========================================================= */
+
+.social-history-loading,
+.social-history-empty {
+  min-height: 150px;
+
+  border-radius: 16px;
+
+  background: #f8fafc;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  color: #9ca3af;
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+
+.social-history-empty svg {
+  font-size: 28px;
+}
+
+
+.social-history-empty strong {
+  color: #374151;
+
+  font-size: 13px;
+}
+
+
+.social-history-empty span {
+  color: #9ca3af;
+
+  font-size: 11px;
+}
+
+
+.social-history-empty.error {
+  color: #dc2626;
+
+  background: #fef2f2;
+
+  border: 1px solid #fecaca;
+}
+
+
+/* =========================================================
+   SPINNER HISTORIQUE
+========================================================= */
+
+.social-spinner.dark {
+  width: 16px;
+
+  height: 16px;
+
+  border: 2px solid #ddd6fe;
+
+  border-top-color: #5b3cc4;
+
+  border-radius: 50%;
+
+  animation:
+    socialHistorySpin .7s linear infinite;
+}
+
+
+@keyframes socialHistorySpin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =========================================================
+   LISTE DES PUBLICATIONS
+========================================================= */
+
+.social-post-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+
+/* =========================================================
+   PUBLICATION
+========================================================= */
+
+.social-post-item {
+  display: grid;
+
+  grid-template-columns:
+    170px
+    minmax(0, 1fr);
+
+  gap: 16px;
+
+  padding: 12px;
+
+  border: 1px solid #eef0f4;
+
+  border-radius: 17px;
+
+  background: #ffffff;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+
+  box-sizing: border-box;
+}
+
+
+.social-post-item:hover {
+  border-color: #ddd6fe;
+
+  box-shadow:
+    0 7px 20px rgba(75,46,131,.06);
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   VIDÉO HISTORIQUE
+========================================================= */
+
+.social-post-media {
+  height: 115px;
+
+  border-radius: 13px;
+
+  overflow: hidden;
+
+  background: #111827;
+
+  min-width: 0;
+}
+
+
+.social-post-media video {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  background: #000;
+}
+
+
+.social-post-no-video {
+  width: 100%;
+
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #9ca3af;
+
+  font-size: 25px;
+}
+
+
+/* =========================================================
+   INFORMATIONS PUBLICATION
+========================================================= */
+
+.social-post-info {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.social-post-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+
+.social-post-top h3 {
+  margin: 0;
+
+  font-size: 14px;
+
+  font-weight: 900;
+
+  color: #111827;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.social-post-top p {
+  margin: 5px 0 0;
+
+  color: #6b7280;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   STATUT
+========================================================= */
+
+.social-status {
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  white-space: nowrap;
+
+  flex-shrink: 0;
+}
+
+
+.social-status.draft {
+  background: #f3f4f6;
+
+  color: #6b7280;
+}
+
+
+.social-status.uploading {
+  background: #e0f2fe;
+
+  color: #0369a1;
+}
+
+
+.social-status.publishing {
+  background: #fef3c7;
+
+  color: #92400e;
+}
+
+
+.social-status.published {
+  background: #dcfce7;
+
+  color: #15803d;
+}
+
+
+.social-status.partial {
+  background: #dbeafe;
+
+  color: #2563eb;
+}
+
+
+.social-status.failed {
+  background: #fee2e2;
+
+  color: #dc2626;
+}
+
+
+/* =========================================================
+   PLATEFORMES DE LA PUBLICATION
+========================================================= */
+
+.social-post-platforms {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  margin-top: 10px;
+}
+
+
+.social-platform {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 5px 8px;
+
+  border-radius: 8px;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+
+.social-platform.facebook {
+  background: #eff6ff;
+
+  color: #1877f2;
+}
+
+
+.social-platform.instagram {
+  background: #fdf2f8;
+
+  color: #e1306c;
+}
+
+
+.social-platform.tiktok {
+  background: #f3f4f6;
+
+  color: #111111;
+}
+
+
+.social-platform.youtube {
+  background: #fef2f2;
+
+  color: #ff0000;
+}
+
+
+/* =========================================================
+   HASHTAGS
+========================================================= */
+
+.social-post-hashtags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 8px;
+}
+
+
+.social-post-hashtags span {
+  color: #5b3cc4;
+
+  font-size: 9px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   DATE
+========================================================= */
+
+.social-post-date {
+  margin-top: auto;
+
+  padding-top: 8px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  color: #9ca3af;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .admin-social-grid {
+    grid-template-columns:
+      minmax(0, 1fr)
+      320px;
+  }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET / MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-social-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .social-sidebar {
+    position: static;
+  }
+
+
+  .social-history-card {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .admin-social-page {
+    padding: 12px;
+
+    padding-bottom: 30px;
+  }
+
+
+  /* HEADER */
+
+  .admin-social-header {
+    padding: 20px 18px;
+
+    border-radius: 20px;
+
+    margin-bottom: 15px;
+
+    gap: 12px;
+  }
+
+
+  .admin-social-badge {
+    font-size: 8px;
+
+    padding: 6px 9px;
+  }
+
+
+  .admin-social-header h1 {
+    font-size: 22px;
+  }
+
+
+  .admin-social-header p {
+    font-size: 11px;
+
+    line-height: 1.4;
+  }
+
+
+  .admin-social-header-icon {
+    width: 48px;
+
+    height: 48px;
+
+    border-radius: 15px;
+
+    font-size: 20px;
+  }
+
+
+  /* ALERT */
+
+  .social-alert {
+    padding: 12px;
+
+    font-size: 11px;
+
+    border-radius: 13px;
+  }
+
+
+  /* CARDS */
+
+  .social-card {
+    padding: 16px;
+
+    border-radius: 18px;
+  }
+
+
+  .social-card-header {
+    margin-bottom: 16px;
+  }
+
+
+  .social-card-header h2 {
+    font-size: 16px;
+  }
+
+
+  .social-card-header p {
+    font-size: 10px;
+  }
+
+
+  /* UPLOAD */
+
+  .video-upload-zone {
+    min-height: 240px;
+
+    padding: 20px;
+  }
+
+
+  .upload-icon {
+    width: 58px;
+
+    height: 58px;
+
+    font-size: 25px;
+  }
+
+
+  .video-upload-zone h3 {
+    font-size: 15px;
+  }
+
+
+  .video-upload-zone p {
+    font-size: 11px;
+
+    text-align: center;
+  }
+
+
+  .video-upload-zone span {
+    font-size: 9px;
+  }
+
+
+  /* VIDEO */
+
+  .video-info {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+
+
+  .remove-video-button {
+    width: 100%;
+
+    justify-content: center;
+  }
+
+
+  /* PLATEFORMES */
+
+  .platform-card {
+    padding: 11px;
+  }
+
+
+  /* PREVIEW */
+
+  .publication-preview {
+    border-radius: 15px;
+  }
+
+
+  .preview-empty {
+    height: 220px;
+  }
+
+
+  /* =====================================================
+     HISTORIQUE MOBILE
+  ===================================================== */
+
+  .social-history-card {
+    margin-top: 16px;
+
+    padding: 16px;
+
+    border-radius: 18px;
+  }
+
+
+  .social-history-header {
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+
+  .social-history-title {
+    gap: 7px;
+  }
+
+
+  .social-history-title svg {
+    font-size: 15px;
+  }
+
+
+  .social-history-title h2 {
+    font-size: 16px;
+  }
+
+
+  .social-history-header p {
+    font-size: 10px;
+
+    line-height: 1.4;
+  }
+
+
+  .social-history-count {
+    min-width: 32px;
+
+    height: 32px;
+
+    font-size: 11px;
+
+    border-radius: 10px;
+  }
+
+
+  /* PUBLICATION MOBILE */
+
+  .social-post-item {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+
+    padding: 10px;
+
+    border-radius: 15px;
+  }
+
+
+  .social-post-media {
+    width: 100%;
+
+    height: 210px;
+
+    border-radius: 12px;
+  }
+
+
+  .social-post-top {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+
+  .social-post-top h3 {
+    white-space: normal;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+  }
+
+
+  .social-post-top p {
+    font-size: 10px;
+
+    line-height: 1.5;
+  }
+
+
+  .social-status {
+    align-self: flex-start;
+
+    font-size: 9px;
+  }
+
+
+  .social-post-platforms {
+    gap: 5px;
+
+    margin-top: 9px;
+  }
+
+
+  .social-platform {
+    font-size: 8px;
+
+    padding: 5px 7px;
+  }
+
+
+  .social-post-hashtags {
+    margin-top: 7px;
+  }
+
+
+  .social-post-hashtags span {
+    font-size: 8px;
+  }
+
+
+  .social-post-date {
+    font-size: 8px;
+
+    padding-top: 9px;
+  }
+
+}
+
+
+/* =========================================================
+   TRÈS PETITS TÉLÉPHONES
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .admin-social-page {
+    padding: 8px;
+  }
+
+
+  .admin-social-header {
+    padding: 18px 14px;
+
+    border-radius: 17px;
+  }
+
+
+  .admin-social-header h1 {
+    font-size: 19px;
+  }
+
+
+  .admin-social-header-icon {
+    display: none;
+  }
+
+
+  .social-card {
+    padding: 14px;
+
+    border-radius: 16px;
+  }
+
+
+  .social-history-card {
+    padding: 13px;
+
+    border-radius: 16px;
+  }
+
+
+  .social-history-title h2 {
+    font-size: 14px;
+  }
+
+
+  .social-history-header p {
+    font-size: 9px;
+  }
+
+
+  .social-post-media {
+    height: 190px;
+  }
+
+
+  .social-post-item {
+    padding: 8px;
+  }
+
+}
