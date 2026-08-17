@@ -8,6 +8,8 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const nodemailer = require("nodemailer");
 
+const cookieParser = require("cookie-parser");
+
 const path = require("path");
 const productRoutes =
 require("./routes/products");
@@ -42,6 +44,9 @@ const aiRoutes =
 
   const socialRoutes =
   require("./routes/socialRoutes");
+
+  const tiktokRoutes =
+  require("./routes/tiktokRoutes");
 
 const Coupon =
   require("./models/Coupon");
@@ -633,6 +638,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+
+app.use(cookieParser());
 
 app.use(cors());
 app.use(express.json({
@@ -4094,6 +4101,11 @@ app.use(
 app.use(
   "/api/social",
   socialRoutes
+);
+
+app.use(
+  "/api/tiktok",
+  tiktokRoutes
 );
 
 app.get("/ai/search", async (req, res) => {
