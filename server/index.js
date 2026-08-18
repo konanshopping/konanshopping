@@ -1696,6 +1696,101 @@ app.post(
   }
 );
 
+// ======================================================
+// ✏️ MODIFIER PRODUIT
+// ======================================================
+
+app.put(
+  "/update-product/:id",
+  upload.single("image"),
+  async (req, res) => {
+
+    try {
+
+      const product =
+        await Product.findById(
+          req.params.id
+        );
+
+      if (!product) {
+
+        return res.status(404).json({
+          success: false,
+          message: "Produit introuvable",
+        });
+
+      }
+
+      if (req.body.name !== undefined) {
+        product.name =
+          req.body.name;
+      }
+
+      if (req.body.price !== undefined) {
+        product.price =
+          Number(req.body.price);
+      }
+
+      if (req.body.category !== undefined) {
+        product.category =
+          req.body.category;
+      }
+
+      if (req.body.description !== undefined) {
+        product.description =
+          req.body.description;
+      }
+
+      if (req.file) {
+
+        product.image =
+          req.file.secure_url ||
+          req.file.path;
+
+      }
+
+      await product.save();
+
+      console.log(
+        "✅ Produit modifié :",
+        product._id
+      );
+
+      res.json({
+
+        success: true,
+
+        message:
+          "Produit modifié avec succès",
+
+        product,
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "❌ UPDATE PRODUCT ERROR:",
+        error
+      );
+
+      res.status(500).json({
+
+        success: false,
+
+        message:
+          "Erreur lors de la modification du produit",
+
+        error:
+          error.message,
+
+      });
+
+    }
+
+  }
+);
+
 // AJOUTER COMMANDE
 app.post("/orders", async (req, res) => {
 
