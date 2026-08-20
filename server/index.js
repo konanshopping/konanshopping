@@ -3730,57 +3730,174 @@ app.post(
 
       }
 
-  const hasPurchased =
-await Order.findOne({
 
-  userId: req.body.clientId,
+      // ==================================================
+      // 🛒 VÉRIFIER SI L'AUTEUR A ACHETÉ LE PRODUIT
+      // ==================================================
 
-  "items.productId": req.params.id,
+      let hasPurchased = null;
 
-});
+      const clientId =
+        req.body.clientId;
 
-console.log(req.body);
+
+      // ==================================================
+      // 👤 CLIENT CONNECTÉ
+      // ==================================================
+
+      if (
+
+        clientId &&
+
+        !String(clientId).startsWith(
+          "guest_"
+        ) &&
+
+        mongoose.Types.ObjectId.isValid(
+          clientId
+        )
+
+      ) {
+
+        hasPurchased =
+          await Order.findOne({
+
+            userId:
+              clientId,
+
+            "items.productId":
+              req.params.id,
+
+          });
+
+      }
+
+
+      // ==================================================
+      // 🧪 DEBUG
+      // ==================================================
+
+      console.log(
+        "=========================================="
+      );
+
+      console.log(
+        "⭐ AJOUT AVIS"
+      );
+
+      console.log(
+        "CLIENT ID :",
+        clientId
+      );
+
+      console.log(
+        "TYPE :",
+        String(clientId || "")
+          .startsWith("guest_")
+          ? "VISITEUR"
+          : "CLIENT"
+      );
+
+      console.log(
+        "ACHAT TROUVÉ :",
+        !!hasPurchased
+      );
+
+      console.log(
+        "=========================================="
+      );
+
+
+      // ==================================================
+      // ⭐ CRÉER L'AVIS
+      // ==================================================
 
       const review = {
 
-  clientId: req.body.clientId,
+        clientId:
+          clientId,
 
-  name: req.body.name,
+        name:
+          req.body.name,
 
-  rating: Number(req.body.rating),
+        rating:
+          Number(
+            req.body.rating
+          ),
 
-  comment: req.body.comment,
+        comment:
+          req.body.comment,
 
-  verifiedPurchase:
-  !!hasPurchased,
+        verifiedPurchase:
+          !!hasPurchased,
 
-  images: req.files
-    ? req.files.map(
-        (file) => file.path
-      )
-    : [],
+        images:
+          req.files
+            ? req.files.map(
+                (file) =>
+                  file.path
+              )
+            : [],
 
-};
-
-console.log("BODY =", req.body);
-console.log("FILES =", req.files);
-console.log("REVIEW =", review);
+      };
 
 
-      product.reviews.push(review);
+      // ==================================================
+      // 🧪 DEBUG REVIEW
+      // ==================================================
+
+      console.log(
+        "BODY =",
+        req.body
+      );
+
+      console.log(
+        "FILES =",
+        req.files
+      );
+
+      console.log(
+        "REVIEW =",
+        review
+      );
+
+
+      // ==================================================
+      // 💾 AJOUTER L'AVIS AU PRODUIT
+      // ==================================================
+
+      product.reviews.push(
+        review
+      );
+
 
       await product.save();
 
-      res.json(product);
+
+      // ==================================================
+      // 📤 RÉPONSE
+      // ==================================================
+
+      res.json(
+        product
+      );
+
 
     } catch (err) {
 
-      console.log(err);
+      console.log(
+        "❌ ERREUR AJOUT AVIS :",
+        err
+      );
+
 
       res.status(500).json({
 
         message:
           "Erreur serveur",
+
+        error:
+          err.message,
 
       });
 
