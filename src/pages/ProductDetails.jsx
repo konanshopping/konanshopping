@@ -908,12 +908,17 @@ return (
   fetchPriority="high"
   decoding="async"
 
+  onClick={() => {
+    setSelectedImage(product.image);
+  }}
+
   style={{
     width: "100%",
     height: "100%",
     objectFit: "cover",
     display: "block",
     transition: "0.4s",
+    cursor: "zoom-in",
   }}
 
   onMouseEnter={(e) => {
