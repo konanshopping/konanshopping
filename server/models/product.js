@@ -1,92 +1,79 @@
 const mongoose = require("mongoose");
 
 const ProductSchema =
-  new mongoose.Schema({
+  new mongoose.Schema(
+    {
+      name: String,
 
-    name: String,
+      price: Number,
 
-    price: Number,
+      image: String,
 
-    image: String,
+      category: String,
 
-    category: String,
+      description: String,
 
-    description: String,
+      reviews: [
+        {
+          clientId: String,
 
-  reviews: [
+          name: String,
 
-  {
+          rating: Number,
 
-    clientId: String,
+          comment: String,
 
-    name: String,
+          images: [String],
 
-    rating: Number,
+          verifiedPurchase: {
+            type: Boolean,
+            default: false,
+          },
 
-    comment: String,
+          likes: [
+            String,
+          ],
 
-    images: [String],
+          dislikes: [
+            String,
+          ],
 
-    verifiedPurchase: {
+          replies: [
+            {
+              clientId: String,
 
-      type: Boolean,
+              name: String,
 
-      default: false,
+              comment: String,
 
-    },
+              createdAt: {
+                type: Date,
+                default: Date.now,
+              },
+            },
+          ],
 
-    likes: [
-
-      String,
-
-    ],
-
-    dislikes: [
-
-      String,
-
-    ],
-
-    replies: [
-
-      {
-
-        clientId: String,
-
-        name: String,
-
-        comment: String,
-
-        createdAt: {
-
-          type: Date,
-
-          default: Date.now,
-
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
         },
-
-      },
-
-    ],
-
-    createdAt: {
-
-      type: Date,
-
-      default: Date.now,
-
+      ],
     },
 
-  },
+    {
+      // =====================================================
+      // DATES AUTOMATIQUES DU PRODUIT
+      // =====================================================
 
-],
-
-});
+      timestamps: true,
+    }
+  );
 
 module.exports = mongoose.model(
 
   "Product",
 
   ProductSchema
-
+  
 );

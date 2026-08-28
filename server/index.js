@@ -1529,15 +1529,22 @@ app.get("/products", async (req, res) => {
 
 app.get("/product-sitemap.xml", async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find()
+      .select("_id updatedAt")
+      .lean();
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
     products.forEach((product) => {
+      const lastmod = product.updatedAt
+        ? new Date(product.updatedAt).toISOString()
+        : new Date().toISOString();
+
       sitemap += `
   <url>
     <loc>https://konanshopping.com/product/${product._id}</loc>
+    <lastmod>${lastmod}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>`;
@@ -1546,12 +1553,20 @@ app.get("/product-sitemap.xml", async (req, res) => {
     sitemap += `
 </urlset>`;
 
-    res.set("Content-Type", "application/xml");
-    res.send(sitemap);
+    res
+      .status(200)
+      .set("Content-Type", "application/xml; charset=UTF-8")
+      .send(sitemap);
 
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Erreur");
+    console.error("❌ Erreur product-sitemap.xml :", err);
+
+    res
+      .status(500)
+      .set("Content-Type", "application/xml; charset=UTF-8")
+      .send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+</urlset>`);
   }
 });
 

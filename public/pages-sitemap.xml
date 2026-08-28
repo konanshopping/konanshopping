@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+>
+
+  <!-- =====================================================
+       KONAN SHOPPING — PAGES PUBLIQUES
+  ====================================================== -->
+
+  <!-- ACCUEIL -->
+
+  <url>
+    <loc>https://konanshopping.com/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+
+  <!-- BOUTIQUE -->
+
+  <url>
+    <loc>https://konanshopping.com/boutique</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+
+  <!-- PROMOTIONS -->
+
+  <url>
+    <loc>https://konanshopping.com/promotions</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+
+  <!-- MODE IA -->
+
+  <url>
+    <loc>https://konanshopping.com/ai-mode</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+
+  <!-- FAVORIS -->
+
+  <url>
+    <loc>https://konanshopping.com/favoris</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+
+  <!-- PANIER -->
+
+  <url>
+    <loc>https://konanshopping.com/panier</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+
+  <!-- CONNEXION -->
+
+  <url>
+    <loc>https://konanshopping.com/login</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+
+  <!-- INSCRIPTION -->
+
+  <url>
+    <loc>https://konanshopping.com/register</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+
+  <!-- CONTACT -->
+
+  <url>
+    <loc>https://konanshopping.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+
+  <!-- POLITIQUE DE CONFIDENTIALITÉ -->
+
+  <url>
+    <loc>https://konanshopping.com/privacy-policy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+</urlset>

@@ -59,6 +59,8 @@ import SeoProduct from "../components/SeoProduct";
 
 import SeoMeta from "../components/SeoMeta";
 
+import SeoBreadcrumb from "../components/SeoBreadcrumb";
+
 function ProductDetails() {
 
 const navigate = useNavigate();
@@ -808,6 +810,32 @@ return (
   type="product"
   keywords={`${product.name}, Cameroun, Yaoundé, Douala, boutique en ligne, KONAN SHOPPING, livraison, achat`}
 />
+
+ <SeoBreadcrumb
+      pageUrl={productUrl}
+      items={[
+        {
+          name: "Accueil",
+          url: "https://konanshopping.com/",
+        },
+        {
+          name: "Boutique",
+          url: "https://konanshopping.com/boutique",
+        },
+        ...(product.category
+          ? [
+              {
+                name: product.category,
+                url: "https://konanshopping.com/boutique",
+              },
+            ]
+          : []),
+        {
+          name: product.name,
+          url: productUrl,
+        },
+      ]}
+    />
 
 <div
   style={{

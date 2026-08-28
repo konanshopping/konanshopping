@@ -32,6 +32,8 @@ import {
   FaGem,
 } from "react-icons/fa";
 
+import SeoBreadcrumb from "../components/SeoBreadcrumb";
+
 function Boutique() {
 
   // ================= HERO PROMOTIONS =================
@@ -776,6 +778,22 @@ const displayedProducts =
     : randomProducts;
 
   return (
+
+      <>
+    <SeoBreadcrumb
+      pageUrl="https://konanshopping.com/boutique"
+      items={[
+        {
+          name: "Accueil",
+          url: "https://konanshopping.com/",
+        },
+        {
+          name: "Boutique",
+          url: "https://konanshopping.com/boutique",
+        },
+      ]}
+    />
+
 
     <div
   style={{
@@ -3706,7 +3724,8 @@ fontSize:
 
     </div>
 
-  );
+   </>
+);
 
 }
 
