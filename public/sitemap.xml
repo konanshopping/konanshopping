@@ -18,7 +18,7 @@
   <!-- Catalogue produits dynamique -->
 
   <sitemap>
-    <loc>https://konanshopping.com/product-sitemap.xml</loc>
+    <loc>https://konanshopping.com/api/product-sitemap.xml</loc>
   </sitemap>
 
 </sitemapindex>
