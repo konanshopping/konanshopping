@@ -790,6 +790,510 @@ await axios.post(
 
 };
 
+// =====================================================
+// 🛍️ KONAN SHOPPING CAMEROUN
+// DESCRIPTION PREMIUM ET PROFESSIONNELLE PAR CATÉGORIE
+// =====================================================
+
+const getProductDescription = (product) => {
+
+  // ==========================================
+  // INFORMATIONS PRINCIPALES
+  // ==========================================
+
+  const name =
+    product?.name?.trim() ||
+    "Ce produit";
+
+  const category =
+    product?.category?.trim() ||
+    "";
+
+  const price =
+    Number(
+      product?.promoPrice ??
+      product?.price ??
+      product?.originalPrice ??
+      0
+    ) || 0;
+
+  const formattedPrice =
+    price > 0
+      ? new Intl.NumberFormat(
+          "fr-FR"
+        ).format(price)
+      : null;
+
+
+  // ==========================================
+  // 💰 PRIX
+  // ==========================================
+
+  const priceText = formattedPrice
+    ? `Disponible au prix de ${formattedPrice} FCFA.`
+    : "Prix disponible sur demande.";
+
+
+  // ==========================================
+  // 🚚 LIVRAISON KONAN SHOPPING
+  // ==========================================
+
+  const deliveryText =
+    `Commandez dès maintenant sur Konan Shopping Cameroun et profitez d'une expérience d'achat simple, rapide et sécurisée. Notre équipe vous accompagne tout au long de votre commande afin de vous garantir un excellent service et une livraison adaptée à vos besoins.`;
+
+
+  // ==========================================
+  // 📞 CONFIRMATION TAILLE VÊTEMENTS
+  // ==========================================
+
+  const sizeText =
+    `Disponible en différentes tailles selon le modèle et les disponibilités. Afin de vous garantir la taille la plus adaptée, notre équipe vous contactera directement après votre commande pour confirmer votre taille avant la préparation et la livraison de votre article.`;
+
+
+  // ==========================================
+  // 👟 CONFIRMATION POINTURE CHAUSSURES
+  // ==========================================
+
+  const shoeSizeText =
+    `Disponible en différentes pointures selon les modèles et les disponibilités. Après votre commande, notre équipe vous contactera directement afin de confirmer votre pointure avant la préparation de votre commande. Cette étape nous permet de vous livrer la pointure la plus adaptée et d'améliorer votre expérience d'achat.`;
+
+
+  // ==========================================
+  // 👕 DESCRIPTION PREMIUM VÊTEMENTS
+  // ==========================================
+
+  const clothingText = (type) =>
+    `Découvrez ${name}, un(e) ${type} soigneusement sélectionné(e) par Konan Shopping Cameroun pour répondre aux exigences de style, de confort et de qualité de nos clients.
+
+Pensé(e) pour s'intégrer facilement à votre quotidien, ce modèle vous permet de compléter votre garde-robe avec une pièce tendance, pratique et agréable à porter. Sa conception et son style en font un excellent choix pour différentes occasions, selon le modèle sélectionné.
+
+${sizeText}
+
+${priceText}
+
+${deliveryText}`;
+
+
+  // ==========================================
+  // 👟 DESCRIPTION PREMIUM CHAUSSURES
+  // ==========================================
+
+  const shoeText = (type) =>
+    `Découvrez ${name}, un(e) ${type} soigneusement sélectionné(e) par Konan Shopping Cameroun pour son style, son confort et son excellent potentiel d'utilisation au quotidien.
+
+Ce modèle est idéal pour celles et ceux qui recherchent une chaussure capable d'apporter une touche moderne à leur look tout en restant confortable et pratique. Que ce soit pour vos sorties, votre quotidien ou pour compléter une tenue particulière, ${name} constitue un choix élégant et tendance.
+
+${shoeSizeText}
+
+${priceText}
+
+${deliveryText}`;
+
+
+  // ==========================================
+  // 📝 DESCRIPTION PAR CATÉGORIE
+  // ==========================================
+
+  const descriptions = {
+
+
+    // ==========================================
+    // 👕 VÊTEMENTS & MODE
+    // ==========================================
+
+    "T-shirts":
+      clothingText("T-shirt"),
+
+    "Chemises":
+      clothingText("chemise"),
+
+    "Blouses":
+      clothingText("blouse"),
+
+    "Polos":
+      clothingText("polo"),
+
+    "Débardeurs":
+      clothingText("débardeur"),
+
+    "Pulls":
+      clothingText("pull"),
+
+    "Gilets":
+      clothingText("gilet"),
+
+    "Sweats":
+      clothingText("sweat"),
+
+    "Hoodies":
+      clothingText("hoodie"),
+
+    "Vestes":
+      clothingText("veste"),
+
+    "Blousons":
+      clothingText("blouson"),
+
+    "Manteaux":
+      clothingText("manteau"),
+
+    "Costumes":
+      clothingText("costume"),
+
+    "Blazers":
+      clothingText("blazer"),
+
+    "Robes":
+      clothingText("robe"),
+
+    "Jupes":
+      clothingText("jupe"),
+
+    "Pantalons":
+      clothingText("pantalon"),
+
+    "Jeans":
+      clothingText("jean"),
+
+    "Leggings":
+      clothingText("legging"),
+
+    "Shorts":
+      clothingText("short"),
+
+    "Combinaisons":
+      clothingText("combinaison"),
+
+    "Pyjamas":
+      clothingText("pyjama"),
+
+    "Sous-vêtements":
+      clothingText("article de sous-vêtement"),
+
+    "Lingerie":
+      clothingText("article de lingerie"),
+
+    "Chaussettes":
+      `Découvrez ${name}, un article soigneusement sélectionné pour apporter confort et praticité à votre quotidien.
+
+Grâce à son utilisation simple et agréable, ce produit constitue un excellent complément à votre garde-robe et à vos tenues.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Maillots de bain":
+      clothingText("maillot de bain"),
+
+    "Vêtements de sport":
+      clothingText("vêtement de sport"),
+
+    "Tenues de yoga":
+      clothingText("tenue de yoga"),
+
+    "Mode homme":
+      `Découvrez ${name}, un article de mode pour homme sélectionné avec soin par Konan Shopping Cameroun.
+
+Alliant style, confort et praticité, ce produit est idéal pour accompagner votre quotidien et vous aider à composer un look qui correspond à vos envies.
+
+${sizeText}
+
+${priceText}
+
+${deliveryText}`,
+
+    "Mode femme":
+      `Découvrez ${name}, un article de mode pour femme soigneusement sélectionné pour celles qui souhaitent associer élégance, confort et tendance.
+
+Son style polyvalent permet de l'intégrer facilement à différentes tenues et de l'adapter à votre quotidien selon vos envies.
+
+${sizeText}
+
+${priceText}
+
+${deliveryText}`,
+
+    "Mode enfant":
+      `Découvrez ${name}, un article spécialement sélectionné pour accompagner les enfants avec confort et style.
+
+Notre objectif est de proposer des articles pratiques et adaptés au quotidien, tout en tenant compte des besoins liés au confort et à la taille.
+
+${sizeText}
+
+${priceText}
+
+${deliveryText}`,
+
+    "Mode bébé":
+      `Découvrez ${name}, un article soigneusement sélectionné pour le confort et le bien-être des bébés.
+
+Pratique et adapté au quotidien, il constitue un excellent choix pour accompagner votre enfant avec confort.
+
+${sizeText}
+
+${priceText}
+
+${deliveryText}`,
+
+
+    // ==========================================
+    // 👟 CHAUSSURES
+    // ==========================================
+
+    "Chaussures":
+      shoeText("chaussure"),
+
+    "Baskets":
+      shoeText("basket"),
+
+    "Chaussures de ville":
+      shoeText("chaussure de ville"),
+
+    "Bottes":
+      shoeText("botte"),
+
+    "Bottines":
+      shoeText("bottine"),
+
+    "Sandales":
+      shoeText("sandale"),
+
+    "Mocassins":
+      shoeText("mocassin"),
+
+    "Escarpins":
+      shoeText("escarpin"),
+
+    "Ballerines":
+      shoeText("ballerine"),
+
+    "Claquettes":
+      shoeText("claquette"),
+
+
+    // ==========================================
+    // 👜 SACS & VOYAGES
+    // ==========================================
+
+    "Sacs à main":
+      `Découvrez ${name}, un sac à main soigneusement sélectionné pour associer élégance, praticité et confort d'utilisation.
+
+Idéal pour transporter vos essentiels tout en apportant une touche raffinée à votre style, ce modèle peut accompagner vos sorties, vos déplacements et votre quotidien selon vos besoins.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Sacs à dos":
+      `Découvrez ${name}, un sac à dos pratique et polyvalent conçu pour accompagner vos déplacements au quotidien.
+
+Il constitue une solution idéale pour transporter et organiser vos effets personnels à l'école, au travail, lors de vos sorties ou pendant vos déplacements.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Sacs de voyage":
+      `Découvrez ${name}, un sac de voyage pratique et spacieux, sélectionné pour vous accompagner lors de vos déplacements.
+
+Il offre une solution adaptée pour transporter vos effets personnels et préparer vos voyages avec davantage de simplicité.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Valises":
+      `Découvrez ${name}, une valise sélectionnée pour faciliter l'organisation et le transport de vos affaires pendant vos déplacements.
+
+Pratique et adaptée aux besoins du voyage, elle constitue un excellent choix pour préparer vos effets personnels avec plus de sérénité.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Portefeuilles":
+      `Découvrez ${name}, un portefeuille pratique et élégant permettant d'organiser vos cartes, votre argent et vos documents essentiels.
+
+Un accessoire idéal pour accompagner votre quotidien tout en apportant une touche de style à vos essentiels.
+
+${priceText}
+
+${deliveryText}`,
+
+
+    // ==========================================
+    // ⌚ ACCESSOIRES DE MODE
+    // ==========================================
+
+    "Ceintures":
+      `Découvrez ${name}, une ceinture soigneusement sélectionnée pour compléter vos tenues avec élégance.
+
+Pratique et polyvalente, elle vous permet d'ajouter une finition soignée à votre look tout en répondant aux besoins du quotidien.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Montres":
+      `Découvrez ${name}, une montre sélectionnée pour son élégance et son style.
+
+Plus qu'un simple accessoire, elle constitue un élément capable de compléter votre tenue et d'apporter une touche moderne à votre apparence.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Bijoux":
+      `Découvrez ${name}, un bijou soigneusement sélectionné pour apporter une touche d'élégance et de personnalité à votre style.
+
+Idéal pour compléter une tenue ou pour offrir, cet article vous permet de mettre en valeur votre look selon vos envies.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Lunettes":
+      `Découvrez ${name}, un accessoire tendance sélectionné pour compléter votre style.
+
+Son design et son utilisation permettent d'apporter une touche moderne à votre apparence et de s'intégrer facilement à différentes tenues.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Casquettes":
+      `Découvrez ${name}, une casquette tendance et pratique, idéale pour compléter votre style au quotidien.
+
+Elle constitue un excellent accessoire pour apporter une touche moderne et décontractée à vos tenues.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Chapeaux":
+      `Découvrez ${name}, un chapeau soigneusement sélectionné pour compléter votre tenue avec élégance.
+
+Son style permet d'apporter une touche distinctive à votre apparence et de créer un look plus personnel.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Écharpes":
+      `Découvrez ${name}, une écharpe pratique et élégante, idéale pour compléter votre tenue avec style.
+
+Elle peut accompagner différentes tenues et apporter davantage de confort selon vos besoins.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Foulards":
+      `Découvrez ${name}, un foulard élégant et polyvalent qui vous permet d'ajouter une touche personnelle à votre style.
+
+Un accessoire pratique pour varier vos tenues et exprimer votre élégance selon vos envies.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Gants":
+      `Découvrez ${name}, une paire de gants sélectionnée pour associer confort et praticité.
+
+Un accessoire utile et élégant pour compléter votre tenue et accompagner votre quotidien.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Accessoires":
+      `Découvrez ${name}, un accessoire soigneusement sélectionné par Konan Shopping Cameroun.
+
+Pratique et utile, il est conçu pour répondre à vos besoins et compléter votre équipement ou votre quotidien.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Accessoires de mode":
+      `Découvrez ${name}, un accessoire de mode soigneusement sélectionné pour compléter votre style.
+
+Il vous permet d'apporter une touche personnelle et élégante à votre look tout en restant pratique au quotidien.
+
+${priceText}
+
+${deliveryText}`,
+
+
+    // ==========================================
+    // ✨ COLLECTIONS
+    // ==========================================
+
+    "Luxe":
+      `Découvrez ${name}, un article de notre collection Luxe, sélectionné pour les clients à la recherche d'un produit au style élégant et premium.
+
+Cette sélection met en avant des articles capables d'apporter une touche distinctive à votre quotidien et à votre style.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Nouveautés":
+      `Découvrez ${name}, l'une des nouveautés disponibles sur Konan Shopping Cameroun.
+
+Notre sélection de nouveautés vous permet de découvrir régulièrement des articles tendance et soigneusement choisis pour répondre à vos besoins.
+
+${priceText}
+
+${deliveryText}`,
+
+    "Promotions":
+      `Profitez de ${name}, actuellement proposé dans le cadre de nos offres promotionnelles.
+
+C'est une excellente occasion de commander un article soigneusement sélectionné à un prix avantageux, tout en bénéficiant du service Konan Shopping Cameroun.
+
+${priceText}
+
+${deliveryText}`
+  };
+
+
+  // ==========================================
+  // 🔎 RECHERCHE DE LA CATÉGORIE
+  // ==========================================
+
+  const categoryKey =
+    Object.keys(descriptions).find(
+      (key) =>
+        key
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+        ===
+        category
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+    );
+
+
+  // ==========================================
+  // 🌟 DESCRIPTION PAR DÉFAUT
+  // ==========================================
+
+  return (
+    descriptions[categoryKey] ||
+
+    `Découvrez ${name}, un produit soigneusement sélectionné par Konan Shopping Cameroun pour répondre aux besoins de nos clients.
+
+Nous mettons un point d'honneur à proposer des articles pratiques, tendance et accessibles, afin de vous offrir une expérience d'achat simple et agréable.
+
+${priceText}
+
+${deliveryText}`
+  );
+};
+
 
 return (
 
@@ -1245,8 +1749,7 @@ Basé sur {product.reviews?.length || 0} avis
     wordBreak: "break-word",
   }}
 >
-  {product.description ||
-    "Produit premium disponible sur Konan Shopping Cameroun."}
+  {getProductDescription(product)}
 </p>
 
 {/* FEATURES */}
