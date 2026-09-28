@@ -24,6 +24,26 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    // ======================================================
+// 👥 COMMUNAUTÉ KONAN SHOPPING
+// ======================================================
+
+communityMember: {
+  type: Boolean,
+  default: true,
+},
+
+communityRole: {
+  type: String,
+  enum: ["member", "admin"],
+  default: "member",
+},
+
+communityJoinedAt: {
+  type: Date,
+  default: Date.now,
+},
+
     avatar: {
       type: String,
       default: "",

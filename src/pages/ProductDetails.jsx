@@ -49,6 +49,14 @@ import {
   FaReply,
   FaImage,
 
+  FaChevronUp,
+
+  FaTimes,
+  FaSearchMinus,
+  FaSearchPlus,
+
+  FaChevronDown
+
 } from "react-icons/fa";
 
 import { FaClock } from "react-icons/fa";
@@ -236,6 +244,19 @@ const openProduct = (_id) => {
 };
 
 const [showAllReviews, setShowAllReviews] = useState(false);
+const [showReviewsSection, setShowReviewsSection] = useState(false);
+const [imageZoom, setImageZoom] = useState(1);
+const [showFullDescription, setShowFullDescription] = useState(false);
+
+// Affichage uniquement : ne modifie jamais le vrai prix utilisé par le panier/commande.
+const getDisplayReferencePrice = (currentPrice) => {
+  const price = Number(currentPrice) || 0;
+  if (!price) return null;
+
+  const reference = Math.ceil((price * 1.25) / 500) * 500;
+  return reference > price ? reference : price + 500;
+};
+
 
 const getProduct = async () => {
 
@@ -555,6 +576,15 @@ const averageRating =
         ) / product.reviews.length
       ).toFixed(1)
     : "5";
+const fullProductDescription = getProductDescription(product);
+const descriptionLimit = mobile ? 175 : 300;
+const displayedProductDescription =
+  showFullDescription || fullProductDescription.length <= descriptionLimit
+    ? fullProductDescription
+    : `${fullProductDescription.slice(0, descriptionLimit).trim()}…`;
+
+const displayReferencePrice = getDisplayReferencePrice(product.price);
+
 
 // =========================
 // ADD TO CART
@@ -795,7 +825,7 @@ await axios.post(
 // DESCRIPTION PREMIUM ET PROFESSIONNELLE PAR CATÉGORIE
 // =====================================================
 
-const getProductDescription = (product) => {
+function getProductDescription(product) {
 
   // ==========================================
   // INFORMATIONS PRINCIPALES
@@ -1292,7 +1322,7 @@ ${priceText}
 
 ${deliveryText}`
   );
-};
+}
 
 
 return (
@@ -1348,7 +1378,7 @@ return (
     background:
       "linear-gradient(135deg,#f8fafc,#eef2ff)",
 
-    padding: mobile ? "12px" : "26px",
+    padding: mobile ? "max(8px, env(safe-area-inset-top)) max(0px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(0px, env(safe-area-inset-left))" : "26px",
 
     width: "100%",
 
@@ -1420,37 +1450,63 @@ return (
 <div
   style={{
     width: "100%",
-
-    height: mobile ? "320px" : "520px",
+    height: mobile
+      ? "min(100vw, 560px)"
+      : "min(42vw, 620px)",
 
     overflow: "hidden",
-
     borderRadius: mobile ? "18px" : "22px",
 
-    background:
-      "linear-gradient(135deg,#f9fafb,#eef2ff)",
+    background: "#ffffff",
 
     position: "relative",
+
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    boxSizing: "border-box",
+
+    WebkitOverflowScrolling: "touch",
   }}
 >
 
 <img
   src={product.image}
-  alt=""
+  alt={product.name || "Produit Konan Shopping"}
   fetchPriority="high"
   decoding="async"
 
   onClick={() => {
+    playClick();
+    setImageZoom(1);
     setSelectedImage(product.image);
   }}
 
   style={{
+    display: "block",
+
     width: "100%",
     height: "100%",
+
+    maxWidth: "100%",
+    maxHeight: "100%",
+
     objectFit: "cover",
-    display: "block",
-    transition: "0.4s",
+
+    padding: 0,
+    margin: 0,
+
+    boxSizing: "border-box",
+
+    transition: "transform 0.4s ease",
     cursor: "zoom-in",
+
+    WebkitTapHighlightColor: "transparent",
+    WebkitUserSelect: "none",
+    userSelect: "none",
+
+    touchAction: "manipulation",
   }}
 
   onMouseEnter={(e) => {
@@ -1720,37 +1776,159 @@ Basé sur {product.reviews?.length || 0} avis
 
 </div>
 
-<h2
+<div
   style={{
-    color: "#4f46e5",
-
-    fontSize: mobile ? "32px" : "40px",
-
-    marginBottom: "18px",
-
-    fontWeight: "900",
-
-    wordBreak: "break-word",
+    marginBottom: mobile ? "20px" : "24px",
+    width: "100%",
+    boxSizing: "border-box",
   }}
 >
-  {product.price} FCFA
-</h2>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "baseline",
+      flexWrap: "wrap",
+      gap: mobile ? "8px" : "12px",
+    }}
+  >
+    <h2
+      style={{
+        margin: 0,
+        color: "#111827",
+        fontSize: mobile ? "34px" : "42px",
+        fontWeight: "900",
+        lineHeight: "1",
+        letterSpacing: "-1px",
+        wordBreak: "break-word",
+      }}
+    >
+      {product.price} FCFA
+    </h2>
 
-<p
+    {displayReferencePrice &&
+      displayReferencePrice > Number(product.price) && (
+        <span
+          style={{
+            color: "#9ca3af",
+            fontSize: mobile ? "13px" : "15px",
+            fontWeight: "700",
+            textDecoration: "line-through",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {displayReferencePrice} FCFA
+        </span>
+      )}
+  </div>
+
+  <div
+    style={{
+      marginTop: "7px",
+      color: "#6b7280",
+      fontSize: mobile ? "12px" : "13px",
+      fontWeight: "600",
+      lineHeight: "1.4",
+    }}
+  >
+    Prix affiché en FCFA
+  </div>
+</div>
+<div
   style={{
-    color: "#4b5563",
-
-    lineHeight: "1.8",
-
-    marginBottom: "24px",
-
-    fontSize: mobile ? "15px" : "14px",
-
-    wordBreak: "break-word",
+    marginBottom: mobile ? "20px" : "24px",
+    padding: mobile ? "15px" : "18px",
+    borderRadius: mobile ? "17px" : "20px",
+    background: "#ffffff",
+    border: "1px solid #eef2ff",
+    boxShadow: "0 8px 22px rgba(15,23,42,.045)",
+    width: "100%",
+    boxSizing: "border-box",
   }}
 >
-  {getProductDescription(product)}
-</p>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "10px",
+      marginBottom: "8px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        color: "#111827",
+        fontSize: mobile ? "15px" : "16px",
+        fontWeight: "900",
+      }}
+    >
+      <FaGem style={{ color: "#6366f1", fontSize: "14px" }} />
+      Description
+    </div>
+
+    <span
+      style={{
+        color: "#9ca3af",
+        fontSize: mobile ? "10px" : "11px",
+        fontWeight: "700",
+      }}
+    >
+      {showFullDescription ? "Détails complets" : "Aperçu"}
+    </span>
+  </div>
+
+  <p
+    style={{
+      color: "#4b5563",
+      lineHeight: "1.75",
+      margin: 0,
+      fontSize: mobile ? "14px" : "14px",
+      wordBreak: "break-word",
+      whiteSpace: "pre-line",
+    }}
+  >
+    {displayedProductDescription}
+  </p>
+
+  {fullProductDescription.length > descriptionLimit && (
+    <button
+      type="button"
+      onClick={() => {
+        playClick();
+        setShowFullDescription((value) => !value);
+      }}
+      aria-expanded={showFullDescription}
+      style={{
+        marginTop: "12px",
+        padding: "8px 0",
+        border: "none",
+        background: "transparent",
+        color: "#4f46e5",
+        fontSize: mobile ? "13px" : "13px",
+        fontWeight: "900",
+        cursor: "pointer",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "7px",
+        WebkitTapHighlightColor: "transparent",
+      }}
+    >
+      {showFullDescription ? (
+        <>
+          Voir moins
+          <FaChevronUp />
+        </>
+      ) : (
+        <>
+          Voir plus
+          <FaChevronDown />
+        </>
+      )}
+    </button>
+  )}
+</div>
 
 {/* FEATURES */}
 
@@ -1767,42 +1945,6 @@ Basé sur {product.reviews?.length || 0} avis
     width: "100%",
   }}
 >
-
-<div
-  style={{
-    ...badgeStyle,
-    flex: mobile ? "1 1 calc(50% - 8px)" : "unset",
-    justifyContent: "center",
-    boxSizing: "border-box",
-  }}
->
-  <FaTruck />
-  Livraison rapide
-</div>
-
-<div
-  style={{
-    ...badgeStyle,
-    flex: mobile ? "1 1 calc(50% - 8px)" : "unset",
-    justifyContent: "center",
-    boxSizing: "border-box",
-  }}
->
-  <FaShieldAlt />
-  Paiement sécurisé
-</div>
-
-<div
-  style={{
-    ...badgeStyle,
-    flex: mobile ? "1 1 100%" : "unset",
-    justifyContent: "center",
-    boxSizing: "border-box",
-  }}
->
-  <FaGem />
-  Premium
-</div>
 
 </div>
 
@@ -2007,34 +2149,137 @@ style={{
 
 </div>
 
-{/* AVIS PREMIUM */}
-
+{/* AVIS PREMIUM — ACCORDÉON */}
 <div
   style={{
     marginTop: "24px",
-
-    background:
-      "linear-gradient(135deg,#ffffff,#f8fafc)",
-
-    padding: mobile ? "16px" : "20px",
-
-    borderRadius: mobile ? "18px" : "20px",
-
-    border:
-      "1px solid rgba(99,102,241,0.08)",
-
-    boxShadow:
-      "0 10px 25px rgba(0,0,0,0.04)",
-
-    position: "relative",
-
+    background: "linear-gradient(135deg,#ffffff,#f8fafc)",
+    borderRadius: mobile ? "18px" : "22px",
+    border: "1px solid rgba(99,102,241,0.10)",
+    boxShadow: "0 12px 30px rgba(15,23,42,0.05)",
     width: "100%",
-
     boxSizing: "border-box",
-
     overflow: "hidden",
   }}
 >
+  <button
+    type="button"
+    onClick={() => {
+      playClick();
+      setShowReviewsSection((value) => !value);
+    }}
+    aria-expanded={showReviewsSection}
+    style={{
+      width: "100%",
+      border: "none",
+      background: "transparent",
+      padding: mobile ? "14px 13px" : "18px 20px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: "12px",
+      cursor: "pointer",
+      WebkitTapHighlightColor: "transparent",
+      textAlign: "left",
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
+      <div
+        style={{
+          width: mobile ? "40px" : "44px",
+          height: mobile ? "40px" : "44px",
+          borderRadius: "14px",
+          background: "linear-gradient(135deg,#fff7ed,#fffbeb)",
+          border: "1px solid rgba(245,158,11,.16)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <FaStar style={{ color: "#f59e0b" }} />
+      </div>
+
+      <div style={{ minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          <strong style={{ color: "#111827", fontSize: mobile ? "16px" : "18px", fontWeight: "900" }}>
+            Avis clients
+          </strong>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "4px 8px",
+              borderRadius: "999px",
+              background: "#f8fafc",
+              border: "1px solid #e5e7eb",
+              color: "#4f46e5",
+              fontSize: "10px",
+              fontWeight: "800",
+            }}
+          >
+            <FaCommentDots /> {product?.reviews?.length || 0}
+          </span>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "7px", marginTop: "4px", flexWrap: "wrap" }}>
+          <span style={{ color: "#111827", fontSize: mobile ? "13px" : "14px", fontWeight: "900" }}>
+            {product?.reviews?.length > 0
+              ? (
+                  product.reviews.reduce((total, review) => total + review.rating, 0) /
+                  product.reviews.length
+                ).toFixed(1)
+              : "0.0"} / 5
+          </span>
+
+          <span style={{ color: "#f59e0b", display: "inline-flex", gap: "2px" }}>
+            {[...Array(5)].map((_, i) => (
+              <FaStar
+                key={i}
+                style={{
+                  fontSize: "11px",
+                  color: "#f59e0b",
+                  opacity:
+                    i < Math.round(Number(averageRating) || 0) ? 1 : 0.25,
+                }}
+              />
+            ))}
+          </span>
+
+          <span style={{ color: "#6b7280", fontSize: "10px", fontWeight: "600" }}>
+            {showReviewsSection ? "Masquer les avis" : "Afficher les avis"}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <span
+      style={{
+        width: mobile ? "34px" : "38px",
+        height: mobile ? "34px" : "38px",
+        borderRadius: "12px",
+        background: "#eef2ff",
+        color: "#4f46e5",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      {showReviewsSection ? <FaChevronUp /> : <FaChevronDown />}
+    </span>
+  </button>
+
+  {showReviewsSection && (
+    <div
+      style={{
+        padding: mobile ? "0 12px 14px" : "0 20px 20px",
+        animation: "ksReviewsOpen .28s ease",
+        minWidth: 0,
+      }}
+    >
+
 
 {/* HEADER */}
 
@@ -2645,7 +2890,11 @@ review.images.length > 0 && (
   alt=""
   loading="lazy"
   decoding="async"
-  onClick={() => setSelectedImage(img)}
+  onClick={() => {
+      playClick();
+      setImageZoom(1);
+      setSelectedImage(img);
+    }}
   style={{
     width:"100%",
     aspectRatio:"1",
@@ -3153,7 +3402,17 @@ Soyez le premier à donner votre avis ⭐
 
 </div>
 
+
+    </div>
+  )}
 </div>
+
+<style>{`
+  @keyframes ksReviewsOpen {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`}</style>
 
 {/* PRODUITS SIMILAIRES */}
 
@@ -3640,71 +3899,227 @@ Ajouter
 
 </div>
 
-{/* IMAGE MODAL */}
-
+{/* IMAGE MODAL — VISIONNEUSE PROFESSIONNELLE */}
 {selectedImage && (
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label="Aperçu de l'image"
+    onClick={() => {
+      setImageZoom(1);
+      setSelectedImage(null);
+    }}
+    style={{
+      position: "fixed",
+      inset: 0,
+      zIndex: 999999,
+      background: "radial-gradient(circle at 50% 45%, rgba(99,102,241,.14), transparent 34%), rgba(3,7,18,.91)",
+      backdropFilter: "blur(18px)",
+      WebkitBackdropFilter: "blur(14px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left))",
+      boxSizing: "border-box",
+      animation: "ksViewerFade .22s ease",
+      WebkitTapHighlightColor: "transparent",
+    }}
+  >
+    <div
+      onClick={(e) => e.stopPropagation()}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "max(8px, env(safe-area-inset-top))",
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          zIndex: 3,
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "8px 11px",
+            borderRadius: "999px",
+            background: "rgba(255,255,255,.10)",
+            border: "1px solid rgba(255,255,255,.14)",
+            color: "#fff",
+            fontSize: "11px",
+            fontWeight: "800",
+          }}
+        >
+          <FaImage /> Aperçu
+        </div>
 
-<div
+        <button
+          type="button"
+          onClick={() => {
+            setImageZoom(1);
+            setSelectedImage(null);
+          }}
+          aria-label="Fermer l'aperçu"
+          style={{
+            width: mobile ? "42px" : "46px",
+            height: mobile ? "42px" : "46px",
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,.16)",
+            background: "rgba(255,255,255,.12)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            fontSize: "17px",
+          }}
+        >
+          <FaTimes />
+        </button>
+      </div>
 
-onClick={()=>
-setSelectedImage(null)
-}
+      <img
+        src={selectedImage}
+        alt={product?.name || "Image du produit"}
+        decoding="async"
+        draggable="false"
+        onDoubleClick={() => setImageZoom((z) => (z >= 2.5 ? 1 : 2.5))}
+        style={{
+          maxWidth: "94vw",
+          maxHeight: mobile ? "78vh" : "82vh",
+          width: "auto",
+          height: "auto",
+          objectFit: "contain",
+          borderRadius: mobile ? "14px" : "20px",
+          boxShadow: "0 30px 90px rgba(0,0,0,.55)",
+          transform: `scale(${imageZoom})`,
+          transformOrigin: "center center",
+          transition: "transform .25s ease",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+        }}
+      />
 
-style={{
-position: "fixed",
+      <div
+        style={{
+          position: "absolute",
+          bottom: "max(12px, env(safe-area-inset-bottom))",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "7px",
+          borderRadius: "999px",
+          background: "rgba(255,255,255,.10)",
+          border: "1px solid rgba(255,255,255,.14)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setImageZoom((z) => Math.max(1, +(z - 0.25).toFixed(2)))}
+          aria-label="Réduire le zoom"
+          style={{
+            width: "38px",
+            height: "38px",
+            border: "none",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,.12)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          <FaSearchMinus />
+        </button>
 
-top: 0,
+        <span style={{ minWidth: "48px", textAlign: "center", color: "#fff", fontSize: "11px", fontWeight: "900" }}>
+          {Math.round(imageZoom * 100)}%
+        </span>
 
-left: 0,
-
-width: "100%",
-
-height: "100%",
-
-background:
-"rgba(0,0,0,0.82)",
-
-display: "flex",
-
-justifyContent:
-"center",
-
-alignItems:
-"center",
-
-zIndex: 9999,
-
-padding: mobile ? "12px" : "20px",
-
-backdropFilter:
-"blur(8px)",
-}}
->
-
-<img
-src={selectedImage}
-
-alt=""
-
-decoding="async"
-
-style={{
-maxWidth: "100%",
-
-maxHeight: "90%",
-
-borderRadius: mobile ? "14px" : "20px",
-
-objectFit: "contain",
-
-boxShadow:
-"0 20px 50px rgba(0,0,0,0.45)",
-}}
-/>
-
-</div>
-
+        <button
+          type="button"
+          onClick={() => setImageZoom((z) => Math.min(2.5, +(z + 0.25).toFixed(2)))}
+          aria-label="Augmenter le zoom"
+          style={{
+            width: "38px",
+            height: "38px",
+            border: "none",
+            borderRadius: "50%",
+            background: "rgba(255,255,255,.12)",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
+        >
+          <FaSearchPlus />
+        </button>
+      </div>
+    </div>
+  </div>
 )}
+
+<style>{`
+  @keyframes ksViewerFade {
+    from { opacity: 0; transform: scale(.985); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes ksViewerImageIn {
+    from {
+      opacity: 0;
+      transform: scale(.92);
+      filter: blur(5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+      filter: blur(0);
+    }
+  }
+`}</style>
+
+<style>{`
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  button, input, textarea, select {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+`}</style>
 
 </>
 
