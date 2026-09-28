@@ -44,6 +44,56 @@ const API =
 // 🚚 INSCRIPTION LIVREUR
 // ======================================================
 
+// ======================================================
+// 🧩 CHAMP INPUT
+// ======================================================
+
+const InputField = ({
+  name,
+  label,
+  placeholder,
+  icon,
+  type = "text",
+  value,
+  onChange
+}) => {
+
+  return (
+
+    <div className="driver-field">
+
+      <label>
+        {label}
+      </label>
+
+      <div className="driver-input">
+
+        <span className="driver-input-icon">
+          {icon}
+        </span>
+
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          autoComplete={
+            name ===
+            "password"
+              ? "new-password"
+              : "off"
+          }
+        />
+
+      </div>
+
+    </div>
+
+  );
+
+};
+
 export default function DriverRegister() {
 
   const navigate =
@@ -699,72 +749,6 @@ export default function DriverRegister() {
   };
 
 
-  // ======================================================
-  // 🧩 CHAMP INPUT
-  // ======================================================
-
-  const InputField = ({
-    name,
-    label,
-    placeholder,
-    icon,
-    type = "text"
-  }) => {
-
-    return (
-
-      <div className="driver-field">
-
-        <label>
-
-          {label}
-
-        </label>
-
-
-        <div className="driver-input">
-
-          <span className="driver-input-icon">
-
-            {icon}
-
-          </span>
-
-
-          <input
-
-            type={type}
-
-            name={name}
-
-            value={
-              form[name]
-            }
-
-            onChange={
-              handleChange
-            }
-
-            placeholder={
-              placeholder
-            }
-
-            autoComplete={
-              name ===
-              "password"
-                ? "new-password"
-                : "off"
-            }
-
-          />
-
-        </div>
-
-      </div>
-
-    );
-
-  };
 
 
   // ======================================================
@@ -2211,6 +2195,9 @@ export default function DriverRegister() {
                 <FaUser />
               }
 
+              value={form.name}
+
+              onChange={handleChange}
             />
 
 
@@ -2230,6 +2217,9 @@ export default function DriverRegister() {
                 <FaEnvelope />
               }
 
+              value={form.email}
+
+              onChange={handleChange}
             />
 
 
@@ -2344,6 +2334,9 @@ export default function DriverRegister() {
                 <FaPhone />
               }
 
+              value={form.phone}
+
+              onChange={handleChange}
             />
 
 
@@ -2361,6 +2354,9 @@ export default function DriverRegister() {
                 <FaCity />
               }
 
+              value={form.city}
+
+              onChange={handleChange}
             />
 
 
@@ -2378,6 +2374,9 @@ export default function DriverRegister() {
                 <FaCar />
               }
 
+              value={form.vehicle}
+
+              onChange={handleChange}
             />
 
 
@@ -2397,6 +2396,9 @@ export default function DriverRegister() {
                 <FaIdCard />
               }
 
+              value={form.plate}
+
+              onChange={handleChange}
             />
 
 
