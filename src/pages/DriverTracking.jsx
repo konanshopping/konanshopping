@@ -178,6 +178,14 @@ export default function DriverTracking() {
   const watchIdsRef =
     useRef({});
 
+  // 📍 Dernière position GPS connue du livreur
+  const driverPositionRef =
+    useRef({
+      lat: null,
+      lng: null,
+      updatedAt: 0
+    });
+
   const mountedRef =
     useRef(true);
 
@@ -521,19 +529,166 @@ export default function DriverTracking() {
       order.location.lat === undefined ||
       order.location.lng === undefined
     ) {
-
       return;
-
     }
+
+    if (!navigator.geolocation) {
+      return;
+    }
+
+    const clientLat =
+      Number(order.location.lat);
+
+    const clientLng =
+      Number(order.location.lng);
 
     if (
-      !navigator.geolocation
+      !Number.isFinite(clientLat) ||
+      !Number.isFinite(clientLng)
     ) {
-
       return;
-
     }
 
+    const useRoute = (
+      driverLat,
+      driverLng
+    ) => {
+
+      if (
+        !Number.isFinite(driverLat) ||
+        !Number.isFinite(driverLng)
+      ) {
+        return;
+      }
+
+      const routeUrl =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${driverLng},${driverLat};` +
+        `${clientLng},${clientLat}` +
+        `?overview=false&alternatives=false`;
+
+      axios.get(routeUrl)
+        .then(response => {
+
+          const route =
+            response.data?.routes?.[0];
+
+          if (
+            !route ||
+            !Number.isFinite(route.distance) ||
+            !Number.isFinite(route.duration)
+          ) {
+            throw new Error(
+              "Itinéraire routier indisponible."
+            );
+          }
+
+          if (!mountedRef.current) {
+            return;
+          }
+
+          const km =
+            route.distance / 1000;
+
+          const minutes =
+            Math.max(
+              1,
+              Math.round(
+                route.duration / 60
+              )
+            );
+
+          setDistances(
+            previous => ({
+              ...previous,
+              [order._id]:
+                `≈ ${km.toFixed(1)} km`
+            })
+          );
+
+          setEtas(
+            previous => ({
+              ...previous,
+              [order._id]:
+                `≈ ${minutes} min`
+            })
+          );
+
+        })
+        .catch(error => {
+
+          console.log(
+            "OSRM distance:",
+            error
+          );
+
+          // Fallback : on conserve une estimation
+          // si le service routier est indisponible.
+          const kmDirect =
+            calculateDistance(
+              driverLat,
+              driverLng,
+              clientLat,
+              clientLng
+            );
+
+          const estimatedRoadKm =
+            kmDirect * 1.25;
+
+          const speed =
+            30;
+
+          const minutes =
+            Math.max(
+              1,
+              Math.round(
+                (estimatedRoadKm / speed) * 60
+              )
+            );
+
+          if (!mountedRef.current) {
+            return;
+          }
+
+          setDistances(
+            previous => ({
+              ...previous,
+              [order._id]:
+                `≈ ${estimatedRoadKm.toFixed(1)} km`
+            })
+          );
+
+          setEtas(
+            previous => ({
+              ...previous,
+              [order._id]:
+                `≈ ${minutes} min`
+            })
+          );
+
+        });
+
+    };
+
+    // Réutiliser la dernière position GPS live
+    // lorsqu'elle est déjà disponible.
+    const currentPosition =
+      driverPositionRef.current;
+
+    if (
+      Number.isFinite(currentPosition.lat) &&
+      Number.isFinite(currentPosition.lng)
+    ) {
+
+      useRoute(
+        currentPosition.lat,
+        currentPosition.lng
+      );
+
+      return;
+    }
+
+    // Sinon, récupérer une position GPS ponctuelle.
     navigator.geolocation.getCurrentPosition(
 
       position => {
@@ -544,51 +699,15 @@ export default function DriverTracking() {
         const driverLng =
           position.coords.longitude;
 
-        const km =
-          calculateDistance(
+        driverPositionRef.current = {
+          lat: driverLat,
+          lng: driverLng,
+          updatedAt: Date.now()
+        };
 
-            driverLat,
-            driverLng,
-
-            Number(order.location.lat),
-            Number(order.location.lng)
-
-          );
-
-        if (!mountedRef.current) {
-          return;
-        }
-
-        setDistances(
-          previous => ({
-
-            ...previous,
-
-            [order._id]:
-              `${km.toFixed(1)} km`
-
-          })
-        );
-
-        const speed = 35;
-
-        const minutes =
-          Math.max(
-            1,
-            Math.round(
-              (km / speed) * 60
-            )
-          );
-
-        setEtas(
-          previous => ({
-
-            ...previous,
-
-            [order._id]:
-              `${minutes} min`
-
-          })
+        useRoute(
+          driverLat,
+          driverLng
         );
 
       },
@@ -1456,6 +1575,14 @@ const startDriverGPS =
 
             const lng =
               position.coords.longitude;
+
+            // 📍 Conserver la dernière position connue
+            // pour calculer distance et itinéraire.
+            driverPositionRef.current = {
+              lat,
+              lng,
+              updatedAt: Date.now()
+            };
 
 
             // ==========================================
@@ -2472,6 +2599,152 @@ const stopGPS =
 
 
   // ====================================================
+  // 🗺️ OUVRIR L'ITINÉRAIRE RÉEL
+  // ====================================================
+
+  const openRealRoute = (
+    order
+  ) => {
+
+    if (
+      !order?.location ||
+      order.location.lat === undefined ||
+      order.location.lng === undefined
+    ) {
+      notify(
+        "La localisation du client est indisponible.",
+        "error",
+        "Itinéraire"
+      );
+
+      return;
+    }
+
+    const destinationLat =
+      Number(order.location.lat);
+
+    const destinationLng =
+      Number(order.location.lng);
+
+    if (
+      !Number.isFinite(destinationLat) ||
+      !Number.isFinite(destinationLng)
+    ) {
+      notify(
+        "Les coordonnées du client sont invalides.",
+        "error",
+        "Itinéraire"
+      );
+
+      return;
+    }
+
+    const openGoogleMaps = (
+      driverLat,
+      driverLng
+    ) => {
+
+      const url =
+        `https://www.google.com/maps/dir/?api=1` +
+        `&origin=${driverLat},${driverLng}` +
+        `&destination=${destinationLat},${destinationLng}` +
+        `&travelmode=driving`;
+
+      window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+    };
+
+    const currentPosition =
+      driverPositionRef.current;
+
+    if (
+      Number.isFinite(currentPosition.lat) &&
+      Number.isFinite(currentPosition.lng)
+    ) {
+
+      openGoogleMaps(
+        currentPosition.lat,
+        currentPosition.lng
+      );
+
+      return;
+    }
+
+    if (!navigator.geolocation) {
+
+      const fallbackUrl =
+        `https://www.google.com/maps/dir/?api=1` +
+        `&destination=${destinationLat},${destinationLng}` +
+        `&travelmode=driving`;
+
+      window.open(
+        fallbackUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+      position => {
+
+        const driverLat =
+          position.coords.latitude;
+
+        const driverLng =
+          position.coords.longitude;
+
+        driverPositionRef.current = {
+          lat: driverLat,
+          lng: driverLng,
+          updatedAt: Date.now()
+        };
+
+        openGoogleMaps(
+          driverLat,
+          driverLng
+        );
+
+      },
+
+      error => {
+
+        console.log(
+          "GPS itinéraire:",
+          error
+        );
+
+        const fallbackUrl =
+          `https://www.google.com/maps/dir/?api=1` +
+          `&destination=${destinationLat},${destinationLng}` +
+          `&travelmode=driving`;
+
+        window.open(
+          fallbackUrl,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
+      },
+
+      {
+        enableHighAccuracy: true,
+        maximumAge: 10000,
+        timeout: 10000
+      }
+
+    );
+
+  };
+
+
+  // ====================================================
   // 📦 CARTE COMMANDE
   // ====================================================
 
@@ -2505,13 +2778,46 @@ const stopGPS =
         "Annulée";
 
 
+      // ==================================================
+      // 📍 DESTINATION CLIENT
+      // Priorité au quartier + ville saisis par le client.
+      // Si "address" contient accidentellement un email,
+      // on ne l'affiche jamais comme adresse.
+      // ==================================================
+
+      const isEmailAddress = (value) =>
+        typeof value === "string" &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          value.trim()
+        );
+
+      const district =
+        String(order.district || "").trim();
+
+      const city =
+        String(order.city || "").trim();
+
+      const orderAddress =
+        String(order.address || "").trim();
+
+      const safeOrderAddress =
+        !isEmailAddress(orderAddress)
+          ? orderAddress
+          : "";
+
+      const explicitDestination = [
+        district,
+        city,
+        safeOrderAddress
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       const address =
+        explicitDestination ||
         clientAddresses[
           order._id
         ] ||
-
-        order.address ||
-
         "Localisation GPS du client";
 
 
@@ -2705,15 +3011,12 @@ const stopGPS =
               order.location?.lng !==
               undefined && (
 
-                <a
+                <button
+                  type="button"
 
-                  href={
-                    `https://www.google.com/maps/dir/?api=1&destination=${order.location.lat},${order.location.lng}`
+                  onClick={() =>
+                    openRealRoute(order)
                   }
-
-                  target="_blank"
-
-                  rel="noreferrer"
 
                   className="map-button"
 
@@ -2725,7 +3028,7 @@ const stopGPS =
 
                   <FaChevronRight />
 
-                </a>
+                </button>
 
               )}
 
