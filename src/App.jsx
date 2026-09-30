@@ -421,13 +421,65 @@ const [showAlert, setShowAlert] =
 
   const [showBottomNav, setShowBottomNav] = useState(true);
 
+  // Header compact au scroll : on conserve toute la logique existante
+  // et on change uniquement l'affichage du header selon la direction.
+  const [compactHeader, setCompactHeader] = useState(false);
+
 useEffect(() => {
 
   console.log("Effect 5");
 
   let scrollTimer;
+  let lastScrollY = window.scrollY;
+
+  // Distance cumulée de remontée avant de réafficher
+  // le header complet. Cela évite qu'un petit mouvement
+  // vers le haut donne l'impression que le header bug.
+  let upwardScrollDistance = 0;
 
   const handleScroll = () => {
+
+    const currentScrollY = window.scrollY;
+    const delta = currentScrollY - lastScrollY;
+
+    // =========================
+    // HEADER PREMIUM AU SCROLL
+    // =========================
+
+    if (Math.abs(delta) >= 4) {
+
+      // Le client descend : header compact
+      if (currentScrollY > 70 && delta > 0) {
+        upwardScrollDistance = 0;
+        setCompactHeader(true);
+      }
+
+      // Le client remonte :
+      // on attend une remontée significative
+      // avant de réafficher tout le header.
+      else if (delta < 0) {
+
+        upwardScrollDistance += Math.abs(delta);
+
+        if (
+          upwardScrollDistance >= 80 ||
+          currentScrollY <= 10
+        ) {
+          setCompactHeader(false);
+          upwardScrollDistance = 0;
+        }
+
+      }
+
+    }
+
+    // Toujours afficher le header complet tout en haut
+    if (currentScrollY <= 10) {
+      setCompactHeader(false);
+      upwardScrollDistance = 0;
+    }
+
+    lastScrollY = currentScrollY;
 
     // =========================
     // LE CLIENT SCROLL
@@ -1141,17 +1193,48 @@ if (
 
     borderBottom: "1px solid rgba(229,231,235,0.85)",
 
-    boxShadow:
-      "0 6px 24px rgba(15,23,42,0.07)",
-
     zIndex: 9999,
 
     boxSizing: "border-box",
 
-    padding:
-      window.innerWidth < 768
-        ? "8px 10px 9px"
-        : "10px 22px 12px",
+    // =========================
+    // HEADER NORMAL / COMPACT
+    // =========================
+
+    padding: compactHeader
+      ? (
+          window.innerWidth < 768
+            ? "6px 10px"
+            : "7px 22px"
+        )
+      : (
+          window.innerWidth < 768
+            ? "8px 10px 9px"
+            : "10px 22px 12px"
+        ),
+
+    maxHeight: compactHeader
+      ? (
+          window.innerWidth < 768
+            ? "58px"
+            : "68px"
+        )
+      : (
+          window.innerWidth < 768
+            ? "150px"
+            : "110px"
+        ),
+
+    overflow: "hidden",
+
+    transition:
+      "max-height .42s cubic-bezier(.22,1,.36,1), " +
+      "padding .32s ease, " +
+      "box-shadow .32s ease",
+
+    boxShadow: compactHeader
+      ? "0 10px 28px rgba(15,23,42,0.11)"
+      : "0 6px 24px rgba(15,23,42,0.07)",
   }}
 >
 
@@ -1196,10 +1279,13 @@ if (
 
         alignItems: "center",
 
-        gap:
-          window.innerWidth < 768
-            ? "6px"
-            : "9px",
+        gap: compactHeader
+          ? "0"
+          : (
+              window.innerWidth < 768
+                ? "6px"
+                : "9px"
+            ),
 
         flexShrink: 0,
       }}
@@ -1212,14 +1298,30 @@ if (
 
         style={{
           width:
-            window.innerWidth < 768
-              ? "34px"
-              : "42px",
+            compactHeader
+              ? (
+                  window.innerWidth < 768
+                    ? "34px"
+                    : "40px"
+                )
+              : (
+                  window.innerWidth < 768
+                    ? "34px"
+                    : "42px"
+                ),
 
           height:
-            window.innerWidth < 768
-              ? "34px"
-              : "42px",
+            compactHeader
+              ? (
+                  window.innerWidth < 768
+                    ? "34px"
+                    : "40px"
+                )
+              : (
+                  window.innerWidth < 768
+                    ? "34px"
+                    : "42px"
+                ),
 
           objectFit: "cover",
 
@@ -1239,10 +1341,8 @@ if (
         style={{
           lineHeight: "1",
 
-          display:
-            window.innerWidth < 768
-              ? "block"
-              : "block",
+          display: "block",
+          transition: "opacity .25s ease",
         }}
       >
 
@@ -1300,7 +1400,7 @@ if (
         Sur mobile elle descend sur la deuxième ligne
     =================================================== */}
 
-    {window.innerWidth >= 768 && (
+    {window.innerWidth >= 768 && !compactHeader && (
 
       <div
         style={{
@@ -1631,10 +1731,17 @@ if (
 
         alignItems: "center",
 
-        gap:
-          window.innerWidth < 768
-            ? "5px"
-            : "8px",
+        gap: compactHeader
+          ? (
+              window.innerWidth < 768
+                ? "6px"
+                : "9px"
+            )
+          : (
+              window.innerWidth < 768
+                ? "5px"
+                : "8px"
+            ),
 
         flexShrink: 0,
       }}
@@ -1939,7 +2046,7 @@ if (
       RECHERCHE MOBILE
   ===================================================== */}
 
-  {window.innerWidth < 768 && (
+  {window.innerWidth < 768 && !compactHeader && (
 
     <div
       style={{
@@ -2333,6 +2440,21 @@ if (
         "touch",
 
       width: "100%",
+
+      opacity: compactHeader ? 0 : 1,
+
+      transform:
+        compactHeader
+          ? "translateY(-8px)"
+          : "translateY(0)",
+
+      pointerEvents:
+        compactHeader
+          ? "none"
+          : "auto",
+
+      transition:
+        "opacity .25s ease, transform .35s cubic-bezier(.22,1,.36,1)",
     }}
   >
 
@@ -2455,10 +2577,20 @@ if (
 
 <div
   style={{
-    height:
-      window.innerWidth < 768
-        ? "148px"
-        : "105px",
+    height: compactHeader
+      ? (
+          window.innerWidth < 768
+            ? "68px"
+            : "82px"
+        )
+      : (
+          window.innerWidth < 768
+            ? "148px"
+            : "105px"
+        ),
+
+    transition:
+      "height .42s cubic-bezier(.22,1,.36,1)",
   }}
 />
 
