@@ -40,6 +40,8 @@ const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const aiRoutes =
   require("./ai");
 
+  const communityRoutes = require("./routes/community");
+
   const paymentRoutes = require("./routes/payment");
 
   const socialRoutes =
@@ -657,6 +659,8 @@ app.use(
 );
 
 app.use("/api/payment", paymentRoutes);
+
+app.use("/api/community", communityRoutes);
 
 const cloudinary =
 require("cloudinary").v2;

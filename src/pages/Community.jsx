@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { io } from "socket.io-client";
 
 /**
  * KONAN COMMUNITY
@@ -43,6 +44,13 @@ const API_BASE =
   "";
 
 const apiUrl = (path) => `${API_BASE}${path}`;
+
+const SOCKET_URL =
+  (typeof import.meta !== "undefined" &&
+    import.meta.env &&
+    import.meta.env.VITE_SOCKET_URL) ||
+  API_BASE ||
+  (typeof window !== "undefined" ? window.location.origin : "");
 
 const COLORS = {
   primary: "#0b66ff",
@@ -114,16 +122,48 @@ const normalizePost = (post, index = 0) => {
     sharesCount: Number(raw.sharesCount || raw.shares || 0),
     saved: Boolean(raw.saved),
     liked: Boolean(raw.liked),
-    createdAt: raw.createdAt || raw.publishedAt || new Date().toISOString(),
-    author:
-      raw.author ||
-      raw.user ||
-      {
-        name: "Konan Shopping",
-        avatar: "",
-        verified: true,
-        role: "KONAN SHOPPING",
-      },
+    createdAt: raw.createdAt || raw.publishedAt || null,
+    author: raw.author || raw.user || null,
+  };
+};
+
+const normalizeConversation = (conversation, index = 0) => {
+  const raw = conversation || {};
+  const person = raw.user || raw.participant || raw.contact || raw.otherUser || {};
+  return {
+    ...raw,
+    id: raw._id || raw.id || `conversation-${index}`,
+    user: {
+      ...person,
+      id: person._id || person.id || raw.userId || raw.participantId || null,
+      name: person.name || person.fullName || person.username || "Membre",
+      avatar: person.avatar || person.profilePicture || person.photo || "",
+      online: Boolean(person.online || person.isOnline),
+      verified: Boolean(person.verified),
+    },
+    lastMessage: raw.lastMessage?.text || raw.lastMessage || "",
+    unread: Number(raw.unread || raw.unreadCount || 0),
+  };
+};
+
+const normalizeMessage = (message, currentUserId = null) => {
+  const raw = message || {};
+  const sender = raw.sender || raw.author || raw.user || {};
+  const senderId = sender._id || sender.id || raw.senderId || raw.userId || null;
+  const id = raw._id || raw.id;
+  if (!id) return null;
+  return {
+    ...raw,
+    id,
+    text: raw.text || raw.content || raw.message || "",
+    senderId,
+    me: Boolean(raw.me || (currentUserId && String(senderId) === String(currentUserId))),
+    time: raw.time || (raw.createdAt ? new Date(raw.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : ""),
+    sender: {
+      ...sender,
+      name: sender.name || sender.fullName || sender.username || "Membre",
+      avatar: sender.avatar || sender.profilePicture || "",
+    },
   };
 };
 
@@ -236,7 +276,7 @@ const baseCss = `
 .kc-profile-body{padding:0 22px 22px}.kc-profile-row{display:flex;align-items:flex-end;gap:16px;margin-top:-47px;position:relative;z-index:2}.kc-profile-avatar-wrap{padding:4px;border-radius:50%;background:#fff}.kc-profile-main{flex:1;padding-bottom:5px}.kc-profile-main h2{margin:0;font-size:22px}.kc-profile-main p{margin:5px 0 0;color:#7b8799}.kc-profile-buttons{display:flex;gap:8px;padding-bottom:5px}.kc-btn{border:1px solid #dce2eb;background:#fff;border-radius:10px;height:38px;padding:0 13px;font-weight:800;color:#566277}.kc-btn.primary{background:#0b66ff;color:#fff;border-color:#0b66ff}.kc-profile-stats{display:flex;gap:26px;margin-top:17px;border-top:1px solid #edf0f4;padding-top:15px}.kc-profile-stats strong{display:block}.kc-profile-stats span{color:#8b95a7;font-size:11px}
 .kc-section-tabs{display:flex;gap:2px;border-bottom:1px solid #e7ebf2;margin-bottom:15px;overflow:auto}.kc-section-tab{border:0;background:none;padding:12px 14px;color:#7b8798;font-weight:800;white-space:nowrap;border-bottom:2px solid transparent}.kc-section-tab.active{color:#0b66ff;border-bottom-color:#0b66ff}
 .kc-discover-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.kc-group-card{overflow:hidden}.kc-group-cover{height:125px;object-fit:cover;width:100%}.kc-group-body{padding:13px}.kc-group-body h3{margin:0;font-size:14px}.kc-group-body p{margin:6px 0 11px;color:#8791a3;font-size:11px}
-.kc-message-shell{display:grid;grid-template-columns:270px 1fr;height:calc(100vh - 152px);min-height:580px;overflow:hidden}.kc-message-list{border-right:1px solid #e7ebf2;overflow:auto}.kc-message-search{padding:14px;border-bottom:1px solid #edf0f4}.kc-message-search input{width:100%;border:1px solid #e4e9f0;background:#f7f9fb;border-radius:10px;padding:10px 11px;outline:none}.kc-conversation{display:flex;gap:10px;padding:13px 14px;border:0;width:100%;background:#fff;text-align:left;border-bottom:1px solid #f2f4f7}.kc-conversation.active{background:#edf4ff}.kc-conversation .kc-person-info strong{font-size:12px}.kc-conversation small{display:block;color:#8c96a7;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kc-unread{background:#0b66ff;color:#fff;border-radius:20px;font-size:9px;padding:3px 6px;font-weight:900}.kc-chat{display:flex;flex-direction:column;min-width:0}.kc-chat-head{height:67px;border-bottom:1px solid #edf0f4;display:flex;align-items:center;gap:11px;padding:0 17px}.kc-chat-head strong{font-size:13px}.kc-chat-head small{display:block;color:#18a957;margin-top:2px}.kc-chat-messages{flex:1;overflow:auto;padding:20px;background:#fafbfc}.kc-bubble-row{display:flex;margin:8px 0}.kc-bubble-row.me{justify-content:flex-end}.kc-bubble{max-width:min(75%,440px);padding:10px 12px;border-radius:15px;background:#fff;border:1px solid #e7ebf2;box-shadow:0 3px 10px rgba(20,37,63,.03)}.kc-bubble-row.me .kc-bubble{background:#0b66ff;color:#fff;border-color:#0b66ff;border-bottom-right-radius:4px}.kc-bubble-row:not(.me) .kc-bubble{border-bottom-left-radius:4px}.kc-bubble small{display:block;font-size:9px;opacity:.62;margin-top:4px}.kc-chat-compose{padding:12px;border-top:1px solid #edf0f4;display:flex;gap:8px}.kc-chat-compose input{flex:1;border:1px solid #e1e6ee;border-radius:12px;padding:11px 13px;outline:none}.kc-chat-compose button{width:42px;border:0;border-radius:11px;background:#0b66ff;color:#fff}
+.kc-message-shell{display:grid;grid-template-columns:270px 1fr;height:calc(100vh - 152px);min-height:580px;overflow:hidden}.kc-message-list{border-right:1px solid #e7ebf2;overflow:auto}.kc-message-search{padding:14px;border-bottom:1px solid #edf0f4}.kc-message-search input{width:100%;border:1px solid #e4e9f0;background:#f7f9fb;border-radius:10px;padding:10px 11px;outline:none}.kc-conversation{display:flex;gap:10px;padding:13px 14px;border:0;width:100%;background:#fff;text-align:left;border-bottom:1px solid #f2f4f7}.kc-conversation.active{background:#edf4ff}.kc-conversation .kc-person-info strong{font-size:12px}.kc-conversation small{display:block;color:#8c96a7;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kc-unread{background:#0b66ff;color:#fff;border-radius:20px;font-size:9px;padding:3px 6px;font-weight:900}.kc-chat{display:flex;flex-direction:column;min-width:0}.kc-chat-head{height:67px;border-bottom:1px solid #edf0f4;display:flex;align-items:center;gap:11px;padding:0 17px}.kc-chat-head strong{font-size:13px}.kc-chat-head small{display:block;color:#18a957;margin-top:2px}.kc-chat-messages{flex:1;overflow:auto;padding:20px;background:#fafbfc}.kc-bubble-row{display:flex;margin:8px 0}.kc-bubble-row.me{justify-content:flex-end}.kc-bubble{max-width:min(75%,440px);padding:10px 12px;border-radius:15px;background:#fff;border:1px solid #e7ebf2;box-shadow:0 3px 10px rgba(20,37,63,.03)}.kc-bubble-row.me .kc-bubble{background:#0b66ff;color:#fff;border-color:#0b66ff;border-bottom-right-radius:4px}.kc-bubble-row:not(.me) .kc-bubble{border-bottom-left-radius:4px}.kc-bubble small{display:block;font-size:9px;opacity:.62;margin-top:4px}.kc-chat-compose{padding:12px;border-top:1px solid #edf0f4;display:flex;gap:8px}.kc-chat-compose input{flex:1;border:1px solid #e1e6ee;border-radius:12px;padding:11px 13px;outline:none}.kc-chat-compose button{width:42px;border:0;border-radius:11px;background:#0b66ff;color:#fff}.kc-chat-compose button:disabled{opacity:.45;cursor:not-allowed}.kc-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:#8b95a7;padding:35px;min-height:150px}.kc-empty i{font-size:27px;color:#9db9e8}.kc-empty strong{color:#4c586d;font-size:13px}.kc-empty span{font-size:11px;line-height:1.5;max-width:420px}
 .kc-notif{display:flex;gap:12px;padding:13px;border-bottom:1px solid #eef1f5}.kc-notif.unread{background:#f4f8ff}.kc-notif-icon{width:38px;height:38px;border-radius:12px;background:#eaf2ff;color:#0b66ff;display:grid;place-items:center}.kc-notif p{margin:0;color:#4d596d;line-height:1.4}.kc-notif small{display:block;color:#929bac;margin-top:4px}
 .kc-short-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.kc-short{height:320px;border-radius:16px;overflow:hidden;position:relative;background:#101828}.kc-short img,.kc-short video{width:100%;height:100%;object-fit:cover}.kc-short-overlay{position:absolute;inset:auto 0 0;padding:13px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.78))}.kc-short-overlay strong{display:block}.kc-short-overlay small{display:block;margin-top:5px;opacity:.8}
 .kc-page-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.kc-page-card{padding:16px;display:flex;align-items:center;gap:12px}.kc-page-card .kc-person-info{min-width:0}
@@ -1057,6 +1097,7 @@ function PostCard({
   onCommentSubmit,
   onVote,
   onDelete,
+  onMenu,
   currentUser,
 }) {
   const author = post.author || post.user || {};
@@ -1081,11 +1122,16 @@ function PostCard({
             {author.verified ? <i className={icon("badge-check")} /> : null}
           </strong>
           <span>
-            {author.role || "Membre de la communauté"} · {post.timeLabel || post.createdAtLabel || "Publication"}
+            {author.role || "Membre de la communauté"}{post.createdAt ? ` · ${timeAgo(post.createdAt)}` : ""}
           </span>
         </div>
 
-        <button className="kc-icon-btn" type="button" title="Plus d'options">
+        <button
+          className="kc-icon-btn"
+          type="button"
+          title="Plus d'options"
+          onClick={() => onMenu?.(post)}
+        >
           <i className={icon("ellipsis")} />
         </button>
       </div>
@@ -1899,9 +1945,9 @@ function NotificationsView({ notifications, onRead }) {
     <div>
       <SectionTitle title="Notifications" subtitle="Restez informé de ce qui compte." />
       <div className="kc-card" style={{ overflow: "hidden" }}>
-        {notifications.map((n) => (
+        {notifications.length ? notifications.map((n) => (
           <button
-            key={n.id}
+            key={n.id || n._id}
             className={`kc-notif ${n.unread ? "unread" : ""}`}
             style={{
               width: "100%",
@@ -1931,7 +1977,13 @@ function NotificationsView({ notifications, onRead }) {
               />
             ) : null}
           </button>
-        ))}
+        )) : (
+          <div className="kc-empty" style={{ padding: 30 }}>
+            <i className={icon("bell-slash")} />
+            <strong>Aucune notification réelle.</strong>
+            <span>Les notifications du serveur apparaîtront ici.</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1945,91 +1997,162 @@ function MessagesView({
   message,
   setMessage,
   sendMessage,
+  loadingMessages,
+  onReloadMessages,
 }) {
-  const active = conversations.find((x) => x.id === activeConversation) || conversations[0];
+  const [query, setQuery] = useState("");
+  const active =
+    conversations.find((x) => String(x.id) === String(activeConversation)) ||
+    conversations[0] ||
+    null;
   const bottomRef = useRef(null);
+  const activeMessages = active ? messages[active.id] || [] : [];
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [active?.id, activeMessages.length]);
+
+  const visibleConversations = conversations.filter((conv) =>
+    String(conv.user?.name || "").toLowerCase().includes(query.trim().toLowerCase())
+  );
 
   return (
     <div>
-      <SectionTitle title="Messages" subtitle="Échangez en privé avec votre réseau." />
+      <SectionTitle
+        title="Messages"
+        subtitle="Échangez directement avec les autres membres de KONAN COMMUNITY."
+      />
+
       <div className="kc-card kc-message-shell">
         <div className="kc-message-list">
           <div className="kc-message-search">
-            <input placeholder="Rechercher une conversation..." />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Rechercher une conversation..."
+            />
           </div>
-          {conversations.map((conv) => (
-            <button
-              key={conv.id}
-              className={`kc-conversation ${
-                active?.id === conv.id ? "active" : ""
-              }`}
-              onClick={() => setActiveConversation(conv.id)}
-            >
-              <Avatar src={conv.user.avatar} name={conv.user.name} online={conv.user.online} />
-              <div className="kc-person-info">
-                <strong>{conv.user.name}</strong>
-                <small>{conv.lastMessage}</small>
-              </div>
-              {conv.unread ? <span className="kc-unread">{conv.unread}</span> : null}
-            </button>
-          ))}
+
+          {visibleConversations.length ? (
+            visibleConversations.map((conv) => (
+              <button
+                key={conv.id}
+                className={`kc-conversation ${
+                  String(active?.id) === String(conv.id) ? "active" : ""
+                }`}
+                onClick={() => setActiveConversation(conv.id)}
+              >
+                <Avatar
+                  src={conv.user.avatar}
+                  name={conv.user.name}
+                  online={conv.user.online}
+                  verified={conv.user.verified}
+                />
+                <div className="kc-person-info">
+                  <strong>{conv.user.name}</strong>
+                  <small>{conv.lastMessage || "Aucun message"}</small>
+                </div>
+                {conv.unread ? (
+                  <span className="kc-unread">{conv.unread}</span>
+                ) : null}
+              </button>
+            ))
+          ) : (
+            <div className="kc-empty" style={{ padding: 24 }}>
+              <i className={icon("message")} />
+              <strong>Aucune conversation réelle.</strong>
+              <span>Les conversations créées sur le serveur apparaîtront ici.</span>
+            </div>
+          )}
         </div>
 
         <div className="kc-chat">
-          <div className="kc-chat-head">
-            <Avatar
-              src={active?.user?.avatar}
-              name={active?.user?.name}
-              online={Boolean(active?.user?.online)}
-            />
-            <div>
-              <strong>{active?.user?.name || "Conversation"}</strong>
-              <small>En ligne</small>
-            </div>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
-              <button className="kc-icon-btn"><i className={icon("phone")} /></button>
-              <button className="kc-icon-btn"><i className={icon("video")} /></button>
-              <button className="kc-icon-btn"><i className={icon("ellipsis")} /></button>
-            </div>
-          </div>
-
-          <div className="kc-chat-messages">
-            {(messages[active?.id] || [
-              { id: 1, text: "Bonjour 👋", me: false, time: "12:30" },
-              { id: 2, text: "Bonjour ! Heureux de te retrouver sur Konan Community.", me: true, time: "12:31" },
-              { id: 3, text: "Merci pour ton retour !", me: false, time: "12:42" },
-            ]).map((m) => (
-              <div className={`kc-bubble-row ${m.me ? "me" : ""}`} key={m.id}>
-                <div className="kc-bubble">
-                  {m.text}
-                  <small>{m.time}</small>
+          {active ? (
+            <>
+              <div className="kc-chat-head">
+                <Avatar
+                  src={active.user.avatar}
+                  name={active.user.name}
+                  online={active.user.online}
+                  verified={active.user.verified}
+                />
+                <div>
+                  <strong>{active.user.name}</strong>
+                  <small>
+                    {active.user.online ? "En ligne" : "Hors ligne"}
+                  </small>
+                </div>
+                <div style={{ marginLeft: "auto", display: "flex", gap: 5 }}>
+                  <button
+                    type="button"
+                    className="kc-icon-btn"
+                    onClick={onReloadMessages}
+                    title="Actualiser"
+                  >
+                    <i className={icon("rotate-right")} />
+                  </button>
                 </div>
               </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
 
-          <form className="kc-chat-compose" onSubmit={(e) => {
-            e.preventDefault();
-            if (!message.trim()) return;
-            sendMessage(active?.id, message.trim());
-          }}>
-            <button type="button" className="kc-icon-btn">
-              <i className={icon("paperclip")} />
-            </button>
-            <input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Écrire un message..."
-            />
-            <button type="submit">
-              <i className={icon("paper-plane")} />
-            </button>
-          </form>
+              <div className="kc-chat-messages">
+                {loadingMessages ? (
+                  <div className="kc-empty" style={{ minHeight: 220 }}>
+                    <i className={icon("spinner", "fa-spin")} />
+                    <span>Chargement des messages réels…</span>
+                  </div>
+                ) : activeMessages.length ? (
+                  activeMessages.map((m) => (
+                    <div
+                      className={`kc-bubble-row ${m.me ? "me" : ""}`}
+                      key={m.id}
+                    >
+                      <div className="kc-bubble">
+                        {!m.me ? (
+                          <strong style={{ display: "block", fontSize: 11, marginBottom: 3 }}>
+                            {m.sender?.name || "Membre"}
+                          </strong>
+                        ) : null}
+                        {m.text}
+                        <small>{m.time}</small>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="kc-empty" style={{ minHeight: 220 }}>
+                    <i className={icon("comments")} />
+                    <strong>Aucun message dans cette conversation.</strong>
+                    <span>Commencez la discussion avec un message.</span>
+                  </div>
+                )}
+                <div ref={bottomRef} />
+              </div>
+
+              <form
+                className="kc-chat-compose"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!message.trim() || !active?.id) return;
+                  sendMessage(active.id, message.trim());
+                }}
+              >
+                <input
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Écrire un message..."
+                  disabled={!active}
+                />
+                <button type="submit" disabled={!message.trim() || !active}>
+                  <i className={icon("paper-plane")} />
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="kc-empty" style={{ minHeight: 580 }}>
+              <i className={icon("comments")} />
+              <strong>Sélectionnez une conversation.</strong>
+              <span>Vos échanges réels seront affichés ici.</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -2166,62 +2289,82 @@ function MarketplaceView({ products = [] }) {
   );
 }
 
-function ProfessionalView() {
+function ProfessionalView({ posts = [], contacts = [], videos = [], events = [] }) {
+  const stats = [
+    ["Publications", posts.length, "données actuellement chargées"],
+    ["Membres visibles", contacts.length, "données actuellement chargées"],
+    ["Vidéos", videos.length, "données actuellement chargées"],
+    ["Événements", events.length, "données actuellement chargées"],
+  ];
+
   return (
     <div>
       <div className="kc-prof-banner">
         <h2>Espace professionnel</h2>
-        <p>Développez votre présence, mesurez votre audience et transformez votre communauté en opportunités.</p>
+        <p>
+          Les indicateurs affichés ici proviennent uniquement des données réellement
+          retournées par votre API Community.
+        </p>
       </div>
+
       <div className="kc-kpi-grid" style={{ marginBottom: 15 }}>
-        {[
-          ["Audience", "24,8 k", "+12,4%"],
-          ["Portée", "184 k", "+18,7%"],
-          ["Engagement", "8,6%", "+2,1%"],
-          ["Leads", "342", "+31"],
-        ].map(([label, value, growth]) => (
+        {stats.map(([label, value, note]) => (
           <div className="kc-card kc-kpi" key={label}>
             <span>{label}</span>
-            <strong>{value}</strong>
-            <em>{growth} ce mois</em>
+            <strong>{Number(value).toLocaleString("fr-FR")}</strong>
+            <em>{note}</em>
           </div>
         ))}
       </div>
+
       <div className="kc-card" style={{ padding: 18, marginBottom: 15 }}>
         <div className="kc-side-title">
-          <strong>Performance du contenu</strong>
-          <button>30 derniers jours</button>
+          <strong>Activité réelle disponible</strong>
         </div>
-        <div style={{ height: 220, display: "flex", alignItems: "end", gap: 10, paddingTop: 20 }}>
-          {[38, 58, 47, 72, 65, 88, 76, 95, 83, 91, 79, 100].map((h, i) => (
-            <div key={i} style={{ flex: 1 }}>
+        {posts.length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            {posts.slice(0, 8).map((post) => (
               <div
+                key={post.id}
                 style={{
-                  height: `${h * 1.7}px`,
-                  maxHeight: 175,
-                  borderRadius: "8px 8px 3px 3px",
-                  background: "linear-gradient(180deg,#0b66ff,#8bb8ff)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "10px 0",
+                  borderBottom: "1px solid #eef1f5",
                 }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="kc-page-grid">
-        {[
-          ["Publier", "Créez du contenu et programmez vos publications.", "plus"],
-          ["Audience", "Comprenez qui vous suit et ce qui l'intéresse.", "users"],
-          ["Monétisation", "Préparez les futures fonctionnalités créateurs.", "coins"],
-          ["Sécurité", "Gérez les rôles, accès et protections.", "shield-halved"],
-        ].map(([title, text, ic]) => (
-          <div className="kc-card" key={title} style={{ padding: 16 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 11, background: "#eaf2ff", color: COLORS.primary, display: "grid", placeItems: "center" }}>
-              <i className={icon(ic)} />
-            </div>
-            <h3 style={{ margin: "11px 0 5px" }}>{title}</h3>
-            <p style={{ color: "#7d889a", margin: 0, lineHeight: 1.5 }}>{text}</p>
+              >
+                <Avatar src={post.author?.avatar} name={post.author?.name} />
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <strong style={{ display: "block", fontSize: 12 }}>
+                    {post.author?.name || "Membre"}
+                  </strong>
+                  <span
+                    style={{
+                      display: "block",
+                      color: "#7f899a",
+                      fontSize: 11,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {post.content || post.title || "Publication"}
+                  </span>
+                </div>
+                <span style={{ color: "#8c96a7", fontSize: 10 }}>
+                  {post.likesCount || 0} réactions
+                </span>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="kc-empty">
+            <i className={icon("chart-line")} />
+            <strong>Aucune activité réelle à analyser.</strong>
+            <span>Les indicateurs apparaîtront lorsque l'API fournira des données.</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2350,16 +2493,13 @@ export default function Community() {
   const [modal, setModal] = useState(null);
   const [toast, setToast] = useState("");
   const [user, setUser] = useState(null);
+  const [profileUser, setProfileUser] = useState(null);
+  const [publishing, setPublishing] = useState(false);
+  const socketRef = useRef(null);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
-  const currentUser = useMemo(() => {
-    if (user) return user;
-    return {
-      name: "Compte",
-      email: "",
-      avatar: "",
-      role: "Membre",
-    };
-  }, [user]);
+  const currentUser = useMemo(() => user || {}, [user]);
+  const currentUserId = currentUser?._id || currentUser?.id || null;
 
   const showToast = useCallback((text) => {
     setToast(text);
@@ -2481,7 +2621,7 @@ export default function Community() {
       setStories(safeArray(data?.stories));
       setContacts(safeArray(data?.contacts || data?.members));
       setNotifications(safeArray(data?.notifications));
-      setConversations(safeArray(data?.conversations));
+      setConversations(safeArray(data?.conversations).map(normalizeConversation));
       setGroups(safeArray(data?.groups));
       setPages(safeArray(data?.pages));
       setVideos(safeArray(data?.videos));
@@ -2502,11 +2642,141 @@ export default function Community() {
     loadCommunityData();
   }, [loadCommunityData]);
 
+  const loadConversationMessages = useCallback(async (conversationId) => {
+    if (!conversationId) return;
+    setLoadingMessages(true);
+    try {
+      const response = await fetch(
+        apiUrl(`/api/community/conversations/${conversationId}/messages`),
+        { headers: { Accept: "application/json" } }
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const list = safeArray(data?.messages || data?.items || data?.data)
+        .map((item) => normalizeMessage(item, currentUserId))
+        .filter(Boolean);
+      setMessages((previous) => ({ ...previous, [conversationId]: list }));
+    } catch (error) {
+      console.error("Community conversation messages:", error);
+      setMessages((previous) => ({ ...previous, [conversationId]: [] }));
+      showToast("Impossible de charger les messages réels de cette conversation.");
+    } finally {
+      setLoadingMessages(false);
+    }
+  }, [currentUserId, showToast]);
 
-  // Le nombre de membres en ligne sera alimenté par Socket.IO
+  useEffect(() => {
+    if (!activeConversation && conversations.length) {
+      setActiveConversation(conversations[0].id);
+    }
+  }, [activeConversation, conversations]);
+
+  useEffect(() => {
+    if (activeConversation && messages[activeConversation] === undefined) {
+      loadConversationMessages(activeConversation);
+    }
+  }, [activeConversation, messages, loadConversationMessages]);
+
+  // Le nombre de membres en ligne est alimenté exclusivement par Socket.IO.
   // lorsque le backend Community temps réel sera branché.
   // Aucune valeur artificielle n'est affichée.
 
+
+  useEffect(() => {
+    if (!SOCKET_URL) return undefined;
+
+    const socket = io(SOCKET_URL, {
+      transports: ["websocket", "polling"],
+      autoConnect: true,
+    });
+    socketRef.current = socket;
+
+    const communityId = "konan-community";
+
+    const upsertPost = (payload) => {
+      const rawPost = payload?.post || payload?.item || payload?.data || payload;
+      if (!rawPost || typeof rawPost !== "object") return;
+      const post = normalizePost(rawPost);
+      if (!post.id || String(post.id).startsWith("post-")) return;
+      setPosts((previous) => {
+        const exists = previous.some((item) => String(item.id) === String(post.id));
+        return exists
+          ? previous.map((item) => String(item.id) === String(post.id) ? { ...item, ...post } : item)
+          : [post, ...previous];
+      });
+    };
+
+    const upsertComment = (payload) => {
+      const postId = payload?.postId || payload?.post?._id || payload?.post?.id;
+      const comment = payload?.comment || payload?.item || payload?.data || payload;
+      if (!postId || !(comment?._id || comment?.id)) return;
+      setComments((previous) => {
+        const current = previous[postId] || [];
+        const commentId = comment._id || comment.id;
+        if (current.some((item) => String(item._id || item.id) === String(commentId))) return previous;
+        return { ...previous, [postId]: [...current, comment] };
+      });
+    };
+
+    const receiveMessage = (payload) => {
+      const conversationId = payload?.conversationId || payload?.conversation?._id || payload?.conversation?.id;
+      const raw = payload?.message || payload?.item || payload?.data || payload;
+      if (!conversationId || !raw) return;
+      const normalized = normalizeMessage(raw, currentUserId);
+      if (!normalized) return;
+      setMessages((previous) => {
+        const current = previous[conversationId] || [];
+        if (current.some((item) => String(item.id) === String(normalized.id))) return previous;
+        return { ...previous, [conversationId]: [...current, normalized] };
+      });
+    };
+
+    const receiveOnline = (payload) => {
+      const count = typeof payload === "number"
+        ? payload
+        : Number(payload?.count ?? payload?.onlineUsers ?? payload?.usersCount);
+      if (Number.isFinite(count) && count >= 0) setOnlineUsers(count);
+    };
+
+    const receiveNotification = (payload) => {
+      const notification = payload?.notification || payload?.item || payload?.data || payload;
+      if (!notification) return;
+      const id = notification._id || notification.id;
+      if (!id) return;
+      setNotifications((previous) => {
+        if (previous.some((item) => String(item._id || item.id) === String(id))) return previous;
+        return [{ ...notification, id, unread: true }, ...previous];
+      });
+    };
+
+    socket.on("connect", () => {
+      socket.emit("joinCommunity", {
+        userId: currentUserId,
+        communityId,
+      });
+      socket.emit("community:join", {
+        userId: currentUserId,
+        communityId,
+      });
+    });
+
+    ["newPost", "community:newPost", "postCreated"].forEach((event) => socket.on(event, upsertPost));
+    ["newComment", "community:newComment", "commentCreated"].forEach((event) => socket.on(event, upsertComment));
+    ["newMessage", "community:newMessage", "messageCreated"].forEach((event) => socket.on(event, receiveMessage));
+    ["onlineUsers", "community:onlineUsers", "userCount"].forEach((event) => socket.on(event, receiveOnline));
+    ["notification", "community:notification", "newNotification"].forEach((event) => socket.on(event, receiveNotification));
+
+    return () => {
+      ["newPost", "community:newPost", "postCreated"].forEach((event) => socket.off(event, upsertPost));
+      ["newComment", "community:newComment", "commentCreated"].forEach((event) => socket.off(event, upsertComment));
+      ["newMessage", "community:newMessage", "messageCreated"].forEach((event) => socket.off(event, receiveMessage));
+      ["onlineUsers", "community:onlineUsers", "userCount"].forEach((event) => socket.off(event, receiveOnline));
+      ["notification", "community:notification", "newNotification"].forEach((event) => socket.off(event, receiveNotification));
+      socket.emit("leaveCommunity", { userId: currentUserId, communityId });
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [currentUserId]);
 
   const filteredPosts = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -2557,7 +2827,7 @@ export default function Community() {
     } catch (error) {
       console.error("Community publish:", error);
       showToast(
-        "Publication impossible : l'API Community doit encore être activée."
+        error?.message || "Publication impossible. Vérifiez votre connexion et l'API Community."
       );
       throw error;
     }
@@ -2769,6 +3039,9 @@ export default function Community() {
   };
 
   const sendMessage = async (conversationId, text) => {
+    const cleanText = String(text || "").trim();
+    if (!conversationId || !cleanText) return;
+
     try {
       const response = await fetch(
         apiUrl(`/api/community/conversations/${conversationId}/messages`),
@@ -2778,29 +3051,34 @@ export default function Community() {
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify({ text }),
+          body: JSON.stringify({ text: cleanText }),
         }
       );
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message || `HTTP ${response.status}`);
+      }
 
       const data = await response.json();
       const created = data?.message || data?.item || data?.data;
+      const normalized = normalizeMessage(created, currentUserId);
 
-      if (created) {
-        setMessages((previous) => ({
-          ...previous,
-          [conversationId]: [
-            ...(previous[conversationId] || []),
-            created,
-          ],
-        }));
+      if (normalized) {
+        setMessages((previous) => {
+          const current = previous[conversationId] || [];
+          if (current.some((item) => String(item.id) === String(normalized.id))) return previous;
+          return {
+            ...previous,
+            [conversationId]: [...current, normalized],
+          };
+        });
       }
 
       setMessage("");
     } catch (error) {
       console.error("Community message:", error);
-      showToast("Impossible d'envoyer le message.");
+      showToast(error?.message || "Impossible d'envoyer le message.");
     }
   };
 
@@ -2865,8 +3143,8 @@ export default function Community() {
         title="Accueil"
         subtitle={
           onlineUsers > 0
-            ? `${onlineUsers} membre${onlineUsers > 1 ? "s" : ""} en ligne`
-            : "Bienvenue dans votre communauté"
+            ? `${onlineUsers} membre${onlineUsers > 1 ? "s" : ""} en ligne actuellement`
+            : "Les données de la communauté sont chargées depuis le serveur"
         }
       />
       <Stories
@@ -2903,6 +3181,7 @@ export default function Community() {
             onShare={sharePost}
             onSave={toggleSave}
             onVote={votePoll}
+            onDelete={deletePost}
             onMenu={openPostMenu}
           />
         ))
@@ -2969,7 +3248,7 @@ export default function Community() {
           people={people}
           groups={groups}
           onProfile={(person) => {
-            setUser(person);
+            setProfileUser(person);
             setActiveView("profile");
           }}
           onGroups={() => navigate("groups")}
@@ -2986,6 +3265,8 @@ export default function Community() {
           message={message}
           setMessage={setMessage}
           sendMessage={sendMessage}
+          loadingMessages={loadingMessages}
+          onReloadMessages={() => loadConversationMessages(activeConversation)}
         />
       );
       break;
@@ -3013,7 +3294,14 @@ export default function Community() {
       content = <MarketplaceView products={marketplaceProducts} />;
       break;
     case "professional":
-      content = <ProfessionalView />;
+      content = (
+        <ProfessionalView
+          posts={posts}
+          contacts={contacts}
+          videos={videos}
+          events={events}
+        />
+      );
       break;
     case "settings":
       content = <SettingsView user={currentUser} />;
@@ -3021,8 +3309,11 @@ export default function Community() {
     case "profile":
       content = (
         <ProfileView
-          user={currentUser}
-          onBack={() => navigate("home")}
+          user={profileUser || currentUser}
+          onBack={() => {
+            setProfileUser(null);
+            navigate("home");
+          }}
           onMessage={() => openMessage()}
         />
       );
@@ -3034,6 +3325,7 @@ export default function Community() {
   }
 
   const unreadNotifications = notifications.filter((x) => x.unread).length;
+  const unreadMessages = conversations.reduce((sum, item) => sum + Number(item.unread || 0), 0);
 
   return (
     <div className="kc-root">
@@ -3082,7 +3374,7 @@ export default function Community() {
           </button>
           <button className="kc-icon-btn" onClick={() => navigate("messages")} title="Messages">
             <i className={icon("message")} />
-            <span className="kc-badge">2</span>
+            {unreadMessages ? <span className="kc-badge">{unreadMessages}</span> : null}
           </button>
           <button className="kc-icon-btn" onClick={() => navigate("notifications")} title="Notifications">
             <i className={icon("bell")} />
@@ -3120,7 +3412,7 @@ export default function Community() {
                 iconName={ic}
                 label={label}
                 active={activeView === view && !(view === "discover" && label === "Réseau")}
-                badge={badge}
+                badge={view === "messages" ? unreadMessages : view === "notifications" ? unreadNotifications : 0}
                 onClick={() => navigate(view)}
               />
             ))}
