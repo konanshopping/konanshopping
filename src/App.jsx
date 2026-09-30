@@ -1225,7 +1225,10 @@ if (
             : "110px"
         ),
 
-    overflow: "hidden",
+    // IMPORTANT :
+    // On laisse dépasser les suggestions de recherche afin
+    // qu'elles ne soient pas coupées par le header fixe.
+    overflow: "visible",
 
     transition:
       "max-height .42s cubic-bezier(.22,1,.36,1), " +
