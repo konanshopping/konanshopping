@@ -27,16 +27,22 @@ const communityPostSchema = new mongoose.Schema(
         url: {
           type: String,
           required: true,
+          trim: true,
+          maxlength: 2000,
         },
 
         publicId: {
           type: String,
           default: "",
+          trim: true,
+          maxlength: 500,
         },
 
         thumbnail: {
           type: String,
           default: "",
+          trim: true,
+          maxlength: 2000,
         },
       },
     ],
@@ -57,6 +63,8 @@ const communityPostSchema = new mongoose.Schema(
       question: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 1000,
       },
 
       options: [
@@ -64,6 +72,9 @@ const communityPostSchema = new mongoose.Schema(
           text: {
             type: String,
             required: true,
+            trim: true,
+            minlength: 1,
+            maxlength: 500,
           },
 
           votes: [
@@ -98,11 +109,25 @@ const communityPostSchema = new mongoose.Schema(
     shares: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "shares doit être un nombre entier.",
+      },
     },
 
     commentsCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "commentsCount doit être un nombre entier.",
+      },
     },
 
     visibility: {

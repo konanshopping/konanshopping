@@ -1,67 +1,141 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
-const communityCommentSchema = new mongoose.Schema(
-  {
-    post: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CommunityPost",
-      required: true,
-      index: true,
-    },
+const communityCommentSchema =
+  new mongoose.Schema(
+    {
+      post: {
 
-    author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-      index: true,
-    },
+        type:
+          mongoose.Schema.Types.ObjectId,
 
-    text: {
-      type: String,
-      required: true,
-      trim: true,
-      maxlength: 2000,
-    },
+        ref: "CommunityPost",
 
-    parentComment: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CommunityComment",
-      default: null,
-    },
+        required: true,
 
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        index: true,
+
       },
-    ],
 
-    likesCount: {
-      type: Number,
-      default: 0,
+      author: {
+
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "User",
+
+        required: true,
+
+        index: true,
+
+      },
+
+      text: {
+
+        type: String,
+
+        required: true,
+
+        trim: true,
+
+        minlength: 1,
+
+        maxlength: 2000,
+
+      },
+
+      parentComment: {
+
+        type:
+          mongoose.Schema.Types.ObjectId,
+
+        ref: "CommunityComment",
+
+        default: null,
+
+      },
+
+      likes: [
+
+        {
+
+          type:
+            mongoose.Schema.Types.ObjectId,
+
+          ref: "User",
+
+        },
+
+      ],
+
+      likesCount: {
+
+        type: Number,
+
+        default: 0,
+
+        min: 0,
+
+        validate: {
+
+          validator:
+            Number.isInteger,
+
+          message:
+            "likesCount doit être un nombre entier.",
+
+        },
+
+      },
+
+      repliesCount: {
+
+        type: Number,
+
+        default: 0,
+
+        min: 0,
+
+        validate: {
+
+          validator:
+            Number.isInteger,
+
+          message:
+            "repliesCount doit être un nombre entier.",
+
+        },
+
+      },
+
+      isDeleted: {
+
+        type: Boolean,
+
+        default: false,
+
+      },
+
     },
 
-    repliesCount: {
-      type: Number,
-      default: 0,
-    },
+    {
 
-    isDeleted: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
+      timestamps: true,
+
+    }
+
+  );
 
 communityCommentSchema.index({
+
   post: 1,
+
   createdAt: -1,
+
 });
 
-module.exports = mongoose.model(
-  "CommunityComment",
-  communityCommentSchema
-);
+module.exports =
+  mongoose.model(
+    "CommunityComment",
+    communityCommentSchema
+  );

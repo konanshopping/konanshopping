@@ -52,8 +52,134 @@ import "leaflet/dist/leaflet.css";
 // 🌐 API
 // ======================================================
 
-const API =
-  "https://konanshopping.com";
+const API = (
+  import.meta.env?.VITE_API_URL ||
+  "https://konanshopping.com"
+).replace(/\/$/, "");
+
+const API_TIMEOUT = 15000;
+
+// ======================================================
+// 🔐 AUTHENTIFICATION ADMIN — JWT
+// ======================================================
+
+const getAdminToken = () => {
+  try {
+    return (
+      localStorage.getItem("adminToken") ||
+      localStorage.getItem("token") ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+};
+
+const getAuthConfig = () => {
+  const token = getAdminToken();
+
+  if (!token) {
+    throw new Error("Session administrateur absente.");
+  }
+
+  return {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+};
+
+// ======================================================
+// 🛡️ CLIENT API SÉCURISÉ
+// ======================================================
+
+const apiClient = axios.create({
+  baseURL: API,
+  timeout: API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getAdminToken();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      try {
+        localStorage.removeItem("adminToken");
+      } catch {}
+
+      error.userMessage =
+        "Votre session administrateur a expiré. Veuillez vous reconnecter.";
+    } else if (error?.response?.status === 403) {
+      error.userMessage =
+        "Accès administrateur refusé.";
+    } else if (error?.code === "ECONNABORTED") {
+      error.userMessage =
+        "Le serveur met trop de temps à répondre.";
+    } else if (!error?.response) {
+      error.userMessage =
+        "Impossible de contacter le serveur.";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+const isValidId = (value) => {
+  const id = String(value || "").trim();
+
+  return /^[a-fA-F0-9]{24}$/.test(id);
+};
+
+const safeId = (value) => {
+  const id = String(value || "").trim();
+
+  return isValidId(id) ? encodeURIComponent(id) : "";
+};
+
+const getApiErrorMessage = (
+  error,
+  fallback = "Une erreur est survenue."
+) => {
+  if (error?.userMessage) {
+    return error.userMessage;
+  }
+
+  const status = error?.response?.status;
+
+  if (status === 401) {
+    return "Votre session administrateur a expiré. Veuillez vous reconnecter.";
+  }
+
+  if (status === 403) {
+    return "Accès administrateur refusé.";
+  }
+
+  if (status === 404) {
+    return "Ressource introuvable.";
+  }
+
+  if (status >= 500) {
+    return "Le serveur a rencontré une erreur.";
+  }
+
+  return fallback;
+};
 
 
 // ======================================================
@@ -316,16 +442,15 @@ function getDriverPhoto(
 
 
   if (
-    value.startsWith(
-      "http://"
-    ) ||
-    value.startsWith(
-      "https://"
-    )
+    value.startsWith("https://")
   ) {
-
     return value;
+  }
 
+  if (
+    value.startsWith("http://")
+  ) {
+    return "";
   }
 
 
@@ -353,12 +478,18 @@ export default function Drivers() {
   // 🔐 ADMIN
   // ====================================================
 
-  const admin =
-    JSON.parse(
-      localStorage.getItem(
-        "admin"
-      )
-    );
+  let admin = null;
+
+  try {
+    const rawAdmin =
+      localStorage.getItem("admin");
+
+    admin = rawAdmin
+      ? JSON.parse(rawAdmin)
+      : null;
+  } catch {
+    admin = null;
+  }
 
 
   // ====================================================
@@ -460,8 +591,9 @@ const fetchDrivers =
 
 
       const res =
-        await axios.get(
-          `${API}/api/drivers`
+        await apiClient.get(
+          "/api/drivers",
+          getAuthConfig()
         );
 
 
@@ -478,12 +610,15 @@ const fetchDrivers =
 
       console.error(
         "❌ ERREUR LIVREURS :",
-        err
+        err?.response?.status || "erreur"
       );
 
 
       setError(
-        "Impossible de récupérer les livreurs."
+        getApiErrorMessage(
+          err,
+          "Impossible de récupérer les livreurs."
+        )
       );
 
 
@@ -558,9 +693,10 @@ useEffect(() => {
 
 
         const res =
-          await axios.get(
+          await apiClient.get(
 
-            `${API}/api/driver/${driver._id}/today-route`
+            `/api/driver/${safeId(driver._id)}/today-route`,
+            getAuthConfig()
 
           );
 
@@ -586,19 +722,15 @@ useEffect(() => {
 
         console.error(
           "❌ ERREUR TRAJET :",
-          err
+          err?.response?.status || "erreur"
         );
 
 
         setRouteError(
-
-          err?.response?.data
-            ?.message ||
-
-          err?.message ||
-
-          "Impossible de récupérer le trajet du jour."
-
+          getApiErrorMessage(
+            err,
+            "Impossible de récupérer le trajet du jour."
+          )
         );
 
       } finally {
@@ -661,8 +793,9 @@ useEffect(() => {
         );
 
 
-        await axios.delete(
-          `${API}/api/drivers/${id}`
+        await apiClient.delete(
+          `/api/drivers/${safeId(id)}`,
+          getAuthConfig()
         );
 
 
@@ -693,7 +826,7 @@ useEffect(() => {
 
         console.error(
           "❌ SUPPRESSION LIVREUR :",
-          err
+          err?.response?.status || "erreur"
         );
 
 
@@ -831,7 +964,10 @@ useEffect(() => {
   // 🔐 PROTECTION ADMIN
   // ====================================================
 
-  if (!admin) {
+  if (
+    !admin ||
+    !getAdminToken()
+  ) {
 
     return (
 

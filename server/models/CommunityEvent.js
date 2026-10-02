@@ -6,6 +6,7 @@ const communityEventSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 1,
       maxlength: 200,
     },
 
@@ -19,6 +20,8 @@ const communityEventSchema = new mongoose.Schema(
     cover: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     organizer: {
@@ -45,22 +48,28 @@ const communityEventSchema = new mongoose.Schema(
         type: String,
         default: "",
         trim: true,
+        maxlength: 200,
       },
 
       address: {
         type: String,
         default: "",
         trim: true,
+        maxlength: 500,
       },
 
       latitude: {
         type: Number,
         default: null,
+        min: -90,
+        max: 90,
       },
 
       longitude: {
         type: Number,
         default: null,
+        min: -180,
+        max: 180,
       },
 
       online: {
@@ -71,13 +80,14 @@ const communityEventSchema = new mongoose.Schema(
       onlineUrl: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 1000,
       },
     },
 
     startAt: {
       type: Date,
       required: true,
-      index: true,
     },
 
     endAt: {
@@ -89,6 +99,7 @@ const communityEventSchema = new mongoose.Schema(
       type: String,
       default: "Général",
       trim: true,
+      maxlength: 100,
     },
 
     attendees: [
@@ -100,7 +111,11 @@ const communityEventSchema = new mongoose.Schema(
 
         status: {
           type: String,
-          enum: ["interested", "going", "not_going"],
+          enum: [
+            "interested",
+            "going",
+            "not_going",
+          ],
           default: "interested",
         },
       },
@@ -109,11 +124,22 @@ const communityEventSchema = new mongoose.Schema(
     attendeesCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "attendeesCount doit être un nombre entier.",
+      },
     },
 
     visibility: {
       type: String,
-      enum: ["public", "members", "private"],
+      enum: [
+        "public",
+        "members",
+        "private",
+      ],
       default: "public",
     },
 

@@ -1,91 +1,166 @@
 import {
+
   useState
+
 } from "react";
 
 import axios from "axios";
 
 import {
+
   useNavigate,
+
   Link
+
 } from "react-router-dom";
 
 import {
+
   FaTruck,
+
   FaEnvelope,
+
   FaLock,
+
   FaEye,
+
   FaEyeSlash,
+
   FaArrowRight,
+
   FaUserPlus,
+
   FaShieldAlt,
+
   FaCheckCircle,
+
   FaExclamationTriangle,
+
   FaSpinner
+
 } from "react-icons/fa";
 
+
+// =====================================================
+// 🔐 CONFIGURATION RÉSEAU SÉCURISÉE
+// =====================================================
+
+const DRIVER_API_URL = (
+  import.meta.env?.VITE_API_URL ||
+  "https://konanshopping.com"
+).replace(/\/$/, "");
+
+const DRIVER_API_TIMEOUT = 15000;
+
+const driverApi = axios.create({
+  baseURL: DRIVER_API_URL,
+  timeout: DRIVER_API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+const isValidDriverEmail = (value) =>
+  typeof value === "string" &&
+  value.length <= 254 &&
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const getDriverLoginErrorMessage = (error) => {
+  if (error?.code === "ECONNABORTED") {
+    return "Le serveur met trop de temps à répondre. Veuillez réessayer.";
+  }
+
+  if (error?.response?.status === 429) {
+    return "Trop de tentatives. Veuillez patienter avant de réessayer.";
+  }
+
+  return (
+    error?.response?.data?.message ||
+    "Email ou mot de passe incorrect."
+  );
+};
 
 export default function DriverLogin() {
 
   const navigate =
+
     useNavigate();
 
-
   // =====================================================
+
   // 📝 FORMULAIRE
+
   // =====================================================
 
   const [email, setEmail] =
+
     useState("");
 
   const [password, setPassword] =
+
     useState("");
 
-
   // =====================================================
+
   // 👁️ MOT DE PASSE
+
   // =====================================================
 
   const [showPassword,
+
     setShowPassword] =
+
     useState(false);
 
-
   // =====================================================
+
   // ⏳ LOADING
+
   // =====================================================
 
   const [loading,
+
     setLoading] =
+
     useState(false);
 
-
   // =====================================================
+
   // 🔔 NOTIFICATION
+
   // =====================================================
 
   const [notification,
+
     setNotification] =
+
     useState(null);
 
-
   // =====================================================
+
   // 🔔 NOTIFICATION PROFESSIONNELLE
+
   // =====================================================
 
   const showNotification = (
+
     type,
+
     title,
+
     message
+
   ) => {
 
     setNotification({
 
       type,
+
       title,
+
       message
 
     });
-
 
     setTimeout(() => {
 
@@ -95,15 +170,18 @@ export default function DriverLogin() {
 
   };
 
-
   // =====================================================
+
   // 🔐 CONNEXION
+
   // =====================================================
 
   const login = async () => {
 
     // ===================================================
+
     // EMAIL
+
     // ===================================================
 
     if (!email.trim()) {
@@ -122,9 +200,10 @@ export default function DriverLogin() {
 
     }
 
-
     // ===================================================
+
     // PASSWORD
+
     // ===================================================
 
     if (!password) {
@@ -143,17 +222,18 @@ export default function DriverLogin() {
 
     }
 
-
     try {
 
       setLoading(true);
 
-
       // =================================================
+
       // 🚀 BACKEND
+
       // =================================================
 
       const res =
+
         await axios.post(
 
           "https://konanshopping.com/api/driver-login",
@@ -161,6 +241,7 @@ export default function DriverLogin() {
           {
 
             email:
+
               email.trim(),
 
             password
@@ -169,25 +250,71 @@ export default function DriverLogin() {
 
         );
 
+      // 🔐 SESSION LIVREUR — JWT DU BACKEND SÉCURISÉ
 
       // =================================================
-      // 💾 SAUVEGARDE LIVREUR
-      // =================================================
+
+      const driverToken =
+
+        res.data?.token;
+
+      if (
+
+        !driverToken ||
+
+        typeof driverToken !== "string" ||
+
+        driverToken.length < 20
+
+      ) {
+
+        throw new Error(
+
+          "Session livreur invalide."
+
+        );
+
+      }
+
+      // Conservation de la logique existante :
+
+      // le dashboard continue d'utiliser les données
+
+      // enregistrées sous "driver".
 
       localStorage.setItem(
 
         "driver",
 
         JSON.stringify(
+
           res.data
+
         )
 
       );
 
+      // Token dédié aux routes protégées du livreur.
 
-      // =================================================
-      // 🎉 SUCCÈS
-      // =================================================
+      localStorage.setItem(
+
+        "driverToken",
+
+        driverToken
+
+      );
+
+      // Compatibilité avec les composants existants
+
+      // qui utilisent déjà la clé "token".
+
+      localStorage.setItem(
+
+        "token",
+
+        driverToken
+
+      );
 
       showNotification(
 
@@ -199,35 +326,39 @@ export default function DriverLogin() {
 
       );
 
-
       // =================================================
+
       // 🚚 DASHBOARD
+
       // =================================================
 
       setTimeout(() => {
 
         navigate(
+
           "/driver-dashboard"
+
         );
 
       }, 900);
 
-
     } catch (err) {
 
       console.error(
-        "❌ DRIVER LOGIN :",
-        err.response?.data ||
-        err
-      );
 
+        "❌ DRIVER LOGIN :",
+
+        err.response?.data ||
+
+        err
+
+      );
 
       const message =
 
         err.response?.data?.message ||
 
         "Email ou mot de passe incorrect.";
-
 
       showNotification(
 
@@ -247,18 +378,24 @@ export default function DriverLogin() {
 
   };
 
-
   // =====================================================
+
   // ⌨️ ENTER
+
   // =====================================================
 
   const handleKeyDown = (
+
     e
+
   ) => {
 
     if (
+
       e.key === "Enter" &&
+
       !loading
+
     ) {
 
       login();
@@ -267,42 +404,56 @@ export default function DriverLogin() {
 
   };
 
-
   // =====================================================
+
   // 🔔 ICÔNE NOTIFICATION
+
   // =====================================================
 
   const getNotificationIcon =
+
     () => {
 
       if (
+
         notification?.type ===
+
         "success"
+
       ) {
 
         return (
+
           <FaCheckCircle />
+
         );
 
       }
 
       return (
+
         <FaExclamationTriangle />
+
       );
 
     };
 
-
   // =====================================================
+
   // 🎨 COULEUR
+
   // =====================================================
 
   const getNotificationColor =
+
     () => {
 
       if (
+
         notification?.type ===
+
         "success"
+
       ) {
 
         return "#16a34a";
@@ -310,8 +461,11 @@ export default function DriverLogin() {
       }
 
       if (
+
         notification?.type ===
+
         "warning"
+
       ) {
 
         return "#d97706";
@@ -322,9 +476,10 @@ export default function DriverLogin() {
 
     };
 
-
   // =====================================================
+
   // 🎨 INTERFACE
+
   // =====================================================
 
   return (
@@ -334,34 +489,51 @@ export default function DriverLogin() {
       <style>{`
 
         /* ==================================================
+
            RESET
+
         ================================================== */
 
         * {
+
           box-sizing: border-box;
+
         }
 
         html,
+
         body,
+
         #root {
+
           width: 100%;
+
           min-height: 100%;
+
           margin: 0;
+
           padding: 0;
+
         }
 
         body {
+
           overflow-x: hidden;
 
           font-family:
+
             Inter,
+
             Arial,
+
             sans-serif;
+
         }
 
-
         /* ==================================================
+
            PAGE
+
         ================================================== */
 
         .driver-login-page {
@@ -387,38 +559,61 @@ export default function DriverLogin() {
           background:
 
             radial-gradient(
+
               circle at 0% 0%,
+
               rgba(
+
                 37,
+
                 99,
+
                 235,
+
                 .12
+
               ),
+
               transparent 32%
+
             ),
 
             radial-gradient(
+
               circle at 100% 100%,
+
               rgba(
+
                 79,
+
                 70,
+
                 229,
+
                 .10
+
               ),
+
               transparent 32%
+
             ),
 
             linear-gradient(
+
               135deg,
+
               #eef4ff,
+
               #f8fafc
+
             );
 
         }
 
-
         /* ==================================================
+
            BACKGROUND
+
         ================================================== */
 
         .driver-login-bg-one {
@@ -436,11 +631,17 @@ export default function DriverLogin() {
           border-radius: 50%;
 
           background:
+
             rgba(
+
               37,
+
               99,
+
               235,
+
               .11
+
             );
 
           filter: blur(70px);
@@ -448,7 +649,6 @@ export default function DriverLogin() {
           pointer-events: none;
 
         }
-
 
         .driver-login-bg-two {
 
@@ -465,11 +665,17 @@ export default function DriverLogin() {
           border-radius: 50%;
 
           background:
+
             rgba(
+
               79,
+
               70,
+
               229,
+
               .11
+
             );
 
           filter: blur(70px);
@@ -478,9 +684,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            CARD PC
+
         ================================================== */
 
         .driver-login-card {
@@ -490,6 +697,7 @@ export default function DriverLogin() {
           max-width: 440px;
 
           padding:
+
             40px;
 
           position: relative;
@@ -497,38 +705,59 @@ export default function DriverLogin() {
           z-index: 2;
 
           background:
+
             rgba(
+
               255,
+
               255,
+
               255,
+
               .96
+
             );
 
           border:
+
             1px solid
+
             rgba(
+
               226,
+
               232,
+
               240,
+
               .9
+
             );
 
           border-radius: 28px;
 
           box-shadow:
+
             0 30px 80px
+
             rgba(
+
               15,
+
               23,
+
               42,
+
               .12
+
             );
 
         }
 
-
         /* ==================================================
+
            HEADER
+
         ================================================== */
 
         .driver-login-header {
@@ -536,7 +765,6 @@ export default function DriverLogin() {
           text-align: center;
 
         }
-
 
         .driver-login-logo {
 
@@ -555,10 +783,15 @@ export default function DriverLogin() {
           border-radius: 23px;
 
           background:
+
             linear-gradient(
+
               135deg,
+
               #2563eb,
+
               #4f46e5
+
             );
 
           color: white;
@@ -566,16 +799,22 @@ export default function DriverLogin() {
           font-size: 30px;
 
           box-shadow:
+
             0 15px 35px
+
             rgba(
+
               37,
+
               99,
+
               235,
+
               .28
+
             );
 
         }
-
 
         .driver-login-brand {
 
@@ -591,10 +830,10 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-title {
 
           margin:
+
             7px 0 0;
 
           color: #0f172a;
@@ -609,10 +848,10 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-subtitle {
 
           margin:
+
             10px auto 0;
 
           max-width: 380px;
@@ -625,9 +864,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            SECURITY
+
         ================================================== */
 
         .driver-login-security {
@@ -635,6 +875,7 @@ export default function DriverLogin() {
           margin-top: 22px;
 
           padding:
+
             11px 13px;
 
           display: flex;
@@ -650,7 +891,9 @@ export default function DriverLogin() {
           background: #f8fafc;
 
           border:
+
             1px solid
+
             #e2e8f0;
 
           color: #475569;
@@ -661,16 +904,16 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-security svg {
 
           color: #2563eb;
 
         }
 
-
         /* ==================================================
+
            FORM
+
         ================================================== */
 
         .driver-login-form {
@@ -679,13 +922,11 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-field {
 
           margin-top: 16px;
 
         }
-
 
         .driver-login-field label {
 
@@ -701,7 +942,6 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-input {
 
           width: 100%;
@@ -715,10 +955,13 @@ export default function DriverLogin() {
           gap: 10px;
 
           padding:
+
             0 14px;
 
           border:
+
             1px solid
+
             #dbe3ef;
 
           border-radius: 15px;
@@ -726,29 +969,36 @@ export default function DriverLogin() {
           background: #f8fafc;
 
           transition:
+
             .2s ease;
 
         }
-
 
         .driver-login-input:focus-within {
 
           background: white;
 
           border-color:
+
             #2563eb;
 
           box-shadow:
+
             0 0 0 4px
+
             rgba(
+
               37,
+
               99,
+
               235,
+
               .09
+
             );
 
         }
-
 
         .driver-login-input-icon {
 
@@ -761,7 +1011,6 @@ export default function DriverLogin() {
           font-size: 14px;
 
         }
-
 
         .driver-login-input input {
 
@@ -780,10 +1029,10 @@ export default function DriverLogin() {
           font-size: 14px;
 
           padding:
+
             15px 0;
 
         }
-
 
         .driver-login-input input::placeholder {
 
@@ -791,9 +1040,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            PASSWORD BUTTON
+
         ================================================== */
 
         .driver-login-password-button {
@@ -822,9 +1072,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            LOGIN BUTTON
+
         ================================================== */
 
         .driver-login-button {
@@ -848,10 +1099,15 @@ export default function DriverLogin() {
           gap: 9px;
 
           background:
+
             linear-gradient(
+
               135deg,
+
               #2563eb,
+
               #4f46e5
+
             );
 
           color: white;
@@ -863,42 +1119,57 @@ export default function DriverLogin() {
           cursor: pointer;
 
           box-shadow:
+
             0 12px 30px
+
             rgba(
+
               37,
+
               99,
+
               235,
+
               .25
+
             );
 
           transition:
+
             .2s ease;
 
         }
 
-
         .driver-login-button:hover {
 
           transform:
+
             translateY(-1px);
 
           box-shadow:
+
             0 16px 35px
+
             rgba(
+
               37,
+
               99,
+
               235,
+
               .30
+
             );
 
         }
-
 
         .driver-login-button:disabled {
 
           opacity: .65;
 
           cursor:
+
             not-allowed;
 
           transform: none;
@@ -907,9 +1178,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            REGISTER
+
         ================================================== */
 
         .driver-login-register {
@@ -919,7 +1191,9 @@ export default function DriverLogin() {
           padding-top: 19px;
 
           border-top:
+
             1px solid
+
             #eef2f7;
 
           text-align: center;
@@ -929,7 +1203,6 @@ export default function DriverLogin() {
           font-size: 12px;
 
         }
-
 
         .driver-login-register a {
 
@@ -949,7 +1222,6 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-footer {
 
           margin-top: 16px;
@@ -964,9 +1236,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            NOTIFICATION
+
         ================================================== */
 
         .driver-login-notification {
@@ -980,9 +1253,13 @@ export default function DriverLogin() {
           z-index: 999999;
 
           width:
+
             min(
+
               410px,
+
               calc(100vw - 36px)
+
             );
 
           min-height: 68px;
@@ -996,40 +1273,58 @@ export default function DriverLogin() {
           padding: 13px;
 
           border:
+
             1px solid
+
             #e2e8f0;
 
           border-radius: 17px;
 
           background:
+
             rgba(
+
               255,
+
               255,
+
               255,
+
               .98
+
             );
 
           backdrop-filter:
+
             blur(18px);
 
           -webkit-backdrop-filter:
+
             blur(18px);
 
           box-shadow:
+
             0 20px 60px
+
             rgba(
+
               15,
+
               23,
+
               42,
+
               .18
+
             );
 
           animation:
+
             driverLoginNotificationIn
+
             .3s ease;
 
         }
-
 
         .driver-login-notification-icon {
 
@@ -1051,7 +1346,6 @@ export default function DriverLogin() {
 
         }
 
-
         .driver-login-notification-content {
 
           min-width: 0;
@@ -1059,7 +1353,6 @@ export default function DriverLogin() {
           flex: 1;
 
         }
-
 
         .driver-login-notification-title {
 
@@ -1070,7 +1363,6 @@ export default function DriverLogin() {
           font-weight: 950;
 
         }
-
 
         .driver-login-notification-message {
 
@@ -1083,10 +1375,10 @@ export default function DriverLogin() {
           line-height: 1.45;
 
           overflow-wrap:
+
             anywhere;
 
         }
-
 
         .driver-login-notification-close {
 
@@ -1110,9 +1402,10 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            ANIMATIONS
+
         ================================================== */
 
         @keyframes driverLoginNotificationIn {
@@ -1122,7 +1415,9 @@ export default function DriverLogin() {
             opacity: 0;
 
             transform:
+
               translateY(-12px)
+
               scale(.97);
 
           }
@@ -1132,19 +1427,21 @@ export default function DriverLogin() {
             opacity: 1;
 
             transform:
+
               translateY(0)
+
               scale(1);
 
           }
 
         }
 
-
         @keyframes driverLoginSpin {
 
           from {
 
             transform:
+
               rotate(0deg);
 
           }
@@ -1152,25 +1449,31 @@ export default function DriverLogin() {
           to {
 
             transform:
+
               rotate(360deg);
 
           }
 
         }
 
-
         /* ==================================================
+
            📱 MOBILE — PLEIN ÉCRAN
+
         ================================================== */
 
         @media (
+
           max-width: 600px
+
         ) {
 
           .driver-login-page {
 
             /*
-             * 🔥 TOUTE LA LARGEUR
+
+             \\* 🔥 TOUTE LA LARGEUR
+
              */
 
             width: 100vw;
@@ -1188,18 +1491,25 @@ export default function DriverLogin() {
             justify-content: stretch;
 
             background:
+
               linear-gradient(
+
                 135deg,
+
                 #f1f5ff,
+
                 #f8fafc
+
               );
 
           }
 
-
           /*
-           * 🔥 LA CARTE DEVIENT
-           * LA PAGE ELLE-MÊME
+
+           \\* 🔥 LA CARTE DEVIENT
+
+           \\* LA PAGE ELLE-MÊME
+
            */
 
           .driver-login-card {
@@ -1213,8 +1523,11 @@ export default function DriverLogin() {
             min-height: 100vh;
 
             padding:
+
               28px
+
               18px
+
               30px;
 
             border: none;
@@ -1224,11 +1537,17 @@ export default function DriverLogin() {
             box-shadow: none;
 
             background:
+
               rgba(
+
                 255,
+
                 255,
+
                 255,
+
                 .98
+
               );
 
             display: flex;
@@ -1237,14 +1556,13 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-bg-one,
+
           .driver-login-bg-two {
 
             display: none;
 
           }
-
 
           /* HEADER */
 
@@ -1260,7 +1578,6 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-brand {
 
             margin-top: 13px;
@@ -1269,18 +1586,21 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-title {
 
             font-size:
+
               clamp(
+
                 26px,
+
                 8vw,
+
                 32px
+
               );
 
           }
-
 
           .driver-login-subtitle {
 
@@ -1289,7 +1609,6 @@ export default function DriverLogin() {
             font-size: 12px;
 
           }
-
 
           /* SECURITY */
 
@@ -1301,7 +1620,6 @@ export default function DriverLogin() {
 
           }
 
-
           /* FORM */
 
           .driver-login-form {
@@ -1310,20 +1628,17 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-field {
 
             margin-top: 14px;
 
           }
 
-
           .driver-login-field label {
 
             font-size: 11px;
 
           }
-
 
           .driver-login-input {
 
@@ -1333,16 +1648,15 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-input input {
 
             font-size: 14px;
 
             padding:
+
               15px 0;
 
           }
-
 
           /* BUTTON */
 
@@ -1354,7 +1668,6 @@ export default function DriverLogin() {
 
           }
 
-
           /* FOOTER */
 
           .driver-login-register {
@@ -1363,9 +1676,10 @@ export default function DriverLogin() {
 
           }
 
-
           /*
-           * 🔔 NOTIFICATION MOBILE
+
+           \\* 🔔 NOTIFICATION MOBILE
+
            */
 
           .driver-login-notification {
@@ -1382,24 +1696,29 @@ export default function DriverLogin() {
 
         }
 
-
         /* ==================================================
+
            📱 PETITS ÉCRANS
+
         ================================================== */
 
         @media (
+
           max-width: 380px
+
         ) {
 
           .driver-login-card {
 
             padding:
+
               22px
+
               14px
+
               25px;
 
           }
-
 
           .driver-login-logo {
 
@@ -1411,13 +1730,11 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-title {
 
             font-size: 25px;
 
           }
-
 
           .driver-login-subtitle {
 
@@ -1425,20 +1742,17 @@ export default function DriverLogin() {
 
           }
 
-
           .driver-login-input {
 
             min-height: 52px;
 
           }
 
-
           .driver-login-input input {
 
             font-size: 13px;
 
           }
-
 
           .driver-login-button {
 
@@ -1452,116 +1766,164 @@ export default function DriverLogin() {
 
       `}</style>
 
-
       {/* ==================================================
+
           PAGE
+
       ================================================== */}
 
       <main
+
         className="
+
           driver-login-page
+
         "
+
         onKeyDown={
+
           handleKeyDown
+
         }
+
       >
 
-
-        {/* BACKGROUND */}
+        {/**\\*** BACKGROUND **\\***/}
 
         <div
+
           className="
+
             driver-login-bg-one
+
           "
+
         />
 
         <div
-          className="
-            driver-login-bg-two
-          "
-        />
 
+          className="
+
+            driver-login-bg-two
+
+          "
+
+        />
 
         {/* =================================================
+
             🔔 NOTIFICATION
+
         ================================================= */}
 
         {notification && (
 
           <div
+
             className="
+
               driver-login-notification
+
             "
+
           >
 
             <div
+
               className="
+
                 driver-login-notification-icon
+
               "
+
               style={{
 
                 color:
+
                   getNotificationColor(),
 
                 background:
+
                   `${getNotificationColor()}18`
 
               }}
+
             >
 
               {
+
                 getNotificationIcon()
+
               }
 
             </div>
 
-
             <div
+
               className="
+
                 driver-login-notification-content
+
               "
+
             >
 
               <div
+
                 className="
+
                   driver-login-notification-title
+
                 "
+
               >
 
                 {
+
                   notification.title
+
                 }
 
               </div>
 
-
               <div
+
                 className="
+
                   driver-login-notification-message
+
                 "
+
               >
 
                 {
+
                   notification.message
+
                 }
 
               </div>
 
             </div>
-
 
             <button
 
               type="button"
 
               className="
+
                 driver-login-notification-close
+
               "
 
               onClick={() =>
+
                 setNotification(
+
                   null
+
                 )
+
               }
 
             >
@@ -1574,84 +1936,114 @@ export default function DriverLogin() {
 
         )}
 
-
         {/* =================================================
+
             🚚 CARTE
+
         ================================================= */}
 
         <section
+
           className="
+
             driver-login-card
+
           "
+
         >
 
-
           {/* =================================================
+
               HEADER
+
           ================================================= */}
 
           <header
+
             className="
+
               driver-login-header
+
             "
+
           >
 
             <div
+
               className="
+
                 driver-login-logo
+
               "
+
             >
 
               <FaTruck />
 
             </div>
 
-
             <div
+
               className="
+
                 driver-login-brand
+
               "
+
             >
 
               KONAN SHOPPING
 
             </div>
 
-
             <h1
+
               className="
+
                 driver-login-title
+
               "
+
             >
 
               Centre Livreur
 
             </h1>
 
-
             <p
+
               className="
+
                 driver-login-subtitle
+
               "
+
             >
 
               Connectez-vous pour gérer
+
               vos commandes, vos livraisons
+
               et votre activité en temps réel.
 
             </p>
 
           </header>
 
-
           {/* =================================================
+
               🔐 SÉCURITÉ
+
           ================================================= */}
 
           <div
+
             className="
+
               driver-login-security
+
             "
+
           >
 
             <FaShieldAlt />
@@ -1660,24 +2052,32 @@ export default function DriverLogin() {
 
           </div>
 
-
           {/* =================================================
+
               FORMULAIRE
+
           ================================================= */}
 
           <div
+
             className="
+
               driver-login-form
+
             "
+
           >
 
-
-            {/* EMAIL */}
+            {/**\\*** EMAIL **\\***/}
 
             <div
+
               className="
+
                 driver-login-field
+
               "
+
             >
 
               <label>
@@ -1686,49 +2086,68 @@ export default function DriverLogin() {
 
               </label>
 
-
               <div
+
                 className="
+
                   driver-login-input
+
                 "
+
               >
 
                 <span
+
                   className="
+
                     driver-login-input-icon
+
                   "
+
                 >
 
                   <FaEnvelope />
 
                 </span>
 
-
                 <input
 
                   type="email"
 
                   value={
+
                     email
+
                   }
 
                   onChange={
+
                     e =>
+
                       setEmail(
+
                         e.target.value
+
                       )
+
                   }
 
                   onKeyDown={
+
                     handleKeyDown
+
                   }
 
                   placeholder="
+
                     votre@email.com
+
                   "
 
                   autoComplete="
+
                     email
+
                   "
 
                 />
@@ -1737,13 +2156,16 @@ export default function DriverLogin() {
 
             </div>
 
-
-            {/* PASSWORD */}
+            {/**\\*** PASSWORD **\\***/}
 
             <div
+
               className="
+
                 driver-login-field
+
               "
+
             >
 
               <label>
@@ -1752,77 +2174,110 @@ export default function DriverLogin() {
 
               </label>
 
-
               <div
+
                 className="
+
                   driver-login-input
+
                 "
+
               >
 
                 <span
+
                   className="
+
                     driver-login-input-icon
+
                   "
+
                 >
 
                   <FaLock />
 
                 </span>
 
-
                 <input
 
                   type={
+
                     showPassword
+
                       ? "text"
+
                       : "password"
+
                   }
 
                   value={
+
                     password
+
                   }
 
                   onChange={
+
                     e =>
+
                       setPassword(
+
                         e.target.value
+
                       )
+
                   }
 
                   onKeyDown={
+
                     handleKeyDown
+
                   }
 
                   placeholder="
+
                     Votre mot de passe
+
                   "
 
                   autoComplete="
+
                     current-password
+
                   "
 
                 />
-
 
                 <button
 
                   type="button"
 
                   className="
+
                     driver-login-password-button
+
                   "
 
                   onClick={() =>
+
                     setShowPassword(
+
                       previous =>
+
                         !previous
+
                     )
+
                   }
 
                   aria-label={
+
                     showPassword
+
                       ? "Masquer le mot de passe"
+
                       : "Afficher le mot de passe"
+
                   }
 
                 >
@@ -1841,9 +2296,10 @@ export default function DriverLogin() {
 
             </div>
 
-
             {/* =================================================
+
                 🚀 CONNEXION
+
             ================================================= */}
 
             <button
@@ -1851,15 +2307,21 @@ export default function DriverLogin() {
               type="button"
 
               className="
+
                 driver-login-button
+
               "
 
               onClick={
+
                 login
+
               }
 
               disabled={
+
                 loading
+
               }
 
             >
@@ -1869,10 +2331,15 @@ export default function DriverLogin() {
                 <>
 
                   <FaSpinner
+
                     style={{
+
                       animation:
+
                         "driverLoginSpin 1s linear infinite"
+
                     }}
+
                   />
 
                   Connexion en cours...
@@ -1895,21 +2362,28 @@ export default function DriverLogin() {
 
             </button>
 
-
             {/* =================================================
+
                 👤 INSCRIPTION
+
             ================================================= */}
 
             <div
+
               className="
+
                 driver-login-register
+
               "
+
             >
 
               Pas encore livreur ?
 
               <Link
+
                 to="/driver-register"
+
               >
 
                 <FaUserPlus />
@@ -1920,15 +2394,20 @@ export default function DriverLogin() {
 
             </div>
 
-
             {/* =================================================
+
                 FOOTER
+
             ================================================= */}
 
             <div
+
               className="
+
                 driver-login-footer
+
               "
+
             >
 
               🚚 KONAN SHOPPING CAMEROUN

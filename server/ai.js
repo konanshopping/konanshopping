@@ -2,35 +2,109 @@ const express = require("express");
 
 const router = express.Router();
 
+const rateLimit = require("express-rate-limit");
+
 const {
   GoogleGenerativeAI,
 } = require("@google/generative-ai");
 
-console.log(process.env.GEMINI_API_KEY);
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "";
+// ======================================================
+// 🔐 CONFIGURATION GEMINI
+// ======================================================
+
+const GEMINI_API_KEY =
+  process.env.GEMINI_API_KEY || "";
 
 if (!GEMINI_API_KEY) {
-  console.error("GEMINI_API_KEY manquante !");
+  console.error(
+    "❌ GEMINI_API_KEY manquante !"
+  );
 }
 
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+const genAI =
+  new GoogleGenerativeAI(
+    GEMINI_API_KEY
+  );
 
-// =========================
-// KONAN AI ELITE
-// =========================
+
+// ======================================================
+// 🛡️ PROTECTION KONAN AI
+// ======================================================
+
+const aiChatLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error:
+      "Konan IA est temporairement occupée. Réessayez plus tard ⏳",
+  },
+});
+
+
+// ======================================================
+// 🧹 NETTOYAGE DES ENTREES
+// ======================================================
+
+function cleanText(
+  value,
+  maxLength
+) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value
+    .replace(/\0/g, "")
+    .trim()
+    .slice(0, maxLength);
+}
+
+
+// ======================================================
+// 🤖 KONAN AI ELITE
+// ======================================================
 
 router.post(
   "/chat",
+  aiChatLimiter,
   async (req, res) => {
 
     try {
 
-      const {
-        message,
-        history,
-        currentPage,
-      } = req.body;
+      const message =
+        cleanText(
+          req.body?.message,
+          2000
+        );
+
+      const currentPage =
+        cleanText(
+          req.body?.currentPage,
+          200
+        );
+
+      let history = "";
+
+      if (
+        typeof req.body?.history ===
+        "string"
+      ) {
+        history =
+          req.body.history
+            .replace(/\0/g, "")
+            .slice(0, 12000);
+      }
+
+      if (!message) {
+        return res.status(400).json({
+          error:
+            "Message requis.",
+        });
+      }
+
 
       // =====================
       // MODEL
@@ -38,14 +112,17 @@ router.post(
 
       const model =
         genAI.getGenerativeModel({
-          model: "gemini-1.5-flash-latest",
+          model:
+            "gemini-1.5-flash-latest",
         });
+
 
       // =====================
       // PAGE CONTEXT
       // =====================
 
       let pageContext = "";
+
 
       if (currentPage === "/") {
 
@@ -114,6 +191,7 @@ comme ChatGPT.
 
       }
 
+
       // =====================
       // MASTER PROMPT
       // =====================
@@ -172,12 +250,13 @@ Contexte de la page :
 ${pageContext}
 
 Historique conversation :
-${history || ""}
+${history}
 
 Question du client :
 ${message}
 
 `;
+
 
       // =====================
       // GENERATION
@@ -216,6 +295,7 @@ ${message}
 
         });
 
+
       // =====================
       // RESPONSE
       // =====================
@@ -223,30 +303,44 @@ ${message}
       const response =
         result.response.text();
 
-      res.json({
+      return res.json({
         reply: response,
       });
 
+
     } catch (error) {
 
-      console.log(error.response?.data || error);
+      // ⚠️ Ne jamais renvoyer
+      // les détails internes de Gemini
+      // au client.
 
-      if (error.status === 429) {
+      console.error(
+        "❌ Erreur Konan AI :",
+        error?.status || "unknown"
+      );
 
-  return res.status(429).json({
-    error:
-      "Konan IA est temporairement occupée. Réessayez dans 1 minute ⏳",
-  });
 
-}
+      if (
+        error?.status === 429
+      ) {
 
-res.status(500).json({
-  error: "Konan IA est temporairement occupée. Réessayez dans 1 minute ⏳",
-});
+        return res.status(429).json({
+          error:
+            "Konan IA est temporairement occupée. Réessayez dans 1 minute ⏳",
+        });
+
+      }
+
+
+      return res.status(500).json({
+        error:
+          "Konan IA est temporairement occupée. Réessayez dans 1 minute ⏳",
+      });
 
     }
 
   }
 );
+
 
 module.exports = router;

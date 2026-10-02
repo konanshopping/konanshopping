@@ -6,6 +6,7 @@ const communityPageSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 1,
       maxlength: 150,
     },
 
@@ -15,6 +16,7 @@ const communityPageSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      minlength: 1,
       maxlength: 100,
     },
 
@@ -29,40 +31,49 @@ const communityPageSchema = new mongoose.Schema(
       type: String,
       default: "Général",
       trim: true,
+      maxlength: 100,
     },
 
     avatar: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     cover: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     website: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 1000,
     },
 
     phone: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 30,
     },
 
     email: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 254,
     },
 
     address: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 500,
     },
 
     owner: {
@@ -89,11 +100,25 @@ const communityPageSchema = new mongoose.Schema(
     followersCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "followersCount doit être un nombre entier.",
+      },
     },
 
     postsCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "postsCount doit être un nombre entier.",
+      },
     },
 
     verified: {

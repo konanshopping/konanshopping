@@ -1,931 +1,1813 @@
 import { useState } from "react";
+
 import axios from "axios";
 
+
+
 import {
+
   FaArrowLeft,
+
   FaEnvelope,
+
   FaLock,
+
   FaEye,
+
   FaUserPlus,
+
   FaShieldAlt,
+
   FaHeadset
+
 } from "react-icons/fa";
 
+
+
 import { toast, ToastContainer } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
+
+// ======================================================
+// 🔐 SÉCURITÉ CONNEXION — ALIGNÉE SUR LE BACKEND
+// ======================================================
+
+const API_BASE_URL = "https://konanshopping.com";
+const API_TIMEOUT = 15000;
+const LOGIN_ENDPOINT = "/login";
+
+const MAX_EMAIL_LENGTH = 254;
+const MAX_PASSWORD_LENGTH = 256;
+
+const normalizeEmail = (value) =>
+  String(value ?? "").trim().toLowerCase();
+
+const isValidEmail = (value) =>
+  value.length > 0 &&
+  value.length <= MAX_EMAIL_LENGTH &&
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const isValidLoginResponse = (data) =>
+  data &&
+  typeof data === "object" &&
+  typeof data.token === "string" &&
+  data.token.trim().length > 0 &&
+  data.user &&
+  typeof data.user === "object";
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
+});
+
+
+
 
 function UserLogin() {
 
+
+
   const [email, setEmail] =
+
     useState("");
+
+
 
   const [password, setPassword] =
+
     useState("");
 
+
+
   const [loading, setLoading] =
+
     useState(false);
 
+
+
     const [showPassword,
+
   setShowPassword] =
+
   useState(false);
 
+
+
 const mobile =
+
   window.innerWidth < 768;
 
+
+
   const login = async () => {
+    if (loading) return;
 
-    try {
+    const normalizedEmail = normalizeEmail(email);
 
-      setLoading(true);
+    // Ne jamais trim le mot de passe : les espaces peuvent être valides.
+    const enteredPassword = String(password ?? "");
 
-      const res = await axios.post(
-        "https://konanshopping.com/api/login",
-        {
-          email,
-          password,
-        }
-      );
-
-// SAVE TOKEN
-
-localStorage.setItem(
-  "token",
-  res.data.token
-);
-
-// SUCCESS
-
-toast.success(
-  "Bienvenue sur Konan Shopping 🚀"
-);
-
-// ADMIN
-if (res.data.user.isAdmin) {
-
-  localStorage.setItem(
-
-    "admin",
-
-    JSON.stringify(
-      res.data.user
-    )
-
-  );
-
-  setTimeout(() => {
-
-  window.location.href =
-    "/admin";
-
-}, 1500);
-
-}
-
-// CLIENT
-else {
-
-  localStorage.setItem(
-
-    "user",
-
-    JSON.stringify(
-      res.data.user
-    )
-
-  );
-
-  setTimeout(() => {
-
-  window.location.href =
-    "/account";
-
-}, 1500);
-
-}
-
-    } catch (err) {
-
-      console.log(err);
-
-      toast.error(
-  err.response?.data?.message ||
-  "Erreur connexion"
-);
-
-    } finally {
-
-      setLoading(false);
-
+    if (!normalizedEmail || !enteredPassword) {
+      toast.error("Veuillez remplir tous les champs");
+      return;
     }
 
+    if (!isValidEmail(normalizedEmail)) {
+      toast.error("Veuillez entrer une adresse email valide");
+      return;
+    }
+
+    if (enteredPassword.length > MAX_PASSWORD_LENGTH) {
+      toast.error("Mot de passe trop long");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Backend réel : POST /login
+      const res = await api.post(LOGIN_ENDPOINT, {
+        email: normalizedEmail,
+        password: enteredPassword,
+      });
+
+      if (!isValidLoginResponse(res.data)) {
+        throw new Error("Réponse de connexion invalide");
+      }
+
+      const { token, user } = res.data;
+
+      // SAVE TOKEN
+      localStorage.setItem("token", token);
+
+      // SUCCESS
+      toast.success(
+        "Bienvenue sur Konan Shopping 🚀"
+      );
+
+      // ADMIN
+      if (user.isAdmin) {
+        localStorage.setItem(
+          "admin",
+          JSON.stringify(user)
+        );
+
+        setTimeout(() => {
+          window.location.href = "/admin";
+        }, 1500);
+      }
+
+      // CLIENT
+      else {
+        localStorage.setItem(
+          "user",
+          JSON.stringify(user)
+        );
+
+        setTimeout(() => {
+          window.location.href = "/account";
+        }, 1500);
+      }
+
+    } catch (err) {
+      const serverMessage =
+        typeof err?.response?.data?.message === "string"
+          ? err.response.data.message.trim()
+          : "";
+
+      const networkMessage =
+        !err?.response && err?.message
+          ? "Impossible de joindre le serveur. Vérifiez votre connexion."
+          : "";
+
+      toast.error(
+        serverMessage ||
+        networkMessage ||
+        "Erreur connexion"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
+return (
+
+
 
     <div
+
       style={{
+
         minHeight: "100vh",
+
+
 
         display: "flex",
 
+
+
         justifyContent: "center",
+
+
 
         alignItems: "center",
 
+
+
         overflow: "hidden",
+
+
 
         position: "relative",
 
+
+
        background:
+
   "#f8fafc",
+
       }}
+
     >
+
+
 
       {/* BACKGROUND LIGHTS */}
 
+
+
       <div
+
         style={{
+
           position: "absolute",
+
+
 
           width: "500px",
 
+
+
           height: "500px",
 
+
+
           background:
+
             "#7C3AED",
 
+
+
           borderRadius: "50%",
+
+
 
           top: "-180px",
 
+
+
           left: "-120px",
+
+
 
           opacity: 0.25,
 
+
+
           filter: "blur(120px)",
+
         }}
+
       />
 
+
+
       <div
+
         style={{
+
           position: "absolute",
+
+
 
           width: "450px",
 
+
+
           height: "450px",
 
+
+
           background:
+
             "#2563EB",
+
+
 
           borderRadius: "50%",
 
+
+
           bottom: "-180px",
+
+
 
           right: "-120px",
 
+
+
           opacity: 0.25,
 
+
+
           filter: "blur(120px)",
+
         }}
+
       />
+
+
 
       {/* CARD */}
 
+
+
       <div
+
       style={{
+
   width: "100%",
+
+
 
   maxWidth: "720px",
 
+
+
   background: "#ffffff",
+
+
 
   borderRadius: "40px",
 
+
+
   padding:
+
     mobile
+
       ? "35px 25px"
+
       : "50px",
 
+
+
   boxShadow:
+
     "0 20px 50px rgba(0,0,0,0.08)",
 
+
+
   border:
+
     "1px solid #e5e7eb",
+
+
 
   position: "relative",
 
+
+
   zIndex: 5,
+
 }}
+
       >
+
+
 
         {/* LOGO */}
 
+
+
 <div
+
   style={{
+
     display: "flex",
+
     justifyContent: "center",
+
     marginBottom: "25px",
+
   }}
+
 >
+
   <img
+
     src="/logo.jpg"
+
     alt="Konan Shopping"
+
     style={{
+
       width:
+
         window.innerWidth < 768
+
           ? "130px"
+
           : "170px",
 
+
+
       height:
+
         window.innerWidth < 768
+
           ? "130px"
+
           : "170px",
+
+
 
       borderRadius: "50%",
 
+
+
       objectFit: "cover",
+
+
 
       background: "#fff",
 
+
+
       border:
+
         "3px solid #2563eb",
+
+
 
       padding: "8px",
 
+
+
       boxShadow:
+
         "0 10px 30px rgba(37,99,235,0.15)",
+
     }}
+
   />
+
 </div>
 
-        
+
+
+
+
+
 
        {/* TITLE */}
 
+
+
 <div
+
   style={{
+
     textAlign: "center",
+
     marginBottom: "35px",
+
   }}
+
 >
 
+
+
   <h1
+
     style={{
+
       fontSize:
+
         window.innerWidth < 768
+
           ? "52px"
+
           : "70px",
+
+
 
       fontWeight: "900",
 
+
+
       color: "#0f172a",
+
+
 
       marginBottom: "10px",
 
+
+
       lineHeight: "1",
+
     }}
+
   >
+
     Bienvenue
+
   </h1>
 
+
+
   <div
+
     style={{
+
       width: "60px",
+
+
 
       height: "5px",
 
+
+
       borderRadius: "999px",
+
+
 
       background: "#2563eb",
 
+
+
       margin: "0 auto 25px auto",
+
     }}
+
   />
 
+
+
   <p
+
     style={{
+
       color: "#64748b",
 
+
+
       fontSize:
+
         window.innerWidth < 768
+
           ? "15px"
+
           : "16px",
+
+
 
       lineHeight: "28px",
 
+
+
       maxWidth: "450px",
 
+
+
       margin: "0 auto",
+
     }}
+
   >
+
     Connectez-vous à votre espace premium
+
     et gérez vos commandes en temps réel.
+
   </p>
 
+
+
 </div>
+
+
 
         {/* EMAIL */}
 
+
+
 <div
+
   style={{
+
     marginBottom: "24px",
+
   }}
+
 >
 
+
+
   <p
+
     style={{
+
       color: "#0f172a",
+
+
 
       marginBottom: "10px",
 
+
+
       fontWeight: "700",
 
+
+
       fontSize: "15px",
+
     }}
+
   >
+
     Adresse email
+
   </p>
 
+
+
   <div
+
     style={{
+
       position: "relative",
+
     }}
+
   >
 
+
+
     <FaEnvelope
+
       style={{
+
         position: "absolute",
+
+
 
         left: "18px",
 
+
+
         top: "21px",
+
+
 
         color: "#94a3b8",
 
+
+
         fontSize: "16px",
+
       }}
+
     />
 
+
+
     <input
+
       type="email"
+
+
 
       placeholder="Entrez votre email"
 
+
+
       value={email}
 
+
+
       onChange={(e) =>
+
         setEmail(
+
           e.target.value
+
         )
+
       }
 
+
+
       style={{
+
         width: "100%",
+
+
 
         height: "60px",
 
+
+
         paddingLeft: "50px",
+
+
 
         paddingRight: "15px",
 
+
+
         borderRadius: "18px",
 
+
+
         border:
+
           "1px solid #dbe2ea",
+
+
 
         background: "#ffffff",
 
+
+
         color: "#111827",
 
+
+
         WebkitTextFillColor:
+
           "#111827",
+
+
 
         fontSize: "15px",
 
+
+
         outline: "none",
 
+
+
         boxSizing:
+
           "border-box",
 
+
+
         boxShadow:
+
           "0 4px 12px rgba(0,0,0,0.04)",
+
       }}
+
     />
+
+
 
   </div>
 
+
+
 </div>
+
+
 
 {/* PASSWORD */}
 
+
+
 <div
+
   style={{
+
     marginBottom: "28px",
+
   }}
+
 >
 
+
+
   <p
+
     style={{
+
       color: "#0f172a",
+
+
 
       marginBottom: "10px",
 
+
+
       fontWeight: "700",
 
+
+
       fontSize: "15px",
+
     }}
+
   >
+
     Mot de passe
+
   </p>
 
+
+
   <div
+
     style={{
+
       position: "relative",
+
     }}
+
   >
 
+
+
     <FaLock
+
       style={{
+
         position: "absolute",
+
+
 
         left: "18px",
 
+
+
         top: "21px",
+
+
 
         color: "#94a3b8",
 
+
+
         fontSize: "16px",
+
       }}
+
     />
 
+
+
     <input
+
       type={
+
         showPassword
+
           ? "text"
+
           : "password"
+
       }
+
+
 
       placeholder="Entrez votre mot de passe"
 
+
+
       value={password}
 
+
+
       onChange={(e) =>
+
         setPassword(
+
           e.target.value
+
         )
+
       }
 
+
+
       style={{
+
         width: "100%",
+
+
 
         height: "60px",
 
+
+
         paddingLeft: "50px",
+
+
 
         paddingRight: "50px",
 
+
+
         borderRadius: "18px",
 
+
+
         border:
+
           "1px solid #dbe2ea",
+
+
 
         background: "#ffffff",
 
+
+
         color: "#111827",
 
+
+
         WebkitTextFillColor:
+
           "#111827",
+
+
 
         fontSize: "15px",
 
+
+
         outline: "none",
 
+
+
         boxSizing:
+
           "border-box",
 
+
+
         boxShadow:
+
           "0 4px 12px rgba(0,0,0,0.04)",
+
       }}
+
     />
 
+
+
     <FaEye
+
       onClick={() =>
+
         setShowPassword(
+
           !showPassword
+
         )
+
       }
 
+
+
       style={{
+
         position: "absolute",
+
+
 
         right: "18px",
 
+
+
         top: "21px",
+
+
 
         color: "#94a3b8",
 
+
+
         cursor: "pointer",
+
       }}
+
     />
+
+
 
   </div>
 
+
+
 </div>
+
+
 
 {/* MOT DE PASSE OUBLIÉ */}
 
+
+
 <div
+
   style={{
+
     display: "flex",
+
+
 
     justifyContent: "space-between",
 
+
+
     alignItems: "center",
+
+
 
     marginTop: "-10px",
 
+
+
     marginBottom: "25px",
+
   }}
+
 >
 
+
+
   <span
+
     style={{
+
       color: "#94a3b8",
 
+
+
       fontSize: "13px",
+
     }}
+
   >
+
     Mot de passe oublié ?
+
   </span>
 
+
+
   <button
+
     onClick={() =>
+
       window.location.href =
+
         "/forgot-password"
+
     }
 
+
+
     style={{
+
       border: "none",
+
+
 
       background: "transparent",
 
+
+
       color: "#4f46e5",
+
+
 
       fontWeight: "700",
 
+
+
       fontSize: "14px",
+
+
 
       cursor: "pointer",
 
+
+
       padding: 0,
+
     }}
+
   >
+
     Réinitialiser
+
   </button>
 
+
+
 </div>
+
+
 
         {/* LOGIN BUTTON */}
 
+
+
 <button
+
   onClick={login}
+
+
 
   disabled={loading}
 
+
+
   onMouseEnter={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(-3px)";
 
+
+
     e.target.style.boxShadow =
+
       "0 15px 35px rgba(37,99,235,0.30)";
+
   }}
+
+
 
   onMouseLeave={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(0px)";
 
+
+
     e.target.style.boxShadow =
+
       "0 10px 25px rgba(37,99,235,0.20)";
+
   }}
 
+
+
   style={{
+
     width: "100%",
+
+
 
     height: "62px",
 
+
+
     border: "none",
+
+
 
     borderRadius: "18px",
 
+
+
     background:
+
       "linear-gradient(135deg,#2563eb,#1d4ed8)",
+
+
 
     color: "white",
 
+
+
     fontSize: "18px",
+
+
 
     fontWeight: "800",
 
+
+
     cursor: "pointer",
 
+
+
     boxShadow:
+
       "0 10px 25px rgba(37,99,235,0.20)",
 
+
+
     transition: "0.3s",
+
   }}
+
 >
+
+
 
   {loading ? (
 
+
+
     "Connexion..."
+
+
 
   ) : (
 
+
+
     "Se connecter"
+
+
 
   )}
 
+
+
 </button>
+
+
 
         {/* CREATE ACCOUNT */}
 
+
+
         <button
 
+
+
   onClick={() =>
+
     window.location.href =
+
       "/register"
+
   }
+
+
 
   onMouseEnter={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(-2px)";
 
+
+
     e.target.style.background =
+
       "#eff6ff";
 
+
+
     e.target.style.border =
+
       "1px solid #2563eb";
+
   }}
+
+
 
   onMouseLeave={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(0px)";
 
+
+
     e.target.style.background =
+
       "#ffffff";
 
+
+
     e.target.style.border =
+
       "1px solid #dbeafe";
+
   }}
 
+
+
   style={{
+
     width: "100%",
+
+
 
     height: "60px",
 
+
+
     marginTop: "16px",
 
+
+
     border:
+
       "1px solid #dbeafe",
+
+
 
     borderRadius: "18px",
 
+
+
     background: "#ffffff",
+
+
 
     color: "#2563eb",
 
+
+
     fontSize: "16px",
+
+
 
     fontWeight: "700",
 
+
+
     cursor: "pointer",
+
+
 
     transition: "0.3s",
 
+
+
     boxShadow:
+
       "0 4px 12px rgba(37,99,235,0.08)",
+
   }}
+
 >
+
+
 
   Créer un compte
 
+
+
 </button>
+
+
 
 <button
 
+
+
   onClick={() =>
+
     window.location.href = "/"
+
   }
+
+
 
   onMouseEnter={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(-2px)";
 
+
+
     e.target.style.background =
+
       "#f8fafc";
+
   }}
+
+
 
   onMouseLeave={(e) => {
 
+
+
     e.target.style.transform =
+
       "translateY(0px)";
 
+
+
     e.target.style.background =
+
       "#ffffff";
+
   }}
 
+
+
   style={{
+
+
 
     width: "100%",
 
+
+
     height: "60px",
+
+
 
     marginTop: "16px",
 
+
+
     border:
+
       "1px solid #e5e7eb",
+
+
 
     borderRadius: "18px",
 
+
+
     background: "#ffffff",
+
+
 
     color: "#374151",
 
+
+
     fontSize: "16px",
+
+
 
     fontWeight: "700",
 
+
+
     cursor: "pointer",
+
+
 
     transition: "0.3s",
 
+
+
     display: "flex",
+
+
 
     justifyContent: "center",
 
+
+
     alignItems: "center",
+
+
 
     gap: "10px",
 
+
+
     boxShadow:
+
       "0 4px 12px rgba(0,0,0,0.05)",
+
   }}
 
+
+
 >
+
+
 
   <FaArrowLeft />
 
+
+
   Retour accueil
+
+
 
 </button>
 
+
+
        {/* FOOTER PREMIUM */}
 
+
+
 <div
+
   style={{
+
     marginTop: "30px",
+
+
 
     paddingTop: "22px",
 
+
+
     borderTop: "1px solid #e5e7eb",
 
+
+
     textAlign: "center",
+
   }}
+
 >
 
+
+
   <p
+
     style={{
+
       margin: 0,
+
+
 
       color: "#64748b",
 
+
+
       fontSize: "13px",
 
+
+
       fontWeight: "500",
+
     }}
+
   >
+
     Plateforme sécurisée • Paiements protégés • Support client
+
   </p>
 
+
+
   <p
+
     style={{
+
       marginTop: "8px",
+
+
 
       color: "#94a3b8",
 
+
+
       fontSize: "12px",
+
     }}
+
   >
+
     © 2026 Konan Shopping Cameroun
+
   </p>
+
+
 
 </div>
 
+
+
       {/* PROFESSIONAL NOTIFICATIONS */}
+
       <ToastContainer
+
         position="top-right"
+
         autoClose={3500}
+
         hideProgressBar={false}
+
         newestOnTop
+
         closeOnClick
+
         pauseOnFocusLoss
+
         draggable
+
         pauseOnHover
+
         theme="light"
+
         toastClassName="konan-toast"
+
         bodyClassName="konan-toast-body"
+
       />
 
+
+
       <style>{`
+
         .konan-toast {
+
           min-height: 72px !important;
+
           padding: 0 10px 0 0 !important;
+
           border-radius: 16px !important;
+
           background: rgba(255,255,255,.98) !important;
+
           color: #0f172a !important;
+
           border: 1px solid #e5e7eb !important;
+
           border-left: 5px solid #2563eb !important;
+
           box-shadow: 0 18px 45px rgba(15,23,42,.16) !important;
+
           overflow: hidden !important;
+
           font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+
         }
+
+
 
         .konan-toast.Toastify__toast--success {
+
           border-left-color: #16a34a !important;
+
         }
+
+
 
         .konan-toast.Toastify__toast--error {
+
           border-left-color: #dc2626 !important;
+
         }
+
+
 
         .konan-toast .Toastify__toast-icon {
+
           width: 28px !important;
+
           margin-left: 12px !important;
+
           margin-right: 4px !important;
+
         }
+
+
 
         .konan-toast-body {
+
           padding: 15px 8px 15px 0 !important;
+
           margin: 0 !important;
+
           font-size: 14px !important;
+
           font-weight: 650 !important;
+
           line-height: 1.45 !important;
+
           color: #0f172a !important;
+
         }
+
+
 
         .konan-toast .Toastify__close-button {
+
           color: #64748b !important;
+
           opacity: .7 !important;
+
           align-self: center !important;
+
         }
+
+
 
         .konan-toast .Toastify__close-button:hover {
+
           opacity: 1 !important;
+
         }
+
+
 
         .konan-toast .Toastify__progress-bar {
+
           height: 3px !important;
+
         }
+
+
 
         .konan-toast.Toastify__toast--success .Toastify__progress-bar {
+
           background: #16a34a !important;
+
         }
+
+
 
         .konan-toast.Toastify__toast--error .Toastify__progress-bar {
+
           background: #dc2626 !important;
+
         }
+
+
 
         @media (max-width: 768px) {
+
           .Toastify__toast-container {
+
             width: calc(100% - 20px) !important;
+
             left: 10px !important;
+
             right: 10px !important;
+
             top: 10px !important;
+
             padding: 0 !important;
+
           }
+
+
 
           .konan-toast {
+
             width: 100% !important;
+
             min-height: 68px !important;
+
             border-radius: 15px !important;
+
           }
+
+
 
           .konan-toast-body {
+
             font-size: 13px !important;
+
           }
+
         }
+
       `}</style>
 
+
+
     </div>
+
     </div>
+
+
 
   );
 
+
+
 }
+
+
 
 export default UserLogin;

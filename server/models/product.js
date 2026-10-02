@@ -1,29 +1,85 @@
-const mongoose = require("mongoose");
+const mongoose =
+  require("mongoose");
 
 const ProductSchema =
   new mongoose.Schema(
     {
-      name: String,
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 1,
+        maxlength: 250,
+      },
 
-      price: Number,
+      price: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
 
-      image: String,
+      image: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 2000,
+      },
 
-      category: String,
+      category: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 100,
+      },
 
-      description: String,
+      description: {
+        type: String,
+        default: "",
+        trim: true,
+        maxlength: 10000,
+      },
 
       reviews: [
         {
-          clientId: String,
+          clientId: {
+            type: String,
+            trim: true,
+            maxlength: 100,
+          },
 
-          name: String,
+          name: {
+            type: String,
+            trim: true,
+            maxlength: 150,
+          },
 
-          rating: Number,
+          rating: {
+            type: Number,
+            min: 1,
+            max: 5,
 
-          comment: String,
+            validate: {
+              validator:
+                Number.isInteger,
 
-          images: [String],
+              message:
+                "La note doit être un nombre entier entre 1 et 5.",
+            },
+          },
+
+          comment: {
+            type: String,
+            trim: true,
+            maxlength: 2000,
+          },
+
+          images: [
+            {
+              type: String,
+              trim: true,
+              maxlength: 2000,
+            },
+          ],
 
           verifiedPurchase: {
             type: Boolean,
@@ -31,20 +87,40 @@ const ProductSchema =
           },
 
           likes: [
-            String,
+            {
+              type: String,
+              trim: true,
+              maxlength: 100,
+            },
           ],
 
           dislikes: [
-            String,
+            {
+              type: String,
+              trim: true,
+              maxlength: 100,
+            },
           ],
 
           replies: [
             {
-              clientId: String,
+              clientId: {
+                type: String,
+                trim: true,
+                maxlength: 100,
+              },
 
-              name: String,
+              name: {
+                type: String,
+                trim: true,
+                maxlength: 150,
+              },
 
-              comment: String,
+              comment: {
+                type: String,
+                trim: true,
+                maxlength: 2000,
+              },
 
               createdAt: {
                 type: Date,
@@ -70,10 +146,8 @@ const ProductSchema =
     }
   );
 
-module.exports = mongoose.model(
-
-  "Product",
-
-  ProductSchema
-  
-);
+module.exports =
+  mongoose.model(
+    "Product",
+    ProductSchema
+  );

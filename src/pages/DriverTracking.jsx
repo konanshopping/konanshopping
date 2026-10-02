@@ -42,7 +42,106 @@ import {
 // 🌐 API
 // ======================================================
 
-const API = "https://konanshopping.com";
+// ======================================================
+// 🔐 API SECURITY LAYER
+// ======================================================
+
+const API = (
+  import.meta.env?.VITE_API_URL ||
+  "https://konanshopping.com"
+).replace(/\/$/, "");
+
+const API_TIMEOUT = 15000;
+
+const getDriverAuthToken = () => {
+  try {
+    return (
+      localStorage.getItem("driverToken") ||
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token") ||
+      ""
+    );
+  } catch {
+    return "";
+  }
+};
+
+const apiClient = axios.create({
+  baseURL: API,
+  timeout: API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json"
+  }
+});
+
+apiClient.interceptors.request.use(
+  config => {
+    const token = getDriverAuthToken();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  error => Promise.reject(error)
+);
+
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    if (error?.code === "ECONNABORTED") {
+      error.userMessage = "Le serveur met trop de temps à répondre.";
+    } else if (!error?.response) {
+      error.userMessage = "Connexion au serveur impossible.";
+    } else if (error.response.status === 401) {
+      error.userMessage = "Session livreur expirée ou non autorisée.";
+    } else if (error.response.status === 403) {
+      error.userMessage = "Action non autorisée pour ce compte livreur.";
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+const isValidId = value =>
+  /^[a-fA-F0-9]{24}$/.test(String(value || "").trim());
+
+const safeId = value => {
+  const id = String(value || "").trim();
+  return isValidId(id) ? id : "";
+};
+
+const getApiErrorMessage = (
+  error,
+  fallback = "Une erreur est survenue."
+) => {
+  if (error?.userMessage) return error.userMessage;
+
+  const status = error?.response?.status;
+
+  if (status === 401) {
+    return "Session livreur expirée ou non autorisée.";
+  }
+
+  if (status === 403) {
+    return "Action non autorisée pour ce compte livreur.";
+  }
+
+  if (status === 409) {
+    return (
+      error?.response?.data?.message ||
+      "Cette commande a changé d'état."
+    );
+  }
+
+  return (
+    error?.response?.data?.message ||
+    fallback
+  );
+};
 
 
 // ======================================================
@@ -742,8 +841,8 @@ export default function DriverTracking() {
       try {
 
         const response =
-          await axios.get(
-            `${API}/api/driver-orders`
+          await apiClient.get(
+            `api/driver-orders`
           );
 
         const list =
@@ -823,8 +922,8 @@ export default function DriverTracking() {
       try {
 
         const response =
-          await axios.get(
-            `${API}/api/orders`
+          await apiClient.get(
+            `api/orders`
           );
 
         const list =
@@ -1041,9 +1140,9 @@ export default function DriverTracking() {
         );
 
         const response =
-          await axios.post(
+          await apiClient.post(
 
-            `${API}/api/driver/${driver._id}/telegram-connect`
+            `api/driver/${driver._id}/telegram-connect`
 
           );
 
@@ -1082,8 +1181,10 @@ export default function DriverTracking() {
         );
 
         notify(
-          error.response?.data?.message ||
-          "Impossible de connecter Telegram.",
+          getApiErrorMessage(
+            error,
+            "Impossible de connecter Telegram."
+          ),
           "error",
           "Telegram"
         );
@@ -1197,9 +1298,7 @@ export default function DriverTracking() {
       try {
 
         const response =
-          await axios.put(
-
-            `${API}/api/accept-order/${orderId}`,
+          await apiClient.put(`/api/accept-order/${safeId(orderId)}`,
 
             {
 
@@ -1457,9 +1556,10 @@ export default function DriverTracking() {
 
 
         notify(
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "Impossible d'accepter la commande.",
+          getApiErrorMessage(
+            error,
+            "Impossible d'accepter la commande."
+          ),
           "error"
         );
 
@@ -1515,9 +1615,9 @@ const startDriverGPS =
     // 🟢 PASSER LE LIVREUR EN LIGNE
     // ==================================================
 
-    axios.put(
+    apiClient.put(
 
-      `${API}/api/driver-online/${driver._id}`,
+      `api/driver-online/${driver._id}`,
 
       {
         isOnline: true
@@ -1589,9 +1689,7 @@ const startDriverGPS =
             // 📍 ENVOYER LA POSITION AU SERVEUR
             // ==========================================
 
-            await axios.put(
-
-              `${API}/api/order-location/${orderId}`,
+            await apiClient.put(`/api/order-location/${safeId(orderId)}`,
 
               {
 
@@ -1727,9 +1825,9 @@ const stopGPS =
       driver?._id
     ) {
 
-      axios.put(
+      apiClient.put(
 
-        `${API}/api/driver-online/${driver._id}`,
+        `api/driver-online/${driver._id}`,
 
         {
           isOnline: false
@@ -1940,10 +2038,8 @@ const stopGPS =
               return;
             }
 
-            console.log(
-              "📷 QR SCANNÉ:",
-              scannedToken
-            );
+            // Le contenu du QR n'est jamais écrit dans la console.
+            // La vérification définitive reste effectuée par le backend.
 
             if (
               scannedToken !==
@@ -2020,6 +2116,13 @@ const stopGPS =
       fromQr = false
     ) => {
 
+      orderId = safeId(orderId);
+
+      if (!orderId) {
+        notify("Identifiant de commande invalide.", "error");
+        return;
+      }
+
       if (!driver?._id) {
 
         return;
@@ -2028,9 +2131,9 @@ const stopGPS =
 
       try {
 
-        await axios.put(
+        await apiClient.put(
 
-          `${API}/api/driver-deliver/${orderId}`,
+          `api/driver-deliver/${orderId}`,
 
           {
 
@@ -2122,8 +2225,10 @@ const stopGPS =
         );
 
         notify(
-          error.response?.data?.message ||
-          "Impossible de terminer la livraison.",
+          getApiErrorMessage(
+            error,
+            "Impossible de terminer la livraison."
+          ),
           "error"
         );
 
@@ -2141,6 +2246,13 @@ const stopGPS =
       orderId
     ) => {
 
+      orderId = safeId(orderId);
+
+      if (!orderId) {
+        notify("Identifiant de commande invalide.", "error");
+        return;
+      }
+
       if (!driver?._id) {
 
         notify(
@@ -2156,9 +2268,7 @@ const stopGPS =
       try {
 
         const response =
-          await axios.put(
-
-            `${API}/api/driver-cancel/${orderId}`,
+          await apiClient.put(`/api/driver-cancel/${safeId(orderId)}`,
 
             {
 
@@ -2277,10 +2387,10 @@ const stopGPS =
 
 
         notify(
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          error.message ||
-          "Impossible d'annuler la livraison.",
+          getApiErrorMessage(
+            error,
+            "Impossible d'annuler la livraison."
+          ),
           "error"
         );
 
@@ -2298,11 +2408,18 @@ const stopGPS =
       orderId
     ) => {
 
+      orderId = safeId(orderId);
+
+      if (!orderId) {
+        notify("Identifiant de commande invalide.", "error");
+        return;
+      }
+
       try {
 
-        await axios.delete(
+        await apiClient.delete(
 
-          `${API}/api/delete-order/${orderId}`
+          `api/delete-order/${orderId}`
 
         );
 

@@ -19,11 +19,15 @@ const communityStorySchema = new mongoose.Schema(
       url: {
         type: String,
         required: true,
+        trim: true,
+        maxlength: 2000,
       },
 
       publicId: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 500,
       },
     },
 
@@ -50,7 +54,6 @@ const communityStorySchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
     },
 
     isDeleted: {

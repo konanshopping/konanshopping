@@ -11,6 +11,7 @@ import {
   Routes,
   Route,
   Link,
+  Navigate,
   useLocation,
 } from "react-router-dom";
 
@@ -181,6 +182,54 @@ import PageLoader from "./components/PageLoader";
 
 import InstallButton from "./components/InstallButton";
 
+// ======================================================
+// 🔐 PROTECTION FRONTEND ALIGNÉE SUR LE BACKEND
+// ======================================================
+// Le frontend bloque l'accès aux interfaces sensibles.
+// Le backend reste l'autorité réelle et vérifie toujours les JWT.
+// Aucun secret backend n'est stocké ici.
+
+function readStoredJSON(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function hasUserSession() {
+  return Boolean(localStorage.getItem("token") && readStoredJSON("user"));
+}
+
+function hasAdminSession() {
+  const token = localStorage.getItem("token");
+  const admin = readStoredJSON("admin");
+  return Boolean(token && admin && (admin.role === "admin" || admin.isAdmin === true));
+}
+
+function hasDriverSession() {
+  const driver = readStoredJSON("driver");
+  const driverToken = driver?.token || localStorage.getItem("driverToken");
+  return Boolean(driverToken && driver);
+}
+
+function RequireUser({ children }) {
+  return hasUserSession() ? children : <Navigate to="/login" replace />;
+}
+
+function RequireAdmin({ children }) {
+  return hasAdminSession() ? children : <Navigate to="/admin-login" replace />;
+}
+
+function RequireDriver({ children }) {
+  return hasDriverSession() ? children : <Navigate to="/driver-login" replace />;
+}
+
+function RequireUserOrAdmin({ children }) {
+  return hasUserSession() || hasAdminSession() ? children : <Navigate to="/login" replace />;
+}
+
 function Home() {
 
   console.log("HOME RENDER");
@@ -284,6 +333,12 @@ const clientId =
   localStorage.getItem(
     "guestId"
   );
+
+// JWT uniquement pour les appels backend nécessitant l'identité du client.
+const authToken = localStorage.getItem("token");
+const authHeaders = authToken
+  ? { Authorization: `Bearer ${authToken}` }
+  : {};
 
 const favoritesKey =
   `favorites_${clientId}`;
@@ -1073,7 +1128,9 @@ await axios.post(
 
 "https://konanshopping.com/api/products/ai-search",
 
-formData
+formData,
+
+{ headers: authHeaders }
 
 );
 
@@ -3786,7 +3843,9 @@ transition:"transform .35s ease",
 
       await axios.delete(
 
-        `https://konanshopping.com/api/favorites/${user._id}/${product._id}`
+        `https://konanshopping.com/api/favorites/${user._id}/${product._id}`,
+
+        { headers: authHeaders }
 
       );
 
@@ -3825,7 +3884,8 @@ transition:"transform .35s ease",
               productId:
                 product._id,
 
-            }
+            },
+            { headers: authHeaders }
           );
 
         }
@@ -5559,7 +5619,11 @@ function App() {
 
         <Route
           path="/admin"
-          element={<Admin />}
+          element={
+    <RequireAdmin>
+      <Admin />
+    </RequireAdmin>
+  }
         />
 
         <Route
@@ -5569,7 +5633,11 @@ function App() {
 
         <Route
           path="/orders"
-          element={<Orders />}
+          element={
+    <RequireAdmin>
+      <Orders />
+    </RequireAdmin>
+  }
         />
 
         <Route
@@ -5589,12 +5657,20 @@ function App() {
 
 <Route
   path="/favorites"
-  element={<Favorites />}
+  element={
+    <RequireUser>
+      <Favorites />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/account"
-  element={<Account />}
+  element={
+    <RequireUser>
+      <Account />
+    </RequireUser>
+  }
 />
 
 <Route
@@ -5609,7 +5685,11 @@ function App() {
 
 <Route
   path="/my-orders"
-  element={<MyOrders />}
+  element={
+    <RequireUser>
+      <MyOrders />
+    </RequireUser>
+  }
 />
 
 <Route
@@ -5619,47 +5699,83 @@ function App() {
 
 <Route
   path="/messages"
-  element={<Messages />}
+  element={
+    <RequireUser>
+      <Messages />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/orders/pending"
-  element={<PendingOrders />}
+  element={
+    <RequireUser>
+      <PendingOrders />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/orders/shipped"
-  element={<ShippedOrders />}
+  element={
+    <RequireUser>
+      <ShippedOrders />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/orders/delivered"
-  element={<DeliveredOrders />}
+  element={
+    <RequireUser>
+      <DeliveredOrders />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/orders/cancelled"
-  element={<CancelledOrders />}
+  element={
+    <RequireUser>
+      <CancelledOrders />
+    </RequireUser>
+  }
 />
 
 <Route
   path="/order/:id"
-  element={<OrderDetails />}
+  element={
+    <RequireUserOrAdmin>
+      <OrderDetails />
+    </RequireUserOrAdmin>
+  }
 />
 
 <Route
   path="/track-order/:id"
-  element={<TrackOrder />}
+  element={
+    <RequireUserOrAdmin>
+      <TrackOrder />
+    </RequireUserOrAdmin>
+  }
 />
 
 <Route
   path="/driver/:id"
-  element={<DriverTracking />}
+  element={
+    <RequireDriver>
+      <DriverTracking />
+    </RequireDriver>
+  }
 />
 
 <Route
   path="/driver-register"
-  element={<DriverRegister />}
+  element={
+    <RequireAdmin>
+      <DriverRegister />
+    </RequireAdmin>
+  }
 />
 
 <Route
@@ -5672,53 +5788,90 @@ function App() {
 <Route
   path="/driver-dashboard"
   element={
-    <DriverTracking />
+    <RequireDriver>
+      <DriverTracking />
+    </RequireDriver>
+  }/>
+
+<Route
+  path="/drivers"
+  element={
+    <RequireAdmin>
+      <Drivers />
+    </RequireAdmin>
   }
 />
 
 <Route
-  path="/drivers"
-  element={<Drivers />}
-/>
-
-<Route
   path="/admin-products"
-  element={<AdminProducts />}
+  element={
+    <RequireAdmin>
+      <AdminProducts />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin-clients"
-  element={<AdminClients />}
+  element={
+    <RequireAdmin>
+      <AdminClients />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin-stats"
-  element={<AdminStats />}
+  element={
+    <RequireAdmin>
+      <AdminStats />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin-orders"
-  element={<AdminOrders />}
+  element={
+    <RequireAdmin>
+      <AdminOrders />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin/settings"
-  element={<AdminSettings />}
+  element={
+    <RequireAdmin>
+      <AdminSettings />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin-coupons"
-  element={<AdminCoupons />}
+  element={
+    <RequireAdmin>
+      <AdminCoupons />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/admin-social"
-  element={<AdminSocial />}
+  element={
+    <RequireAdmin>
+      <AdminSocial />
+    </RequireAdmin>
+  }
 />
 
 <Route
   path="/deliveries"
-  element={<Deliveries />}
+  element={
+    <RequireAdmin>
+      <Deliveries />
+    </RequireAdmin>
+  }
 />
 
 <Route
@@ -5761,7 +5914,11 @@ function App() {
 
 <Route
   path="/admin-messages"
-  element={<AdminMessages />}
+  element={
+    <RequireAdmin>
+      <AdminMessages />
+    </RequireAdmin>
+  }
 />
 
       </Routes>

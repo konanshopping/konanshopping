@@ -45,6 +45,106 @@ const API_BASE =
 
 const apiUrl = (path) => `${API_BASE}${path}`;
 
+/* ============================================================
+   COUCHE DE SECURITE FRONTEND — COMMUNITY
+   Le backend reste toujours l'autorité finale.
+============================================================ */
+
+const MAX_COMMUNITY_TEXT = 5000;
+const MAX_COMMUNITY_SEARCH = 200;
+const COMMUNITY_MUTATION_COOLDOWN_MS = 450;
+
+function getCommunityToken() {
+  try {
+    const token = localStorage.getItem("token");
+    return typeof token === "string" && token.trim()
+      ? token.trim()
+      : "";
+  } catch {
+    return "";
+  }
+}
+
+function communityAuthHeaders(extra = {}) {
+  const token = getCommunityToken();
+  return {
+    Accept: "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extra,
+  };
+}
+
+const communityMutationTimes = new Map();
+
+function communityMutationAllowed(key) {
+  const now = Date.now();
+  const previous = communityMutationTimes.get(key) || 0;
+
+  if (now - previous < COMMUNITY_MUTATION_COOLDOWN_MS) {
+    return false;
+  }
+
+  communityMutationTimes.set(key, now);
+  return true;
+}
+
+async function secureCommunityFetch(url, options = {}) {
+  const method = String(options.method || "GET").toUpperCase();
+  const headers = communityAuthHeaders(options.headers || {});
+
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    const key = `${method}:${url}`;
+    if (!communityMutationAllowed(key)) {
+      throw new Error("Action trop rapide. Veuillez patienter un instant.");
+    }
+  }
+
+  return fetch(url, {
+    ...options,
+    method,
+    headers,
+    credentials: "same-origin",
+  });
+}
+
+function sanitizeCommunityText(value, max = MAX_COMMUNITY_TEXT) {
+  return String(value || "")
+    .replace(/\u0000/g, "")
+    .trim()
+    .slice(0, max);
+}
+
+function isSafeCommunityId(value) {
+  const id = String(value || "");
+  return Boolean(id) && id.length <= 128 && /^[A-Za-z0-9_-]+$/.test(id);
+}
+
+function secureSocketPayload(payload = {}) {
+  const safe = { ...payload };
+
+  /*
+    L'identité ne doit jamais venir du navigateur.
+    Le serveur Socket.IO doit utiliser socket.user/sub issu du JWT.
+  */
+  delete safe.userId;
+  delete safe.senderId;
+  delete safe.authorId;
+  delete safe.reporterId;
+  delete safe.driverId;
+
+  if (typeof safe.communityId === "string") {
+    safe.communityId = safe.communityId.slice(0, 128);
+  }
+
+  return safe;
+}
+
+function secureSocketEmit(socket, event, payload = {}) {
+  if (!socket || typeof socket.emit !== "function") return false;
+  socket.emit(event, secureSocketPayload(payload));
+  return true;
+}
+
 const SOCKET_URL =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
@@ -2527,7 +2627,7 @@ export default function Community() {
     setPostsError("");
 
     try {
-      const response = await fetch(apiUrl("/api/community/posts"), {
+      const response = await secureCommunityFetch(apiUrl("/api/community/posts"), {
         method: "GET",
         headers: { Accept: "application/json" },
       });
@@ -2560,7 +2660,7 @@ export default function Community() {
   }, [loadPosts]);
 
   const handlePublish = async () => {
-    const text = composerText.trim();
+    const text = sanitizeCommunityText(composerText);
     const validPoll = composerPoll
       .map((item) => item.trim())
       .filter(Boolean);
@@ -2609,7 +2709,7 @@ export default function Community() {
 
   const loadCommunityData = useCallback(async () => {
     try {
-      const response = await fetch(apiUrl("/api/community/bootstrap"), {
+      const response = await secureCommunityFetch(apiUrl("/api/community/bootstrap"), {
         method: "GET",
         headers: { Accept: "application/json" },
       });
@@ -2685,11 +2785,25 @@ export default function Community() {
   useEffect(() => {
     if (!SOCKET_URL) return undefined;
 
+    const token = getCommunityToken();
+
     const socket = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
-      autoConnect: true,
+      autoConnect: Boolean(token),
+
+      auth: token
+        ? { token }
+        : undefined,
+
+      reconnection: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
     });
     socketRef.current = socket;
+
+    socket.on("connect_error", () => {
+      /* Ne jamais afficher le contenu d'une erreur réseau au client. */
+    });
 
     const communityId = "konan-community";
 
@@ -2750,12 +2864,10 @@ export default function Community() {
     };
 
     socket.on("connect", () => {
-      socket.emit("joinCommunity", {
-        userId: currentUserId,
+      secureSocketEmit(socket, "joinCommunity", {
         communityId,
       });
-      socket.emit("community:join", {
-        userId: currentUserId,
+      secureSocketEmit(socket, "community:join", {
         communityId,
       });
     });
@@ -2772,14 +2884,14 @@ export default function Community() {
       ["newMessage", "community:newMessage", "messageCreated"].forEach((event) => socket.off(event, receiveMessage));
       ["onlineUsers", "community:onlineUsers", "userCount"].forEach((event) => socket.off(event, receiveOnline));
       ["notification", "community:notification", "newNotification"].forEach((event) => socket.off(event, receiveNotification));
-      socket.emit("leaveCommunity", { userId: currentUserId, communityId });
+      secureSocketEmit(socket, "leaveCommunity", { communityId });
       socket.disconnect();
       socketRef.current = null;
     };
   }, [currentUserId]);
 
   const filteredPosts = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const q = sanitizeCommunityText(search, MAX_COMMUNITY_SEARCH).toLowerCase();
     if (!q) return posts;
     return posts.filter((p) => {
       const text = [
@@ -2798,7 +2910,7 @@ export default function Community() {
 
   const publishPost = async (draft) => {
     try {
-      const response = await fetch(apiUrl("/api/community/posts"), {
+      const response = await secureCommunityFetch(apiUrl("/api/community/posts"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2806,7 +2918,6 @@ export default function Community() {
         },
         body: JSON.stringify({
           ...draft,
-          authorId: currentUser?._id || currentUser?.id || null,
         }),
       });
 
@@ -2827,7 +2938,7 @@ export default function Community() {
     } catch (error) {
       console.error("Community publish:", error);
       showToast(
-        error?.message || "Publication impossible. Vérifiez votre connexion et l'API Community."
+        "Publication impossible. Vérifiez votre connexion et réessayez."
       );
       throw error;
     }
@@ -2865,16 +2976,17 @@ export default function Community() {
   };
 
   const submitComment = async (postId) => {
-    const text = String(commentDrafts[postId] || "").trim();
-    if (!text) return;
+    const text = sanitizeCommunityText(commentDrafts[postId], 2000);
+    if (!text || !isSafeCommunityId(postId)) return;
 
     await addComment(postId, text);
     setCommentDrafts((prev) => ({ ...prev, [postId]: "" }));
   };
 
   const toggleLike = async (postId) => {
+    if (!isSafeCommunityId(postId)) return;
     try {
-      const response = await fetch(apiUrl(`/api/community/posts/${postId}/like`), {
+      const response = await secureCommunityFetch(apiUrl(`/api/community/posts/${postId}/like`), {
         method: "POST",
         headers: { Accept: "application/json" },
       });
@@ -2898,8 +3010,9 @@ export default function Community() {
   };
 
   const toggleSave = async (postId) => {
+    if (!isSafeCommunityId(postId)) return;
     try {
-      const response = await fetch(apiUrl(`/api/community/posts/${postId}/save`), {
+      const response = await secureCommunityFetch(apiUrl(`/api/community/posts/${postId}/save`), {
         method: "POST",
         headers: { Accept: "application/json" },
       });
@@ -2921,6 +3034,7 @@ export default function Community() {
   };
 
   const addComment = async (postId, commentText) => {
+    if (!isSafeCommunityId(postId)) return;
     try {
       const response = await fetch(
         apiUrl(`/api/community/posts/${postId}/comments`),
@@ -3008,6 +3122,7 @@ export default function Community() {
   };
 
   const votePoll = async (postId, optionIndex) => {
+    if (!isSafeCommunityId(postId) || !Number.isInteger(Number(optionIndex)) || Number(optionIndex) < 0 || Number(optionIndex) > 100) return;
     try {
       const response = await fetch(
         apiUrl(`/api/community/posts/${postId}/poll/vote`),
@@ -3039,8 +3154,8 @@ export default function Community() {
   };
 
   const sendMessage = async (conversationId, text) => {
-    const cleanText = String(text || "").trim();
-    if (!conversationId || !cleanText) return;
+    const cleanText = sanitizeCommunityText(text);
+    if (!isSafeCommunityId(conversationId) || !cleanText) return;
 
     try {
       const response = await fetch(
@@ -3078,11 +3193,12 @@ export default function Community() {
       setMessage("");
     } catch (error) {
       console.error("Community message:", error);
-      showToast(error?.message || "Impossible d'envoyer le message.");
+      showToast("Impossible d'envoyer le message.");
     }
   };
 
   const markNotificationRead = async (id) => {
+    if (!isSafeCommunityId(id)) return;
     try {
       const response = await fetch(
         apiUrl(`/api/community/notifications/${id}/read`),
@@ -3104,6 +3220,7 @@ export default function Community() {
   };
 
   const deletePost = async (post) => {
+    if (!post?.id || !isSafeCommunityId(post.id)) return;
     try {
       const response = await fetch(
         apiUrl(`/api/community/posts/${post.id}`),

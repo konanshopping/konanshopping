@@ -6,6 +6,7 @@ const communityGroupSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      minlength: 1,
       maxlength: 150,
     },
 
@@ -19,11 +20,15 @@ const communityGroupSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     cover: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     creator: {
@@ -58,12 +63,14 @@ const communityGroupSchema = new mongoose.Schema(
       type: String,
       default: "Général",
       trim: true,
+      maxlength: 100,
     },
 
     rules: [
       {
         type: String,
         trim: true,
+        minlength: 1,
         maxlength: 500,
       },
     ],
@@ -71,11 +78,25 @@ const communityGroupSchema = new mongoose.Schema(
     memberCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "memberCount doit être un nombre entier.",
+      },
     },
 
     postsCount: {
       type: Number,
       default: 0,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "postsCount doit être un nombre entier.",
+      },
     },
 
     isActive: {

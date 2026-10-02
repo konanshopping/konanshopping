@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./AdminSettings.css";
 
 import {
@@ -15,6 +15,90 @@ import {
   FaGlobeAfrica,
   FaCog,
 } from "react-icons/fa";
+
+// ============================================================
+// SÉCURITÉ ADMIN
+// La logique métier d'origine est conservée.
+// Ce composant ne faisait aucun appel backend.
+// ============================================================
+
+const MAX_TEXT_LENGTH = 150;
+const MAX_DESCRIPTION_LENGTH = 1000;
+const MAX_PHONE_LENGTH = 30;
+const MAX_EMAIL_LENGTH = 150;
+const MAX_WEBSITE_LENGTH = 200;
+
+const ALLOWED_PAYMENT_METHODS = [
+  "Paiement à la livraison",
+  "Orange Money",
+  "MTN Mobile Money",
+  "Carte bancaire",
+];
+
+const safeParse = (value, fallback = null) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const getAuthToken = () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    return typeof token === "string" && token.trim()
+      ? token.trim()
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredAdmin = () => {
+  try {
+    return safeParse(
+      localStorage.getItem("admin"),
+      null
+    );
+  } catch {
+    return null;
+  }
+};
+
+const requireAdminSession = () => {
+  const token = getAuthToken();
+  const admin = getStoredAdmin();
+
+  if (!token || !admin) {
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname !== "/admin-login"
+    ) {
+      window.location.replace("/admin-login");
+    }
+
+    return false;
+  }
+
+  return true;
+};
+
+const normalizeText = (
+  value,
+  maxLength
+) =>
+  typeof value === "string"
+    ? value.slice(0, maxLength)
+    : "";
+
+const normalizeNumber = (value) => {
+  const number = Number(value);
+
+  return Number.isFinite(number) && number >= 0
+    ? number
+    : 0;
+};
 
 export default function AdminSettings() {
 
@@ -60,21 +144,108 @@ export default function AdminSettings() {
   });
 
   // =========================
+  // ADMIN SESSION
+  // =========================
+
+  useEffect(() => {
+
+    requireAdminSession();
+
+  }, []);
+
+  // =========================
   // HANDLE CHANGE
   // =========================
 
   const handleChange = (e) => {
 
-    setSettings({
+    if (!requireAdminSession()) {
+      return;
+    }
 
-      ...settings,
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
 
-      [e.target.name]:
-        e.target.type === "checkbox"
-          ? e.target.checked
-          : e.target.value,
+    if (type === "checkbox") {
 
-    });
+      setSettings((previous) => ({
+        ...previous,
+        [name]: checked,
+      }));
+
+      return;
+    }
+
+    let safeValue = value;
+
+    if (
+      name === "storeName" ||
+      name === "city" ||
+      name === "address"
+    ) {
+      safeValue = normalizeText(
+        value,
+        MAX_TEXT_LENGTH
+      );
+    }
+
+    if (name === "website") {
+      safeValue = normalizeText(
+        value,
+        MAX_WEBSITE_LENGTH
+      );
+    }
+
+    if (name === "description") {
+      safeValue = normalizeText(
+        value,
+        MAX_DESCRIPTION_LENGTH
+      );
+    }
+
+    if (
+      name === "phone" ||
+      name === "whatsapp"
+    ) {
+      safeValue = normalizeText(
+        value,
+        MAX_PHONE_LENGTH
+      );
+    }
+
+    if (name === "email") {
+      safeValue = normalizeText(
+        value,
+        MAX_EMAIL_LENGTH
+      );
+    }
+
+    if (
+      name === "doualaShipping" ||
+      name === "yaoundeShipping" ||
+      name === "otherShipping"
+    ) {
+      safeValue = normalizeNumber(value);
+    }
+
+    if (name === "paymentMethod") {
+      if (
+        !ALLOWED_PAYMENT_METHODS.includes(
+          value
+        )
+      ) {
+        return;
+      }
+    }
+
+    setSettings((previous) => ({
+      ...previous,
+      [name]: safeValue,
+    }));
 
   };
 
@@ -83,6 +254,10 @@ export default function AdminSettings() {
   // =========================
 
   const saveSettings = () => {
+
+    if (!requireAdminSession()) {
+      return;
+    }
 
     alert(
       "✅ Paramètres enregistrés avec succès"
@@ -142,6 +317,8 @@ export default function AdminSettings() {
             name="storeName"
             value={settings.storeName}
             onChange={handleChange}
+            maxLength={MAX_TEXT_LENGTH}
+            autoComplete="organization"
             className="settingsInput"
           />
 
@@ -150,6 +327,8 @@ export default function AdminSettings() {
             name="city"
             value={settings.city}
             onChange={handleChange}
+            maxLength={MAX_TEXT_LENGTH}
+            autoComplete="address-level2"
             className="settingsInput"
           />
 
@@ -158,6 +337,8 @@ export default function AdminSettings() {
             name="address"
             value={settings.address}
             onChange={handleChange}
+            maxLength={MAX_TEXT_LENGTH}
+            autoComplete="street-address"
             className="settingsInput"
           />
 
@@ -166,6 +347,9 @@ export default function AdminSettings() {
             name="website"
             value={settings.website}
             onChange={handleChange}
+            maxLength={MAX_WEBSITE_LENGTH}
+            autoComplete="url"
+            spellCheck="false"
             className="settingsInput"
           />
 
@@ -174,6 +358,7 @@ export default function AdminSettings() {
             name="description"
             value={settings.description}
             onChange={handleChange}
+            maxLength={MAX_DESCRIPTION_LENGTH}
             className="settingsTextarea"
           />
 
@@ -196,6 +381,9 @@ export default function AdminSettings() {
             name="phone"
             value={settings.phone}
             onChange={handleChange}
+            maxLength={MAX_PHONE_LENGTH}
+            inputMode="tel"
+            autoComplete="tel"
             className="settingsInput"
           />
 
@@ -204,6 +392,9 @@ export default function AdminSettings() {
             name="whatsapp"
             value={settings.whatsapp}
             onChange={handleChange}
+            maxLength={MAX_PHONE_LENGTH}
+            inputMode="tel"
+            autoComplete="tel"
             className="settingsInput"
           />
 
@@ -212,6 +403,9 @@ export default function AdminSettings() {
             name="email"
             value={settings.email}
             onChange={handleChange}
+            maxLength={MAX_EMAIL_LENGTH}
+            autoComplete="email"
+            spellCheck="false"
             className="settingsInput"
           />
 
@@ -255,6 +449,9 @@ export default function AdminSettings() {
             name="doualaShipping"
             value={settings.doualaShipping}
             onChange={handleChange}
+            min="0"
+            step="1"
+            inputMode="numeric"
             className="settingsInput"
           />
 
@@ -263,6 +460,9 @@ export default function AdminSettings() {
             name="yaoundeShipping"
             value={settings.yaoundeShipping}
             onChange={handleChange}
+            min="0"
+            step="1"
+            inputMode="numeric"
             className="settingsInput"
           />
 
@@ -271,6 +471,9 @@ export default function AdminSettings() {
             name="otherShipping"
             value={settings.otherShipping}
             onChange={handleChange}
+            min="0"
+            step="1"
+            inputMode="numeric"
             className="settingsInput"
           />
 
@@ -373,6 +576,7 @@ export default function AdminSettings() {
       {/* SAVE BUTTON */}
 
       <button
+        type="button"
         onClick={saveSettings}
         className="saveButton"
       >

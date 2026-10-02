@@ -34,16 +34,22 @@ const communityMessageSchema = new mongoose.Schema(
         url: {
           type: String,
           required: true,
+          trim: true,
+          maxlength: 2000,
         },
 
         name: {
           type: String,
           default: "",
+          trim: true,
+          maxlength: 255,
         },
 
         publicId: {
           type: String,
           default: "",
+          trim: true,
+          maxlength: 500,
         },
       },
     ],
@@ -63,6 +69,7 @@ const communityMessageSchema = new mongoose.Schema(
 
         emoji: {
           type: String,
+          trim: true,
           maxlength: 20,
         },
       },

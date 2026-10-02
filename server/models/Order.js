@@ -19,31 +19,42 @@ const OrderSchema = new mongoose.Schema({
   customerName: {
     type: String,
     default: "",
+    trim: true,
+    maxlength: 150,
   },
 
   phone: {
     type: String,
     default: "",
+    trim: true,
+    maxlength: 30,
   },
 
   address: {
     type: String,
     default: "",
+    trim: true,
+    maxlength: 500,
   },
 
   city: {
     type: String,
     default: "",
+    trim: true,
+    maxlength: 100,
   },
 
   district: {
     type: String,
     default: "",
+    trim: true,
+    maxlength: 150,
   },
 
   shipping: {
     type: Number,
     default: 0,
+    min: 0,
   },
 
 
@@ -57,26 +68,41 @@ const OrderSchema = new mongoose.Schema({
       productId: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 100,
       },
 
       name: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 250,
       },
 
       image: {
         type: String,
         default: "",
+        trim: true,
+        maxlength: 2000,
       },
 
       price: {
         type: Number,
         default: 0,
+        min: 0,
       },
 
       quantity: {
         type: Number,
         default: 1,
+        min: 1,
+        max: 100,
+
+        validate: {
+          validator: Number.isInteger,
+          message:
+            "La quantité doit être un nombre entier.",
+        },
       },
 
     },
@@ -90,6 +116,7 @@ const OrderSchema = new mongoose.Schema({
   total: {
     type: Number,
     default: 0,
+    min: 0,
   },
 
 
@@ -100,16 +127,13 @@ const OrderSchema = new mongoose.Schema({
   paymentMethod: {
     type: String,
     default: "Paiement à la livraison",
+    trim: true,
+    maxlength: 100,
   },
 
 
   // ====================================================
   // 📍 POSITION DU CLIENT
-  // ====================================================
-  //
-  // Cette position sert à afficher la destination
-  // du client sur la carte.
-  //
   // ====================================================
 
   location: {
@@ -117,11 +141,15 @@ const OrderSchema = new mongoose.Schema({
     lat: {
       type: Number,
       default: null,
+      min: -90,
+      max: 90,
     },
 
     lng: {
       type: Number,
       default: null,
+      min: -180,
+      max: 180,
     },
 
   },
@@ -136,11 +164,15 @@ const OrderSchema = new mongoose.Schema({
     lat: {
       type: Number,
       default: null,
+      min: -90,
+      max: 90,
     },
 
     lng: {
       type: Number,
       default: null,
+      min: -180,
+      max: 180,
     },
 
     updatedAt: {
@@ -166,26 +198,36 @@ const OrderSchema = new mongoose.Schema({
     name: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 150,
     },
 
     phone: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 30,
     },
 
     photo: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 500,
     },
 
     vehicle: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 100,
     },
 
     plate: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 50,
     },
 
   },
@@ -204,6 +246,10 @@ const OrderSchema = new mongoose.Schema({
     sparse: true,
 
     index: true,
+
+    trim: true,
+
+    maxlength: 500,
 
   },
 
@@ -256,6 +302,10 @@ const OrderSchema = new mongoose.Schema({
     type: String,
 
     default: "En attente",
+
+    trim: true,
+
+    maxlength: 50,
 
   },
 

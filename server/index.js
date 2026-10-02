@@ -34,6 +34,18 @@ const axios = require("axios");
 
 require("dotenv").config();
 
+const {
+  rateLimit,
+  requireAdmin,
+  requireUser,
+  requireUserOrAdmin,
+  requireSelfOrAdmin,
+  requireDriverSelf,
+  requireDriverSelfOrAdmin,
+  requireDriverOrAdmin,
+  securityHeaders
+} = require("./middleware/security");
+
 const BOT_TOKEN = process.env.TELEGRAM_TOKEN;
 const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
@@ -71,8 +83,7 @@ const Coupon =
   },
 });
 
-console.log("EMAIL_USER =", process.env.EMAIL_USER);
-console.log("EMAIL_PASS =", process.env.EMAIL_PASS ? "OK" : "UNDEFINED");
+console.log("SMTP configuré :", process.env.EMAIL_USER ? "OUI" : "NON");
 
 transporter.verify(function (error, success) {
   if (error) {
@@ -634,32 +645,324 @@ const app = express();
 
 const server = http.createServer(app);
 
+const allowedOrigins = (process.env.FRONTEND_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Origin non autorisée"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+};
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: allowedOrigins,
+    credentials: true,
     methods: ["GET", "POST"],
   },
+  // Limite la taille maximale d'un paquet Socket.IO pour réduire les abus.
+  maxHttpBufferSize: 64 * 1024,
 });
 
+// ======================================================
+// 🔐 AUTHENTIFICATION SOCKET.IO
+// ======================================================
+
+function getSocketToken(socket) {
+  const authToken = socket.handshake?.auth?.token;
+  if (typeof authToken === "string" && authToken.trim()) {
+    return authToken.trim();
+  }
+
+  const header = socket.handshake?.headers?.authorization || "";
+  if (typeof header === "string" && header.startsWith("Bearer ")) {
+    return header.slice(7).trim() || null;
+  }
+
+  return null;
+}
+
+function verifySocketToken(token) {
+  if (!token) {
+    throw new Error("Token Socket.IO manquant");
+  }
+
+  const secrets = [
+    { secret: process.env.JWT_SECRET, role: "user" },
+    { secret: process.env.ADMIN_JWT_SECRET, role: "admin" },
+    { secret: process.env.DRIVER_JWT_SECRET, role: "driver" },
+  ];
+
+  for (const entry of secrets) {
+    if (!entry.secret) continue;
+
+    try {
+      const payload = jwt.verify(token, entry.secret, {
+        algorithms: ["HS256"],
+      });
+
+      return {
+        ...payload,
+        role: payload.role || entry.role,
+      };
+    } catch (_) {
+      // On essaie le secret suivant sans révéler lequel a échoué.
+    }
+  }
+
+  throw new Error("Token Socket.IO invalide ou expiré");
+}
+
+io.use((socket, next) => {
+  try {
+    const token = getSocketToken(socket);
+    const user = verifySocketToken(token);
+
+    if (!user.id && !user.sub) {
+      return next(new Error("Identité utilisateur absente du token"));
+    }
+
+    socket.authUser = user;
+    socket.authUserId = String(user.id || user.sub);
+
+    next();
+  } catch (error) {
+    next(new Error("Authentification Socket.IO requise"));
+  }
+});
+
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+
 app.use(cookieParser());
-
-app.use(cors());
-app.use(express.json({
-  limit: "50mb"
-}));
-
-app.use(express.urlencoded({
-  extended: true,
-  limit: "50mb"
-}));
+app.use(securityHeaders);
+app.use(cors(corsOptions));
+app.use(rateLimit({ name: "global", windowMs: 15 * 60 * 1000, max: 600 }));
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "200kb" }));
 
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
 );
 
-app.use("/api/payment", paymentRoutes);
+// ======================================================
+// 🔐 SECURITY GATE — protège les routes sensibles sans
+// modifier leur logique métier interne.
+// ======================================================
+function securityGate(req, res, next) {
+  const pathName = req.path;
+  const method = req.method;
 
+  // Routes publiques nécessaires au fonctionnement de la boutique.
+  const publicExact = new Set([
+    "/",
+    "/admin-login",
+    "/register",
+    "/login",
+    "/forgot-password",
+    "/apply-coupon",
+    "/products",
+    "/ai-chat",
+    "/ai/search",
+    "/track-visitor",
+  ]);
+
+  // Création de commande : le checkout invité reste public.
+  // Si un token utilisateur est fourni, son identité sera vérifiée et
+  // utilisée par la route /orders au lieu du userId envoyé par le client.
+  if (method === "POST" && pathName === "/orders") {
+    const authorization = String(req.headers.authorization || "");
+
+    if (!authorization) return next();
+
+    if (!authorization.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Authentification invalide." });
+    }
+
+    const token = authorization.slice(7).trim();
+
+    if (!token) {
+      return res.status(401).json({ message: "Authentification invalide." });
+    }
+
+    try {
+      req.user = jwt.verify(
+        token,
+        process.env.JWT_SECRET,
+        {
+          algorithms: ["HS256"],
+          issuer: process.env.JWT_ISSUER || "konanshopping",
+          audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+        }
+      );
+
+      return next();
+    } catch (_) {
+      return res.status(401).json({ message: "Authentification invalide." });
+    }
+  }
+
+  if (method === "POST" && publicExact.has(pathName)) return next();
+  if (method === "GET" && publicExact.has(pathName)) return next();
+  if (pathName.startsWith("/reset-password/")) return next();
+  if (pathName.startsWith("/product/") && method === "GET") return next();
+  if (pathName.startsWith("/feed") || pathName.startsWith("/sitemap")) return next();
+  if (pathName === "/uploads" || pathName.startsWith("/uploads/")) return next();
+
+  // Webhooks externes: ils doivent être protégés par leur propre signature/secret.
+  if (
+    pathName === "/telegram/webhook" ||
+    pathName === "/api/payment/notify" ||
+    pathName === "/api/tiktok/callback"
+  ) return next();
+
+  // Routeurs montés séparément : on verrouille explicitement les opérations sensibles.
+  if (pathName === "/api/payment/create" || pathName === "/api/payment/notify") {
+    return next();
+  }
+
+  if (pathName === "/api/tiktok/callback") return next();
+  if (pathName === "/api/tiktok/connect" || pathName.startsWith("/api/tiktok/")) {
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName === "/api/orders" || pathName.startsWith("/api/orders/")) {
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName === "/messages" && method === "GET") {
+    if (req.query?.userId) return requireSelfOrAdmin("userId")(req, res, next);
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName.startsWith("/messages")) {
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName.startsWith("/products/") || pathName === "/products") {
+    if (method === "GET") return next();
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName.startsWith("/api/social")) {
+    if (method === "GET") return next();
+    return requireAdmin(req, res, next);
+  }
+
+  if (pathName === "/chat") {
+    return requireUserOrAdmin(req, res, next);
+  }
+
+  if (pathName === "/upload") {
+    return requireAdmin(req, res, next);
+  }
+
+  // Administration.
+  const adminPrefixes = [
+    "/admin",
+    "/add-product",
+    "/update-product/",
+    "/delete-product/",
+    "/order-delivered/",
+    "/orders/status/",
+    "/coupons/create-default",
+    "/coupons",
+    "/users",
+    "/api/users",
+    "/visitors",
+    "/api/visitors",
+    "/api/fix-images",
+    "/fix-images",
+    "/drivers",
+    "/api/social/upload-video",
+  ];
+  if (adminPrefixes.some((prefix) => pathName === prefix || pathName.startsWith(prefix))) {
+    return requireAdmin(req, res, next);
+  }
+
+  // Gestion d'une commande par l'administration.
+  if ((pathName === "/orders" && method === "GET") ||
+      (pathName.startsWith("/orders/") && method !== "POST")) {
+    return requireAdmin(req, res, next);
+  }
+
+  // Ressources utilisateur personnelles.
+  if (pathName.startsWith("/profile/")) {
+    return requireSelfOrAdmin("id")(req, res, next);
+  }
+
+  if (pathName.startsWith("/favorites/") ||
+      pathName.startsWith("/cart/") ||
+      pathName.startsWith("/my-orders/")) {
+    return requireSelfOrAdmin("userId")(req, res, next);
+  }
+
+  if (pathName.startsWith("/users/") || pathName.startsWith("/api/users/")) {
+    return requireSelfOrAdmin("id")(req, res, next);
+  }
+
+  // Routes livreur: identité du livreur vérifiée par JWT.
+  const driverPrefixes = [
+    "/driver-orders",
+    "/driver/my-orders/",
+    "/driver/",
+    "/driver-online/",
+  ];
+  if (pathName === "/driver-login" || pathName === "/driver-register") return next();
+
+  if (pathName.startsWith("/driver/my-orders/")) {
+    return requireDriverSelfOrAdmin("driverId")(req, res, next);
+  }
+
+  if (pathName.startsWith("/driver/") || pathName.startsWith("/driver-online/")) {
+    return requireDriverSelfOrAdmin("driverId")(req, res, next);
+  }
+
+  if (pathName === "/driver-orders") {
+    return requireDriverOrAdmin(req, res, next);
+  }
+
+  if (pathName.startsWith("/accept-order/") ||
+      pathName.startsWith("/order-location/") ||
+      pathName.startsWith("/driver-location/") ||
+      pathName.startsWith("/driver-deliver/") ||
+      pathName.startsWith("/driver-cancel/")) {
+    return requireDriverSelfOrAdmin("driverId")(req, res, next);
+  }
+
+  if (pathName.startsWith("/delete-order/")) {
+    return requireAdmin(req, res, next);
+  }
+
+  // Suivi d'une commande: authentification obligatoire.
+  if (pathName.startsWith("/order/")) {
+    return requireUserOrAdmin(req, res, next);
+  }
+
+  // Les avis peuvent être publiés par un visiteur (logique existante).
+  // La route recalcule toutefois l'identité client côté serveur lorsqu'un JWT est présent.
+  if (method === "POST" && /^\/product\/[^/]+\/review$/.test(pathName)) {
+    return next();
+  }
+
+  // Toute autre route d'écriture non explicitement publique doit être authentifiée.
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+    return requireUserOrAdmin(req, res, next);
+  }
+
+  return next();
+}
+
+app.use(securityGate);
+
+app.use("/api/payment", paymentRoutes);
 app.use("/api/community", communityRoutes);
 
 const cloudinary =
@@ -687,6 +990,40 @@ const {
   "multer-storage-cloudinary"
 );
 
+// ======================================================
+// 🔐 PROTECTION DES UPLOADS IMAGES
+// ======================================================
+
+const IMAGE_UPLOAD_MAX_SIZE = 5 * 1024 * 1024; // 5 Mo
+
+function imageFileFilter(req, file, cb) {
+
+  const allowedMimeTypes = new Set([
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ]);
+
+  const allowedExtensions = new Set([
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".webp",
+  ]);
+
+  const extension =
+    path.extname(String(file.originalname || "")).toLowerCase();
+
+  if (
+    !allowedMimeTypes.has(String(file.mimetype || "").toLowerCase()) ||
+    !allowedExtensions.has(extension)
+  ) {
+    return cb(new Error("Type de fichier image non autorisé."));
+  }
+
+  return cb(null, true);
+}
+
 const storage =
 new CloudinaryStorage({
 
@@ -709,7 +1046,13 @@ new CloudinaryStorage({
 });
 
 const upload =
-multer({ storage });
+multer({
+  storage,
+  limits: {
+    fileSize: IMAGE_UPLOAD_MAX_SIZE,
+  },
+  fileFilter: imageFileFilter,
+});
 
 // ======================================================
 // 🎬 STOCKAGE VIDÉOS — RÉSEAUX SOCIAUX
@@ -738,6 +1081,33 @@ const videoStorage =
 
   });
 
+function videoFileFilter(req, file, cb) {
+
+  const allowedMimeTypes = new Set([
+    "video/mp4",
+    "video/quicktime",
+    "video/webm",
+  ]);
+
+  const allowedExtensions = new Set([
+    ".mp4",
+    ".mov",
+    ".webm",
+  ]);
+
+  const extension =
+    path.extname(String(file.originalname || "")).toLowerCase();
+
+  if (
+    !allowedMimeTypes.has(String(file.mimetype || "").toLowerCase()) ||
+    !allowedExtensions.has(extension)
+  ) {
+    return cb(new Error("Type de vidéo non autorisé."));
+  }
+
+  return cb(null, true);
+}
+
 const uploadSocialVideo =
   multer({
 
@@ -746,10 +1116,14 @@ const uploadSocialVideo =
 
     limits: {
 
+      // 100 Mo conservés pour ne pas réduire la fonctionnalité vidéo actuelle.
       fileSize:
         100 * 1024 * 1024,
 
     },
+
+    fileFilter:
+      videoFileFilter,
 
   });
 
@@ -780,6 +1154,13 @@ multer({
   storage:
     reviewStorage,
 
+  limits: {
+    fileSize: IMAGE_UPLOAD_MAX_SIZE,
+  },
+
+  fileFilter:
+    imageFileFilter,
+
 });
 
 const Tesseract =
@@ -790,14 +1171,11 @@ const Tesseract =
 // ==========================
 
 const ADMIN = {
-  email: "konanshoppingcameroun@gmail.com",
-
-  // Mot de passe crypté
-  // Mot de passe réel :
-  // konan123
-
-  password: "konan123",
+  email: process.env.ADMIN_EMAIL,
 };
+
+// Secrets et identifiants sensibles doivent uniquement venir du fichier .env.
+// Ne jamais les afficher dans les logs.
 
 // ==========================
 // HOME
@@ -813,63 +1191,53 @@ app.get("/", (req, res) => {
 // LOGIN ADMIN
 // ==========================
 
-app.post("/admin-login", async (req, res) => {
+app.post("/admin-login", rateLimit({ name: "admin-login", windowMs: 15 * 60 * 1000, max: 8 }), async (req, res) => {
 
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body || {};
 
-  // Vérification email
-  if (email !== ADMIN.email) {
-
-    return res.status(401).json({
-      message: "Email incorrect",
-    });
-
-  }
-
-  // Vérification mot de passe
-  if (password !== "konan123") {
-
-    return res.status(401).json({
-      message: "Mot de passe incorrect",
-    });
-
-  }
-
-  // Création token
-  const token = jwt.sign(
-    {
-      email: ADMIN.email,
-    },
-    "KONAN_SECRET_KEY",
-    {
-      expiresIn: "7d",
+    if (!email || !password || !ADMIN.email || !process.env.ADMIN_PASSWORD_HASH || !process.env.ADMIN_JWT_SECRET) {
+      return res.status(503).json({ message: "Configuration administrateur indisponible." });
     }
-  );
 
-  // Réponse
-  res.json({
+    if (String(email).trim().toLowerCase() !== String(ADMIN.email).trim().toLowerCase()) {
+      return res.status(401).json({ message: "Identifiants invalides." });
+    }
 
-  token,
+    const valid = await bcrypt.compare(String(password), process.env.ADMIN_PASSWORD_HASH);
+    if (!valid) {
+      return res.status(401).json({ message: "Identifiants invalides." });
+    }
 
-  message:
-    "Connexion réussie 🚀",
+    const token = jwt.sign(
+      {
+        sub: "admin",
+        email: ADMIN.email,
+        role: "admin",
+      },
+      process.env.ADMIN_JWT_SECRET,
+      {
+        expiresIn: process.env.ADMIN_JWT_EXPIRES_IN || "8h",
+        issuer: process.env.JWT_ISSUER || "konanshopping",
+        audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+        algorithm: "HS256",
+      }
+    );
 
-  user: {
-
-    _id: "admin",
-
-    name:
-      "Konan Admin",
-
-    email:
-      ADMIN.email,
-
-    role:
-      "admin",
-
-  },
-
-});
+    return res.json({
+      token,
+      message: "Connexion réussie 🚀",
+      user: {
+        _id: "admin",
+        name: "Konan Admin",
+        email: ADMIN.email,
+        role: "admin",
+      },
+    });
+  } catch (error) {
+    console.error("ADMIN LOGIN ERROR:", error.message);
+    return res.status(500).json({ message: "Erreur serveur." });
+  }
 
 });
 
@@ -877,8 +1245,15 @@ app.post("/admin-login", async (req, res) => {
 // 🤖 TELEGRAM — WEBHOOK LIVREURS
 // ======================================================
 
+const telegramWebhookLimiter = rateLimit({
+  name: "telegram-webhook",
+  windowMs: 60 * 1000,
+  max: 120,
+});
+
 app.post(
   "/telegram/webhook",
+  telegramWebhookLimiter,
   async (req, res) => {
 
     try {
@@ -954,11 +1329,17 @@ et générez un nouveau lien.
         // 🔍 RECHERCHER LE LIVREUR
         // ==============================================
 
+        const tokenHash =
+          crypto
+            .createHash("sha256")
+            .update(token, "utf8")
+            .digest("hex");
+
         const driver =
           await Driver.findOne({
 
             telegramConnectToken:
-              token,
+              tokenHash,
 
             telegramConnectExpires: {
               $gt: new Date()
@@ -1136,6 +1517,7 @@ Pour connecter votre compte :
 
 app.get(
   "/telegram/setup-webhook",
+  requireAdmin,
   async (req, res) => {
 
     try {
@@ -1195,8 +1577,7 @@ app.get(
           "Impossible de configurer le webhook Telegram",
 
         error:
-          err.response?.data ||
-          err.message,
+          "Erreur serveur.",
 
       });
 
@@ -1211,6 +1592,7 @@ app.get(
 
 app.get(
   "/telegram/webhook-info",
+  requireAdmin,
   async (req, res) => {
 
     try {
@@ -1242,8 +1624,7 @@ app.get(
         success: false,
 
         error:
-          err.response?.data ||
-          err.message,
+          "Erreur serveur.",
 
       });
 
@@ -1277,7 +1658,7 @@ app.get("/admin", (req, res) => {
     // Vérification token
     const verified = jwt.verify(
       token,
-      "KONAN_SECRET_KEY"
+      process.env.ADMIN_JWT_SECRET
     );
 
     res.json({
@@ -1295,8 +1676,21 @@ app.get("/admin", (req, res) => {
 
 });
 
+const passwordResetRequestLimiter = rateLimit({
+  name: "forgot-password",
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+});
+
+const passwordResetLimiter = rateLimit({
+  name: "reset-password",
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+});
+
 app.post(
   "/forgot-password",
+  passwordResetRequestLimiter,
   async (req, res) => {
 
     const { email } = req.body;
@@ -1307,12 +1701,9 @@ app.post(
       });
 
     if (!user) {
-
-      return res.status(404).json({
-        message:
-          "Aucun compte trouvé",
+      return res.json({
+        message: "Si cette adresse existe, un email de récupération sera envoyé.",
       });
-
     }
 
     const token =
@@ -1320,7 +1711,10 @@ app.post(
       .toString("hex");
 
     user.resetToken =
-      token;
+      crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
 
     user.resetTokenExpire =
       Date.now() +
@@ -1331,7 +1725,7 @@ app.post(
     // envoi email ici
 
 const resetUrl =
-`https://konanshopping-npgy.vercel.app/reset-password/${token}`;
+`${process.env.FRONTEND_URL || "https://konanshopping.com"}/reset-password/${token}`;
 
 await apiInstance.sendTransacEmail({
 
@@ -1402,6 +1796,7 @@ res.json({
 
 app.post(
   "/reset-password/:token",
+  passwordResetLimiter,
   async (req, res) => {
     try {
 
@@ -1411,9 +1806,15 @@ app.post(
       const { password } =
         req.body;
 
+      const hashedResetToken =
+        crypto
+          .createHash("sha256")
+          .update(token)
+          .digest("hex");
+
       const user =
         await User.findOne({
-          resetToken: token,
+          resetToken: hashedResetToken,
           resetTokenExpire: {
             $gt: Date.now(),
           },
@@ -1465,9 +1866,9 @@ const authToken = jwt.sign(
     id: user._id,
     isAdmin: user.isAdmin,
   },
-  "KONAN_SECRET",
+  process.env.JWT_SECRET,
   {
-    expiresIn: "30d",
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   }
 );
 
@@ -1706,7 +2107,7 @@ app.post(
 
         success: false,
 
-        message: err.message,
+        message: "Erreur serveur.",
 
       });
 
@@ -1801,7 +2202,7 @@ app.put(
           "Erreur lors de la modification du produit",
 
         error:
-          error.message,
+          "Erreur serveur.",
 
       });
 
@@ -1811,13 +2212,332 @@ app.put(
 );
 
 // AJOUTER COMMANDE
-app.post("/orders", async (req, res) => {
+// 🔐 SÉCURITÉ : limitation dédiée + validation des données reçues.
+// La commande invité reste possible : aucune authentification n'est imposée ici.
+const orderCreationLimiter = rateLimit({
+  name: "create-order",
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+});
+
+app.post("/orders", orderCreationLimiter, async (req, res) => {
 
   try {
 
     // ======================================================
-// 📦 CRÉER LA COMMANDE
-// ======================================================
+    // 🔐 VALIDATION SÉCURISÉE DE LA COMMANDE
+    // ======================================================
+
+    const body = req.body && typeof req.body === "object"
+      ? req.body
+      : {};
+
+    const itemsInput = Array.isArray(body.items)
+      ? body.items
+      : [];
+
+    if (itemsInput.length < 1 || itemsInput.length > 50) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Le panier est vide ou contient trop d'articles.",
+      });
+    }
+
+    const customerName = String(body.customerName || "").trim().slice(0, 120);
+    const phone = String(body.phone || "").trim().slice(0, 40);
+    const address = String(body.address || "").trim().slice(0, 300);
+    const city = String(body.city || "").trim().slice(0, 100);
+    const district = String(body.district || "").trim().slice(0, 120);
+
+    // 🔐 SÉCURITÉ FINANCIÈRE
+    // Les valeurs body.shipping et body.total viennent du navigateur.
+    // Elles peuvent donc être modifiées par un attaquant et ne sont JAMAIS
+    // utilisées comme source de vérité. Les montants seront recalculés
+    // ci-dessous exclusivement à partir des produits MongoDB + règles métier.
+    const clientShippingValue = Number(body.shipping);
+    const clientTotalValue = Number(body.total);
+
+    if (body.shipping !== undefined &&
+        (!Number.isFinite(clientShippingValue) || clientShippingValue < 0 || clientShippingValue > 1000000)) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Frais de livraison invalides.",
+      });
+    }
+
+    if (body.total !== undefined &&
+        (!Number.isFinite(clientTotalValue) || clientTotalValue < 0 || clientTotalValue > 1000000000)) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Montant de commande invalide.",
+      });
+    }
+
+    // 🔐 IDENTITÉ UTILISATEUR
+    // Le userId envoyé par le navigateur n'est jamais considéré comme une
+    // preuve d'identité. Pour une commande connectée, seul le JWT fait foi.
+    // Sans JWT, la commande reste une commande invitée et userId est ignoré.
+    let safeUserId = null;
+
+    if (req.user?.sub || req.user?.id) {
+      safeUserId = String(req.user.sub || req.user.id);
+    }
+
+    if (safeUserId && !mongoose.Types.ObjectId.isValid(String(safeUserId))) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Identifiant utilisateur invalide.",
+      });
+    }
+
+    if (safeUserId) {
+      const existingUser = await User.findById(safeUserId).select("_id").lean();
+
+      if (!existingUser) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Utilisateur introuvable.",
+        });
+      }
+    }
+
+    // 🔐 On recharge les produits depuis MongoDB afin qu'un client ne puisse
+    // pas modifier le prix, le nom ou l'image d'un produit dans sa requête.
+    const normalizedItems = [];
+
+    for (const item of itemsInput) {
+      const productId = String(item?._id || item?.productId || "").trim();
+      const quantity = Number(item?.quantity);
+
+      if (!mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Un produit du panier est invalide.",
+        });
+      }
+
+      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Quantité de produit invalide.",
+        });
+      }
+
+      const product = await Product.findById(productId)
+        .select("name price image")
+        .lean();
+
+      if (!product) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Un produit du panier n'existe plus.",
+        });
+      }
+
+      const serverPrice = Number(product.price);
+
+      if (!Number.isFinite(serverPrice) || serverPrice < 0) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Prix produit invalide.",
+        });
+      }
+
+      normalizedItems.push({
+        productId: product._id,
+        name: String(product.name || "Produit").slice(0, 200),
+        image: String(product.image || "").slice(0, 2000),
+        price: serverPrice,
+        quantity,
+      });
+    }
+
+    // ======================================================
+    // 🔐 RECALCUL SERVEUR DES MONTANTS
+    // ======================================================
+
+    // Sous-total basé uniquement sur les prix relus depuis MongoDB.
+    const subtotalValue = normalizedItems.reduce(
+      (sum, item) =>
+        sum + (Number(item.price) * Number(item.quantity)),
+      0
+    );
+
+    if (!Number.isFinite(subtotalValue) || subtotalValue < 0 || subtotalValue > 1000000000) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Sous-total invalide.",
+      });
+    }
+
+    // Même règle métier que Checkout.jsx : la livraison dépend du sous-total.
+    const calculatedShipping =
+      subtotalValue >= 50000 ? 0 :
+      city === "" ? 0 :
+      city === "Douala" ? 2000 :
+      city === "Yaoundé" ? 1500 :
+      city === "Bafoussam" ? 2500 :
+      3000;
+
+    // 🔐 Le coupon est recalculé côté serveur au moment de la commande.
+    // Ainsi, un attaquant ne peut pas modifier le montant envoyé par le frontend
+    // pour obtenir une réduction artificielle.
+    let calculatedDiscount = 0;
+    const normalizedCouponCode = String(body.couponCode || "").trim().toUpperCase().slice(0, 50);
+
+    if (normalizedCouponCode) {
+
+      // Un coupon est lié à un compte dans la logique actuelle.
+      if (!safeUserId) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Un compte est requis pour utiliser ce coupon.",
+        });
+      }
+
+      const coupon = await Coupon.findOne({
+        code: normalizedCouponCode,
+      }).lean();
+
+      if (!coupon) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Coupon invalide.",
+        });
+      }
+
+      if (!coupon.active) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Coupon désactivé.",
+        });
+      }
+
+      const couponUser = await User.findById(safeUserId)
+        .select("usedCoupons registerDate orders")
+        .lean();
+
+      if (!couponUser) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Utilisateur introuvable.",
+        });
+      }
+
+      const usedCoupons = Array.isArray(couponUser.usedCoupons)
+        ? couponUser.usedCoupons
+        : [];
+
+      if (usedCoupons.includes(coupon.code)) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Vous avez déjà utilisé ce coupon.",
+        });
+      }
+
+      const registerDate = new Date(couponUser.registerDate);
+      if (Number.isNaN(registerDate.getTime())) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Date d'inscription invalide.",
+        });
+      }
+
+      const expireDate = new Date(registerDate);
+      switch (coupon.code) {
+        case "LIVRAISON":
+          expireDate.setDate(expireDate.getDate() + 1);
+          break;
+        case "KONAN10":
+        case "WELCOME20":
+          expireDate.setDate(expireDate.getDate() + 7);
+          break;
+        case "VIP50":
+          expireDate.setDate(expireDate.getDate() + 30);
+          break;
+      }
+
+      if (new Date() > expireDate) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Coupon expiré.",
+        });
+      }
+
+      const usedCount = Number(coupon.usedCount || 0);
+      const maxUses = Number(coupon.maxUses || 0);
+      if (!Number.isFinite(usedCount) || usedCount < 0 ||
+          !Number.isFinite(maxUses) || maxUses < 0 ||
+          usedCount >= maxUses) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Coupon épuisé.",
+        });
+      }
+
+      const minPurchase = Number(coupon.minPurchase || 0);
+      if (!Number.isFinite(minPurchase) || minPurchase < 0 || subtotalValue < minPurchase) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: Number.isFinite(minPurchase) && minPurchase >= 0
+            ? `Minimum ${minPurchase} FCFA requis`
+            : "Configuration du coupon invalide",
+        });
+      }
+
+      const userOrders = Array.isArray(couponUser.orders)
+        ? couponUser.orders
+        : [];
+
+      if (coupon.code === "WELCOME20" && userOrders.length > 0) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Coupon réservé à la première commande.",
+        });
+      }
+
+      const discountValue = Number(coupon.discountValue);
+      if (!Number.isFinite(discountValue) || discountValue < 0) {
+        return res.status(400).json({
+          error: "Commande invalide.",
+          message: "Configuration du coupon invalide.",
+        });
+      }
+
+      if (coupon.discountType === "percent") {
+        if (discountValue > 100) {
+          return res.status(400).json({
+            error: "Commande invalide.",
+            message: "Configuration du coupon invalide.",
+          });
+        }
+        calculatedDiscount = subtotalValue * (discountValue / 100);
+      } else {
+        calculatedDiscount = discountValue;
+      }
+
+      calculatedDiscount = Math.min(
+        Math.max(calculatedDiscount, 0),
+        subtotalValue
+      );
+    }
+
+    // Même formule que le checkout actuel : sous-total + livraison - réduction.
+    const calculatedTotal = Math.max(
+      subtotalValue + calculatedShipping - calculatedDiscount,
+      0
+    );
+
+    if (!Number.isFinite(calculatedTotal) || calculatedTotal > 1000000000) {
+      return res.status(400).json({
+        error: "Commande invalide.",
+        message: "Montant final invalide.",
+      });
+    }
+
+    // ======================================================
+    // 📦 CRÉER LA COMMANDE
+    // ======================================================
 
 const order = new Order({
 
@@ -1825,23 +2545,18 @@ const order = new Order({
   // 👤 CLIENT
   // ====================================================
 
-  customerName:
-    req.body.customerName || "",
+  customerName,
 
   userId:
-    req.body.userId || null,
+    safeUserId,
 
-  phone:
-    req.body.phone || "",
+  phone,
 
-  address:
-    req.body.address || "",
+  address,
 
-  city:
-    req.body.city || "",
+  city,
 
-  district:
-    req.body.district || "",
+  district,
 
 
   // ====================================================
@@ -1849,9 +2564,7 @@ const order = new Order({
   // ====================================================
 
   shipping:
-    Number(
-      req.body.shipping || 0
-    ),
+    calculatedShipping,
 
 
   // ====================================================
@@ -1859,30 +2572,7 @@ const order = new Order({
   // ====================================================
 
   items:
-    (req.body.items || []).map(
-      (item) => ({
-
-        productId:
-          item._id || "",
-
-        name:
-          item.name || "",
-
-        image:
-          item.image || "",
-
-        price:
-          Number(
-            item.price || 0
-          ),
-
-        quantity:
-          Number(
-            item.quantity || 1
-          ),
-
-      })
-    ),
+    normalizedItems,
 
 
   // ====================================================
@@ -1890,9 +2580,7 @@ const order = new Order({
   // ====================================================
 
   total:
-    Number(
-      req.body.total || 0
-    ),
+    calculatedTotal,
 
 
   // ====================================================
@@ -1900,8 +2588,10 @@ const order = new Order({
   // ====================================================
 
   paymentMethod:
-    req.body.paymentMethod ||
-    "Paiement à la livraison",
+    String(
+      body.paymentMethod ||
+      "Paiement à la livraison"
+    ).slice(0, 80),
 
 
   // ====================================================
@@ -1912,16 +2602,16 @@ const order = new Order({
 
     lat:
       Number.isFinite(
-        Number(req.body.lat)
+        Number(body.lat)
       )
-        ? Number(req.body.lat)
+        ? Number(body.lat)
         : null,
 
     lng:
       Number.isFinite(
-        Number(req.body.lng)
+        Number(body.lng)
       )
-        ? Number(req.body.lng)
+        ? Number(body.lng)
         : null,
 
   },
@@ -2072,7 +2762,7 @@ notifyDriversNewOrder(order)
 // AJOUTER LA COMMANDE AU CLIENT
 // ===============================
 
-if (req.body.userId) {
+if (safeUserId) {
 
   const update = {
 
@@ -2088,12 +2778,12 @@ if (req.body.userId) {
   // SI UN COUPON A ÉTÉ UTILISÉ
   // ===============================
 
-  if (req.body.couponCode) {
+  if (normalizedCouponCode) {
 
     update.$addToSet = {
 
       usedCoupons:
-        req.body.couponCode.toUpperCase(),
+        normalizedCouponCode,
 
     };
 
@@ -2105,7 +2795,7 @@ if (req.body.userId) {
       {
 
         code:
-          req.body.couponCode.toUpperCase(),
+          normalizedCouponCode,
 
       },
 
@@ -2125,7 +2815,7 @@ if (req.body.userId) {
 
   await User.findByIdAndUpdate(
 
-    req.body.userId,
+    safeUserId,
 
     update
 
@@ -2143,21 +2833,21 @@ await sendTelegramMessage(`
 
 📋 Commande : ${orderRef}
 
-👤 Client : ${req.body.customerName}
+👤 Client : ${customerName}
 
-📞 ${req.body.phone}
+📞 ${phone}
 
-📍 ${req.body.address}
+📍 ${address}
 
-🏙️ ${req.body.city}
+🏙️ ${city}
 
-📌 ${req.body.district}
+📌 ${district}
 
 ━━━━━━━━━━━━━━━━━━
 
 📦 PRODUITS
 
-${(req.body.items || [])
+${(normalizedItems)
   .map(
     (p) =>
 
@@ -2172,16 +2862,16 @@ ${(req.body.items || [])
 ━━━━━━━━━━━━━━━━━━
 
 💳 Paiement :
-${req.body.paymentMethod || "À la livraison"}
+${body.paymentMethod || "À la livraison"}
 
 🚚 Livraison :
 ${Number(
-  req.body.shipping || 0
+  calculatedShipping
 ).toLocaleString()} FCFA
 
 💰 TOTAL :
 ${Number(
-  req.body.total || 0
+  calculatedTotal
 ).toLocaleString()} FCFA
 
 ━━━━━━━━━━━━━━━━━━
@@ -2261,33 +2951,33 @@ for (const item of order.items) {
 
 👤 CLIENT
 
-${req.body.customerName}
+${customerName}
 
 📞 Téléphone
 
-${req.body.phone}
+${phone}
 
 📍 Adresse
 
-${req.body.address}
+${address}
 
 🏙️ Ville
 
-${req.body.city}
+${city}
 
 📌 Quartier
 
-${req.body.district}
+${district}
 
 💳 Paiement
 
-${req.body.paymentMethod || "Paiement à la livraison"}
+${body.paymentMethod || "Paiement à la livraison"}
 
 ━━━━━━━━━━━━━━━━━━━━
 
 📦 PRODUITS COMMANDÉS
 
-${(req.body.items || [])
+${(normalizedItems)
   .map(
     (p) =>
 
@@ -2306,7 +2996,7 @@ ${(req.body.items || [])
 📊 RÉSUMÉ
 
 🛒 Articles :
-${(req.body.items || []).reduce(
+${(normalizedItems).reduce(
   (total, item) =>
     total + item.quantity,
   0
@@ -2314,12 +3004,12 @@ ${(req.body.items || []).reduce(
 
 🚚 Livraison :
 ${Number(
-  req.body.shipping || 0
+  calculatedShipping
 ).toLocaleString()} FCFA
 
 💰 TOTAL :
 ${Number(
-  req.body.total || 0
+  calculatedTotal
 ).toLocaleString()} FCFA
 
 ━━━━━━━━━━━━━━━━━━━━
@@ -2345,10 +3035,10 @@ ${Number(
 `;
 
       await axios.post(
-        "https://api.ultramsg.com/instance174320/messages/chat",
+        `${process.env.ULTRAMSG_BASE_URL || "https://api.ultramsg.com/instance174320"}/messages/chat`,
         {
           token:
-            "tjsbbnge72azvqj1",
+            process.env.ULTRAMSG_TOKEN,
 
           to:
             "237694641329",
@@ -2366,10 +3056,10 @@ ${Number(
   if (item.image) {
 
     await axios.post(
-      "https://api.ultramsg.com/instance174320/messages/image",
+      `${process.env.ULTRAMSG_BASE_URL || "https://api.ultramsg.com/instance174320"}/messages/image`,
       {
         token:
-          "tjsbbnge72azvqj1",
+          process.env.ULTRAMSG_TOKEN,
 
         to:
           "237694641329",
@@ -2567,9 +3257,9 @@ KONAN SHOPPING CAMEROUN
 `;
 
 await axios.post(
-  "https://api.ultramsg.com/instance174320/messages/chat",
+  `${process.env.ULTRAMSG_BASE_URL || "https://api.ultramsg.com/instance174320"}/messages/chat`,
   {
-    token: "tjsbbnge72azvqj1",
+    token: process.env.ULTRAMSG_TOKEN,
     to: updatedOrder.phone,
     body: message
   }
@@ -2589,8 +3279,17 @@ await axios.post(
 
 });
 
+const registerRateLimiter = rateLimit({
+  name: "register",
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.post(
   "/register",
+  registerRateLimiter,
 
   async (req, res) => {
 
@@ -2660,11 +3359,14 @@ const token = jwt.sign(
 
   },
 
-  "KONAN_SECRET",
+  process.env.JWT_SECRET,
 
   {
 
-    expiresIn: "365d",
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    issuer: process.env.JWT_ISSUER || "konanshopping",
+    audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+    algorithm: "HS256",
 
   }
 
@@ -2715,8 +3417,17 @@ res.json({
   }
 );
 
+const loginRateLimiter = rateLimit({
+  name: "login",
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.post(
   "/login",
+  loginRateLimiter,
 
   async (req, res) => {
 
@@ -2785,10 +3496,13 @@ if (!user.registerDate) {
 
     },
 
-    "KONAN_SECRET",
+    process.env.JWT_SECRET,
 
     {
-      expiresIn: "365d",
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+      issuer: process.env.JWT_ISSUER || "konanshopping",
+      audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+      algorithm: "HS256",
     }
   );
 
@@ -2836,9 +3550,15 @@ if (!user.registerDate) {
   }
 );
 
-app.post("/ai-chat", async (req, res) => {
+const aiChatRateLimiter = rateLimit({
+  name: "ai-chat",
+  windowMs: 10 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-console.log(req.body);
+app.post("/ai-chat", aiChatRateLimiter, async (req, res) => {
 
   try {
 
@@ -2847,10 +3567,23 @@ console.log(req.body);
   history = []
 } = req.body;
 
-console.log(
-  "Historique :",
-  history
-);
+    if (typeof message !== "string" || message.length === 0 || message.length > 2000) {
+      return res.status(400).json({ error: "Message invalide." });
+    }
+
+    if (!Array.isArray(history) || history.length > 40) {
+      return res.status(400).json({ error: "Historique invalide." });
+    }
+
+    const safeHistory = history.map((item) => {
+      if (!item || typeof item !== "object") return {};
+
+      return {
+        role: typeof item.role === "string" ? item.role.slice(0, 20) : "",
+        text: typeof item.text === "string" ? item.text.slice(0, 2000) : "",
+        products: Array.isArray(item.products) ? item.products.slice(0, 12) : [],
+      };
+    });
 
     const search =
       message.toLowerCase();
@@ -2873,7 +3606,7 @@ search.includes("top");
 
       const lastUserMessage =
 
-history
+safeHistory
 
 .filter(
 msg => msg.role === "user"
@@ -2881,14 +3614,9 @@ msg => msg.role === "user"
 
 .slice(-1)[0]?.text || "";
 
-console.log(
-"Dernier message :",
-lastUserMessage
-);
-
 const previousSearch =
 
-history
+safeHistory
 
 .filter(
 msg => msg.role === "user"
@@ -2898,7 +3626,7 @@ msg => msg.role === "user"
 
 const previousProducts =
 
-history
+safeHistory
 
 .filter(
 msg =>
@@ -3423,23 +4151,112 @@ app.put("/profile/:id", async (req, res) => {
 
   try {
 
+    // ======================================================
+    // 🔐 PROTECTION PROFIL — WHITELIST
+    // Le client ne peut modifier que les champs de profil
+    // autorisés. Les champs sensibles sont ignorés.
+    // ======================================================
+
+    const allowedFields = [
+      "name",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "district",
+      "avatar",
+    ];
+
+    const profileUpdate = {};
+
+    for (const field of allowedFields) {
+
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, field)) {
+
+        const value = req.body[field];
+
+        if (typeof value !== "string") {
+          return res.status(400).json({
+            error: `Le champ ${field} doit être une chaîne de caractères`,
+          });
+        }
+
+        if (value.length > 500) {
+          return res.status(400).json({
+            error: `Le champ ${field} est trop long`,
+          });
+        }
+
+        profileUpdate[field] = value.trim();
+      }
+    }
+
+    if (Object.keys(profileUpdate).length === 0) {
+      return res.status(400).json({
+        error: "Aucune donnée de profil autorisée à modifier",
+      });
+    }
+
+    // Validation email uniquement lorsqu'il est modifié.
+    if (Object.prototype.hasOwnProperty.call(profileUpdate, "email")) {
+      const email = profileUpdate.email.toLowerCase();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!emailOk) {
+        return res.status(400).json({
+          error: "Adresse email invalide",
+        });
+      }
+
+      profileUpdate.email = email;
+    }
+
     const updatedUser =
       await User.findByIdAndUpdate(
 
         req.params.id,
 
-        req.body,
+        { $set: profileUpdate },
 
         {
           new: true,
+          runValidators: true,
         }
       );
 
-    res.json(updatedUser);
+    if (!updatedUser) {
+      return res.status(404).json({
+        error: "Utilisateur introuvable",
+      });
+    }
+
+    // 🔒 Ne jamais renvoyer le mot de passe au navigateur.
+    const safeUser = updatedUser.toObject
+      ? updatedUser.toObject()
+      : { ...updatedUser };
+
+    delete safeUser.password;
+    delete safeUser.resetToken;
+    delete safeUser.resetPasswordToken;
+
+    res.json(safeUser);
 
   }
 
   catch (error) {
+
+    // Ne pas exposer les détails internes de Mongo/Mongoose.
+    if (error?.name === "ValidationError") {
+      return res.status(400).json({
+        error: "Données de profil invalides",
+      });
+    }
+
+    if (error?.code === 11000) {
+      return res.status(409).json({
+        error: "Cette adresse email est déjà utilisée",
+      });
+    }
 
     res.status(500).json({
       error: "Erreur update",
@@ -3453,10 +4270,31 @@ app.post("/favorites", async (req, res) => {
 
   try {
 
-    const {
-      userId,
-      productId,
-    } = req.body;
+    const requestedUserId =
+      typeof req.body?.userId === "string"
+        ? req.body.userId.trim()
+        : "";
+
+    // Un client connecté ne peut jamais modifier les favoris d'un autre client.
+    // L'administrateur conserve la possibilité d'agir sur un userId fourni.
+    const userId =
+      req.admin?.role === "admin"
+        ? requestedUserId
+        : String(req.user?.sub || "").trim();
+
+    const { productId } = req.body;
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(401).json({
+        error: "Utilisateur non authentifié.",
+      });
+    }
+
+    if (!productId || !mongoose.isValidObjectId(String(productId))) {
+      return res.status(400).json({
+        error: "Produit invalide.",
+      });
+    }
 
     const user =
       await User.findById(userId);
@@ -3571,17 +4409,44 @@ app.post("/cart", async (req, res) => {
 
   try {
 
-    const {
-      userId,
-      productId,
-      quantity
-    } = req.body;
+    const requestedUserId =
+      typeof req.body?.userId === "string"
+        ? req.body.userId.trim()
+        : "";
+
+    // Un client connecté ne peut jamais enregistrer un panier sous l'identité d'un autre.
+    // L'administrateur conserve la logique existante d'intervention sur un userId.
+    const userId =
+      req.admin?.role === "admin"
+        ? requestedUserId
+        : String(req.user?.sub || "").trim();
+
+    const { productId, quantity } = req.body;
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return res.status(401).json({
+        error: "Utilisateur non authentifié.",
+      });
+    }
+
+    if (!productId || !mongoose.isValidObjectId(String(productId))) {
+      return res.status(400).json({
+        error: "Produit invalide.",
+      });
+    }
+
+    const safeQuantity = Number(quantity);
+    if (!Number.isInteger(safeQuantity) || safeQuantity < 1 || safeQuantity > 100) {
+      return res.status(400).json({
+        error: "Quantité invalide.",
+      });
+    }
 
     const newCart = new Cart({
 
       userId,
       productId,
-      quantity,
+      quantity: safeQuantity,
 
     });
 
@@ -3642,11 +4507,29 @@ app.get(
   }
 );
 
-app.post("/chat", async (req, res) => {
+const chatRateLimiter = rateLimit({
+  name: "chat",
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.post("/chat", chatRateLimiter, async (req, res) => {
 
   try {
 
-    const chat = new Chat(req.body);
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const safeBody = { ...body };
+
+    // Un client connecté ne peut pas envoyer un message sous l'identité d'un autre.
+    if (req.user?.sub) {
+      safeBody.userId = String(req.user.sub);
+      if (safeBody.clientId) safeBody.clientId = String(req.user.sub);
+      if (req.user.email) safeBody.email = String(req.user.email);
+    }
+
+    const chat = new Chat(safeBody);
 
     await chat.save();
 
@@ -3670,8 +4553,19 @@ app.get("/chat", async (req, res) => {
 
   try {
 
-    const messages =
-      await Chat.find();
+    let messages;
+
+    if (req.admin) {
+      messages = await Chat.find();
+    } else if (req.user?.sub) {
+      const userId = String(req.user.sub);
+      const email = String(req.user.email || "");
+      const filters = [{ userId }, { clientId: userId }];
+      if (email) filters.push({ email });
+      messages = await Chat.find({ $or: filters });
+    } else {
+      return res.status(401).json({ error: "Authentification requise." });
+    }
 
     res.json(messages);
 
@@ -3756,8 +4650,21 @@ app.post(
 
       let hasPurchased = null;
 
+      const authenticatedClientId =
+        req.user?.sub && mongoose.Types.ObjectId.isValid(String(req.user.sub))
+          ? String(req.user.sub)
+          : null;
+
+      const requestedClientId =
+        typeof req.body.clientId === "string"
+          ? req.body.clientId.trim().slice(0, 100)
+          : "";
+
+      // JWT prioritaire. Les visiteurs gardent leur identifiant guest pour préserver
+      // la possibilité de laisser un avis sans compte.
       const clientId =
-        req.body.clientId;
+        authenticatedClientId ||
+        (requestedClientId.startsWith("guest_") ? requestedClientId : `guest_${crypto.randomBytes(12).toString("hex")}`);
 
 
       // ==================================================
@@ -3790,41 +4697,6 @@ app.post(
           });
 
       }
-
-
-      // ==================================================
-      // 🧪 DEBUG
-      // ==================================================
-
-      console.log(
-        "=========================================="
-      );
-
-      console.log(
-        "⭐ AJOUT AVIS"
-      );
-
-      console.log(
-        "CLIENT ID :",
-        clientId
-      );
-
-      console.log(
-        "TYPE :",
-        String(clientId || "")
-          .startsWith("guest_")
-          ? "VISITEUR"
-          : "CLIENT"
-      );
-
-      console.log(
-        "ACHAT TROUVÉ :",
-        !!hasPurchased
-      );
-
-      console.log(
-        "=========================================="
-      );
 
 
       // ==================================================
@@ -3862,26 +4734,6 @@ app.post(
 
 
       // ==================================================
-      // 🧪 DEBUG REVIEW
-      // ==================================================
-
-      console.log(
-        "BODY =",
-        req.body
-      );
-
-      console.log(
-        "FILES =",
-        req.files
-      );
-
-      console.log(
-        "REVIEW =",
-        review
-      );
-
-
-      // ==================================================
       // 💾 AJOUTER L'AVIS AU PRODUIT
       // ==================================================
 
@@ -3916,7 +4768,7 @@ app.post(
           "Erreur serveur",
 
         error:
-          err.message,
+          "Erreur serveur.",
 
       });
 
@@ -4033,8 +4885,14 @@ app.delete("/coupons/:id", async (req, res) => {
 
 // ==========================
 // ==========================
-// VERIFIER COUPON
+// 🔐 VERIFIER COUPON — VERSION SÉCURISÉE
 // ==========================
+
+const couponCheckLimiter = rateLimit({
+  name: "apply-coupon",
+  windowMs: 10 * 60 * 1000,
+  max: 20,
+});
 
 console.log("Je suis juste avant apply-coupon");
 
@@ -4042,41 +4900,83 @@ app.post(
 
   "/apply-coupon",
 
+  couponCheckLimiter,
+
+  // Le système de coupon original exige déjà un compte utilisateur.
+  // On conserve donc cette logique, mais l'identité est maintenant
+  // vérifiée par le JWT au lieu de faire confiance au userId envoyé.
+  requireSelfOrAdmin("userId"),
+
   async (req, res) => {
-
-    console.log("BODY =", req.body);
-
-    console.log("ROUTE APPLY COUPON CHARGÉE");
 
     try {
 
-      const {
+      const body = req.body && typeof req.body === "object"
+        ? req.body
+        : {};
 
-        code,
+      const rawCode =
+        typeof body.code === "string"
+          ? body.code.trim().toUpperCase()
+          : "";
 
-        total,
+      const rawTotal = Number(body.total);
+      const userId =
+        typeof body.userId === "string"
+          ? body.userId.trim()
+          : body.userId;
 
-        userId,
+      // =====================
+      // VALIDATION ENTRÉE
+      // =====================
 
-      } = req.body;
+      if (!rawCode || rawCode.length > 50) {
+
+        return res.status(400).json({
+
+          message:
+            "Code coupon invalide",
+
+        });
+
+      }
+
+      if (
+        !Number.isFinite(rawTotal) ||
+        rawTotal < 0 ||
+        rawTotal > 1000000000
+      ) {
+
+        return res.status(400).json({
+
+          message:
+            "Montant invalide",
+
+        });
+
+      }
+
+      if (!userId || !mongoose.isValidObjectId(userId)) {
+
+        return res.status(400).json({
+
+          message:
+            "Utilisateur invalide",
+
+        });
+
+      }
 
       // =====================
       // RECHERCHE COUPON
       // =====================
 
-const coupons = await Coupon.find();
-
-console.log("Tous les coupons :", coupons);
-
       const coupon =
         await Coupon.findOne({
 
-          code:
-            code.toUpperCase(),
+          code: rawCode,
 
-        });
-
-        console.log("Coupon trouvé :", coupon);
+        }).lean();
 
       if (!coupon) {
 
@@ -4089,16 +4989,14 @@ console.log("Tous les coupons :", coupons);
 
       }
 
-
       // =====================
       // RECHERCHE UTILISATEUR
       // =====================
 
-      console.log("userId =", userId);
-console.log("Type =", typeof userId);
-console.log("Je vais chercher l'utilisateur");
       const user =
-        await User.findById(userId);
+        await User.findById(userId).select(
+          "usedCoupons registerDate orders"
+        );
 
       if (!user) {
 
@@ -4115,8 +5013,13 @@ console.log("Je vais chercher l'utilisateur");
       // COUPON DÉJÀ UTILISÉ
       // =====================
 
+      const usedCoupons =
+        Array.isArray(user.usedCoupons)
+          ? user.usedCoupons
+          : [];
+
       if (
-        user.usedCoupons.includes(
+        usedCoupons.includes(
           coupon.code
         )
       ) {
@@ -4150,8 +5053,22 @@ console.log("Je vais chercher l'utilisateur");
       // DATE D'INSCRIPTION
       // =====================
 
-      let expireDate =
+      const registerDate =
         new Date(user.registerDate);
+
+      if (Number.isNaN(registerDate.getTime())) {
+
+        return res.status(400).json({
+
+          message:
+            "Date d'inscription invalide",
+
+        });
+
+      }
+
+      let expireDate =
+        new Date(registerDate);
 
       switch (coupon.code) {
 
@@ -4206,9 +5123,18 @@ console.log("Je vais chercher l'utilisateur");
       // LIMITE GLOBALE
       // =====================
 
+      const usedCount =
+        Number(coupon.usedCount || 0);
+
+      const maxUses =
+        Number(coupon.maxUses || 0);
+
       if (
-        coupon.usedCount >=
-        coupon.maxUses
+        !Number.isFinite(usedCount) ||
+        usedCount < 0 ||
+        !Number.isFinite(maxUses) ||
+        maxUses < 0 ||
+        usedCount >= maxUses
       ) {
 
         return res.status(400).json({
@@ -4224,15 +5150,32 @@ console.log("Je vais chercher l'utilisateur");
       // ACHAT MINIMUM
       // =====================
 
+      const minPurchase =
+        Number(coupon.minPurchase || 0);
+
       if (
-        total <
-        coupon.minPurchase
+        !Number.isFinite(minPurchase) ||
+        minPurchase < 0
       ) {
 
         return res.status(400).json({
 
           message:
-            `Minimum ${coupon.minPurchase} FCFA requis`,
+            "Configuration du coupon invalide",
+
+        });
+
+      }
+
+      if (
+        rawTotal <
+        minPurchase
+      ) {
+
+        return res.status(400).json({
+
+          message:
+            `Minimum ${minPurchase} FCFA requis`,
 
         });
 
@@ -4243,16 +5186,42 @@ console.log("Je vais chercher l'utilisateur");
       // (WELCOME20)
       // =====================
 
+      const orders =
+        Array.isArray(user.orders)
+          ? user.orders
+          : [];
+
       if (
         coupon.code ===
           "WELCOME20" &&
-        user.orders.length > 0
+        orders.length > 0
       ) {
 
         return res.status(400).json({
 
           message:
             "Coupon réservé à la première commande",
+
+        });
+
+      }
+
+      // =====================
+      // VALIDATION CONFIGURATION
+      // =====================
+
+      const discountValue =
+        Number(coupon.discountValue);
+
+      if (
+        !Number.isFinite(discountValue) ||
+        discountValue < 0
+      ) {
+
+        return res.status(400).json({
+
+          message:
+            "Configuration du coupon invalide",
 
         });
 
@@ -4269,10 +5238,21 @@ console.log("Je vais chercher l'utilisateur");
         "percent"
       ) {
 
+        if (discountValue > 100) {
+
+          return res.status(400).json({
+
+            message:
+              "Configuration du coupon invalide",
+
+          });
+
+        }
+
         discount =
-          total *
+          rawTotal *
           (
-            coupon.discountValue /
+            discountValue /
             100
           );
 
@@ -4281,23 +5261,46 @@ console.log("Je vais chercher l'utilisateur");
       else {
 
         discount =
-          coupon.discountValue;
+          discountValue;
 
       }
 
-      res.json({
+      // Un coupon ne peut jamais produire un total négatif.
+      discount = Math.min(
+        Math.max(discount, 0),
+        rawTotal
+      );
+
+      const finalTotal =
+        Math.max(
+          rawTotal - discount,
+          0
+        );
+
+      // =====================
+      // RÉPONSE SÉCURISÉE
+      // =====================
+
+      // On ne renvoie pas le document Mongoose complet.
+      // Seules les informations nécessaires au checkout sont exposées.
+      const safeCoupon = {
+        _id: coupon._id,
+        code: coupon.code,
+        active: Boolean(coupon.active),
+        discountType: coupon.discountType,
+        discountValue,
+        minPurchase,
+      };
+
+      return res.json({
 
         success: true,
 
         discount,
 
-        finalTotal:
-          Math.max(
-            total - discount,
-            0
-          ),
+        finalTotal,
 
-        coupon,
+        coupon: safeCoupon,
 
       });
 
@@ -4305,9 +5308,12 @@ console.log("Je vais chercher l'utilisateur");
 
     catch (err) {
 
-      console.log(err);
+      console.error(
+        "❌ APPLY COUPON ERROR:",
+        err?.message || "Erreur inconnue"
+      );
 
-      res.status(500).json({
+      return res.status(500).json({
 
         error:
           "Erreur serveur",
@@ -4339,18 +5345,39 @@ app.use(
   tiktokRoutes
 );
 
-app.get("/ai/search", async (req, res) => {
+const aiSearchRateLimiter = rateLimit({
+  name: "ai-search",
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+app.get("/ai/search", aiSearchRateLimiter, async (req, res) => {
 
   try {
 
-    const query = req.query.q;
+    const rawQuery =
+      typeof req.query.q === "string"
+        ? req.query.q.trim().slice(0, 100)
+        : "";
+
+    if (!rawQuery) {
+      return res.json([]);
+    }
+
+    const query = escapeRegex(rawQuery);
 
     const products = await Product.find({
       name: {
         $regex: query,
         $options: "i"
       }
-    });
+    }).limit(100);
 
     res.json(products);
 
@@ -4425,6 +5452,65 @@ app.get(
 
         });
 
+      }
+
+
+      // ==================================================
+      // 🔐 CONTRÔLE D'ACCÈS À LA COMMANDE
+      // Admin : accès complet
+      // Client : uniquement ses propres commandes
+      // Livreur : uniquement les commandes qui lui sont assignées
+      // ==================================================
+
+      const requesterId = String(
+        req.user?.sub ||
+        req.user?.id ||
+        ""
+      );
+
+      const isAdmin =
+        req.admin?.role === "admin" ||
+        String(req.admin?.sub || "") === "admin";
+
+      const authenticatedDriverId = String(
+        req.driver?.sub ||
+        req.driver?.id ||
+        ""
+      );
+
+      const isDriver =
+        req.driver?.role === "driver" ||
+        Boolean(authenticatedDriverId);
+
+      if (!isAdmin) {
+
+        if (isDriver) {
+
+          if (
+            !authenticatedDriverId ||
+            !order.assignedDriver?.id ||
+            String(order.assignedDriver.id) !==
+              authenticatedDriverId
+          ) {
+            return res.status(403).json({
+              success: false,
+              error: "Accès refusé à cette commande"
+            });
+          }
+
+        } else {
+
+          if (
+            !requesterId ||
+            !order.userId ||
+            String(order.userId) !== requesterId
+          ) {
+            return res.status(403).json({
+              success: false,
+              error: "Accès refusé à cette commande"
+            });
+          }
+        }
       }
 
 
@@ -4616,39 +5702,93 @@ app.get(
   }
 );
 
+// ======================================================
+// 🔐 SÉCURITÉ ACTIONS LIVREUR
+// ======================================================
+
+const driverActionLimiter = rateLimit({
+  name: "driver-action",
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+});
+
+const driverLocationLimiter = rateLimit({
+  name: "driver-location",
+  windowMs: 10 * 60 * 1000,
+  max: 600,
+});
+
 // =========================
 // DRIVER LOCATION
 // =========================
 
 app.put(
   "/driver-location/:id",
-
+  driverLocationLimiter,
   async (req, res) => {
 
     try {
 
       const {
+        driverId,
         lat,
         lng,
       } = req.body;
 
+      const authenticatedDriverId =
+        getAuthenticatedDriverId(req);
+
+      if (!driverId || !authenticatedDriverId || String(driverId) !== authenticatedDriverId) {
+        return res.status(403).json({
+          success: false,
+          message: "Accès livreur refusé.",
+        });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Identifiant de commande invalide.",
+        });
+      }
+
+      const coordinates =
+        validateDriverCoordinates(lat, lng);
+
+      if (!coordinates) {
+        return res.status(400).json({
+          success: false,
+          message: "Coordonnées GPS invalides.",
+        });
+      }
+
       const order =
-        await Order.findByIdAndUpdate(
-
-          req.params.id,
-
+        await Order.findOneAndUpdate(
           {
-            driverLocation: {
-              lat,
-              lng,
+            _id: req.params.id,
+            "assignedDriver.id": authenticatedDriverId,
+            status: "En livraison",
+          },
+          {
+            $set: {
+              driverLocation: {
+                lat: coordinates.latitude,
+                lng: coordinates.longitude,
+                updatedAt: new Date(),
+              },
             },
           },
-
           {
             new: true,
           }
-
         );
+
+      if (!order) {
+        return res.status(403).json({
+          success: false,
+          message: "Vous n'êtes pas le livreur assigné à cette commande.",
+        });
+      }
 
       res.json(order);
 
@@ -4667,35 +5807,66 @@ app.put(
 // DRIVER LOGIN
 // =========================
 
-app.post("/driver-login", async (req, res) => {
+app.post("/driver-login", rateLimit({ name: "driver-login", windowMs: 15 * 60 * 1000, max: 10 }), async (req, res) => {
 
-  const driver =
-    await Driver.findOne({
-      email: req.body.email,
+  try {
+    const driver = await Driver.findOne({ email: req.body.email });
+
+    if (!driver) {
+      return res.status(401).json({ message: "Identifiants invalides" });
+    }
+
+    let validPassword = false;
+    const storedPassword = String(driver.password || "");
+
+    if (/^\$2[aby]\$/.test(storedPassword)) {
+      validPassword = await bcrypt.compare(String(req.body.password || ""), storedPassword);
+    } else {
+      // Migration transparente des anciens mots de passe en clair.
+      validPassword = storedPassword === String(req.body.password || "");
+      if (validPassword) {
+        driver.password = await bcrypt.hash(String(req.body.password), 12);
+        await driver.save();
+      }
+    }
+
+    if (!validPassword) {
+      return res.status(401).json({ message: "Identifiants invalides" });
+    }
+
+    if (!process.env.DRIVER_JWT_SECRET) {
+      return res.status(503).json({ message: "Authentification livreur indisponible." });
+    }
+
+    const token = jwt.sign(
+      {
+        sub: String(driver._id),
+        id: String(driver._id),
+        role: "driver",
+        email: driver.email,
+      },
+      process.env.DRIVER_JWT_SECRET,
+      {
+        expiresIn: process.env.DRIVER_JWT_EXPIRES_IN || "12h",
+        issuer: process.env.JWT_ISSUER || "konanshopping",
+        audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+        algorithm: "HS256",
+      }
+    );
+
+    const safeDriver = driver.toObject();
+    delete safeDriver.password;
+    delete safeDriver.telegramToken;
+
+    return res.json({
+      ...safeDriver,
+      token,
     });
 
-  if (!driver) {
-
-    return res.status(401).json({
-      message:
-        "Livreur introuvable",
-    });
-
+  } catch (error) {
+    console.error("DRIVER LOGIN ERROR:", error.message);
+    return res.status(500).json({ message: "Erreur serveur." });
   }
-
-  if (
-    driver.password !==
-    req.body.password
-  ) {
-
-    return res.status(401).json({
-      message:
-        "Mot de passe incorrect",
-    });
-
-  }
-
-  res.json(driver);
 
 });
 
@@ -4813,11 +5984,21 @@ app.post(
           .toString("hex");
 
       // ==================================================
-      // 💾 ENREGISTRER LE TOKEN
+      // 🔐 HACHER LE TOKEN AVANT STOCKAGE
+      // ==================================================
+
+      const tokenHash =
+        crypto
+          .createHash("sha256")
+          .update(token, "utf8")
+          .digest("hex");
+
+      // ==================================================
+      // 💾 ENREGISTRER LE TOKEN HACHÉ
       // ==================================================
 
       driver.telegramConnectToken =
-        token;
+        tokenHash;
 
       driver.telegramConnectExpires =
         new Date(
@@ -4884,6 +6065,33 @@ app.post(
   }
 );
 
+
+function validateDriverCoordinates(lat, lng) {
+  const latitude = Number(lat);
+  const longitude = Number(lng);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    return null;
+  }
+
+  return { latitude, longitude };
+}
+
+function getAuthenticatedDriverId(req) {
+  return String(
+    req.driver?.sub ||
+    req.driver?.id ||
+    ""
+  );
+}
+
 // ======================================================
 // 🚚 ACCEPTER UNE COMMANDE
 // 🔒 PREMIER LIVREUR QUI CLIQUE = LIVREUR ASSIGNÉ
@@ -4891,6 +6099,7 @@ app.post(
 
 app.put(
   "/accept-order/:id",
+  driverActionLimiter,
   async (req, res) => {
 
     try {
@@ -4904,19 +6113,28 @@ app.put(
       // 🔐 VALIDATION
       // ==================================================
 
-      if (!driverId) {
+      const authenticatedDriverId =
+        getAuthenticatedDriverId(req);
 
-        return res.status(400).json({
+      if (!driverId || !authenticatedDriverId || String(driverId) !== authenticatedDriverId) {
+
+        return res.status(403).json({
 
           success: false,
 
           message:
-            "Livreur non identifié"
+            "Accès livreur refusé."
 
         });
 
       }
 
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Identifiant de commande invalide."
+        });
+      }
 
       // ==================================================
       // 👨‍🚚 RÉCUPÉRER LE VRAI LIVREUR
@@ -5224,7 +6442,7 @@ app.put(
           "Erreur serveur lors de l'acceptation",
 
         error:
-          err.message
+          "Erreur serveur."
 
       });
 
@@ -5358,7 +6576,7 @@ app.get(
           "Erreur récupération commandes",
 
         error:
-          err.message
+          "Erreur serveur."
 
       });
 
@@ -5567,7 +6785,7 @@ app.get(
           "Erreur récupération commandes du livreur",
 
         error:
-          err.message
+          "Erreur serveur."
 
       });
 
@@ -5590,6 +6808,12 @@ app.get("/drivers", async (req, res) => {
 
     const drivers =
       await Driver.find()
+        // 🔐 Ne jamais charger les secrets d'authentification
+        // du livreur pour cette réponse d'administration.
+        // La logique des statistiques et du suivi reste inchangée.
+        .select(
+          "-password -telegramConnectToken -telegramConnectExpires"
+        )
         .sort({
           createdAt: -1
         })
@@ -5987,7 +7211,7 @@ app.get(
           "Erreur récupération du trajet",
 
         error:
-          err.message
+          "Erreur serveur."
 
       });
 
@@ -6020,8 +7244,17 @@ app.delete("/drivers/:id", async (req, res) => {
 
 });
 
+const driverRegisterRateLimiter = rateLimit({
+  name: "driver-register",
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.post(
   "/driver-register",
+  driverRegisterRateLimiter,
   upload.single("photo"),
   async (req, res) => {
 
@@ -6064,7 +7297,7 @@ app.post(
             req.body.email,
 
           password:
-            req.body.password,
+            await bcrypt.hash(String(req.body.password || ""), 12),
 
           phone:
             req.body.phone,
@@ -6095,15 +7328,14 @@ app.post(
         photoUrl
       );
 
+      const safeDriver = driver.toObject();
+      delete safeDriver.password;
+      delete safeDriver.telegramToken;
+
       return res.status(201).json({
-
         success: true,
-
-        message:
-          "Compte livreur créé avec succès",
-
-        driver,
-
+        message: "Compte livreur créé avec succès",
+        driver: safeDriver,
       });
 
     } catch (err) {
@@ -6121,7 +7353,7 @@ app.post(
           "Erreur inscription livreur",
 
         error:
-          err.message,
+          "Erreur serveur.",
 
       });
 
@@ -6136,6 +7368,7 @@ app.post(
 
 app.put(
   "/order-location/:orderId",
+  driverLocationLimiter,
   async (req, res) => {
 
     try {
@@ -6146,12 +7379,15 @@ app.put(
         lng
       } = req.body;
 
+      const authenticatedDriverId =
+        getAuthenticatedDriverId(req);
+
 
       // ============================================
       // VALIDATION
       // ============================================
 
-      if (!driverId) {
+      if (!driverId || !authenticatedDriverId || String(driverId) !== authenticatedDriverId) {
 
         return res.status(400).json({
 
@@ -6182,21 +7418,21 @@ app.put(
       }
 
 
+      if (!mongoose.Types.ObjectId.isValid(req.params.orderId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Identifiant de commande invalide"
+        });
+      }
+
       // ============================================
       // 🔢 CONVERTIR LES COORDONNÉES
       // ============================================
 
-      const latitude =
-        Number(lat);
+      const coordinates =
+        validateDriverCoordinates(lat, lng);
 
-      const longitude =
-        Number(lng);
-
-
-      if (
-        !Number.isFinite(latitude) ||
-        !Number.isFinite(longitude)
-      ) {
+      if (!coordinates) {
 
         return res.status(400).json({
 
@@ -6231,7 +7467,7 @@ app.put(
               req.params.orderId,
 
             "assignedDriver.id":
-              driverId,
+              authenticatedDriverId,
 
             status:
               "En livraison"
@@ -6249,10 +7485,10 @@ app.put(
               driverLocation: {
 
                 lat:
-                  latitude,
+                  coordinates.latitude,
 
                 lng:
-                  longitude,
+                  coordinates.longitude,
 
                 updatedAt:
                   now
@@ -6294,7 +7530,7 @@ app.put(
 
       const driver =
         await Driver.findById(
-          driverId
+          authenticatedDriverId
         );
 
 
@@ -6571,6 +7807,7 @@ app.put(
 
 app.put(
   "/driver-deliver/:orderId",
+  driverActionLimiter,
   async (req, res) => {
 
     try {
@@ -6580,12 +7817,15 @@ app.put(
         deliveryQrToken
       } = req.body;
 
+      const authenticatedDriverId =
+        getAuthenticatedDriverId(req);
+
 
       // ==================================================
       // 🔐 VÉRIFIER LE LIVREUR
       // ==================================================
 
-      if (!driverId) {
+      if (!driverId || !authenticatedDriverId || String(driverId) !== authenticatedDriverId) {
 
         return res.status(400).json({
 
@@ -6610,7 +7850,7 @@ app.put(
             req.params.orderId,
 
           "assignedDriver.id":
-            driverId,
+            authenticatedDriverId,
 
           status:
             "En livraison"
@@ -6795,6 +8035,7 @@ app.put(
 
 app.put(
   "/driver-cancel/:orderId",
+  driverActionLimiter,
   async (req, res) => {
 
     try {
@@ -6803,12 +8044,15 @@ app.put(
         driverId
       } = req.body;
 
+      const authenticatedDriverId =
+        getAuthenticatedDriverId(req);
+
 
       // ================================================
       // VALIDATION
       // ================================================
 
-      if (!driverId) {
+      if (!driverId || !authenticatedDriverId || String(driverId) !== authenticatedDriverId) {
 
         return res.status(400).json({
 
@@ -6821,6 +8065,13 @@ app.put(
 
       }
 
+
+      if (!mongoose.Types.ObjectId.isValid(req.params.orderId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Identifiant de commande invalide."
+        });
+      }
 
       // ================================================
       // ANNULATION ATOMIQUE
@@ -6837,7 +8088,7 @@ app.put(
             // PEUT ANNULER
 
             "assignedDriver.id":
-              driverId,
+              authenticatedDriverId,
 
             // LA COMMANDE DOIT ÊTRE
             // EN LIVRAISON
@@ -6995,7 +8246,7 @@ app.delete(
 
     } catch (err) {
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7017,7 +8268,7 @@ app.get(
 
     }catch(err){
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7025,8 +8276,17 @@ app.get(
 
 // VISITORS
 
+const trackVisitorRateLimiter = rateLimit({
+  name: "track-visitor",
+  windowMs: 10 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.post(
   "/track-visitor",
+  trackVisitorRateLimiter,
 
   async(req,res)=>{
 
@@ -7084,7 +8344,7 @@ if(!existingVisitor){
 
     }catch(err){
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7103,7 +8363,7 @@ app.get(
 
     } catch (err) {
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7126,7 +8386,7 @@ app.get(
 
     }catch(err){
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7298,7 +8558,7 @@ app.post(
       }
 
       review.replies.push({
-        clientId: req.body.clientId,
+        clientId: req.user?.sub || (typeof req.body.clientId === "string" ? req.body.clientId.trim().slice(0, 100) : "guest"),
         name: req.body.name,
         comment: req.body.comment,
       });
@@ -7416,7 +8676,7 @@ app.put(
 
       console.log(err);
 
-      res.status(500).json(err);
+      res.status(500).json({ message: "Erreur serveur." });
 
     }
 
@@ -7444,10 +8704,9 @@ app.post(
         "🎬 UPLOAD VIDÉO SOCIAL"
       );
 
-      console.log(
-        "📁 FILE :",
-        req.file
-      );
+      // Ne jamais journaliser le contenu complet de req.file :
+      // cela peut exposer des métadonnées ou des chemins internes.
+      console.log("📁 FICHIER VIDÉO REÇU");
 
       if (!req.file) {
 
@@ -7518,7 +8777,7 @@ app.post(
           "Erreur lors de l'upload de la vidéo",
 
         error:
-          error.message,
+          "Erreur serveur.",
 
       });
 
@@ -7559,6 +8818,29 @@ app.get(
 
 let onlineUsers = 0;
 
+const socketMessageBuckets = new Map();
+
+function allowSocketEvent(socket, eventName, max = 20, windowMs = 10_000) {
+  const key = `${socket.authUserId}:${eventName}`;
+  const now = Date.now();
+  let bucket = socketMessageBuckets.get(key);
+
+  if (!bucket || now - bucket.start >= windowMs) {
+    bucket = { start: now, count: 0 };
+    socketMessageBuckets.set(key, bucket);
+  }
+
+  bucket.count += 1;
+  return bucket.count <= max;
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, bucket] of socketMessageBuckets.entries()) {
+    if (now - bucket.start > 60_000) socketMessageBuckets.delete(key);
+  }
+}, 30_000).unref();
+
 io.on("connection", (socket) => {
 
   console.log("🟢 Utilisateur connecté :", socket.id);
@@ -7569,21 +8851,65 @@ io.on("connection", (socket) => {
 
   socket.on("joinCommunity", (user) => {
 
-    socket.user = user;
+    if (!allowSocketEvent(socket, "joinCommunity", 5, 30_000)) return;
 
-    io.emit("userJoined", user);
+    // On conserve les informations d'affichage envoyées par le frontend,
+    // mais l'identité technique vient toujours du JWT vérifié.
+    const safeUser =
+      user && typeof user === "object"
+        ? { ...user }
+        : {};
+
+    safeUser.userId = socket.authUserId;
+    if (safeUser.id !== undefined) safeUser.id = socket.authUserId;
+    if (safeUser._id !== undefined) safeUser._id = socket.authUserId;
+
+    socket.user = safeUser;
+
+    io.emit("userJoined", safeUser);
 
   });
 
   socket.on("sendMessage", (message) => {
 
-    io.emit("newMessage", message);
+    // Anti-spam : maximum 20 messages / 10 secondes / utilisateur.
+    if (!allowSocketEvent(socket, "sendMessage", 20, 10_000)) {
+      return socket.emit("securityError", {
+        message: "Trop de messages. Réessayez dans quelques secondes.",
+      });
+    }
+
+    let safeMessage;
+
+    if (message && typeof message === "object") {
+      safeMessage = { ...message };
+    } else {
+      safeMessage = { text: String(message ?? "") };
+    }
+
+    // L'expéditeur ne peut plus être usurpé depuis le navigateur.
+    safeMessage.userId = socket.authUserId;
+    if (safeMessage.senderId !== undefined) safeMessage.senderId = socket.authUserId;
+    if (safeMessage.authorId !== undefined) safeMessage.authorId = socket.authUserId;
+
+    io.emit("newMessage", safeMessage);
 
   });
 
   socket.on("typing", (user) => {
 
-    socket.broadcast.emit("typing", user);
+    if (!allowSocketEvent(socket, "typing", 30, 10_000)) return;
+
+    const safeUser =
+      user && typeof user === "object"
+        ? { ...user }
+        : {};
+
+    safeUser.userId = socket.authUserId;
+    if (safeUser.id !== undefined) safeUser.id = socket.authUserId;
+    if (safeUser._id !== undefined) safeUser._id = socket.authUserId;
+
+    socket.broadcast.emit("typing", safeUser);
 
   });
 
@@ -7597,13 +8923,104 @@ io.on("connection", (socket) => {
 
     io.emit("onlineUsers", onlineUsers);
 
+    // Nettoyage des compteurs de cet utilisateur.
+    for (const key of socketMessageBuckets.keys()) {
+      if (key.startsWith(`${socket.authUserId}:`)) {
+        socketMessageBuckets.delete(key);
+      }
+    }
+
   });
 
+});
+
+// ======================================================
+// 🔐 RÉPONSES D'ERREUR GLOBALES
+// Ne jamais exposer les détails internes du serveur au client.
+// ======================================================
+
+app.use((req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Ressource introuvable.",
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error("❌ ERREUR SERVEUR INTERNE :", err);
+
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  return res.status(500).json({
+    success: false,
+    message: "Une erreur interne est survenue.",
+  });
+});
+
+// ======================================================
+// 🔐 ERREURS MULTER — ne jamais exposer les détails internes
+// ======================================================
+
+app.use((err, req, res, next) => {
+
+  if (err && err.name === "MulterError") {
+
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({
+        success: false,
+        message: "Fichier trop volumineux.",
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Fichier d'upload invalide.",
+    });
+  }
+
+  if (
+    err &&
+    (err.message === "Type de fichier image non autorisé." ||
+      err.message === "Type de vidéo non autorisé.")
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Erreur serveur.",
+    });
+  }
+
+  return next(err);
 });
 
 // =========================
 // START SERVER
 // =========================
+
+const requiredSecurityEnv = [
+  "MONGO_URI",
+  "JWT_SECRET",
+  "ADMIN_JWT_SECRET",
+  "DRIVER_JWT_SECRET",
+  "ADMIN_EMAIL",
+  "ADMIN_PASSWORD_HASH",
+  "ULTRAMSG_TOKEN",
+];
+
+for (const key of requiredSecurityEnv) {
+  if (!process.env[key]) {
+    console.error(`❌ Variable .env manquante: ${key}`);
+    process.exit(1);
+  }
+}
+
+for (const key of ["JWT_SECRET", "ADMIN_JWT_SECRET", "DRIVER_JWT_SECRET"]) {
+  if (String(process.env[key]).length < 32) {
+    console.error(`❌ Secret de sécurité trop court: ${key}`);
+    process.exit(1);
+  }
+}
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -7612,7 +9029,7 @@ mongoose
 
     console.log("MongoDB Atlas connecté ✅");
 console.log("Base utilisée :", mongoose.connection.name);
-console.log("URI :", process.env.MONGO_URI);
+console.log("Connexion MongoDB établie ✅");
 
     await Order.updateMany(
       {

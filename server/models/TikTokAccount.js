@@ -6,16 +6,22 @@ const TikTokAccountSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      trim: true,
+      maxlength: 255,
     },
 
+    // 🔐 Secret OAuth
     accessToken: {
       type: String,
       required: true,
+      select: false,
     },
 
+    // 🔐 Secret OAuth
     refreshToken: {
       type: String,
       required: true,
+      select: false,
     },
 
     accessTokenExpiresAt: {
@@ -31,21 +37,29 @@ const TikTokAccountSchema = new mongoose.Schema(
     scope: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 2000,
     },
 
     username: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 150,
     },
 
     displayName: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 250,
     },
 
     avatarUrl: {
       type: String,
       default: "",
+      trim: true,
+      maxlength: 2000,
     },
 
     connectedAt: {

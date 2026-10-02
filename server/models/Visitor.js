@@ -4,35 +4,62 @@ const mongoose =
 const visitorSchema =
   new mongoose.Schema({
 
-    ip:String,
-
-    country:String,
-
-    city:String,
-
-    device:String,
-
-    pagesVisited:{
-      type:Number,
-      default:1,
+    ip: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 100,
     },
 
-    online:{
-      type:Boolean,
-      default:true,
+    country: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 100,
     },
 
-    lastVisit:{
-      type:Date,
-      default:Date.now,
+    city: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 100,
     },
 
-    createdAt:{
-      type:Date,
-      default:Date.now,
+    device: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500,
     },
 
-});
+    pagesVisited: {
+      type: Number,
+      default: 1,
+      min: 0,
+
+      validate: {
+        validator: Number.isInteger,
+        message:
+          "pagesVisited doit être un nombre entier.",
+      },
+    },
+
+    online: {
+      type: Boolean,
+      default: true,
+    },
+
+    lastVisit: {
+      type: Date,
+      default: Date.now,
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+  });
 
 module.exports =
   mongoose.model(

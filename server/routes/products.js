@@ -1,778 +1,2368 @@
 const express = require("express");
 
-const multer =
-require("multer");
+const multer = require("multer");
 
-const axios =
-require("axios");
+const axios = require("axios");
 
-const router =
-express.Router();
+const mongoose = require("mongoose");
+
+
+
+const router = express.Router();
+
+
 
 const Product =
-require("../models/product");
+
+  require("../models/product");
+
+
+
+const Order =
+
+  require("../models/Order");
+
+const User =
+  require("../models/User");
+
+
 
 // ======================
-// CLOUDINARY
+
+// 🔐 SÉCURITÉ
+
 // ======================
 
-const cloudinary =
-require("cloudinary").v2;
+
 
 const {
-CloudinaryStorage,
-} = require(
-"multer-storage-cloudinary"
-);
+
+  rateLimit,
+
+} = require("../middleware/security");
+
+
+
+const productReadLimiter = rateLimit({
+
+  name: "products-read",
+
+  windowMs: 10 * 60 * 1000,
+
+  max: 300,
+
+});
+
+
+
+const reviewLimiter = rateLimit({
+
+  name: "reviews-write",
+
+  windowMs: 10 * 60 * 1000,
+
+  max: 30,
+
+});
+
+
+
+const aiSearchLimiter = rateLimit({
+
+  name: "products-ai-search",
+
+  windowMs: 10 * 60 * 1000,
+
+  max: 20,
+
+});
+
+
+
+const isValidId = (value) =>
+
+  typeof value === "string" &&
+
+  mongoose.isValidObjectId(value);
+
+
+
+const cleanText = (value, maxLength) => {
+
+  if (typeof value !== "string") return "";
+
+  return value.trim().slice(0, maxLength);
+
+};
+
+
+
+const escapeRegex = (value) =>
+
+  String(value).replace(
+
+    /[.*+?^${}()|[**\\]\\\**]/g,
+
+    "\\\\$&"
+
+  );
+
+
 
 // ======================
-// CONFIG CLOUDINARY
+
+// ☁️ CLOUDINARY
+
 // ======================
+
+
+
+const cloudinary =
+
+  require("cloudinary").v2;
+
+
 
 cloudinary.config({
 
-cloud_name:
-process.env.CLOUDINARY_CLOUD_NAME,
 
-api_key:
-process.env.CLOUDINARY_API_KEY,
 
-api_secret:
-process.env.CLOUDINARY_API_SECRET,
+  cloud_name:
+
+    process.env.CLOUDINARY_CLOUD_NAME,
+
+
+
+  api_key:
+
+    process.env.CLOUDINARY_API_KEY,
+
+
+
+  api_secret:
+
+    process.env.CLOUDINARY_API_SECRET,
+
+
 
 });
 
+
+
 // ======================
-// MULTER STORAGE
+
+// 📤 MULTER CLOUDINARY
+
 // ======================
+
+
 
 const storage =
-new CloudinaryStorage({
 
-cloudinary,
+  new (
 
-params: {
+    require("multer-storage-cloudinary")
 
-folder:
-"konanshopping",
+      .CloudinaryStorage
 
-allowed_formats: [
-"jpg",
-"png",
-"jpeg",
-"webp",
-],
+  )({
 
-},
 
-});
+
+    cloudinary,
+
+
+
+    params: {
+
+
+
+      folder:
+
+        "konanshopping",
+
+
+
+      allowed_formats: [
+
+        "jpg",
+
+        "png",
+
+        "jpeg",
+
+        "webp",
+
+      ],
+
+
+
+    },
+
+
+
+  });
+
+
 
 const upload =
-multer({ storage });
+
+  multer({
+
+
+
+    storage,
+
+
+
+    limits: {
+
+      fileSize:
+
+        5 * 1024 * 1024,
+
+
+
+      files: 5,
+
+    },
+
+
+
+    fileFilter:
+
+      (req, file, cb) => {
+
+
+
+        const allowedMimeTypes = [
+
+          "image/jpeg",
+
+          "image/png",
+
+          "image/webp",
+
+        ];
+
+
+
+        const allowedExtensions = [
+
+          ".jpg",
+
+          ".jpeg",
+
+          ".png",
+
+          ".webp",
+
+        ];
+
+
+
+        const originalName =
+
+          typeof file.originalname === "string"
+
+            ? file.originalname.toLowerCase()
+
+            : "";
+
+
+
+        const extension =
+
+          originalName.includes(".")
+
+            ? originalName.slice(
+
+                originalName.lastIndexOf(".")
+
+              )
+
+            : "";
+
+
+
+        if (
+
+          !allowedMimeTypes.includes(
+
+            file.mimetype
+
+          ) ||
+
+          !allowedExtensions.includes(
+
+            extension
+
+          )
+
+        ) {
+
+          return cb(
+
+            new Error(
+
+              "Type de fichier non autorisé"
+
+            )
+
+          );
+
+        }
+
+
+
+        cb(null, true);
+
+      },
+
+
+
+  });
+
+
 
 // ======================
-// TOUS LES PRODUITS
+
+// 🧹 MULTER ERREURS
+
 // ======================
+
+
+
+const handleUploadError = (
+
+  err,
+
+  req,
+
+  res,
+
+  next
+
+) => {
+
+
+
+  if (
+
+    err instanceof multer.MulterError
+
+  ) {
+
+
+
+    return res.status(400).json({
+
+      success: false,
+
+      message:
+
+        "Fichier invalide ou trop volumineux",
+
+    });
+
+  }
+
+
+
+  if (err) {
+
+
+
+    return res.status(400).json({
+
+      success: false,
+
+      message:
+
+        "Fichier non autorisé",
+
+    });
+
+  }
+
+
+
+  next();
+
+};
+
+
+
+// ======================
+
+// 🛍️ TOUS LES PRODUITS
+
+// PUBLIC
+
+// ======================
+
+
 
 router.get(
 
-"/",
+  "/",
 
-async(req,res)=>{
+  productReadLimiter,
 
-try{
+  async (req, res) => {
 
-const products =
-await Product.find();
 
-res.json(products);
 
-}
+    try {
 
-catch(err){
 
-console.log(err);
 
-res.status(500).json({
+      const products =
 
-error:
-"Erreur serveur",
+        await Product.find();
 
-});
 
-}
 
-}
+      return res.json(
 
-);
+        products
 
-router.get("/:id", async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
+      );
 
-    if (!product) {
-      return res.status(404).json({
-        message: "Produit introuvable",
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur produits:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        error:
+
+          "Erreur serveur",
+
       });
+
     }
 
-    res.json(product);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: "Erreur serveur",
-    });
   }
-});
+
+);
+
+
 
 // ======================
-// RECHERCHE NOM
+
+// 🛍️ PRODUIT PAR ID
+
+// PUBLIC
+
 // ======================
+
+
 
 router.get(
 
-"/search/:name",
+  "/:id",
 
-async(req,res)=>{
+  productReadLimiter,
 
-try{
+  async (req, res) => {
 
-const keyword =
-req.params.name;
 
-const products =
-await Product.find({
 
-$or:[
+    try {
 
-{
 
-name:{
 
-$regex: keyword,
+      const productId =
 
-$options:"i",
+        typeof req.params.id === "string"
 
-},
+          ? req.params.id.trim()
 
-},
+          : "";
 
-{
 
-category:{
 
-$regex: keyword,
+      if (
 
-$options:"i",
+        !isValidId(productId)
 
-},
+      ) {
 
-},
+        return res.status(400).json({
 
-{
+          message:
 
-description:{
+            "Produit invalide",
 
-$regex: keyword,
+        });
 
-$options:"i",
+      }
 
-},
 
-},
 
-],
+      const product =
 
-});
+        await Product.findById(
 
-res.json(products);
+          productId
 
-}
+        );
 
-catch(err){
 
-console.log(err);
 
-res.status(500).json({
+      if (!product) {
 
-error:
-"Erreur recherche",
+        return res.status(404).json({
 
-});
+          message:
 
-}
+            "Produit introuvable",
 
-}
+        });
+
+      }
+
+
+
+      return res.json(
+
+        product
+
+      );
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur produit:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        message:
+
+          "Erreur serveur",
+
+      });
+
+    }
+
+  }
 
 );
 
+
+
 // ======================
-// IA IMAGE SEARCH
+
+// 🔎 RECHERCHE NOM
+
+// PUBLIC
+
 // ======================
+
+
+
+router.get(
+
+  "/search/:name",
+
+  productReadLimiter,
+
+  async (req, res) => {
+
+
+
+    try {
+
+
+
+      const keyword =
+
+        cleanText(
+
+          req.params.name,
+
+          100
+
+        );
+
+
+
+      if (!keyword) {
+
+        return res.json([]);
+
+      }
+
+
+
+      const safeKeyword =
+
+        escapeRegex(keyword);
+
+
+
+      const products =
+
+        await Product.find({
+
+
+
+          $or: [
+
+
+
+            {
+
+              name: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+            {
+
+              category: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+            {
+
+              description: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+          ],
+
+
+
+        }).limit(100);
+
+
+
+      return res.json(
+
+        products
+
+      );
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur recherche produits:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        error:
+
+          "Erreur recherche",
+
+      });
+
+    }
+
+  }
+
+);
+
+
+
+// ======================
+
+// 🤖 IA IMAGE SEARCH
+
+// ======================
+
+
 
 router.post(
 
-"/ai-search",
+  "/ai-search",
 
-upload.single("image"),
+  aiSearchLimiter,
 
-async(req,res)=>{
+  upload.single("image"),
 
-try{
+  async (req, res, next) => {
 
-// ======================
-// IMAGE CLOUDINARY URL
-// ======================
 
-const image =
-req.file.path;
 
-// ======================
-// HUGGINGFACE API
-// ======================
+    try {
 
-const response =
-await axios.post(
 
-"https://router.huggingface.co/hf-inference/models/google/vit-base-patch16-224",
 
-{
-inputs: image,
-},
+      if (
 
-{
+        !req.file ||
 
-headers:{
+        !req.file.path
 
-Authorization:
-`Bearer ${process.env.HF_TOKEN}`,
+      ) {
 
-},
+        return res.status(400).json({
 
-}
+          success: false,
+
+          error:
+
+            "Image obligatoire",
+
+        });
+
+      }
+
+
+
+      if (!process.env.HF_TOKEN) {
+
+        console.error(
+
+          "HF_TOKEN non configuré"
+
+        );
+
+
+
+        return res.status(503).json({
+
+          success: false,
+
+          error:
+
+            "Service IA temporairement indisponible",
+
+        });
+
+      }
+
+
+
+      // ======================
+
+      // IMAGE CLOUDINARY
+
+      // ======================
+
+
+
+      const image =
+
+        req.file.path;
+
+
+
+      // ======================
+
+      // HUGGINGFACE
+
+      // ======================
+
+
+
+      const response =
+
+        await axios.post(
+
+
+
+          "https://router.huggingface.co/hf-inference/models/google/vit-base-patch16-224",
+
+
+
+          {
+
+            inputs:
+
+              image,
+
+          },
+
+
+
+          {
+
+            headers: {
+
+              Authorization:
+
+                `Bearer ${process.env.HF_TOKEN}`,
+
+            },
+
+
+
+            timeout:
+
+              15000,
+
+
+
+            maxContentLength:
+
+              2 * 1024 * 1024,
+
+
+
+            maxBodyLength:
+
+              2 * 1024 * 1024,
+
+          }
+
+        );
+
+
+
+      const keyword =
+
+        cleanText(
+
+          response.data?.[0]?.label,
+
+          100
+
+        );
+
+
+
+      if (!keyword) {
+
+        return res.json({
+
+          success: true,
+
+          keyword: "",
+
+          count: 0,
+
+          products: [],
+
+        });
+
+      }
+
+
+
+      console.log(
+
+        "Mot IA:",
+
+        keyword
+
+      );
+
+
+
+      const safeKeyword =
+
+        escapeRegex(keyword);
+
+
+
+      const products =
+
+        await Product.find({
+
+
+
+          $or: [
+
+
+
+            {
+
+              name: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+            {
+
+              category: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+            {
+
+              description: {
+
+                $regex:
+
+                  safeKeyword,
+
+                $options: "i",
+
+              },
+
+            },
+
+
+
+          ],
+
+
+
+        }).limit(100);
+
+
+
+      return res.json({
+
+
+
+        success: true,
+
+
+
+        keyword,
+
+
+
+        count:
+
+          products.length,
+
+
+
+        products,
+
+
+
+      });
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur recherche IA:",
+
+        err.response?.status ||
+
+          err.code ||
+
+          err.message
+
+      );
+
+
+
+      return res.status(500).json({
+
+        success: false,
+
+        error:
+
+          "Erreur service IA",
+
+      });
+
+    }
+
+  }
 
 );
 
-// ======================
-// LABEL IA
-// ======================
 
-const keyword =
-response.data[0]?.label || "";
-
-console.log(
-"Mot IA :",
-keyword
-);
 
 // ======================
-// RECHERCHE MONGODB
-// ======================
 
-const products =
-await Product.find({
+// ⭐ AJOUTER UN AVIS
 
-$or:[
-
-{
-
-name:{
-
-$regex: keyword,
-
-$options:"i",
-
-},
-
-},
-
-{
-
-category:{
-
-$regex: keyword,
-
-$options:"i",
-
-},
-
-},
-
-{
-
-description:{
-
-$regex: keyword,
-
-$options:"i",
-
-},
-
-},
-
-],
-
-});
+// PUBLIC COMME DANS LA LOGIQUE ORIGINALE
 
 // ======================
-// RESPONSE
-// ======================
 
-res.json({
 
-success:true,
 
-keyword,
-
-count:
-products.length,
-
-products,
-
-});
-
-}
-
-catch(err){
-
-console.log(
-
-err.response?.data ||
-err.message
-
-);
-
-res.status(500).json({
-
-error:
-err.response?.data ||
-err.message,
-
-});
-
-}
-
-}
-
-);
-
-// ======================
-// ADD REVIEW
-// ======================
 router.post(
 
-"/:id/review",
+  "/:id/review",
 
-upload.array(
-"images",
-5
-),
+  reviewLimiter,
 
-async(req,res)=>{
+  upload.array(
 
-try{
+    "images",
 
-const product =
-await Product.findById(
-req.params.id
+    5
+
+  ),
+
+  async (req, res, next) => {
+
+
+
+    try {
+
+
+
+      const productId =
+
+        typeof req.params.id === "string"
+
+          ? req.params.id.trim()
+
+          : "";
+
+
+
+      if (
+
+        !isValidId(productId)
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Produit invalide",
+
+        });
+
+      }
+
+
+
+      const product =
+
+        await Product.findById(
+
+          productId
+
+        );
+
+
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Produit introuvable",
+
+        });
+
+      }
+
+
+
+      const clientId =
+
+        typeof req.body?.clientId === "string"
+
+          ? req.body.clientId.trim()
+
+          : "";
+
+
+
+      const name =
+
+        cleanText(
+
+          req.body?.name,
+
+          100
+
+        );
+
+
+
+      const rating =
+
+        Number(req.body?.rating);
+
+
+
+      const comment =
+
+        cleanText(
+
+          req.body?.comment,
+
+          2000
+
+        );
+
+
+
+      const images =
+
+        req.files?.map(
+
+          (file) => file.path
+
+        ) || [];
+
+
+
+      // ======================
+
+      // VALIDATION
+
+      // ======================
+
+
+
+      if (
+
+        !clientId ||
+
+        !isValidId(clientId) ||
+
+        !name ||
+
+        !comment ||
+
+        !Number.isInteger(rating) ||
+
+        rating < 1 ||
+
+        rating > 5
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Données avis invalides",
+
+        });
+
+      }
+
+
+
+      // ======================
+
+      // SI UN JWT UTILISATEUR
+
+      // EST PRÉSENT, IL DOIT
+
+      // CORRESPONDRE AU CLIENTID
+
+      // ======================
+
+
+
+      const authenticatedUserId =
+
+        req.user?.sub ||
+
+        req.user?.id ||
+
+        "";
+
+
+
+      if (
+
+        authenticatedUserId &&
+
+        String(authenticatedUserId) !==
+
+          String(clientId)
+
+      ) {
+
+        return res.status(403).json({
+
+          message:
+
+            "Accès refusé",
+
+        });
+
+      }
+
+
+
+      // ======================
+
+      // CLIENT EXISTANT
+
+      // ======================
+
+
+
+      const reviewUser =
+
+        await User.findById(
+
+          clientId
+
+        ).select(
+
+          "_id name"
+
+        );
+
+
+
+      if (!reviewUser) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Utilisateur introuvable",
+
+        });
+
+      }
+
+
+
+      // ======================
+
+      // AVIS EXISTANT
+
+      // ======================
+
+
+
+      const alreadyReviewed =
+
+        product.reviews.find(
+
+          (review) =>
+
+            String(review.clientId) ===
+
+            String(clientId)
+
+        );
+
+
+
+      if (alreadyReviewed) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Vous avez déjà donné un avis",
+
+        });
+
+      }
+
+
+
+      // ======================
+
+      // ACHAT VÉRIFIÉ
+
+      // ======================
+
+
+
+      const hasPurchased =
+
+        await Order.exists({
+
+
+
+          userId:
+
+            clientId,
+
+
+
+          "items._id":
+
+            product._id,
+
+
+
+        });
+
+
+
+      // ======================
+
+      // NOUVEL AVIS
+
+      // ======================
+
+
+
+      product.reviews.push({
+
+
+
+        clientId,
+
+
+
+        name,
+
+
+
+        rating,
+
+
+
+        comment,
+
+
+
+        images,
+
+
+
+        verifiedPurchase:
+
+          Boolean(hasPurchased),
+
+
+
+        likes: [],
+
+
+
+        dislikes: [],
+
+
+
+        replies: [],
+
+
+
+        createdAt:
+
+          new Date(),
+
+
+
+      });
+
+
+
+      await product.save();
+
+
+
+      return res.json({
+
+
+
+        success: true,
+
+
+
+        message:
+
+          "Avis ajouté avec succès",
+
+
+
+        product,
+
+
+
+      });
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur avis:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        message:
+
+          "Erreur avis",
+
+      });
+
+    }
+
+  }
+
 );
 
-if(!product){
 
-return res.status(404).json({
-
-message:
-"Produit introuvable",
-
-});
-
-}
-
-const {
-
-clientId,
-
-name,
-
-rating,
-
-comment,
-
-} = req.body;
-
-// REVIEW IMAGES
-
-const images =
-
-req.files?.map(
-(file)=> file.path
-) || [];
-
-// VALIDATION
-
-if(
-
-!clientId ||
-
-!name ||
-
-!rating ||
-
-!comment
-
-){
-
-return res.status(400).json({
-
-message:
-"Tous les champs sont obligatoires",
-
-});
-
-}
-
-// CHECK REVIEW EXIST
-
-const alreadyReviewed =
-
-product.reviews.find(
-
-(review)=>
-
-review.clientId ===
-clientId
-
-);
-
-if(alreadyReviewed){
-
-return res.status(400).json({
-
-message:
-"Vous avez déjà donné un avis",
-
-});
-
-}
-
-// VERIFIED PURCHASE
-
-const Order =
-require("../models/order");
-
-const hasPurchased =
-await Order.findOne({
-
-userId: clientId,
-
-"items._id":
-product._id,
-
-});
-
-// NEW REVIEW
-
-product.reviews.push({
-
-clientId,
-
-name,
-
-rating,
-
-comment,
-
-images,
-
-verifiedPurchase:
-!!hasPurchased,
-
-likes: [],
-
-dislikes: [],
-
-replies: [],
-
-createdAt:
-new Date(),
-
-});
-
-// SAVE
-
-await product.save();
-
-res.json({
-
-success:true,
-
-message:
-"Avis ajouté avec succès",
-
-product,
-
-});
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-message:
-"Erreur avis",
-
-});
-
-}
-
-}
-
-);
 
 // ======================
-// LIKE REVIEW
+
+// 👍 LIKE REVIEW
+
 // ======================
+
+
 
 router.put(
 
-"/:productId/review/:reviewId/like",
+  "/:productId/review/:reviewId/like",
 
-async(req,res)=>{
+  reviewLimiter,
 
-try{
+  async (req, res) => {
 
-const { clientId } =
-req.body;
 
-const product =
-await Product.findById(
-req.params.productId
+
+    try {
+
+
+
+      const productId =
+
+        typeof req.params.productId === "string"
+
+          ? req.params.productId.trim()
+
+          : "";
+
+
+
+      const reviewId =
+
+        typeof req.params.reviewId === "string"
+
+          ? req.params.reviewId.trim()
+
+          : "";
+
+
+
+      if (
+
+        !isValidId(productId) ||
+
+        !isValidId(reviewId)
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Avis invalide",
+
+        });
+
+      }
+
+
+
+      const authenticatedUserId =
+
+        req.user?.sub ||
+
+        req.user?.id ||
+
+        "";
+
+
+
+      const clientId =
+
+        authenticatedUserId ||
+
+        (
+
+          typeof req.body?.clientId === "string"
+
+            ? req.body.clientId.trim()
+
+            : ""
+
+        );
+
+
+
+      if (
+
+        !clientId ||
+
+        !isValidId(clientId)
+
+      ) {
+
+        return res.status(401).json({
+
+          message:
+
+            "Utilisateur requis",
+
+        });
+
+      }
+
+
+
+      if (
+
+        authenticatedUserId &&
+
+        String(authenticatedUserId) !==
+
+          String(clientId)
+
+      ) {
+
+        return res.status(403).json({
+
+          message:
+
+            "Accès refusé",
+
+        });
+
+      }
+
+
+
+      const product =
+
+        await Product.findById(
+
+          productId
+
+        );
+
+
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Produit introuvable",
+
+        });
+
+      }
+
+
+
+      const review =
+
+        product.reviews.id(
+
+          reviewId
+
+        );
+
+
+
+      if (!review) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Avis introuvable",
+
+        });
+
+      }
+
+
+
+      if (!Array.isArray(review.likes)) {
+
+        review.likes = [];
+
+      }
+
+
+
+      if (!Array.isArray(review.dislikes)) {
+
+        review.dislikes = [];
+
+      }
+
+
+
+      review.dislikes =
+
+        review.dislikes.filter(
+
+          (id) =>
+
+            String(id) !==
+
+            String(clientId)
+
+        );
+
+
+
+      if (
+
+        review.likes.some(
+
+          (id) =>
+
+            String(id) ===
+
+            String(clientId)
+
+        )
+
+      ) {
+
+
+
+        review.likes =
+
+          review.likes.filter(
+
+            (id) =>
+
+              String(id) !==
+
+              String(clientId)
+
+          );
+
+
+
+      } else {
+
+
+
+        review.likes.push(
+
+          clientId
+
+        );
+
+      }
+
+
+
+      await product.save();
+
+
+
+      return res.json(
+
+        review
+
+      );
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur like:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        message:
+
+          "Erreur like",
+
+      });
+
+    }
+
+  }
+
 );
 
-const review =
-product.reviews.id(
-req.params.reviewId
-);
 
-// REMOVE DISLIKE
-
-review.dislikes =
-review.dislikes.filter(
-
-(id)=> id !== clientId
-
-);
-
-// TOGGLE LIKE
-
-if(
-
-review.likes.includes(
-clientId
-)
-
-){
-
-review.likes =
-review.likes.filter(
-
-(id)=>
-id !== clientId
-
-);
-
-}
-
-else{
-
-review.likes.push(
-clientId
-);
-
-}
-
-await product.save();
-
-res.json(review);
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-message:
-"Erreur like",
-
-});
-
-}
-
-}
-
-);
 
 // ======================
-// DISLIKE REVIEW
+
+// 👎 DISLIKE REVIEW
+
 // ======================
+
+
 
 router.put(
 
-"/:productId/review/:reviewId/dislike",
+  "/:productId/review/:reviewId/dislike",
 
-async(req,res)=>{
+  reviewLimiter,
 
-try{
+  async (req, res) => {
 
-const { clientId } =
-req.body;
 
-const product =
-await Product.findById(
-req.params.productId
+
+    try {
+
+
+
+      const productId =
+
+        typeof req.params.productId === "string"
+
+          ? req.params.productId.trim()
+
+          : "";
+
+
+
+      const reviewId =
+
+        typeof req.params.reviewId === "string"
+
+          ? req.params.reviewId.trim()
+
+          : "";
+
+
+
+      if (
+
+        !isValidId(productId) ||
+
+        !isValidId(reviewId)
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Avis invalide",
+
+        });
+
+      }
+
+
+
+      const authenticatedUserId =
+
+        req.user?.sub ||
+
+        req.user?.id ||
+
+        "";
+
+
+
+      const clientId =
+
+        authenticatedUserId ||
+
+        (
+
+          typeof req.body?.clientId === "string"
+
+            ? req.body.clientId.trim()
+
+            : ""
+
+        );
+
+
+
+      if (
+
+        !clientId ||
+
+        !isValidId(clientId)
+
+      ) {
+
+        return res.status(401).json({
+
+          message:
+
+            "Utilisateur requis",
+
+        });
+
+      }
+
+
+
+      if (
+
+        authenticatedUserId &&
+
+        String(authenticatedUserId) !==
+
+          String(clientId)
+
+      ) {
+
+        return res.status(403).json({
+
+          message:
+
+            "Accès refusé",
+
+        });
+
+      }
+
+
+
+      const product =
+
+        await Product.findById(
+
+          productId
+
+        );
+
+
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Produit introuvable",
+
+        });
+
+      }
+
+
+
+      const review =
+
+        product.reviews.id(
+
+          reviewId
+
+        );
+
+
+
+      if (!review) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Avis introuvable",
+
+        });
+
+      }
+
+
+
+      if (!Array.isArray(review.likes)) {
+
+        review.likes = [];
+
+      }
+
+
+
+      if (!Array.isArray(review.dislikes)) {
+
+        review.dislikes = [];
+
+      }
+
+
+
+      review.likes =
+
+        review.likes.filter(
+
+          (id) =>
+
+            String(id) !==
+
+            String(clientId)
+
+        );
+
+
+
+      if (
+
+        review.dislikes.some(
+
+          (id) =>
+
+            String(id) ===
+
+            String(clientId)
+
+        )
+
+      ) {
+
+
+
+        review.dislikes =
+
+          review.dislikes.filter(
+
+            (id) =>
+
+              String(id) !==
+
+              String(clientId)
+
+          );
+
+
+
+      } else {
+
+
+
+        review.dislikes.push(
+
+          clientId
+
+        );
+
+      }
+
+
+
+      await product.save();
+
+
+
+      return res.json(
+
+        review
+
+      );
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur dislike:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        message:
+
+          "Erreur dislike",
+
+      });
+
+    }
+
+  }
+
 );
 
-const review =
-product.reviews.id(
-req.params.reviewId
-);
 
-// REMOVE LIKE
-
-review.likes =
-review.likes.filter(
-
-(id)=> id !== clientId
-
-);
-
-// TOGGLE DISLIKE
-
-if(
-
-review.dislikes.includes(
-clientId
-)
-
-){
-
-review.dislikes =
-review.dislikes.filter(
-
-(id)=>
-id !== clientId
-
-);
-
-}
-
-else{
-
-review.dislikes.push(
-clientId
-);
-
-}
-
-await product.save();
-
-res.json(review);
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-message:
-"Erreur dislike",
-
-});
-
-}
-
-}
-
-);
 
 // ======================
-// REPLY REVIEW
+
+// 💬 RÉPONSE À UN AVIS
+
 // ======================
+
+
 
 router.post(
 
-"/:productId/review/:reviewId/reply",
+  "/:productId/review/:reviewId/reply",
 
-async(req,res)=>{
+  reviewLimiter,
 
-try{
+  async (req, res) => {
 
-const {
 
-clientId,
 
-name,
+    try {
 
-comment,
 
-} = req.body;
 
-const product =
-await Product.findById(
-req.params.productId
+      const productId =
+
+        typeof req.params.productId === "string"
+
+          ? req.params.productId.trim()
+
+          : "";
+
+
+
+      const reviewId =
+
+        typeof req.params.reviewId === "string"
+
+          ? req.params.reviewId.trim()
+
+          : "";
+
+
+
+      if (
+
+        !isValidId(productId) ||
+
+        !isValidId(reviewId)
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Avis invalide",
+
+        });
+
+      }
+
+
+
+      const clientId =
+
+        typeof req.body?.clientId === "string"
+
+          ? req.body.clientId.trim()
+
+          : "";
+
+
+
+      const name =
+
+        cleanText(
+
+          req.body?.name,
+
+          100
+
+        );
+
+
+
+      const comment =
+
+        cleanText(
+
+          req.body?.comment,
+
+          2000
+
+        );
+
+
+
+      if (
+
+        !clientId ||
+
+        !isValidId(clientId) ||
+
+        !name ||
+
+        !comment
+
+      ) {
+
+        return res.status(400).json({
+
+          message:
+
+            "Données réponse invalides",
+
+        });
+
+      }
+
+
+
+      const authenticatedUserId =
+
+        req.user?.sub ||
+
+        req.user?.id ||
+
+        "";
+
+
+
+      if (
+
+        authenticatedUserId &&
+
+        String(authenticatedUserId) !==
+
+          String(clientId)
+
+      ) {
+
+        return res.status(403).json({
+
+          message:
+
+            "Accès refusé",
+
+        });
+
+      }
+
+
+
+      const product =
+
+        await Product.findById(
+
+          productId
+
+        );
+
+
+
+      if (!product) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Produit introuvable",
+
+        });
+
+      }
+
+
+
+      const review =
+
+        product.reviews.id(
+
+          reviewId
+
+        );
+
+
+
+      if (!review) {
+
+        return res.status(404).json({
+
+          message:
+
+            "Avis introuvable",
+
+        });
+
+      }
+
+
+
+      if (!Array.isArray(review.replies)) {
+
+        review.replies = [];
+
+      }
+
+
+
+      review.replies.push({
+
+
+
+        clientId,
+
+
+
+        name,
+
+
+
+        comment,
+
+
+
+      });
+
+
+
+      await product.save();
+
+
+
+      return res.json({
+
+
+
+        success: true,
+
+
+
+        review,
+
+
+
+      });
+
+
+
+    } catch (err) {
+
+
+
+      console.error(
+
+        "Erreur réponse:",
+
+        err
+
+      );
+
+
+
+      return res.status(500).json({
+
+        message:
+
+          "Erreur réponse",
+
+      });
+
+    }
+
+  }
+
 );
 
-const review =
-product.reviews.id(
-req.params.reviewId
-);
 
-// PUSH REPLY
 
-review.replies.push({
+// ======================================================
 
-clientId,
+// 🛡️ ERREURS MULTER
 
-name,
+// ======================================================
 
-comment,
 
-});
 
-await product.save();
+router.use(
 
-res.json({
-
-success:true,
-
-review,
-
-});
-
-}
-
-catch(err){
-
-console.log(err);
-
-res.status(500).json({
-
-message:
-"Erreur réponse",
-
-});
-
-}
-
-}
+  handleUploadError
 
 );
+
+
 
 module.exports = router;

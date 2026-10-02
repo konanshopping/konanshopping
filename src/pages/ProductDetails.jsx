@@ -69,6 +69,126 @@ import SeoMeta from "../components/SeoMeta";
 
 import SeoBreadcrumb from "../components/SeoBreadcrumb";
 
+
+const API_BASE_URL = "https://konanshopping.com";
+const API_TIMEOUT = 15000;
+
+const MAX_PRODUCT_ID_LENGTH = 24;
+const MAX_REVIEW_NAME_LENGTH = 100;
+const MAX_REVIEW_COMMENT_LENGTH = 2000;
+const MAX_REPLY_LENGTH = 1000;
+const MAX_REVIEW_IMAGES = 6;
+const MAX_REVIEW_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_REVIEW_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+const safeParse = (value, fallback) => {
+  if (typeof value !== "string" || !value.trim()) return fallback;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const getAuthToken = () => {
+  try {
+    const token = localStorage.getItem("token");
+    return typeof token === "string" ? token.trim() : "";
+  } catch {
+    return "";
+  }
+};
+
+const isValidObjectId = (value) =>
+  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
+
+const sanitizeText = (value, maxLength) =>
+  typeof value === "string"
+    ? value.replace(/\u0000/g, "").trim().slice(0, maxLength)
+    : "";
+
+const safeServerMessage = (error, fallback) => {
+  const message = error?.response?.data?.message;
+  return typeof message === "string" && message.trim()
+    ? message.trim().slice(0, 300)
+    : fallback;
+};
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 || error?.response?.status === 403) {
+      error.userMessage = "Accès refusé ou session expirée.";
+    } else if (error?.code === "ECONNABORTED") {
+      error.userMessage = "Le serveur met trop de temps à répondre.";
+    } else if (!error?.response) {
+      error.userMessage = "Impossible de contacter le serveur.";
+    }
+    return Promise.reject(error);
+  }
+);
+
+const validateImageFiles = (files) => {
+  const selected = Array.from(files || []);
+  if (selected.length > MAX_REVIEW_IMAGES) {
+    return {
+      ok: false,
+      message: `Vous pouvez sélectionner au maximum ${MAX_REVIEW_IMAGES} photos.`,
+      files: [],
+    };
+  }
+
+  for (const file of selected) {
+    if (!ALLOWED_REVIEW_IMAGE_TYPES.has(file?.type)) {
+      return {
+        ok: false,
+        message: "Format d'image non autorisé. Utilisez JPG, PNG, WEBP ou GIF.",
+        files: [],
+      };
+    }
+    if (file.size > MAX_REVIEW_IMAGE_SIZE) {
+      return {
+        ok: false,
+        message: "Chaque image doit faire au maximum 5 Mo.",
+        files: [],
+      };
+    }
+  }
+
+  return { ok: true, message: "", files: selected };
+};
+
+const normalizeProductId = (value) => {
+  const id = typeof value === "string" ? value.trim() : "";
+  return id.length <= MAX_PRODUCT_ID_LENGTH && isValidObjectId(id) ? id : "";
+};
+
 function ProductDetails() {
 
 const navigate = useNavigate();
@@ -124,10 +244,16 @@ const getTimeAgo = (date) => {
 // CLIENT ID
 // =========================
 
+const storedUser = safeParse(
+  localStorage.getItem("user"),
+  null
+);
+
 const user =
-  JSON.parse(
-    localStorage.getItem("user")
-  );
+  storedUser &&
+  typeof storedUser === "object"
+    ? storedUser
+    : null;
 
 
 const clientId =
@@ -139,17 +265,19 @@ const clientId =
   ) ||
 
   (() => {
-
     const newGuestId =
       "guest_" + Date.now();
 
-    localStorage.setItem(
-      "guestId",
-      newGuestId
-    );
+    try {
+      localStorage.setItem(
+        "guestId",
+        newGuestId
+      );
+    } catch {
+      // Le panier invité reste fonctionnel pendant la session.
+    }
 
     return newGuestId;
-
   })();
 
 // =========================
@@ -259,22 +387,34 @@ const getDisplayReferencePrice = (currentPrice) => {
 
 
 const getProduct = async () => {
+  const safeId = normalizeProductId(id);
+
+  if (!safeId) {
+    setProduct(null);
+    return;
+  }
 
   try {
+    const res = await api.get(
+      `/api/product/${encodeURIComponent(safeId)}`
+    );
 
-    const res = await axios.get(
-  `https://konanshopping.com/api/product/${id}`
-);
+    if (!res?.data || typeof res.data !== "object") {
+      throw new Error("Réponse produit invalide.");
+    }
 
     setProduct(res.data);
 
-    const response =
-      await axios.get(
-        "https://konanshopping.com/api/products"
-      );
+    const response = await api.get("/api/products");
+
+    const productList = Array.isArray(response?.data)
+      ? response.data
+      : Array.isArray(response?.data?.products)
+      ? response.data.products
+      : [];
 
     const similar =
-  response.data.filter(
+  productList.filter(
     (item) =>
       item.category ===
         res.data.category &&
@@ -301,9 +441,12 @@ setSimilarProducts(
   }
 
   catch (error) {
-
-    console.log(error);
-
+    if (import.meta.env?.DEV) {
+      console.warn(
+        "ProductDetails: échec du chargement du produit.",
+        error?.userMessage || error?.message || "Erreur réseau"
+      );
+    }
   }
 
 };
@@ -592,13 +735,14 @@ const displayReferencePrice = getDisplayReferencePrice(product.price);
 
 const addToCart = () => {
 
-  const cart =
+  const storedCart = safeParse(
+    localStorage.getItem(cartKey),
+    []
+  );
 
-    JSON.parse(
-      localStorage.getItem(
-        cartKey
-      )
-    ) || [];
+  const cart = Array.isArray(storedCart)
+    ? storedCart
+    : [];
 
   const existing =
     cart.find(
@@ -656,13 +800,14 @@ const addToCart = () => {
 
 const addToFavorites = () => {
 
-  let favorites =
+  let favorites = safeParse(
+    localStorage.getItem(favoritesKey),
+    []
+  );
 
-    JSON.parse(
-      localStorage.getItem(
-        favoritesKey
-      )
-    ) || [];
+  if (!Array.isArray(favorites)) {
+    favorites = [];
+  }
 
   const exists =
     favorites.find(
@@ -709,80 +854,77 @@ const addToFavorites = () => {
 const submitReview =
 async () => {
 
-  // VALIDATION
+  const safeProductId = normalizeProductId(id);
+  const safeReviewName = sanitizeText(
+    reviewName,
+    MAX_REVIEW_NAME_LENGTH
+  );
+  const safeReviewComment = sanitizeText(
+    reviewComment,
+    MAX_REVIEW_COMMENT_LENGTH
+  );
+  const numericRating = Number(reviewRating);
 
   if (
-
-    !reviewName ||
-
-    !reviewComment ||
-
-    !reviewRating
-
+    !safeProductId ||
+    !safeReviewName ||
+    !safeReviewComment ||
+    !Number.isInteger(numericRating) ||
+    numericRating < 1 ||
+    numericRating > 5
   ) {
-
     toast.warning(
-      "Veuillez remplir tous les champs ⚠️"
+      "Veuillez remplir correctement tous les champs ⚠️"
     );
-
     return;
+  }
 
+  const imageValidation = validateImageFiles(reviewImages);
+
+  if (!imageValidation.ok) {
+    toast.warning(imageValidation.message);
+    return;
   }
 
   try {
 
     // FORM DATA
 
-   const formData = new FormData();
-
-formData.append(
-  "clientId",
-  clientId
-);
-
-formData.append(
-  "name",
-  reviewName
-);
-
-formData.append(
-  "rating",
-  reviewRating
-);
-
-formData.append(
-  "comment",
-  reviewComment
-);
-
-reviewImages.forEach(
-  (image) => {
+    const formData = new FormData();
 
     formData.append(
-      "images",
-      image
+      "clientId",
+      String(clientId).slice(0, 100)
     );
 
-  }
-);
+    formData.append(
+      "name",
+      safeReviewName
+    );
 
-await axios.post(
-  `https://konanshopping.com/api/product/${id}/review`,
+    formData.append(
+      "rating",
+      String(numericRating)
+    );
 
-  formData,
+    formData.append(
+      "comment",
+      safeReviewComment
+    );
 
-  {
+    imageValidation.files.forEach(
+      (image) => {
+        formData.append(
+          "images",
+          image
+        );
+      }
+    );
 
-    headers: {
-
-      "Content-Type":
-        "multipart/form-data",
-
-    },
-
-  }
-
-);
+    await api.post(
+      `/api/product/${encodeURIComponent(safeProductId)}/review`,
+      formData
+    );
 
     toast.success(
       "Avis ajouté avec succès ⭐"
@@ -791,31 +933,30 @@ await axios.post(
     // RESET FORM
 
     setReviewName("");
-
     setReviewComment("");
-
     setReviewRating(5);
-
     setReviewImages([]);
 
     // RELOAD PRODUCT
 
-   getProduct();
+    getProduct();
 
   }
 
   catch (err) {
+    if (import.meta.env?.DEV) {
+      console.warn(
+        "ProductDetails: échec de publication de l'avis.",
+        err?.userMessage || err?.message || "Erreur réseau"
+      );
+    }
 
-    console.log(err);
-
-  toast.error(
-
-      err.response?.data?.message ||
-
-      "Erreur avis ❌"
-
+    toast.error(
+      safeServerMessage(
+        err,
+        err?.userMessage || "Erreur avis ❌"
+      )
     );
-
   }
 
 };
@@ -1472,7 +1613,7 @@ return (
 >
 
 <img
-  src={product.image}
+  src={typeof product.image === "string" && product.image ? product.image : "/logo.jpg"}
   alt={product.name || "Produit Konan Shopping"}
   fetchPriority="high"
   decoding="async"
@@ -1967,6 +2108,7 @@ Basé sur {product.reviews?.length || 0} avis
 {/* ADD TO CART */}
 
 <button
+  type="button"
   onClick={addToCart}
 
   onMouseEnter={(e) => {
@@ -2386,6 +2528,8 @@ Votre avis compte pour la communauté Konan Shopping Cameroun.
   type="text"
 
   placeholder="Votre nom"
+  maxLength={MAX_REVIEW_NAME_LENGTH}
+  autoComplete="name"
 
   value={reviewName}
 
@@ -2400,6 +2544,7 @@ Votre avis compte pour la communauté Konan Shopping Cameroun.
 
 <textarea
   placeholder="Votre commentaire..."
+  maxLength={MAX_REVIEW_COMMENT_LENGTH}
 
   value={reviewComment}
 
@@ -2473,15 +2618,20 @@ Ajouter des photos
 
   accept="image/*"
 
-  onChange={(e)=>
+  onChange={(e) => {
+    const result = validateImageFiles(
+      e.target.files
+    );
 
-    setReviewImages(
+    if (!result.ok) {
+      e.target.value = "";
+      setReviewImages([]);
+      toast.warning(result.message);
+      return;
+    }
 
-      [...e.target.files]
-
-    )
-
-  }
+    setReviewImages(result.files);
+  }}
 
   hidden
 />
@@ -2945,13 +3095,13 @@ review.images.length > 0 && (
 {/* LIKE */}
 
 <button
+type="button"
 onClick={async()=>{
 
 try{
 
-await axios.put(
-
-`https://konanshopping.com/api/product/${product._id}/review/${review._id}/like`,
+await api.put(
+  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/like`,
 
 {
 
@@ -2966,9 +3116,12 @@ getProduct();
 }
 
 catch(err){
-
-console.log(err);
-
+  if (import.meta.env?.DEV) {
+    console.warn(
+      "ProductDetails: action sur avis échouée.",
+      err?.userMessage || err?.message || "Erreur réseau"
+    );
+  }
 }
 
 }}
@@ -2998,13 +3151,13 @@ boxShadow:"0 2px 8px rgba(37,99,235,.10)",
 {/* DISLIKE */}
 
 <button
+type="button"
 onClick={async()=>{
 
 try{
 
-await axios.put(
-
-`https://konanshopping.com/api/product/${product._id}/review/${review._id}/dislike`,
+await api.put(
+  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/dislike`,
 
 {
 
@@ -3019,9 +3172,12 @@ getProduct();
 }
 
 catch(err){
-
-console.log(err);
-
+  if (import.meta.env?.DEV) {
+    console.warn(
+      "ProductDetails: action sur avis échouée.",
+      err?.userMessage || err?.message || "Erreur réseau"
+    );
+  }
 }
 
 }}
@@ -3051,6 +3207,7 @@ boxShadow:"0 2px 8px rgba(239,68,68,.10)",
 {/* REPLY */}
 
 <button
+type="button"
 onClick={()=>
 setOpenReply(
 openReply===review._id
@@ -3097,6 +3254,7 @@ width:"100%",
 
 <textarea
 placeholder="Répondre..."
+maxLength={MAX_REPLY_LENGTH}
 
 value={replyText}
 
@@ -3126,7 +3284,12 @@ color: "#111827",
 
 onClick={async()=>{
 
-if(!replyText){
+const safeReply = sanitizeText(
+  replyText,
+  MAX_REPLY_LENGTH
+);
+
+if(!safeReply){
 
 return toast.warning(
 "Écrivez une réponse ⚠️"
@@ -3136,24 +3299,17 @@ return toast.warning(
 
 try{
 
-await axios.post(
-
-`https://konanshopping.com/api/product/${product._id}/review/${review._id}/reply`,
-
-{
-
-clientId,
-
-name:
-user?.name ||
-"Invité",
-
-comment:
-replyText,
-
-}
-
-);
+  await api.post(
+    `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/reply`,
+    {
+      clientId: String(clientId).slice(0, 100),
+      name: sanitizeText(
+        user?.name || "Invité",
+        MAX_REVIEW_NAME_LENGTH
+      ),
+      comment: safeReply,
+    }
+  );
 
 setReplyText("");
 
@@ -3167,10 +3323,18 @@ toast.success(
 
 catch(err){
 
-console.log(err);
+if (import.meta.env?.DEV) {
+  console.warn(
+    "ProductDetails: réponse à l'avis échouée.",
+    err?.userMessage || err?.message || "Erreur réseau"
+  );
+}
 
 toast.error(
-"Erreur lors de l'envoi"
+  safeServerMessage(
+    err,
+    err?.userMessage || "Erreur lors de l'envoi"
+  )
 );
 
 }

@@ -10,16 +10,22 @@ const SocialPostSchema = new mongoose.Schema(
     videoUrl: {
       type: String,
       required: true,
+      trim: true,
+      maxlength: 2000,
     },
 
     videoPublicId: {
       type: String,
       default: null,
+      trim: true,
+      maxlength: 500,
     },
 
     thumbnailUrl: {
       type: String,
       default: null,
+      trim: true,
+      maxlength: 2000,
     },
 
     // ======================================================
@@ -30,17 +36,31 @@ const SocialPostSchema = new mongoose.Schema(
       type: String,
       default: "",
       trim: true,
+      maxlength: 250,
     },
 
     description: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 5000,
     },
 
     hashtags: {
       type: [String],
       default: [],
+
+      validate: {
+        validator: function (hashtags) {
+          return (
+            Array.isArray(hashtags) &&
+            hashtags.length <= 100
+          );
+        },
+
+        message:
+          "Le nombre de hashtags est trop élevé.",
+      },
     },
 
     // ======================================================
@@ -108,16 +128,22 @@ const SocialPostSchema = new mongoose.Schema(
         postId: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 500,
         },
 
         url: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
         error: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
       },
@@ -132,16 +158,22 @@ const SocialPostSchema = new mongoose.Schema(
         postId: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 500,
         },
 
         url: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
         error: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
       },
@@ -156,16 +188,22 @@ const SocialPostSchema = new mongoose.Schema(
         postId: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 500,
         },
 
         url: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
         error: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
       },
@@ -180,16 +218,22 @@ const SocialPostSchema = new mongoose.Schema(
         postId: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 500,
         },
 
         url: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
         error: {
           type: String,
           default: null,
+          trim: true,
+          maxlength: 2000,
         },
 
       },

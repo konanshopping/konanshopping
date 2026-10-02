@@ -5,6 +5,128 @@ import {
 
 import axios from "axios";
 
+// ============================================================
+// COUCHE DE SÉCURITÉ — AdminOrders
+// Logique métier et affichage conservés.
+// ============================================================
+
+const API_BASE_URL = "https://konanshopping.com";
+const API_TIMEOUT = 15000;
+
+const ALLOWED_STATUSES = [
+  "En attente",
+  "Préparation",
+  "Livraison",
+  "Livrée",
+  "Annulée",
+];
+
+const safeParse = (value, fallback = null) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const getAuthToken = () => {
+  try {
+    const token = localStorage.getItem("token");
+    return typeof token === "string" && token.trim()
+      ? token.trim()
+      : null;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredAdmin = () => {
+  try {
+    return safeParse(localStorage.getItem("admin"), null);
+  } catch {
+    return null;
+  }
+};
+
+const isValidObjectId = (id) =>
+  typeof id === "string" &&
+  /^[a-f\\d]{24}$/i.test(id);
+
+const normalizeOrdersResponse = (data) =>
+  Array.isArray(data) ? data : [];
+
+const normalizeStatus = (status) =>
+  ALLOWED_STATUSES.includes(status)
+    ? status
+    : null;
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  headers: {
+    Accept: "application/json",
+  },
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getAuthToken();
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+
+    if (status === 401 || status === 403) {
+      try {
+        localStorage.removeItem("token");
+        localStorage.removeItem("admin");
+      } catch {
+        // Ne bloque pas l'application si localStorage est indisponible.
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/admin-login"
+      ) {
+        window.location.href = "/admin-login";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+const requireAdminSession = () => {
+  const token = getAuthToken();
+  const admin = getStoredAdmin();
+
+  if (!token || !admin) {
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname !== "/admin-login"
+    ) {
+      window.location.replace("/admin-login");
+    }
+
+    return false;
+  }
+
+  return true;
+};
+
+
+
 import {
   FaShoppingCart,
   FaClock,
@@ -29,6 +151,10 @@ function AdminOrders() {
 
   useEffect(() => {
 
+    if (!requireAdminSession()) {
+      return;
+    }
+
     fetchOrders();
 
   }, []);
@@ -39,15 +165,18 @@ function AdminOrders() {
       try {
 
         const res =
-          await axios.get(
-            "https://konanshopping.com/api/orders"
-          );
+          await api.get("/api/orders");
 
-        setOrders(res.data);
+        setOrders(
+          normalizeOrdersResponse(res.data)
+        );
 
       } catch (err) {
 
-        console.log(err);
+        console.error(
+          "Erreur lors du chargement des commandes.",
+          err?.message || "Erreur inconnue"
+        );
 
       }
 
@@ -65,552 +194,577 @@ function AdminOrders() {
 
       try {
 
-        await axios.put(
-          `https://konanshopping.com/api/orders/${id}`,
+        if (!requireAdminSession()) {
+          return;
+        }
+
+        if (!isValidObjectId(id)) {
+          return;
+        }
+
+        const safeStatus =
+          normalizeStatus(status);
+
+        if (!safeStatus) {
+          return;
+        }
+
+        await api.put(
+          `/api/orders/${id}`,
           {
-            status,
+            status: safeStatus,
           }
         );
 
-        fetchOrders();
+        fetchOrders(); 
 
       } catch (err) {
 
-        console.log(err);
+        console.error(
+          "Erreur lors de la mise à jour de la commande.",
+          err?.message || "Erreur inconnue"
+        );
 
       }
 
-    };
+    }; 
 
-  // =========================
-  // RETURN
-  // =========================
+  // ========================= 
+  // RETURN 
+  // ========================= 
 
-  return (
+  return ( 
 
-    <div className="adminOrders">
+    <div className="adminOrders"> 
 
-      {/* =========================
-   HEADER PREMIUM
-========================= */}
+      {/* ========================= 
+   HEADER PREMIUM 
+========================= */} 
 
-<div className="ordersTop">
+<div className="ordersTop"> 
 
-  <div className="ordersLeft">
+  <div className="ordersLeft"> 
 
-    <div className="ordersBadge">
+    <div className="ordersBadge"> 
 
-      <FaShoppingCart />
+      <FaShoppingCart /> 
 
-      <span>
+      <span> 
 
-        Gestion Premium
+        Gestion Premium 
 
-      </span>
+      </span> 
 
-    </div>
+    </div> 
 
-    <h1>
+    <h1> 
 
-      Gestion des commandes
+      Gestion des commandes 
 
-    </h1>
+    </h1> 
 
-    <p>
+    <p> 
 
-      Gérez toutes les commandes, suivez leur évolution
-      et mettez à jour leur statut en temps réel.
+      Gérez toutes les commandes, suivez leur évolution 
+      et mettez à jour leur statut en temps réel. 
 
-    </p>
+    </p> 
 
-  </div>
+  </div> 
 
-  <div className="ordersRight">
+  <div className="ordersRight"> 
 
-    <button className="ordersBtn">
+    <button
+      type="button"
+      className="ordersBtn"
+    > 
 
-      <FaCheckCircle />
+      <FaCheckCircle /> 
 
-      Tableau des commandes
+      Tableau des commandes 
 
-    </button>
+    </button> 
 
-  </div>
+  </div> 
 
-</div>
+</div> 
 
-      {/* =========================
-   STATS PREMIUM
-========================= */}
+      {/* ========================= 
+   STATS PREMIUM 
+========================= */} 
 
-<div className="ordersStats">
+<div className="ordersStats"> 
 
-  {/* TOTAL */}
+  {/* TOTAL */} 
 
-  <div className="orderCard">
+  <div className="orderCard"> 
 
-    <div className="orderLeft">
+    <div className="orderLeft"> 
 
-      <p className="cardMini">
+      <p className="cardMini"> 
 
-        Total commandes
+        Total commandes 
 
-      </p>
+      </p> 
 
-      <h2>
+      <h2> 
 
-        {orders.length}
+        {orders.length} 
 
-      </h2>
+      </h2> 
 
-      <div className="cardBottom">
+      <div className="cardBottom"> 
 
-        <FaShoppingCart />
+        <FaShoppingCart /> 
 
-        <span>
+        <span> 
 
-          Toutes les commandes
+          Toutes les commandes 
 
-        </span>
+        </span> 
 
-      </div>
+      </div> 
 
-    </div>
+    </div> 
 
-    <div className="icon blue">
+    <div className="icon blue"> 
 
-      <FaShoppingCart />
+      <FaShoppingCart /> 
 
-    </div>
+    </div> 
 
-  </div>
+  </div> 
 
-  {/* EN ATTENTE */}
+  {/* EN ATTENTE */} 
 
-  <div className="orderCard">
+  <div className="orderCard"> 
 
-    <div className="orderLeft">
+    <div className="orderLeft"> 
 
-      <p className="cardMini">
+      <p className="cardMini"> 
 
-        En attente
+        En attente 
 
-      </p>
+      </p> 
 
-      <h2>
+      <h2> 
 
-        {
-          orders.filter(
-            (o) =>
-              o.status === "En attente"
-          ).length
-        }
+        { 
+          orders.filter( 
+            (o) => 
+              o.status === "En attente" 
+          ).length 
+        } 
 
-      </h2>
+      </h2> 
 
-      <div className="cardBottom">
+      <div className="cardBottom"> 
 
-        <FaClock />
+        <FaClock /> 
 
-        <span>
+        <span> 
 
-          À traiter
+          À traiter 
 
-        </span>
+        </span> 
 
-      </div>
+      </div> 
 
-    </div>
+    </div> 
 
-    <div className="icon orange">
+    <div className="icon orange"> 
 
-      <FaClock />
+      <FaClock /> 
 
-    </div>
+    </div> 
 
-  </div>
+  </div> 
 
-  {/* LIVRAISON */}
+  {/* LIVRAISON */} 
 
-  <div className="orderCard">
+  <div className="orderCard"> 
 
-    <div className="orderLeft">
+    <div className="orderLeft"> 
 
-      <p className="cardMini">
+      <p className="cardMini"> 
 
-        En livraison
+        En livraison 
 
-      </p>
+      </p> 
 
-      <h2>
+      <h2> 
 
-        {
-          orders.filter(
-            (o) =>
-              o.status === "Livraison"
-          ).length
-        }
+        { 
+          orders.filter( 
+            (o) => 
+              o.status === "Livraison" 
+          ).length 
+        } 
 
-      </h2>
+      </h2> 
 
-      <div className="cardBottom">
+      <div className="cardBottom"> 
 
-        <FaTruck />
+        <FaTruck /> 
 
-        <span>
+        <span> 
 
-          Livraison active
+          Livraison active 
 
-        </span>
+        </span> 
 
-      </div>
+      </div> 
 
-    </div>
+    </div> 
 
-    <div className="icon purple">
+    <div className="icon purple"> 
 
-      <FaTruck />
+      <FaTruck /> 
 
-    </div>
+    </div> 
 
-  </div>
+  </div> 
 
-  {/* LIVRÉES */}
+  {/* LIVRÉES */} 
 
-  <div className="orderCard">
+  <div className="orderCard"> 
 
-    <div className="orderLeft">
+    <div className="orderLeft"> 
 
-      <p className="cardMini">
+      <p className="cardMini"> 
 
-        Livrées
+        Livrées 
 
-      </p>
+      </p> 
 
-      <h2>
+      <h2> 
 
-        {
-          orders.filter(
-            (o) =>
-              o.status === "Livrée"
-          ).length
-        }
+        { 
+          orders.filter( 
+            (o) => 
+              o.status === "Livrée" 
+          ).length 
+        } 
 
-      </h2>
+      </h2> 
 
-      <div className="cardBottom">
+      <div className="cardBottom"> 
 
-        <FaCheckCircle />
+        <FaCheckCircle /> 
 
-        <span>
+        <span> 
 
-          Terminées
+          Terminées 
 
-        </span>
+        </span> 
 
-      </div>
+      </div> 
 
-    </div>
+    </div> 
 
-    <div className="icon green">
+    <div className="icon green"> 
 
-      <FaCheckCircle />
+      <FaCheckCircle /> 
 
-    </div>
+    </div> 
 
-  </div>
+  </div> 
 
-</div>
+</div> 
 
-      {/* TABLE */}
+      {/* TABLE */} 
 
-      <div className="ordersTable">
+      <div className="ordersTable"> 
 
-  <div className="tableHeader">
+  <div className="tableHeader"> 
 
-    <div>
+    <div> 
 
-      <p className="tableMini">
+      <p className="tableMini"> 
 
-        <FaShoppingCart
-          style={{
-            marginRight:"6px",
-            color:"#7c3aed"
-          }}
-        />
+        <FaShoppingCart 
+          style={{ 
+            marginRight:"6px", 
+            color:"#7c3aed" 
+          }} 
+        /> 
 
-        COMMANDES
+        COMMANDES 
 
-      </p>
+      </p> 
 
-      <h2>
+      <h2> 
 
-        Toutes les commandes
+        Toutes les commandes 
 
-      </h2>
+      </h2> 
 
-    </div>
+    </div> 
 
-    <button className="tableBtn">
+    <button
+      type="button"
+      className="tableBtn"
+    > 
 
-      <FaCheckCircle />
+      <FaCheckCircle /> 
 
-      Synchronisé
+      Synchronisé 
 
-    </button>
+    </button> 
 
-  </div>
+  </div> 
 
-  <table className="premiumTable">
+  <table className="premiumTable"> 
 
-          <thead>
+          <thead> 
 
-            <tr>
+            <tr> 
 
-              <th>
-                Client
-              </th>
+              <th> 
+                Client 
+              </th> 
 
-              <th>
-                Produits
-              </th>
+              <th> 
+                Produits 
+              </th> 
 
-              <th>
-                Adresse
-              </th>
+              <th> 
+                Adresse 
+              </th> 
 
-              <th>
-                Total
-              </th>
+              <th> 
+                Total 
+              </th> 
 
-              <th>
-                Statut
-              </th>
+              <th> 
+                Statut 
+              </th> 
 
-              <th>
-                Date
-              </th>
+              <th> 
+                Date 
+              </th> 
 
-            </tr>
+            </tr> 
 
-          </thead>
+          </thead> 
 
-          <tbody>
+          <tbody> 
 
-  {orders.map((order, index) => (
+  {orders.map((order, index) => ( 
 
-    <tr
-  key={index}
-  className="orderRow"
->
+    <tr 
+  key={index} 
+  className="orderRow" 
+> 
 
-      {/* CLIENT */}
+      {/* CLIENT */} 
 
-      <td>
+      <td> 
 
-        <div className="customerBox">
+        <div className="customerBox"> 
 
-          <div className="customerAvatar">
+          <div className="customerAvatar"> 
 
             <img
               src="/logo.jpg"
               alt="Konan Shopping"
-            />
+              loading="lazy"
+            /> 
 
-          </div>
+          </div> 
 
-          <div className="customerInfo">
+          <div className="customerInfo"> 
 
-            <h4 className="customerName">
+            <h4 className="customerName"> 
 
-  {order.customerName}
+  {order.customerName} 
 
-</h4>
+</h4> 
 
-            <p>
+            <p> 
 
-              {order.phone}
+              {order.phone} 
 
-            </p>
+            </p> 
 
-          </div>
+          </div> 
 
-        </div>
+        </div> 
 
-      </td>
+      </td> 
 
-{/* PRODUITS */}
+{/* PRODUITS */} 
 
-<td>
+<td> 
 
-  <div className="productsList">
+  <div className="productsList"> 
 
-    {order.items?.map((item, i) => (
+    {order.items?.map((item, i) => ( 
 
-      <div
-        key={i}
-        className="productItem"
-      >
+      <div 
+        key={i} 
+        className="productItem" 
+      > 
 
-        <img
-          src={item.image}
-          alt={item.name}
-        />
+        <img 
+          src={item.image} 
+          alt={item.name} 
+        /> 
 
-        <div className="productDetails">
+        <div className="productDetails"> 
 
-          <h5>
+          <h5> 
 
-            {item.name}
+            {item.name} 
 
-          </h5>
+          </h5> 
 
-          <p>
+          <p> 
 
-            <FaShoppingCart
-              style={{
-                marginRight: "6px",
-                color: "#7c3aed",
-              }}
-            />
+            <FaShoppingCart 
+              style={{ 
+                marginRight: "6px", 
+                color: "#7c3aed", 
+              }} 
+            /> 
 
-            Quantité : {item.quantity}
+            Quantité : {item.quantity} 
 
-          </p>
+          </p> 
 
-        </div>
+        </div> 
 
-      </div>
+      </div> 
 
-    ))}
+    ))} 
 
-  </div>
+  </div> 
 
-</td>
+</td> 
 
 
-      {/* ADRESSE */}
+      {/* ADRESSE */} 
 
-      <td>
+      <td> 
 
-        <div className="addressBox">
+        <div className="addressBox"> 
 
-  <h5>
+  <h5> 
 
-    📍 {order.city}
+    📍 {order.city} 
 
-  </h5>
+  </h5> 
 
-  <p>
+  <p> 
 
-    {order.district}
+    {order.district} 
 
-  </p>
+  </p> 
 
-</div>
+</div> 
 
-      </td>
+      </td> 
 
-      {/* TOTAL */}
+      {/* TOTAL */} 
 
-      <td>
+      <td> 
 
-        <strong className="priceText"
-          style={{
-            color:"#16a34a",
-            fontSize:"15px"
-          }}
-        >
+        <strong className="priceText" 
+          style={{ 
+            color:"#16a34a", 
+            fontSize:"15px" 
+          }} 
+        > 
 
-          {Number(order.total).toLocaleString()} FCFA
+          {Number(order.total).toLocaleString()} FCFA 
 
-        </strong>
+        </strong> 
 
-      </td>
+      </td> 
 
-      {/* STATUS */}
+      {/* STATUS */} 
 
-      <td>
+      <td> 
 
-        <select
-    className="statusSelect"
-    value={order.status}
-    onChange={(e)=>
-        updateStatus(
-            order._id,
-            e.target.value
-        )
-    }
->
+        <select 
+    className="statusSelect" 
+    value={order.status} 
+    onChange={(e)=> 
+        updateStatus( 
+            order._id, 
+            e.target.value 
+        ) 
+    } 
+> 
 
-          <option>
+          <option> 
 
-            En attente
+            En attente 
 
-          </option>
+          </option> 
 
-          <option>
+          <option> 
 
-            Préparation
+            Préparation 
 
-          </option>
+          </option> 
 
-          <option>
+          <option> 
 
-            Livraison
+            Livraison 
 
-          </option>
+          </option> 
 
-          <option>
+          <option> 
 
-            Livrée
+            Livrée 
 
-          </option>
+          </option> 
 
-          <option>
+          <option> 
 
-            Annulée
+            Annulée 
 
-          </option>
+          </option> 
 
-        </select>
+        </select> 
 
-      </td>
+      </td> 
 
-      {/* DATE */}
+      {/* DATE */} 
 
-      <td>
+      <td> 
 
-       <div className="dateBadge">
+       <div className="dateBadge"> 
 
-    <FaClock
-        style={{
-            marginRight:"6px"
-        }}
-    />
+    <FaClock 
+        style={{ 
+            marginRight:"6px" 
+        }} 
+    /> 
 
-    {new Date(
-        order.createdAt
-    ).toLocaleDateString()}
+    {new Date( 
+        order.createdAt 
+    ).toLocaleDateString()} 
 
-</div>
+</div> 
 
-      </td>
+      </td> 
 
-    </tr>
+    </tr> 
 
-  ))}
+  ))} 
 
-</tbody>
+</tbody> 
 
-        </table>
+        </table> 
 
-      </div>
+      </div> 
 
-    </div>
+    </div> 
 
-  );
+  ); 
 
-}
+} 
 
 export default AdminOrders;
