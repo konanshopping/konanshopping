@@ -32,7 +32,7 @@ import "react-toastify/dist/ReactToastify.css";
 // 🔐 SÉCURITÉ CONNEXION — ALIGNÉE SUR LE BACKEND
 // ======================================================
 
-const API_BASE_URL = "https://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com/api";
 const API_TIMEOUT = 15000;
 const LOGIN_ENDPOINT = "/login";
 

@@ -55,12 +55,10 @@ const API_TIMEOUT = 15000;
 
 const getDriverAuthToken = () => {
   try {
-    return (
-      localStorage.getItem("driverToken") ||
-      localStorage.getItem("accessToken") ||
-      localStorage.getItem("token") ||
-      ""
-    );
+    // 🔐 IMPORTANT :
+    // Le centre livreur utilise UNIQUEMENT le token livreur.
+    // On ne réutilise jamais un token client/admin ici.
+    return localStorage.getItem("driverToken") || "";
   } catch {
     return "";
   }
@@ -919,11 +917,20 @@ export default function DriverTracking() {
   const fetchMyDeliveries =
     async () => {
 
+      const driverId = safeId(driver?._id);
+
+      if (!driverId) {
+        if (mountedRef.current) {
+          setMyDeliveries([]);
+        }
+        return [];
+      }
+
       try {
 
         const response =
           await apiClient.get(
-            `api/orders`
+            `api/driver/my-orders/${driverId}`
           );
 
         const list =
@@ -2621,6 +2628,11 @@ const stopGPS =
                 ""
               );
 
+        const availableStatus =
+          order.status === "En attente" ||
+          order.status === "Confirmée" ||
+          order.status === "Préparation";
+
         return (
           !refusedOrders.includes(
             order._id
@@ -2628,8 +2640,7 @@ const stopGPS =
 
           !assignedId &&
 
-          order.status ===
-            "En attente" &&
+          availableStatus &&
 
           order.status !==
             "Livrée" &&

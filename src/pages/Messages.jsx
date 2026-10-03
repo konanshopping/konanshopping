@@ -220,7 +220,7 @@ function Messages() {
     try {
 
       const res = await api.post(
-        "/ai-chat",
+        "/api/ai-chat",
         {
 
           message:

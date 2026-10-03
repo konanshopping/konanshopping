@@ -1,158 +1,317 @@
 import {
 
+
+
   useEffect,
 
+
+
   useState
+
+
 
 } from "react";
 
 
 
+
+
+
+
 import axios from "axios";
 
+
+
 // ============================================================
+
 // SÉCURITÉ ADMIN — AdminProducts
+
 // La logique métier et les endpoints sont conservés.
+
 // Le backend reste l'autorité finale pour les droits admin.
+
 // ============================================================
+
+
 
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
 
+
+
 const MAX_NAME_LENGTH = 150;
+
 const MAX_CATEGORY_LENGTH = 100;
+
 const MAX_SEARCH_LENGTH = 100;
+
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+
 
 const ALLOWED_STATUSES = []; // Conservé sans changer la logique métier.
 
+
+
 const safeParse = (value, fallback = null) => {
+
   try {
+
     return value ? JSON.parse(value) : fallback;
+
   } catch {
+
     return fallback;
+
   }
+
 };
+
+
 
 const getAuthToken = () => {
+
   try {
+
     const token = localStorage.getItem("token");
+
     return typeof token === "string" && token.trim()
+
       ? token.trim()
+
       : null;
+
   } catch {
+
     return null;
+
   }
+
 };
+
+
 
 const getStoredAdmin = () => {
+
   try {
+
     return safeParse(localStorage.getItem("admin"), null);
+
   } catch {
+
     return null;
+
   }
+
 };
+
+
 
 const isValidObjectId = (id) =>
+
   typeof id === "string" &&
+
   /^[a-f\d]{24}$/i.test(id);
 
+
+
 const normalizeProductsResponse = (data) =>
+
   Array.isArray(data) ? data : [];
 
+
+
 const normalizeText = (value, maxLength) =>
+
   typeof value === "string"
+
     ? value.trim().slice(0, maxLength)
+
     : "";
 
+
+
 const normalizePrice = (value) => {
+
   const number = Number(value);
+
   return Number.isFinite(number) && number >= 0
+
     ? number
+
     : null;
+
 };
+
+
 
 const isValidImageFile = (file) => {
+
   if (!file) return false;
 
+
+
   const allowedTypes = [
+
     "image/jpeg",
+
     "image/png",
+
     "image/webp",
+
     "image/gif",
+
   ];
 
+
+
   return (
+
     allowedTypes.includes(file.type) &&
+
     file.size > 0 &&
+
     file.size <= MAX_IMAGE_SIZE
+
   );
+
 };
+
+
 
 const api = axios.create({
+
   baseURL: API_BASE_URL,
+
   timeout: API_TIMEOUT,
+
   headers: {
+
     Accept: "application/json",
+
   },
+
 });
 
+
+
 api.interceptors.request.use(
+
   (config) => {
+
     const token = getAuthToken();
 
+
+
     if (token) {
+
       config.headers = config.headers || {};
+
       config.headers.Authorization = `Bearer ${token}`;
+
     }
+
+
 
     return config;
+
   },
+
   (error) => Promise.reject(error)
+
 );
+
+
 
 api.interceptors.response.use(
+
   (response) => response,
+
   (error) => {
+
     const status = error?.response?.status;
 
+
+
     if (status === 401 || status === 403) {
+
       try {
+
         localStorage.removeItem("token");
+
         localStorage.removeItem("admin");
+
       } catch {
+
         // Ne bloque pas l'application.
+
       }
+
+
 
       if (
+
         typeof window !== "undefined" &&
+
         window.location.pathname !== "/admin-login"
+
       ) {
+
         window.location.replace("/admin-login");
+
       }
+
     }
+
+
 
     return Promise.reject(error);
+
   }
+
 );
 
+
+
 const requireAdminSession = () => {
+
   const token = getAuthToken();
+
   const admin = getStoredAdmin();
 
+
+
   if (!token || !admin) {
+
     if (
+
       typeof window !== "undefined" &&
+
       window.location.pathname !== "/admin-login"
+
     ) {
+
       window.location.replace("/admin-login");
+
     }
 
+
+
     return false;
+
   }
 
+
+
   return true;
+
 };
+
+
+
+
+
 
 
 
@@ -161,23 +320,47 @@ import { toast } from "react-toastify";
 
 
 
+
+
+
+
 import {
+
+
 
   FaPlus,
 
+
+
   FaTrash,
+
+
 
   FaEdit,
 
+
+
   FaBox,
+
+
 
   FaSearch,
 
+
+
   FaTags,
+
+
 
   FaImage,
 
+
+
 } from "react-icons/fa";
+
+
+
+
 
 
 
@@ -185,71 +368,143 @@ import "./AdminProducts.css";
 
 
 
+
+
+
+
 function AdminProducts() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // STATES
 
+
+
   // =========================
+
+
+
+
 
 
 
   const [products, setProducts] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [name, setName] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [price, setPrice] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [category, setCategory] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [image, setImage] =
 
+
+
     useState(null);
+
+
+
+
 
 
 
   const [search, setSearch] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [editId, setEditId] =
 
+
+
     useState(null);
+
+
+
+
 
 
 
   const [loading, setLoading] =
 
+
+
     useState(false);
 
 
 
+
+
+
+
   // =========================
+
+
 
   // FETCH PRODUCTS
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -257,7 +512,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
     fetchProducts();
+
+
+
+
 
 
 
@@ -265,9 +528,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
   const fetchProducts =
 
+
+
     async () => {
+
+
+
+
 
 
 
@@ -275,11 +548,23 @@ function AdminProducts() {
 
 
 
-        const res = await axios.get(
 
-  "https\://konanshopping.com/api/products"
+
+
+
+        const res = await api.get(
+
+
+
+  "https://konanshopping.com/api/products"
+
+
 
 );
+
+
+
+
 
 
 
@@ -287,7 +572,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
       } catch (err) {
+
+
+
+
 
 
 
@@ -295,7 +588,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -303,17 +604,35 @@ function AdminProducts() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // ADD PRODUCT
 
+
+
   // =========================
+
+
+
+
 
 
 
   const addProduct =
 
+
+
     async () => {
+
+
+
+
 
 
 
@@ -321,33 +640,67 @@ function AdminProducts() {
 
 
 
+
+
+
+
         if (
+
+
 
           !name ||
 
+
+
           !price ||
+
+
 
           !category ||
 
+
+
           !image
+
+
 
         ) {
 
 
 
+
+
+
+
           return toast.warning(
+
+
 
   "Veuillez remplir tous les champs ⚠️",
 
+
+
   {
+
+
 
     position: "top-right",
 
+
+
     autoClose: 2500,
+
+
 
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -355,7 +708,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
         setLoading(true);
+
+
+
+
 
 
 
@@ -363,13 +724,27 @@ function AdminProducts() {
 
 
 
+
+
+
+
         // SAVE DATABASE
+
+
+
+
 
 
 
         const formData =
 
+
+
   new FormData();
+
+
+
+
 
 
 
@@ -377,7 +752,15 @@ formData.append("name", name);
 
 
 
+
+
+
+
 formData.append("price", price);
+
+
+
+
 
 
 
@@ -385,27 +768,55 @@ formData.append("category", category);
 
 
 
+
+
+
+
 formData.append("image", image);
 
 
 
-await axios.post(
 
-  "https\://konanshopping.com/api/add-product",
+
+
+
+await api.post(
+
+
+
+  "https://konanshopping.com/api/add-product",
+
+
 
   formData,
 
+
+
   {
+
+
 
     headers: {
 
+
+
       "Content-Type": "multipart/form-data",
+
+
 
     },
 
+
+
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -413,7 +824,15 @@ await axios.post(
 
 
 
+
+
+
+
         setName("");
+
+
+
+
 
 
 
@@ -421,7 +840,15 @@ await axios.post(
 
 
 
+
+
+
+
         setCategory("");
+
+
+
+
 
 
 
@@ -429,23 +856,47 @@ await axios.post(
 
 
 
+
+
+
+
         fetchProducts();
+
+
+
+
 
 
 
         toast.success(
 
+
+
   "Produit ajouté dans la boutique ✅",
+
+
 
   {
 
+
+
     position: "top-right",
+
+
 
     autoClose: 2500,
 
+
+
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -453,23 +904,47 @@ await axios.post(
 
 
 
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
 
 
 
         toast.error(
 
+
+
   "Erreur lors de l'ajout du produit ❌",
+
+
 
   {
 
+
+
     position: "top-right",
+
+
 
     autoClose: 3000,
 
+
+
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -477,7 +952,15 @@ await axios.post(
 
 
 
+
+
+
+
         setLoading(false);
+
+
+
+
 
 
 
@@ -485,37 +968,75 @@ await axios.post(
 
 
 
+
+
+
+
     };
 
 
 
+
+
+
+
   // =========================
+
+
 
   // DELETE PRODUCT
 
+
+
   // =========================
+
+
+
+
 
 
 
   const deleteProduct =
 
+
+
     async (id) => {
+
+
+
+
 
 
 
       const confirmDelete =
 
+
+
         window.confirm(
 
+
+
           "Supprimer ce produit ?"
+
+
 
         );
 
 
 
+
+
+
+
       if (!confirmDelete)
 
+
+
         return;
+
+
+
+
 
 
 
@@ -523,11 +1044,23 @@ await axios.post(
 
 
 
-        await axios.delete(
 
-  `https\://konanshopping.com/api/delete-product/${id}`
+
+
+
+        await api.delete(
+
+
+
+  `https://konanshopping.com/api/delete-product/${id}`
+
+
 
 );
+
+
+
+
 
 
 
@@ -535,19 +1068,39 @@ await axios.post(
 
 
 
+
+
+
+
         toast.success(
+
+
 
   "Produit supprimé avec succès 🗑️",
 
+
+
   {
+
+
 
     position: "top-right",
 
+
+
     autoClose: 2500,
+
+
 
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -555,7 +1108,15 @@ await axios.post(
 
 
 
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
 
 
 
@@ -563,25 +1124,51 @@ await axios.post(
 
 
 
+
+
+
+
     };
 
 
 
+
+
+
+
   // =========================
+
+
 
   // UPDATE PRODUCT
 
+
+
   // =========================
+
+
+
+
 
 
 
   const updateProduct =
 
+
+
     async () => {
 
 
 
+
+
+
+
       try {
+
+
+
+
 
 
 
@@ -589,21 +1176,43 @@ await axios.post(
 
 
 
-        await axios.put(
 
-  `https\://konanshopping.com/api/update-product/${editId}`,
+
+
+
+        await api.put(
+
+
+
+  `https://konanshopping.com/api/update-product/${editId}`,
+
+
 
   {
 
+
+
     name,
+
+
 
     price,
 
+
+
     category,
+
+
 
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -611,7 +1220,15 @@ await axios.post(
 
 
 
+
+
+
+
         setName("");
+
+
+
+
 
 
 
@@ -619,7 +1236,15 @@ await axios.post(
 
 
 
+
+
+
+
         setCategory("");
+
+
+
+
 
 
 
@@ -627,23 +1252,47 @@ await axios.post(
 
 
 
+
+
+
+
         fetchProducts();
+
+
+
+
 
 
 
         toast.success(
 
+
+
   "Produit modifié avec succès ✏️",
+
+
 
   {
 
+
+
     position: "top-right",
+
+
 
     autoClose: 2500,
 
+
+
   }
 
+
+
 );
+
+
+
+
 
 
 
@@ -651,7 +1300,15 @@ await axios.post(
 
 
 
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
 
 
 
@@ -659,7 +1316,15 @@ await axios.post(
 
 
 
+
+
+
+
         setLoading(false);
+
+
+
+
 
 
 
@@ -667,33 +1332,67 @@ await axios.post(
 
 
 
+
+
+
+
     };
 
 
 
+
+
+
+
   // =========================
+
+
 
   // SEARCH
 
+
+
   // =========================
+
+
+
+
 
 
 
   const filteredProducts =
 
+
+
     products.filter((product) =>
+
+
+
+
 
 
 
       product.name
 
+
+
         ?.toLowerCase()
+
+
 
         .includes(
 
+
+
           search.toLowerCase()
 
+
+
         )
+
+
+
+
 
 
 
@@ -701,11 +1400,23 @@ await axios.post(
 
 
 
+
+
+
+
   // =========================
+
+
 
   // RETURN
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -713,11 +1424,23 @@ await axios.post(
 
 
 
+
+
+
+
     <div className="adminProducts">
 
 
 
-      {/\* HEADER \*/}
+
+
+
+
+      {/**\\\*** HEADER **\\\***/}
+
+
+
+
 
 
 
@@ -725,7 +1448,15 @@ await axios.post(
 
 
 
+
+
+
+
         <div>
+
+
+
+
 
 
 
@@ -733,7 +1464,15 @@ await axios.post(
 
 
 
+
+
+
+
             Gestion Produits
+
+
+
+
 
 
 
@@ -741,15 +1480,31 @@ await axios.post(
 
 
 
+
+
+
+
           <p>
+
+
+
+
 
 
 
             Gérez facilement
 
+
+
             tous vos produits
 
+
+
             ecommerce premium
+
+
+
+
 
 
 
@@ -757,7 +1512,15 @@ await axios.post(
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -765,29 +1528,59 @@ await axios.post(
 
 
 
+
+
+
+
           <FaSearch />
+
+
+
+
 
 
 
           <input
 
+
+
             type="text"
+
+
 
             placeholder="Rechercher..."
 
+
+
             value={search}
+
+
 
             onChange={(e) =>
 
+
+
               setSearch(
+
+
 
                 e.target.value
 
+
+
               )
+
+
 
             }
 
+
+
           />
+
+
+
+
 
 
 
@@ -795,11 +1588,23 @@ await axios.post(
 
 
 
+
+
+
+
       </div>
 
 
 
-      {/\* STATS \*/}
+
+
+
+
+      {/**\\\*** STATS **\\\***/}
+
+
+
+
 
 
 
@@ -807,7 +1612,15 @@ await axios.post(
 
 
 
+
+
+
+
         <div className="statCard">
+
+
+
+
 
 
 
@@ -815,23 +1628,47 @@ await axios.post(
 
 
 
+
+
+
+
             <p>
 
+
+
               Produits
+
+
 
             </p>
 
 
 
+
+
+
+
             <h2>
 
+
+
               {products.length}
+
+
 
             </h2>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -839,7 +1676,15 @@ await axios.post(
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -847,15 +1692,31 @@ await axios.post(
 
 
 
+
+
+
+
           <div>
+
+
+
+
 
 
 
             <p>
 
+
+
               Catégories
 
+
+
             </p>
+
+
+
+
 
 
 
@@ -863,25 +1724,51 @@ await axios.post(
 
 
 
+
+
+
+
               {
+
+
 
                 [
 
+
+
                   ...new Set(
+
+
 
                     products.map(
 
+
+
                       (p) =>
+
+
 
                         p.category
 
+
+
                     )
+
+
 
                   )
 
+
+
                 ].length
 
+
+
               }
+
+
+
+
 
 
 
@@ -889,7 +1776,15 @@ await axios.post(
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -897,7 +1792,15 @@ await axios.post(
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -905,7 +1808,15 @@ await axios.post(
 
 
 
-      {/\* FORMULAIRE \*/}
+
+
+
+
+      {/**\\\*** FORMULAIRE **\\\***/}
+
+
+
+
 
 
 
@@ -913,7 +1824,15 @@ await axios.post(
 
 
 
+
+
+
+
         <div className="formHeader">
+
+
+
+
 
 
 
@@ -921,15 +1840,31 @@ await axios.post(
 
 
 
+
+
+
+
             <h2>
+
+
+
+
 
 
 
               {editId
 
+
+
                 ? "Modifier Produit"
 
+
+
                 : "Ajouter Produit"}
+
+
+
+
 
 
 
@@ -937,15 +1872,31 @@ await axios.post(
 
 
 
+
+
+
+
             <p>
+
+
+
+
 
 
 
               Ajoutez rapidement
 
+
+
               vos nouveaux produits
 
+
+
               premium dans la boutique
+
+
+
+
 
 
 
@@ -953,7 +1904,15 @@ await axios.post(
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -961,7 +1920,15 @@ await axios.post(
 
 
 
-        {/\* GRID \*/}
+
+
+
+
+        {/**\\\*** GRID **\\\***/}
+
+
+
+
 
 
 
@@ -969,7 +1936,15 @@ await axios.post(
 
 
 
-          {/\* NOM \*/}
+
+
+
+
+          {/**\\\*** NOM **\\\***/}
+
+
+
+
 
 
 
@@ -977,33 +1952,67 @@ await axios.post(
 
 
 
+
+
+
+
             <label>
+
+
 
               Nom produit
 
+
+
             </label>
 
 
 
+
+
+
+
             <input
+
+
 
               type="text"
 
+
+
               placeholder="Ex: Jordan 4"
+
+
 
               value={name}
 
+
+
               onChange={(e) =>
+
+
 
                 setName(
 
+
+
                   e.target.value
+
+
 
                 )
 
+
+
               }
 
+
+
             />
+
+
+
+
 
 
 
@@ -1011,7 +2020,15 @@ await axios.post(
 
 
 
-          {/\* PRIX \*/}
+
+
+
+
+          {/**\\\*** PRIX **\\\***/}
+
+
+
+
 
 
 
@@ -1019,33 +2036,67 @@ await axios.post(
 
 
 
+
+
+
+
             <label>
+
+
 
               Prix
 
+
+
             </label>
+
+
+
+
 
 
 
             <input
 
+
+
               type="number"
+
+
 
               placeholder="20000"
 
+
+
               value={price}
+
+
 
               onChange={(e) =>
 
+
+
                 setPrice(
+
+
 
                   e.target.value
 
+
+
                 )
+
+
 
               }
 
+
+
             />
+
+
+
+
 
 
 
@@ -1053,7 +2104,15 @@ await axios.post(
 
 
 
-          {/\* CATEGORIE \*/}
+
+
+
+
+          {/**\\\*** CATEGORIE **\\\***/}
+
+
+
+
 
 
 
@@ -1061,163 +2120,327 @@ await axios.post(
 
 
 
+
+
+
+
             <label>
+
+
 
               Catégorie
 
+
+
             </label>
+
+
+
+
 
 
 
             <select
 
+
+
               value={category}
+
+
 
               onChange={(e) =>
 
+
+
                 setCategory(
+
+
 
                   e.target.value
 
+
+
                 )
 
+
+
               }
+
+
 
             >
 
 
 
+
+
+
+
   <option value="">
 
+
+
     Choisir catégorie
+
+
 
   </option>
 
 
 
+
+
+
+
   <option>T-shirts</option>
+
+
 
   <option>Chemises</option>
 
+
+
   <option>Blouses</option>
+
+
 
   <option>Polos</option>
 
+
+
   <option>Débardeurs</option>
+
+
 
   <option>Pulls</option>
 
+
+
   <option>Gilets</option>
+
+
 
   <option>Sweats</option>
 
+
+
   <option>Hoodies</option>
+
+
 
   <option>Vestes</option>
 
+
+
   <option>Blousons</option>
+
+
 
   <option>Manteaux</option>
 
+
+
   <option>Costumes</option>
+
+
 
   <option>Blazers</option>
 
+
+
   <option>Robes</option>
+
+
 
   <option>Jupes</option>
 
+
+
   <option>Pantalons</option>
+
+
 
   <option>Jeans</option>
 
+
+
   <option>Leggings</option>
+
+
 
   <option>Shorts</option>
 
+
+
   <option>Combinaisons</option>
+
+
 
   <option>Pyjamas</option>
 
+
+
   <option>Sous-vêtements</option>
+
+
 
   <option>Lingerie</option>
 
+
+
   <option>Chaussettes</option>
+
+
 
   <option>Maillots de bain</option>
 
+
+
   <option>Vêtements de sport</option>
+
+
 
   <option>Tenues de yoga</option>
 
+
+
   <option>Mode homme</option>
+
+
 
   <option>Mode femme</option>
 
+
+
   <option>Mode enfant</option>
+
+
 
   <option>Mode bébé</option>
 
+
+
   <option>Chaussures</option>
+
+
 
   <option>Baskets</option>
 
+
+
   <option>Chaussures de ville</option>
+
+
 
   <option>Bottes</option>
 
+
+
   <option>Bottines</option>
+
+
 
   <option>Sandales</option>
 
+
+
   <option>Mocassins</option>
+
+
 
   <option>Escarpins</option>
 
+
+
   <option>Ballerines</option>
+
+
 
   <option>Claquettes</option>
 
+
+
   <option>Sacs à main</option>
+
+
 
   <option>Sacs à dos</option>
 
+
+
   <option>Sacs de voyage</option>
+
+
 
   <option>Valises</option>
 
+
+
   <option>Portefeuilles</option>
+
+
 
   <option>Ceintures</option>
 
+
+
   <option>Montres</option>
+
+
 
   <option>Bijoux</option>
 
+
+
   <option>Lunettes</option>
+
+
 
   <option>Casquettes</option>
 
+
+
   <option>Chapeaux</option>
+
+
 
   <option>Écharpes</option>
 
+
+
   <option>Foulards</option>
+
+
 
   <option>Gants</option>
 
+
+
   <option>Accessoires</option>
+
+
 
   <option>Accessoires de mode</option>
 
+
+
   <option>Luxe</option>
+
+
 
   <option>Nouveautés</option>
 
+
+
   <option>Promotions</option>
 
+
+
 </select>
+
+
+
+
 
 
 
@@ -1225,7 +2448,15 @@ await axios.post(
 
 
 
-          {/\* IMAGE \*/}
+
+
+
+
+          {/**\\\*** IMAGE **\\\***/}
+
+
+
+
 
 
 
@@ -1233,11 +2464,23 @@ await axios.post(
 
 
 
+
+
+
+
             <label>
+
+
 
               Image produit
 
+
+
             </label>
+
+
+
+
 
 
 
@@ -1245,29 +2488,59 @@ await axios.post(
 
 
 
+
+
+
+
               <FaImage />
+
+
+
+
 
 
 
               <input
 
+
+
                 type="file"
+
+
 
                 onChange={(e) =>
 
+
+
                   setImage(
+
+
 
                     e.target.files[0]
 
+
+
                   )
 
+
+
                 }
+
+
 
               />
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -1275,29 +2548,59 @@ await axios.post(
 
 
 
+
+
+
+
         </div>
 
 
 
-        {/\* BUTTON \*/}
+
+
+
+
+        {/**\\\*** BUTTON **\\\***/}
+
+
+
+
 
 
 
         <button
 
+
+
           className="addBtn"
+
+
 
           onClick={
 
+
+
             editId
+
+
 
               ? updateProduct
 
+
+
               : addProduct
+
+
 
           }
 
+
+
         >
+
+
+
+
 
 
 
@@ -1305,7 +2608,15 @@ await axios.post(
 
 
 
+
+
+
+
             "Chargement..."
+
+
+
+
 
 
 
@@ -1313,23 +2624,47 @@ await axios.post(
 
 
 
+
+
+
+
             <>
+
+
 
               {editId
 
+
+
                 ? <FaEdit />
+
+
 
                 : <FaPlus />}
 
 
 
+
+
+
+
               {editId
+
+
 
                 ? "Modifier Produit"
 
+
+
                 : "Ajouter à la boutique"}
 
+
+
             </>
+
+
+
+
 
 
 
@@ -1337,7 +2672,15 @@ await axios.post(
 
 
 
+
+
+
+
         </button>
+
+
+
+
 
 
 
@@ -1345,7 +2688,15 @@ await axios.post(
 
 
 
-      {/\* PRODUITS \*/}
+
+
+
+
+      {/**\\\*** PRODUITS **\\\***/}
+
+
+
+
 
 
 
@@ -1353,29 +2704,59 @@ await axios.post(
 
 
 
+
+
+
+
         {filteredProducts.map(
+
+
 
           (
 
+
+
             product,
 
+
+
             index
+
+
 
           ) => (
 
 
 
+
+
+
+
             <div
+
+
 
               key={index}
 
+
+
               className="productCard"
+
+
 
             >
 
 
 
-              {/\* IMAGE \*/}
+
+
+
+
+              {/**\\\*** IMAGE **\\\***/}
+
+
+
+
 
 
 
@@ -1383,21 +2764,43 @@ await axios.post(
 
 
 
+
+
+
+
                 <img
+
+
 
   src={
 
+
+
     product.image.startsWith("http")
+
+
 
       ? product.image
 
-      : `https\://konanshopping.com/api/${product.image}`
+
+
+      : `https://konanshopping.com/api/${product.image}`
+
+
 
   }
 
+
+
    alt=""
 
+
+
 />
+
+
+
+
 
 
 
@@ -1405,7 +2808,15 @@ await axios.post(
 
 
 
-              {/\* INFO \*/}
+
+
+
+
+              {/**\\\*** INFO **\\\***/}
+
+
+
+
 
 
 
@@ -1413,15 +2824,31 @@ await axios.post(
 
 
 
+
+
+
+
                 <h3>
+
+
+
+
 
 
 
                   {
 
+
+
                     product.name
 
+
+
                   }
+
+
+
+
 
 
 
@@ -1429,15 +2856,31 @@ await axios.post(
 
 
 
+
+
+
+
                 <h4>
+
+
+
+
 
 
 
                   {
 
+
+
                     product.price
 
+
+
                   } FCFA
+
+
+
+
 
 
 
@@ -1445,15 +2888,31 @@ await axios.post(
 
 
 
+
+
+
+
                 <span>
+
+
+
+
 
 
 
                   {
 
+
+
                     product.category
 
+
+
                   }
+
+
+
+
 
 
 
@@ -1461,11 +2920,23 @@ await axios.post(
 
 
 
+
+
+
+
               </div>
 
 
 
-              {/\* BUTTONS \*/}
+
+
+
+
+              {/**\\\*** BUTTONS **\\\***/}
+
+
+
+
 
 
 
@@ -1473,13 +2944,27 @@ await axios.post(
 
 
 
-                {/\* EDIT \*/}
+
+
+
+
+                {/**\\\*** EDIT **\\\***/}
+
+
+
+
 
 
 
                 <button
 
+
+
                   className="editBtn"
+
+
+
+
 
 
 
@@ -1487,51 +2972,103 @@ await axios.post(
 
 
 
+
+
+
+
                     setEditId(
+
+
 
                       product._id
 
+
+
                     );
+
+
+
+
 
 
 
                     setName(
 
+
+
                       product.name
 
+
+
                     );
+
+
+
+
 
 
 
                     setPrice(
 
+
+
                       product.price
 
+
+
                     );
+
+
+
+
 
 
 
                     setCategory(
 
+
+
                       product.category
+
+
 
                     );
 
 
 
+
+
+
+
                     window.scrollTo({
+
+
 
                       top:0,
 
+
+
                       behavior:"smooth",
+
+
 
                     });
 
 
 
+
+
+
+
                   }}
 
+
+
                 >
+
+
+
+
 
 
 
@@ -1539,7 +3076,15 @@ await axios.post(
 
 
 
+
+
+
+
                   Modifier
+
+
+
+
 
 
 
@@ -1547,27 +3092,55 @@ await axios.post(
 
 
 
-                {/\* DELETE \*/}
+
+
+
+
+                {/**\\\*** DELETE **\\\***/}
+
+
+
+
 
 
 
                 <button
 
+
+
                   className="deleteBtn"
+
+
+
+
 
 
 
                   onClick={() =>
 
+
+
                     deleteProduct(
+
+
 
                       product._id
 
+
+
                     )
+
+
 
                   }
 
+
+
                 >
+
+
+
+
 
 
 
@@ -1575,7 +3148,15 @@ await axios.post(
 
 
 
+
+
+
+
                   Supprimer
+
+
+
+
 
 
 
@@ -1583,7 +3164,15 @@ await axios.post(
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -1591,9 +3180,19 @@ await axios.post(
 
 
 
+
+
+
+
           )
 
+
+
         )}
+
+
+
+
 
 
 
@@ -1601,7 +3200,15 @@ await axios.post(
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1609,7 +3216,15 @@ await axios.post(
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

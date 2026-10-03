@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
 
     email: {
       type: String,
+      required: true,
       unique: true,
       trim: true,
       lowercase: true,
@@ -60,12 +61,14 @@ const userSchema = new mongoose.Schema(
       default: Date.now,
     },
 
+    
     avatar: {
       type: String,
       default: "",
       trim: true,
-      maxlength: 1000,
+      maxlength: 1500000,
     },
+
 
     phone: {
       type: String,

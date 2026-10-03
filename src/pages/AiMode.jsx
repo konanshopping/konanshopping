@@ -6,15 +6,9 @@ import React, {
 
 } from "react";
 
-
-
 import axios from "axios";
 
-
-
 import { Link } from "react-router-dom";
-
-
 
 import {
 
@@ -36,8 +30,6 @@ import {
 
 } from "react-icons/fa";
 
-
-
 import {
 
 FaBrain,
@@ -56,11 +48,7 @@ FaSpinner,
 
 FaCheck
 
-
-
 } from "react-icons/fa";
-
-
 
 import {
 
@@ -70,140 +58,167 @@ FaTag
 
 } from "react-icons/fa";
 
-
-
-
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
+
 const AI_TIMEOUT = 30000;
 
 const MAX_MESSAGE_LENGTH = 1000;
+
 const MAX_HISTORY_MESSAGES = 30;
+
 const MAX_HISTORY_TEXT_LENGTH = 2000;
+
 const MAX_CART_ITEMS = 100;
 
 const safeParse = (value, fallback = null) => {
+
   try {
+
     return value ? JSON.parse(value) : fallback;
+
   } catch {
+
     return fallback;
+
   }
+
 };
 
 const normalizeText = (value, maxLength) =>
+
   typeof value === "string"
+
     ? value.trim().slice(0, maxLength)
+
     : "";
 
 const isValidProduct = (product) =>
+
   Boolean(
+
     product &&
+
       typeof product === "object" &&
+
       typeof product._id === "string" &&
+
       product._id.length > 0
+
   );
 
 const normalizeProductList = (value) =>
+
   Array.isArray(value)
+
     ? value.filter(isValidProduct).slice(0, 100)
+
     : [];
 
 const normalizeHistory = (value) =>
+
   Array.isArray(value)
+
     ? value
+
         .filter(
+
           (item) =>
+
             item &&
+
             (item.role === "user" || item.role === "ai") &&
+
             typeof item.text === "string"
+
         )
+
         .slice(-MAX_HISTORY_MESSAGES)
+
         .map((item) => ({
+
           role: item.role,
+
           text: normalizeText(item.text, MAX_HISTORY_TEXT_LENGTH)
+
         }))
+
     : [];
 
 const api = axios.create({
+
   baseURL: API_BASE_URL,
+
   timeout: API_TIMEOUT,
+
   headers: {
+
     Accept: "application/json"
+
   }
+
 });
 
 const normalizeCart = (items) =>
+
   Array.isArray(items)
+
     ? items
+
         .filter(isValidProduct)
+
         .slice(0, MAX_CART_ITEMS)
+
         .map((item) => ({
+
           ...item,
+
           quantity:
+
             Number.isFinite(Number(item.quantity)) &&
+
             Number(item.quantity) > 0
+
               ? Math.min(Math.floor(Number(item.quantity)), 99)
+
               : 1
+
         }))
+
     : [];
 
 function AiMode() {
-
-
 
 const [adding,setAdding] =
 
 useState(null);
 
-
-
 const [hover,setHover] =
 
 useState(false);
-
-
 
 const [showFooter, setShowFooter] =
 
 useState(true);
 
-
-
 useEffect(() => {
-
-
 
 let timer;
 
-
-
 const handleInteraction = () => {
-
-
 
 setShowFooter(true);
 
-
-
 clearTimeout(timer);
-
-
 
 timer = setTimeout(() => {
 
-
-
 setShowFooter(false);
-
-
 
 }, 3000);
 
-
-
 };
-
-
 
 window.addEventListener(
 
@@ -213,8 +228,6 @@ handleInteraction
 
 );
 
-
-
 window.addEventListener(
 
 "touchstart",
@@ -222,16 +235,10 @@ window.addEventListener(
 handleInteraction
 
 );
-
-
 
 handleInteraction();
 
-
-
 return () => {
-
-
 
 window.removeEventListener(
 
@@ -241,8 +248,6 @@ handleInteraction
 
 );
 
-
-
 window.removeEventListener(
 
 "touchstart",
@@ -251,57 +256,33 @@ handleInteraction
 
 );
 
-
-
 };
-
-
 
 }, []);
 
-
-
-const user = JSON.parse(
-
-  localStorage.getItem("user")
-
-);
-
-
+const user = safeParse(localStorage.getItem("user"), null);
 
 const userId = user?._id;
-
-
 
 const [listening,setListening] =
 
 useState(false);
 
-
-
 const [thinking,setThinking] =
 
 useState(false);
-
-
 
 const [pulse,setPulse] =
 
 useState(false);
 
-
-
 const [products,setProducts] =
 
 useState([]);
 
-
-
 const [reply,setReply] =
 
 useState("");
-
-
 
 const [featuredProducts,
 
@@ -309,63 +290,33 @@ setFeaturedProducts] =
 
 useState([]);
 
-
-
 useEffect(() => {
-
-
 
 const loadProducts =
 
 async () => {
 
-
-
 try {
-
-
 
 const res =
 
-await axios.get(
-
-"https\://konanshopping.com/api/products"
-
-);
-
-
+await api.get("/api/products");
 
 setFeaturedProducts(normalizeProductList(res.data).slice(0, 8));
 
-
-
 }
-
-
 
 catch(err){
 
-
-
 console.error("Erreur AiMode :", err?.response?.status || "API");
-
-
 
 }
 
-
-
 };
-
-
 
 loadProducts();
 
-
-
 }, []);
-
-
 
 const [messages,setMessages] =
 
@@ -383,23 +334,15 @@ text:
 
 ]);
 
-
-
 const [lastCommand,
 
 setLastCommand] =
 
 useState("");
 
-
-
 const addToCart = (product) => {
 
-
-
-  playSound();
-
-
+  if (typeof playSound === "function") playSound();
 
   const existingProduct =
 
@@ -411,133 +354,73 @@ const addToCart = (product) => {
 
     );
 
-
-
   if (existingProduct) {
-
-
 
     const updatedCart =
 
       cart.map((item)=>
 
-
-
         item._id === product._id
-
-
 
         ? {
 
-
-
           ...item,
-
-
 
           quantity:
 
           item.quantity + 1
 
-
-
         }
-
-
 
         : item
 
-
-
       );
-
-
 
     setCart(normalizeCart(updatedCart));
 
-
-
   }
-
-
 
   else {
 
-
-
     setCart([
-
-
 
       ...cart,
 
-
-
       {
-
-
 
         ...product,
 
-
-
         quantity:1,
-
-
 
         image:
 
         product.image
 
-
-
       }
-
-
 
     ]);
 
-
-
   }
 
-
-
 };
-
-
 
 const [cart, setCart] =
 
 useState(() => {
 
-
-
   const user = safeParse(localStorage.getItem("user"), null);
-
-
 
   const clientId =
 
-
-
     user?._id ||
-
-
 
     normalizeText(localStorage.getItem("guestId"), 100) ||
 
-
-
     (() => {
-
-
 
       const newGuestId =
 
         "guest_" + Date.now();
-
-
 
       localStorage.setItem(
 
@@ -547,27 +430,17 @@ useState(() => {
 
       );
 
-
-
       return newGuestId;
 
-
-
     })();
-
-
 
   const cartKey =
 
     `cart_${clientId}`;
 
-
-
   const savedCart =
 
     localStorage.getItem(cartKey);
-
-
 
   return savedCart
 
@@ -575,37 +448,21 @@ useState(() => {
 
     : [];
 
-
-
 });
-
-
 
 useEffect(() => {
 
-
-
   const user = safeParse(localStorage.getItem("user"), null);
-
-
 
   const clientId =
 
-
-
     user?._id ||
 
-
-
     localStorage.getItem("guestId");
-
-
 
   const cartKey =
 
     `cart_${clientId}`;
-
-
 
   localStorage.setItem(
 
@@ -615,57 +472,41 @@ useEffect(() => {
 
   );
 
-
-
 }, [cart]);
-
-
 
 const startVoice = ()=>{
 
 if (!window.webkitSpeechRecognition) {
+
   return;
+
 }
 
 const recognition =
 
 new window.webkitSpeechRecognition();
 
-
-
 recognition.lang =
 
 "fr-FR";
-
-
 
 recognition.continuous =
 
 false;
 
-
-
 recognition.interimResults =
 
 false;
-
-
 
 setListening(true);
 
 setPulse(true);
 
-
-
 recognition.start();
-
-
 
 recognition.onresult =
 
 async(event)=>{
-
-
 
 const voiceText =
 
@@ -673,21 +514,15 @@ event.results[0][0]
 
 .transcript;
 
-
-
 setLastCommand(
 
 voiceText
 
 );
 
-
-
 setListening(false);
 
 setPulse(false);
-
-
 
 await sendMessage(
 
@@ -695,31 +530,19 @@ voiceText
 
 );
 
-
-
 };
-
-
 
 recognition.onerror =
 
 ()=>{
 
-
-
 setListening(false);
 
 setPulse(false);
 
-
-
 };
 
-
-
 };
-
-
 
 const sendMessage =
 
@@ -731,15 +554,9 @@ if(!cleanMessage) return;
 
 if (thinking) return;
 
-
-
 setThinking(true);
 
-
-
 try{
-
-
 
 const res =
 
@@ -763,57 +580,35 @@ timeout: AI_TIMEOUT
 
 );
 
-
-
 const safeReply = normalizeText(res.data?.reply, 5000);
 
 setReply(safeReply);
 
-
-
 const recommendedProducts = normalizeProductList(
+
   res.data?.products || res.data?.recommendations || []
+
 );
 
 setProducts(recommendedProducts);
 
-
-
 const aiMessage = {
-
-
 
 role:"ai",
 
-
-
 text:res.data.reply,
-
-
 
 products: recommendedProducts
 
-
-
 };
-
-
 
 const userMessage = {
 
-
-
 role:"user",
-
-
 
 text:cleanMessage
 
-
-
 };
-
-
 
 setMessages(prev=>[
 
@@ -825,23 +620,13 @@ aiMessage
 
 ]);
 
-
-
 const speech =
 
-new SpeechSynthesisUtterance(
-
-  res.data.Reply
-
-);
-
-
+new SpeechSynthesisUtterance(safeReply);
 
 speech.lang =
 
 "fr-FR";
-
-
 
 window
 
@@ -849,33 +634,19 @@ window
 
 .speak(speech);
 
-
-
 }
 
 catch(err){
 
-
-
 console.error("Erreur AiMode :", err?.response?.status || "API");
-
-
 
 }
 
-
-
 setThinking(false);
-
-
 
 };
 
-
-
 return (
-
-
 
 <div
 
@@ -895,11 +666,7 @@ overflow:"hidden"
 
 >
 
-
-
 {/* HEADER PREMIUM */}
-
-
 
 <div
 
@@ -919,11 +686,7 @@ gap:"10px"
 
 >
 
-
-
 {/* LOGO + NOM */}
-
-
 
 <div
 
@@ -939,8 +702,6 @@ gap:"10px"
 
 >
 
-
-
 <div
 
 style={{
@@ -953,8 +714,6 @@ window.innerWidth < 768
 
 : "52px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -963,19 +722,11 @@ window.innerWidth < 768
 
 : "52px",
 
-
-
 borderRadius:"14px",
-
-
 
 overflow:"hidden",
 
-
-
 flexShrink:0,
-
-
 
 boxShadow:
 
@@ -984,8 +735,6 @@ boxShadow:
 }}
 
 >
-
-
 
 <img
 
@@ -1005,23 +754,15 @@ objectFit:"cover"
 
 />
 
-
-
 </div>
 
-
-
 <div>
-
-
 
 <h1
 
 style={{
 
 margin:0,
-
-
 
 fontSize:
 
@@ -1031,15 +772,9 @@ window.innerWidth < 768
 
 : "20px",
 
-
-
 fontWeight:"900",
 
-
-
 color:"#111827",
-
-
 
 lineHeight:"1"
 
@@ -1051,35 +786,21 @@ KONAN
 
 </h1>
 
-
-
 <p
 
 style={{
 
 marginTop:"3px",
 
-
-
 fontSize:"10px",
-
-
 
 fontWeight:"700",
 
-
-
 color:"#2563eb",
-
-
 
 display:"flex",
 
-
-
 alignItems:"center",
-
-
 
 gap:"5px"
 
@@ -1087,31 +808,17 @@ gap:"5px"
 
 >
 
-
-
 <FaGlobeAfrica size={10} />
-
-
 
 SHOPPING CAMEROUN
 
-
-
 </p>
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* BADGE IA */}
-
-
 
 <div
 
@@ -1121,8 +828,6 @@ background:
 
 "linear-gradient(135deg,#2563eb,#1d4ed8)",
 
-
-
 padding:
 
 window.innerWidth < 768
@@ -1131,19 +836,11 @@ window.innerWidth < 768
 
 : "9px 14px",
 
-
-
 borderRadius:"999px",
-
-
 
 color:"#fff",
 
-
-
 fontWeight:"700",
-
-
 
 fontSize:
 
@@ -1153,23 +850,13 @@ window.innerWidth < 768
 
 : "12px",
 
-
-
 display:"flex",
-
-
 
 alignItems:"center",
 
-
-
 gap:"6px",
 
-
-
 whiteSpace:"nowrap",
-
-
 
 boxShadow:
 
@@ -1179,27 +866,15 @@ boxShadow:
 
 >
 
-
-
 <FaBrain size={11} />
-
-
 
 IA Konan
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* HALO ARRIÈRE PLAN */}
-
-
 
 <div
 
@@ -1207,19 +882,11 @@ style={{
 
 position:"absolute",
 
-
-
 top:"80px",
-
-
 
 left:"50%",
 
-
-
 transform:"translateX(-50%)",
-
-
 
 width:
 
@@ -1229,8 +896,6 @@ window.innerWidth < 768
 
 : "550px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -1239,21 +904,13 @@ window.innerWidth < 768
 
 : "550px",
 
-
-
 borderRadius:"50%",
-
-
 
 background:
 
 "radial-gradient(circle,rgba(37,99,235,.12),transparent 70%)",
 
-
-
 filter:"blur(50px)",
-
-
 
 zIndex:0,
 
@@ -1261,11 +918,7 @@ zIndex:0,
 
 />
 
-
-
 {/* IA ORB */}
-
-
 
 <div
 
@@ -1273,15 +926,9 @@ style={{
 
 display:"flex",
 
-
-
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 height:
 
@@ -1295,15 +942,9 @@ window.innerWidth < 768
 
 >
 
-
-
 <div
 
-
-
 onClick={startVoice}
-
-
 
 onMouseEnter={() =>
 
@@ -1311,19 +952,13 @@ setHover(true)
 
 }
 
-
-
 onMouseLeave={() =>
 
 setHover(false)
 
 }
 
-
-
 style={{
-
-
 
 width:
 
@@ -1333,8 +968,6 @@ window.innerWidth < 768
 
 : "230px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -1343,41 +976,23 @@ window.innerWidth < 768
 
 : "230px",
 
-
-
 borderRadius:"50%",
-
-
 
 cursor:"pointer",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 background:
 
 "radial-gradient(circle at 30% 30%,#ffffff,#93c5fd,#3b82f6,#2563eb,#1e3a8a)",
 
-
-
 boxShadow:
 
-
-
 pulse
-
-
 
 ? `
 
@@ -1389,8 +1004,6 @@ pulse
 
 `
 
-
-
 : `
 
 0 0 20px rgba(37,99,235,.15),
@@ -1399,39 +1012,21 @@ pulse
 
 `,
 
-
-
 transform:
-
-
 
 pulse
 
-
-
 ? "scale(1.06)"
-
-
 
 : hover
 
-
-
 ? "scale(1.03)"
-
-
 
 : "scale(1)",
 
-
-
 transition:"all .35s ease",
 
-
-
 position:"relative",
-
-
 
 animation:
 
@@ -1441,25 +1036,17 @@ pulse
 
 : "floatOrb 4s ease-in-out infinite"
 
-
-
 }}
 
 >
 
-
-
 {/* Aura 1 */}
-
-
 
 <div
 
 style={{
 
 position:"absolute",
-
-
 
 width:
 
@@ -1469,8 +1056,6 @@ window.innerWidth < 768
 
 : "280px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -1479,17 +1064,11 @@ window.innerWidth < 768
 
 : "280px",
 
-
-
 borderRadius:"50%",
-
-
 
 border:
 
 "2px solid rgba(96,165,250,.30)",
-
-
 
 animation:
 
@@ -1499,19 +1078,13 @@ animation:
 
 />
 
-
-
 {/* Aura 2 */}
-
-
 
 <div
 
 style={{
 
 position:"absolute",
-
-
 
 width:
 
@@ -1521,8 +1094,6 @@ window.innerWidth < 768
 
 : "320px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -1531,17 +1102,11 @@ window.innerWidth < 768
 
 : "320px",
 
-
-
 borderRadius:"50%",
-
-
 
 border:
 
 "1.5px solid rgba(255,255,255,.18)",
-
-
 
 animation:
 
@@ -1551,19 +1116,13 @@ animation:
 
 />
 
-
-
 {/* Aura 3 */}
-
-
 
 <div
 
 style={{
 
 position:"absolute",
-
-
 
 width:
 
@@ -1573,8 +1132,6 @@ window.innerWidth < 768
 
 : "380px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -1583,17 +1140,11 @@ window.innerWidth < 768
 
 : "380px",
 
-
-
 borderRadius:"50%",
-
-
 
 border:
 
 "1px solid rgba(96,165,250,.10)",
-
-
 
 animation:
 
@@ -1603,11 +1154,7 @@ animation:
 
 />
 
-
-
 {/* CERVEAU IA */}
-
-
 
 <FaBrain
 
@@ -1633,19 +1180,13 @@ filter:
 
 />
 
-
-
 {/* ÉTAT IA */}
-
-
 
 <div
 
 style={{
 
 position:"absolute",
-
-
 
 bottom:
 
@@ -1655,27 +1196,15 @@ window.innerWidth < 768
 
 : "-60px",
 
-
-
 display:"flex",
-
-
 
 alignItems:"center",
 
-
-
 gap:"6px",
-
-
 
 color:"#2563eb",
 
-
-
 fontWeight:"700",
-
-
 
 fontSize:
 
@@ -1688,8 +1217,6 @@ window.innerWidth < 768
 }}
 
 >
-
-
 
 {
 
@@ -1727,23 +1254,13 @@ listening ? (
 
 }
 
-
+</div>
 
 </div>
 
-
-
 </div>
-
-
-
-</div>
-
-
 
 {/* CONVERSATION */}
-
-
 
 <div
 
@@ -1751,23 +1268,13 @@ style={{
 
 maxWidth:"750px",
 
-
-
 margin:"20px auto",
-
-
 
 padding:"0 12px",
 
-
-
 display:"flex",
 
-
-
 flexDirection:"column",
-
-
 
 gap:"10px",
 
@@ -1775,11 +1282,7 @@ gap:"10px",
 
 >
 
-
-
 {messages.map((msg,index)=>(
-
-
 
 <div
 
@@ -1788,8 +1291,6 @@ key={index}
 style={{
 
 display:"flex",
-
-
 
 justifyContent:
 
@@ -1803,23 +1304,15 @@ msg.role === "user"
 
 >
 
-
-
 <div
 
 style={{
 
 display:"flex",
 
-
-
 alignItems:"flex-end",
 
-
-
 gap:"8px",
-
-
 
 maxWidth:"90%",
 
@@ -1827,15 +1320,9 @@ maxWidth:"90%",
 
 >
 
-
-
 {/* AVATAR IA */}
 
-
-
 {msg.role === "ai" && (
-
-
 
 <div
 
@@ -1843,41 +1330,23 @@ style={{
 
 width:"30px",
 
-
-
 height:"30px",
 
-
-
 borderRadius:"50%",
-
-
 
 background:
 
 "linear-gradient(135deg,#2563eb,#60a5fa)",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 color:"#fff",
 
-
-
 flexShrink:0,
-
-
 
 boxShadow:
 
@@ -1887,97 +1356,51 @@ boxShadow:
 
 >
 
-
-
 <FaBrain size={12} />
-
-
 
 </div>
 
-
-
 )}
 
-
-
 {/* BULLE */}
-
-
 
 <div
 
 style={{
 
-
-
 background:
 
-
-
 msg.role === "ai"
-
-
 
 ? "#ffffff"
 
-
-
 : "linear-gradient(135deg,#2563eb,#1d4ed8)",
-
-
 
 color:
 
-
-
 msg.role === "ai"
-
-
 
 ? "#111827"
 
-
-
 : "#ffffff",
-
-
 
 padding:"12px 14px",
 
-
-
 borderRadius:
 
-
-
 msg.role === "ai"
-
-
 
 ? "16px 16px 16px 5px"
 
-
-
 : "16px 16px 5px 16px",
-
-
 
 boxShadow:
 
-
-
 msg.role === "ai"
-
-
 
 ? "0 3px 12px rgba(0,0,0,.04)"
 
-
-
 : "0 6px 15px rgba(37,99,235,.15)",
-
-
 
 fontSize:
 
@@ -1987,15 +1410,9 @@ window.innerWidth < 768
 
 : "14px",
 
-
-
 lineHeight:"1.55",
 
-
-
 fontWeight:"500",
-
-
 
 maxWidth:
 
@@ -2005,11 +1422,7 @@ window.innerWidth < 768
 
 : "550px",
 
-
-
 wordBreak:"break-word",
-
-
 
 border:
 
@@ -2023,11 +1436,7 @@ msg.role === "ai"
 
 >
 
-
-
 {/* HEADER */}
-
-
 
 <div
 
@@ -2035,23 +1444,13 @@ style={{
 
 display:"flex",
 
-
-
 justifyContent:"space-between",
-
-
 
 alignItems:"center",
 
-
-
 marginBottom:"8px",
 
-
-
 paddingBottom:"6px",
-
-
 
 borderBottom:
 
@@ -2065,31 +1464,19 @@ msg.role === "ai"
 
 >
 
-
-
 <div
 
 style={{
 
 display:"flex",
 
-
-
 alignItems:"center",
-
-
 
 gap:"6px",
 
-
-
 fontWeight:"700",
 
-
-
 fontSize:"11px",
-
-
 
 color:
 
@@ -2103,13 +1490,9 @@ msg.role === "ai"
 
 >
 
-
-
 {
 
 msg.role === "ai"
-
-
 
 ? (
 
@@ -2123,8 +1506,6 @@ Konan AI
 
 )
 
-
-
 : (
 
 <>
@@ -2137,15 +1518,9 @@ Vous
 
 )
 
-
-
 }
 
-
-
 </div>
-
-
 
 <div
 
@@ -2153,19 +1528,13 @@ style={{
 
 fontSize:"10px",
 
-
-
 opacity:0.6,
-
-
 
 fontWeight:"500",
 
 }}
 
 >
-
-
 
 {new Date().toLocaleTimeString(
 
@@ -2181,27 +1550,17 @@ minute:"2-digit",
 
 )}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* CONTENU */}
-
-
 
 <div
 
 style={{
 
 whiteSpace:"pre-wrap",
-
-
 
 fontSize:
 
@@ -2211,35 +1570,21 @@ window.innerWidth < 768
 
 : "14px",
 
-
-
 lineHeight:"1.6",
 
 }}
 
 >
 
-
-
 {msg.text}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* AVATAR USER */}
 
-
-
 {msg.role === "user" && (
-
-
 
 <div
 
@@ -2247,41 +1592,23 @@ style={{
 
 width:"30px",
 
-
-
 height:"30px",
 
-
-
 borderRadius:"50%",
-
-
 
 background:
 
 "linear-gradient(135deg,#111827,#374151)",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 color:"#fff",
 
-
-
 flexShrink:0,
-
-
 
 boxShadow:
 
@@ -2291,39 +1618,21 @@ boxShadow:
 
 >
 
-
-
 <FaUser size={11} />
 
-
-
 </div>
-
-
 
 )}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 {messages.length <= 1 && (
-
-
 
 <div
 
@@ -2331,11 +1640,7 @@ style={{
 
 maxWidth:"900px",
 
-
-
 margin:"25px auto",
-
-
 
 padding:"0 14px",
 
@@ -2343,23 +1648,15 @@ padding:"0 14px",
 
 >
 
-
-
 <h3
 
 style={{
 
 fontSize:"16px",
 
-
-
 fontWeight:"800",
 
-
-
 marginBottom:"14px",
-
-
 
 color:"#111827",
 
@@ -2367,23 +1664,15 @@ color:"#111827",
 
 >
 
-
-
 Suggestions populaires
 
-
-
 </h3>
-
-
 
 <div
 
 style={{
 
 display:"grid",
-
-
 
 gridTemplateColumns:
 
@@ -2393,27 +1682,19 @@ window.innerWidth < 768
 
 : "repeat(auto-fit,minmax(220px,1fr))",
 
-
-
 gap:"12px",
 
 }}
 
 >
 
-
-
 {featuredProducts.map(
 
 (product)=>(
 
-
-
 <button
 
 key={product._id}
-
-
 
 onClick={() =>
 
@@ -2425,61 +1706,35 @@ product.name
 
 }
 
-
-
 style={{
-
-
 
 background:"#FFFFFF",
 
-
-
 border:"1px solid #E5E7EB",
-
-
 
 padding:"12px",
 
-
-
 borderRadius:"16px",
-
-
 
 cursor:"pointer",
 
-
-
 display:"flex",
-
-
 
 alignItems:"center",
 
-
-
 gap:"10px",
 
-
-
 textAlign:"left",
-
-
 
 boxShadow:
 
 "0 4px 12px rgba(0,0,0,.04)",
-
-
 
 transition:"all .25s ease",
 
 }}
 
 >
-
-
 
 <img
 
@@ -2491,19 +1746,11 @@ style={{
 
 width:"48px",
 
-
-
 height:"48px",
-
-
 
 borderRadius:"10px",
 
-
-
 objectFit:"cover",
-
-
 
 flexShrink:0,
 
@@ -2511,8 +1758,6 @@ flexShrink:0,
 
 />
 
-
-
 <div
 
 style={{
@@ -2523,31 +1768,19 @@ overflow:"hidden",
 
 >
 
-
-
 <div
 
 style={{
 
 fontWeight:"700",
 
-
-
 fontSize:"13px",
-
-
 
 color:"#111827",
 
-
-
 whiteSpace:"nowrap",
 
-
-
 overflow:"hidden",
-
-
 
 textOverflow:"ellipsis",
 
@@ -2555,15 +1788,9 @@ textOverflow:"ellipsis",
 
 >
 
-
-
 {product.name}
 
-
-
 </div>
-
-
 
 <div
 
@@ -2571,23 +1798,15 @@ style={{
 
 fontSize:"11px",
 
-
-
 color:"#2563EB",
 
-
-
 fontWeight:"700",
-
-
 
 marginTop:"4px",
 
 }}
 
 >
-
-
 
 {Number(
 
@@ -2597,45 +1816,25 @@ product.price
 
 FCFA
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 </button>
-
-
 
 ))
 
 }
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 )}
 
-
-
 {/* PRODUITS */}
 
-
-
 {products.length > 0 && (
-
-
 
 <div
 
@@ -2653,15 +1852,11 @@ window.innerWidth < 768
 
 >
 
-
-
 <h2
 
 style={{
 
 textAlign:"center",
-
-
 
 fontSize:
 
@@ -2671,15 +1866,9 @@ window.innerWidth < 768
 
 : "28px",
 
-
-
 fontWeight:"900",
 
-
-
 marginBottom:"20px",
-
-
 
 color:"#111827",
 
@@ -2691,15 +1880,11 @@ Résultats trouvés
 
 </h2>
 
-
-
 <div
 
 style={{
 
 display:"grid",
-
-
 
 gridTemplateColumns:
 
@@ -2708,8 +1893,6 @@ window.innerWidth < 768
 ? "repeat(2,1fr)"
 
 : "repeat(auto-fit,minmax(230px,1fr))",
-
-
 
 gap:
 
@@ -2723,17 +1906,11 @@ window.innerWidth < 768
 
 >
 
-
-
 {products.map((product)=>(
-
-
 
 <div
 
 key={product._id}
-
-
 
 onClick={() =>
 
@@ -2743,35 +1920,21 @@ window.location.href =
 
 }
 
-
-
 style={{
 
 background:"#fff",
 
-
-
 borderRadius:"18px",
-
-
 
 overflow:"hidden",
 
-
-
 cursor:"pointer",
 
-
-
 border:"1px solid #EEF2F7",
-
-
 
 boxShadow:
 
 "0 6px 18px rgba(0,0,0,.05)",
-
-
 
 transition:"all .3s ease",
 
@@ -2779,11 +1942,7 @@ transition:"all .3s ease",
 
 >
 
-
-
 {/* IMAGE */}
-
-
 
 <div
 
@@ -2795,23 +1954,15 @@ position:"relative",
 
 >
 
-
-
 <img
 
 src={product.image}
 
-
-
 alt={product.name}
-
-
 
 style={{
 
 width:"100%",
-
-
 
 height:
 
@@ -2821,15 +1972,11 @@ window.innerWidth < 768
 
 : "220px",
 
-
-
 objectFit:"cover",
 
 }}
 
 />
-
-
 
 <div
 
@@ -2837,43 +1984,23 @@ style={{
 
 position:"absolute",
 
-
-
 top:"10px",
-
-
 
 right:"10px",
 
-
-
 background:"#FFFFFF",
-
-
 
 width:"32px",
 
-
-
 height:"32px",
-
-
 
 borderRadius:"50%",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 boxShadow:
 
@@ -2883,8 +2010,6 @@ boxShadow:
 
 >
 
-
-
 <FaEye
 
 size={13}
@@ -2893,19 +2018,11 @@ color="#2563EB"
 
 />
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* INFOS */}
-
-
 
 <div
 
@@ -2917,47 +2034,27 @@ padding:"14px",
 
 >
 
-
-
 <div
 
 style={{
 
 display:"inline-flex",
 
-
-
 alignItems:"center",
-
-
 
 gap:"5px",
 
-
-
 padding:"5px 8px",
-
-
 
 borderRadius:"20px",
 
-
-
 background:"#EFF6FF",
-
-
 
 color:"#2563EB",
 
-
-
 fontSize:"10px",
 
-
-
 fontWeight:"700",
-
-
 
 marginBottom:"10px",
 
@@ -2965,19 +2062,11 @@ marginBottom:"10px",
 
 >
 
-
-
 <FaTag size={10} />
-
-
 
 {product.category}
 
-
-
 </div>
-
-
 
 <h3
 
@@ -2991,35 +2080,19 @@ window.innerWidth < 768
 
 : "15px",
 
-
-
 fontWeight:"800",
-
-
 
 color:"#111827",
 
-
-
 marginBottom:"8px",
-
-
 
 overflow:"hidden",
 
-
-
 display:"-webkit-box",
-
-
 
 WebkitLineClamp:"2",
 
-
-
 WebkitBoxOrient:"vertical",
-
-
 
 minHeight:"38px",
 
@@ -3027,15 +2100,9 @@ minHeight:"38px",
 
 >
 
-
-
 {product.name}
 
-
-
 </h3>
-
-
 
 <p
 
@@ -3049,23 +2116,15 @@ window.innerWidth < 768
 
 : "22px",
 
-
-
 fontWeight:"900",
 
-
-
 color:"#2563EB",
-
-
 
 marginBottom:"10px",
 
 }}
 
 >
-
-
 
 {Number(
 
@@ -3075,11 +2134,7 @@ product.price
 
  FCFA
 
-
-
 </p>
-
-
 
 <div
 
@@ -3087,19 +2142,13 @@ style={{
 
 display:"flex",
 
-
-
 alignItems:"center",
-
-
 
 gap:"5px",
 
 }}
 
 >
-
-
 
 <FaStar
 
@@ -3109,27 +2158,19 @@ color="#F59E0B"
 
 />
 
-
-
 <span
 
 style={{
 
 fontSize:"11px",
 
-
-
 fontWeight:"600",
-
-
 
 color:"#6B7280",
 
 }}
 
 >
-
-
 
 {
 
@@ -3143,43 +2184,23 @@ product.reviews
 
  avis
 
-
-
 </span>
 
-
+</div>
 
 </div>
 
-
-
 </div>
-
-
-
-</div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 )}
 
-
-
 {showFooter && (
-
-
 
 <div
 
@@ -3187,77 +2208,43 @@ style={{
 
 position:"fixed",
 
-
-
 bottom:"10px",
-
-
 
 left:"50%",
 
-
-
 transform:"translateX(-50%)",
-
-
 
 width:"94%",
 
-
-
 maxWidth:"500px",
-
-
 
 background:"rgba(255,255,255,.96)",
 
-
-
 backdropFilter:"blur(20px)",
-
-
 
 WebkitBackdropFilter:"blur(20px)",
 
-
-
 border:"1px solid rgba(229,231,235,.8)",
-
-
 
 borderRadius:"20px",
 
-
-
 padding:"8px 6px",
-
-
 
 display:"flex",
 
-
-
 justifyContent:"space-between",
 
-
-
 alignItems:"center",
-
-
 
 boxShadow:
 
 "0 8px 30px rgba(0,0,0,.08)",
-
-
 
 zIndex:999,
 
 }}
 
 >
-
-
 
 <Link
 
@@ -3273,8 +2260,6 @@ style={bottomStyle}
 
 </Link>
 
-
-
 <Link
 
 to="/boutique"
@@ -3289,11 +2274,7 @@ style={bottomStyle}
 
 </Link>
 
-
-
 {/* IA */}
-
-
 
 <Link
 
@@ -3303,15 +2284,11 @@ style={{
 
 ...bottomStyle,
 
-
-
 color:"#2563EB",
 
 }}
 
 >
-
-
 
 <div
 
@@ -3319,37 +2296,21 @@ style={{
 
 width:"40px",
 
-
-
 height:"40px",
 
-
-
 borderRadius:"12px",
-
-
 
 background:
 
 "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
 
-
-
 color:"#FFF",
-
-
 
 boxShadow:
 
@@ -3359,23 +2320,15 @@ boxShadow:
 
 >
 
-
-
 <FaRobot size={16}/>
 
-
-
 </div>
-
-
 
 <span
 
 style={{
 
 marginTop:"3px",
-
-
 
 fontWeight:"800",
 
@@ -3387,11 +2340,7 @@ IA
 
 </span>
 
-
-
 </Link>
-
-
 
 <Link
 
@@ -3407,8 +2356,6 @@ style={bottomStyle}
 
 </Link>
 
-
-
 <Link
 
 to="/user-login"
@@ -3423,29 +2370,15 @@ style={bottomStyle}
 
 </Link>
 
-
-
 </div>
-
-
 
 )}
 
 </div>
 
-
-
-
-
-
-
 );
 
-
-
 }
-
-
 
 /* ========================= */
 
@@ -3453,117 +2386,63 @@ style={bottomStyle}
 
 /* ========================= */
 
-
-
 const suggestionStyle = {
-
-
 
 background:"#FFFFFF",
 
-
-
 border:"1px solid #E5E7EB",
-
-
 
 padding:"14px",
 
-
-
 borderRadius:"16px",
-
-
 
 fontSize:"14px",
 
-
-
 fontWeight:"700",
 
-
-
 cursor:"pointer",
-
-
 
 boxShadow:
 
 "0 4px 12px rgba(0,0,0,.04)",
 
-
-
 color:"#111827",
-
-
 
 transition:"all .25s ease",
 
 };
-
-
 
 const bottomStyle = {
 
-
-
 display:"flex",
-
-
 
 flexDirection:"column",
 
-
-
 alignItems:"center",
-
-
 
 justifyContent:"center",
 
-
-
 gap:"3px",
-
-
 
 textDecoration:"none",
 
-
-
 color:"#64748B",
-
-
 
 fontSize:"10px",
 
-
-
 fontWeight:"700",
 
-
-
 minWidth:"50px",
-
-
 
 transition:"all .25s ease",
 
 };
 
-
-
 <style>
-
-
 
 {`
 
-
-
 @keyframes rotateAura {
-
-
 
 from {
 
@@ -3571,31 +2450,21 @@ transform: rotate(0deg);
 
 }
 
-
-
 to {
 
 transform: rotate(360deg);
 
 }
 
-
-
 }
-
-
 
 @keyframes rotateAuraReverse {
 
-
-
 from {
 
 transform: rotate(360deg);
 
 }
-
-
 
 to {
 
@@ -3603,23 +2472,15 @@ transform: rotate(0deg);
 
 }
 
-
-
 }
 
-
-
 @keyframes orbPulse {
-
-
 
 0% {
 
 transform: scale(1);
 
 }
-
-
 
 50% {
 
@@ -3627,23 +2488,15 @@ transform: scale(1.06);
 
 }
 
-
-
 100% {
 
 transform: scale(1);
 
 }
 
-
-
 }
 
-
-
 @keyframes floatOrb {
-
-
 
 0% {
 
@@ -3651,15 +2504,11 @@ transform: translateY(0px);
 
 }
 
-
-
 50% {
 
 transform: translateY(-8px);
 
 }
-
-
 
 100% {
 
@@ -3667,15 +2516,9 @@ transform: translateY(0px);
 
 }
 
-
-
 }
 
-
-
 @keyframes spin {
-
-
 
 from {
 
@@ -3683,19 +2526,13 @@ transform: rotate(0deg);
 
 }
 
-
-
 to {
 
 transform: rotate(360deg);
 
 }
 
-
-
 }
-
-
 
 .spin {
 
@@ -3704,8 +2541,6 @@ animation:
 spin 1s linear infinite;
 
 }
-
-
 
 body {
 
@@ -3725,15 +2560,11 @@ sans-serif;
 
 }
 
-
-
 ::-webkit-scrollbar {
 
 width: 4px;
 
 }
-
-
 
 ::-webkit-scrollbar-thumb {
 
@@ -3743,12 +2574,8 @@ border-radius: 20px;
 
 }
 
-
-
 `}
 
 </style>
-
-
 
 export default AiMode;

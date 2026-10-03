@@ -3301,12 +3301,15 @@ app.post(
         password,
       } = req.body;
 
-      // EMAIL EXISTE
+      // NORMALISER L'EMAIL
+      const normalizedEmail = String(email || "")
+        .trim()
+        .toLowerCase();
 
-      const existingUser =
-        await User.findOne({
-          email,
-        });
+      // EMAIL EXISTE
+      const existingUser = await User.findOne({
+        email: normalizedEmail,
+      });
 
       if (existingUser) {
 
@@ -3334,7 +3337,7 @@ app.post(
 
           name,
 
-          email,
+          email: normalizedEmail,
 
           password:
             hashedPassword,

@@ -13,7 +13,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 
-const API_BASE_URL = "https://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com/api";
 const API_TIMEOUT = 15000;
 
 const MIN_PASSWORD_LENGTH = 6;

@@ -5771,11 +5771,7 @@ function App() {
 
 <Route
   path="/driver-register"
-  element={
-    <RequireAdmin>
-      <DriverRegister />
-    </RequireAdmin>
-  }
+  element={<DriverRegister />}
 />
 
 <Route
