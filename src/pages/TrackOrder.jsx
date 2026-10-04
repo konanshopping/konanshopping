@@ -98,7 +98,7 @@ import { QRCodeSVG } from "qrcode.react";
 
 
 
-const API = "https://konanshopping.com";
+const API = "https://konanshopping.com/api";
 const API_TIMEOUT = 15000;
 const MAX_ORDER_ID_LENGTH = 24;
 
