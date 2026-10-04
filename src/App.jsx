@@ -5634,9 +5634,9 @@ function App() {
         <Route
   path="/orders"
   element={
-    <RequireAdminOrDriver>
+    <RequireAdmin>
       <Orders />
-    </RequireAdminOrDriver>
+    </RequireAdmin>
   }
 />
 
