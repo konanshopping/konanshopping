@@ -5632,13 +5632,13 @@ function App() {
         />
 
         <Route
-          path="/orders"
-          element={
-    <RequireAdmin>
+  path="/orders"
+  element={
+    <RequireAdminOrDriver>
       <Orders />
-    </RequireAdmin>
+    </RequireAdminOrDriver>
   }
-        />
+/>
 
         <Route
           path="/register"
@@ -5657,11 +5657,7 @@ function App() {
 
 <Route
   path="/favorites"
-  element={
-    <RequireUser>
-      <Favorites />
-    </RequireUser>
-  }
+  element={<Favorites />}
 />
 
 <Route

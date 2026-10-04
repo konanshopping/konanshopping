@@ -1,10 +1,8 @@
 const express = require("express");
-
 const router = express.Router();
 
-const Order =
-require("../models/Order");
-
+const Order = require("../models/Order");
+const Driver = require("../models/Driver");
 
 
 // 🔥 Toutes les commandes
@@ -70,7 +68,7 @@ router.get(
 );
 
 router.put(
-  "/orders/:id/assign-driver",
+  "/:id/assign-driver",
 
   async (req, res) => {
 
