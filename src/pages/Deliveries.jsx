@@ -2,7 +2,15 @@ import React, {
 
 
 
+
+
+
+
   useEffect,
+
+
+
+
 
 
 
@@ -10,7 +18,19 @@ import React, {
 
 
 
+
+
+
+
 } from "react";
+
+
+
+
+
+
+
+
 
 
 
@@ -26,7 +46,19 @@ import "./Deliveries.css";
 
 
 
+
+
+
+
+
+
+
+
 import {
+
+
+
+
 
 
 
@@ -34,7 +66,15 @@ import {
 
 
 
+
+
+
+
   FaPhone,
+
+
+
+
 
 
 
@@ -42,7 +82,15 @@ import {
 
 
 
+
+
+
+
   FaCheckCircle,
+
+
+
+
 
 
 
@@ -50,7 +98,15 @@ import {
 
 
 
+
+
+
+
   FaMotorcycle,
+
+
+
+
 
 
 
@@ -58,7 +114,15 @@ import {
 
 
 
+
+
+
+
   FaBoxOpen,
+
+
+
+
 
 
 
@@ -66,7 +130,15 @@ import {
 
 
 
+
+
+
+
   FaPlus,
+
+
+
+
 
 
 
@@ -78,42 +150,33 @@ import {
 
 
 
+
+
+
+
+
+
+
+
 const API_BASE = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
 
+
+
 const isValidObjectId = (value) =>
+
   typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value);
 
-const getAuthToken = () => {
-  try {
-    return (
-      localStorage.getItem("adminToken") ||
-      localStorage.getItem("token") ||
-      localStorage.getItem("driverToken") ||
-      ""
-    );
-  } catch {
-    return "";
-  }
-};
 
-const getAuthHeaders = (includeJson = false) => {
-  const token = getAuthToken();
 
-  return {
-    ...(includeJson ? { "Content-Type": "application/json" } : {}),
-    Accept: "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
+// Authentification par cookie HttpOnly
+const getAuthHeaders = (includeJson = false) => ({
+  ...(includeJson ? { "Content-Type": "application/json" } : {}),
+  Accept: "application/json",
+});
 
 const secureFetch = async (url, options = {}) => {
-  const token = getAuthToken();
-
-  if (!token) {
-    throw new Error("Authentification requise.");
-  }
-
   const controller = new AbortController();
   const timeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT);
 
@@ -127,7 +190,7 @@ const secureFetch = async (url, options = {}) => {
       ...options,
       headers,
       signal: controller.signal,
-      credentials: "same-origin",
+      credentials: "include",
     });
 
     const contentType = response.headers.get("content-type") || "";
@@ -153,12 +216,20 @@ const secureFetch = async (url, options = {}) => {
   }
 };
 
+
 const getSafeApiUrl = (path) => {
+
   if (typeof path !== "string" || !path.startsWith("/")) {
+
     throw new Error("URL API invalide.");
+
   }
+
   return `${API_BASE}${path}`;
+
 };
+
+
 
 export default function Deliveries() {
 
@@ -168,7 +239,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -176,7 +259,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -188,7 +283,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     useState([]);
+
+
+
+
+
+
+
+
 
 
 
@@ -200,7 +307,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     useState([]);
+
+
+
+
+
+
+
+
 
 
 
@@ -212,7 +331,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     useState(true);
+
+
+
+
+
+
+
+
 
 
 
@@ -224,6 +355,10 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     useState("");
 
 
@@ -232,7 +367,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -240,7 +387,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -252,7 +411,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     orders.length;
+
+
+
+
+
+
+
+
 
 
 
@@ -264,7 +435,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     orders.filter(
+
+
+
+
 
 
 
@@ -272,7 +451,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         o.status ===
+
+
+
+
 
 
 
@@ -280,7 +467,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     ).length;
+
+
+
+
+
+
+
+
 
 
 
@@ -292,7 +491,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     orders.filter(
+
+
+
+
 
 
 
@@ -300,11 +507,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         o.status !==
 
 
 
+
+
+
+
         "Livrée"
+
+
+
+
 
 
 
@@ -316,7 +535,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -324,7 +555,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -333,6 +576,14 @@ export default function Deliveries() {
 
 
   useEffect(() => {
+
+
+
+
+
+
+
+
 
 
 
@@ -348,7 +599,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       .then((data) => {
+
+
+
+
+
+
+
+
 
 
 
@@ -364,6 +631,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         setLoading(false);
 
 
@@ -372,7 +647,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       })
+
+
+
+
+
+
+
+
 
 
 
@@ -388,7 +679,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         console.log(err);
+
+
+
+
+
+
+
+
 
 
 
@@ -404,7 +711,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       });
+
+
+
+
+
+
+
+
 
 
 
@@ -420,7 +743,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -428,7 +763,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -444,7 +791,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
     secureFetch(getSafeApiUrl("/api/drivers"), { method: "GET" })
+
+
+
+
+
+
+
+
 
 
 
@@ -460,7 +823,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         setDrivers(data);
+
+
+
+
+
+
+
+
 
 
 
@@ -476,7 +855,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       .catch((err) =>
+
+
+
+
 
 
 
@@ -484,7 +875,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
       );
+
+
+
+
+
+
+
+
 
 
 
@@ -500,7 +903,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -508,7 +923,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -520,7 +947,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     async (
+
+
+
+
 
 
 
@@ -528,11 +963,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
       driverId
 
 
 
+
+
+
+
     ) => {
+
+
+
+
+
+
+
+
 
 
 
@@ -548,17 +999,43 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         if (!isValidObjectId(orderId) || !isValidObjectId(driverId)) {
+
           throw new Error("Identifiant de commande ou de livreur invalide.");
+
         }
 
+
+
         const data = await secureFetch(
+
           getSafeApiUrl(`/api/orders/${orderId}/assign-driver`),
+
           {
+
             method: "PUT",
+
             body: JSON.stringify({ driverId }),
+
           }
+
         );
+
+
+
+
+
+
+
+
 
 
 
@@ -574,7 +1051,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         window.location.reload();
+
+
+
+
+
+
+
+
 
 
 
@@ -590,7 +1083,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         console.log(error);
+
+
+
+
+
+
+
+
 
 
 
@@ -606,6 +1115,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
     };
 
 
@@ -614,7 +1131,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -622,7 +1151,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -634,7 +1175,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
     orders.filter((order) =>
+
+
+
+
+
+
+
+
 
 
 
@@ -646,7 +1199,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         ?.toLowerCase()
+
+
+
+
 
 
 
@@ -654,11 +1215,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           search.toLowerCase()
 
 
 
+
+
+
+
         ) ||
+
+
+
+
+
+
+
+
 
 
 
@@ -670,7 +1247,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         ?.toLowerCase()
+
+
+
+
 
 
 
@@ -678,7 +1263,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           search.toLowerCase()
+
+
+
+
 
 
 
@@ -690,7 +1283,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       order.items?.[0]?.name
+
+
+
+
 
 
 
@@ -698,7 +1303,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         .includes(
+
+
+
+
 
 
 
@@ -706,7 +1319,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         )
+
+
+
+
+
+
+
+
 
 
 
@@ -722,7 +1347,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -730,7 +1367,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -746,7 +1395,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
     return (
+
+
+
+
+
+
+
+
 
 
 
@@ -762,6 +1427,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         Chargement des livraisons...
 
 
@@ -770,7 +1443,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -786,6 +1475,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   }
 
 
@@ -794,7 +1491,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -802,7 +1511,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -818,7 +1539,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
     <div className="deliveriesPage">
+
+
+
+
+
+
+
+
 
 
 
@@ -834,7 +1571,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       <div className="deliveriesHeader">
+
+
+
+
+
+
+
+
 
 
 
@@ -850,11 +1603,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <h1>
 
 
 
+
+
+
+
             🚚 Gestion des Livraisons
+
+
+
+
 
 
 
@@ -866,7 +1635,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <p>
+
+
+
+
 
 
 
@@ -874,11 +1655,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
             commandes KonanShopping
 
 
 
+
+
+
+
             Cameroun
+
+
+
+
 
 
 
@@ -890,7 +1683,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -906,7 +1715,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <FaPlus />
+
+
+
+
+
+
+
+
 
 
 
@@ -922,6 +1747,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         </button>
 
 
@@ -930,7 +1763,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -946,6 +1795,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       <div className="deliveryStats">
 
 
@@ -954,7 +1811,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         <div className="statCard">
+
+
+
+
+
+
+
+
 
 
 
@@ -970,7 +1843,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <div>
+
+
+
+
+
+
+
+
 
 
 
@@ -982,7 +1871,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
               {totalDeliveries}
+
+
+
+
 
 
 
@@ -994,7 +1891,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -1002,7 +1911,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
             </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1018,6 +1939,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         </div>
 
 
@@ -1026,7 +1955,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         <div className="statCard">
+
+
+
+
+
+
+
+
 
 
 
@@ -1042,7 +1987,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1054,7 +2015,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
               {deliveredCount}
+
+
+
+
 
 
 
@@ -1066,7 +2035,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -1074,7 +2055,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
             </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1090,7 +2083,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1106,7 +2115,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
           <FaClock />
+
+
+
+
+
+
+
+
 
 
 
@@ -1122,11 +2147,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
             <h2>
 
 
 
+
+
+
+
               {pendingCount}
+
+
+
+
 
 
 
@@ -1138,7 +2179,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -1146,7 +2199,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
             </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1162,6 +2227,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         </div>
 
 
@@ -1170,7 +2243,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1186,7 +2275,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       <div className="searchBox">
+
+
+
+
+
+
+
+
 
 
 
@@ -1202,7 +2307,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
         <input
+
+
+
+
 
 
 
@@ -1210,7 +2327,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           placeholder="Rechercher une livraison..."
+
+
+
+
 
 
 
@@ -1218,7 +2343,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           onChange={(e) =>
+
+
+
+
 
 
 
@@ -1226,7 +2359,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
               e.target.value
+
+
+
+
 
 
 
@@ -1234,7 +2375,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -1246,7 +2395,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1262,7 +2427,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
       <div className="deliveriesGrid">
+
+
+
+
+
+
+
+
 
 
 
@@ -1274,7 +2455,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
           (order) => (
+
+
+
+
+
+
+
+
 
 
 
@@ -1286,7 +2479,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
               key={order._id}
+
+
+
+
 
 
 
@@ -1294,7 +2495,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
             >
+
+
+
+
+
+
+
+
 
 
 
@@ -1310,7 +2523,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <img
+
+
+
+
 
 
 
@@ -1318,7 +2543,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   order.items?.[0]
+
+
+
+
 
 
 
@@ -1326,7 +2559,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                 }
+
+
+
+
 
 
 
@@ -1334,11 +2575,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                 className="deliveryImage"
 
 
 
+
+
+
+
               />
+
+
+
+
+
+
+
+
 
 
 
@@ -1354,7 +2611,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <div className="deliveryTop">
+
+
+
+
+
+
+
+
 
 
 
@@ -1370,7 +2643,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <h2>
+
+
+
+
+
+
+
+
 
 
 
@@ -1382,7 +2671,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       order.items?.[0]
+
+
+
+
 
 
 
@@ -1390,7 +2687,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     }
+
+
+
+
+
+
+
+
 
 
 
@@ -1406,7 +2715,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1418,7 +2743,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     {
+
+
+
+
 
 
 
@@ -1426,7 +2759,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     }
+
+
+
+
+
+
+
+
 
 
 
@@ -1442,7 +2787,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1454,7 +2815,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   className={
+
+
+
+
 
 
 
@@ -1462,7 +2831,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     "Livrée"
+
+
+
+
 
 
 
@@ -1470,11 +2847,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       : "statusPending"
 
 
 
+
+
+
+
                   }
+
+
+
+
 
 
 
@@ -1486,7 +2875,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   {order.status ===
+
+
+
+
 
 
 
@@ -1494,7 +2895,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     <>
+
+
+
+
+
+
+
+
 
 
 
@@ -1510,7 +2923,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       Livrée
+
+
+
+
+
+
+
+
 
 
 
@@ -1522,11 +2951,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   ) : (
 
 
 
+
+
+
+
                     <>
+
+
+
+
+
+
+
+
 
 
 
@@ -1542,11 +2987,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       {
 
 
 
+
+
+
+
                         order.status
+
+
+
+
 
 
 
@@ -1558,11 +3019,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     </>
 
 
 
+
+
+
+
                   )}
+
+
+
+
+
+
+
+
 
 
 
@@ -1578,7 +3059,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1594,6 +3091,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <div className="deliveryInfos">
 
 
@@ -1602,7 +3107,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <div className="infoRow">
+
+
+
+
+
+
+
+
 
 
 
@@ -1618,7 +3139,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <span>
+
+
+
+
 
 
 
@@ -1626,7 +3159,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   </span>
+
+
+
+
+
+
+
+
 
 
 
@@ -1642,7 +3187,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <div className="infoRow">
+
+
+
+
+
+
+
+
 
 
 
@@ -1658,7 +3219,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <span>
+
+
+
+
+
+
+
+
 
 
 
@@ -1674,7 +3251,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     {" "}
+
+
+
+
+
+
+
+
 
 
 
@@ -1686,11 +3279,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       order.district
 
 
 
+
+
+
+
                     }
+
+
+
+
+
+
+
+
 
 
 
@@ -1706,7 +3315,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1722,7 +3347,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <FaBoxOpen />
+
+
+
+
+
+
+
+
 
 
 
@@ -1738,7 +3379,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     {
+
+
+
+
 
 
 
@@ -1746,7 +3399,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     }
+
+
+
+
+
+
+
+
 
 
 
@@ -1762,6 +3427,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </div>
 
 
@@ -1770,7 +3443,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1786,7 +3475,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <div className="driverCard">
+
+
+
+
+
+
+
+
 
 
 
@@ -1802,7 +3507,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <FaMotorcycle />
+
+
+
+
+
+
+
+
 
 
 
@@ -1818,7 +3539,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </h3>
+
+
+
+
+
+
+
+
 
 
 
@@ -1834,7 +3571,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   <div className="driverBox">
+
+
+
+
+
+
+
+
 
 
 
@@ -1846,7 +3599,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       src={
+
+
+
+
 
 
 
@@ -1854,7 +3615,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           ?.photo
+
+
+
+
 
 
 
@@ -1862,7 +3631,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                        alt=""
+
+
+
+
 
 
 
@@ -1870,7 +3647,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     />
+
+
+
+
+
+
+
+
 
 
 
@@ -1886,7 +3675,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       <h4>
+
+
+
+
+
+
+
+
 
 
 
@@ -1898,7 +3703,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           order.driver
+
+
+
+
 
 
 
@@ -1906,7 +3719,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         }
+
+
+
+
+
+
+
+
 
 
 
@@ -1922,7 +3747,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       <p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1934,7 +3775,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           order.driver
+
+
+
+
 
 
 
@@ -1942,7 +3791,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         }
+
+
+
+
+
+
+
+
 
 
 
@@ -1958,7 +3819,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1974,7 +3851,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 ) : (
+
+
+
+
+
+
+
+
 
 
 
@@ -1990,11 +3883,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     Aucun livreur
 
 
 
+
+
+
+
                     assigné
+
+
+
+
+
+
+
+
 
 
 
@@ -2010,6 +3923,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 )}
 
 
@@ -2018,7 +3939,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2034,7 +3971,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <select
+
+
+
+
+
+
+
+
 
 
 
@@ -2050,7 +4003,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 onChange={(e) =>
+
+
+
+
 
 
 
@@ -2058,7 +4023,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     order._id,
+
+
+
+
 
 
 
@@ -2066,11 +4039,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   )
 
 
 
+
+
+
+
                 }
+
+
+
+
+
+
+
+
 
 
 
@@ -2086,11 +4075,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <option>
 
 
 
+
+
+
+
                   Choisir livreur
+
+
+
+
 
 
 
@@ -2102,7 +4107,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 {drivers.map(
+
+
+
+
 
 
 
@@ -2114,7 +4131,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                     <option
+
+
+
+
 
 
 
@@ -2122,11 +4151,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         driver._id
 
 
 
+
+
+
+
                       }
+
+
+
+
+
+
+
+
 
 
 
@@ -2138,11 +4183,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         driver._id
 
 
 
+
+
+
+
                       }
+
+
+
+
 
 
 
@@ -2154,7 +4211,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       {
+
+
+
+
 
 
 
@@ -2162,7 +4231,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       }
+
+
+
+
+
+
+
+
 
 
 
@@ -2178,11 +4259,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   )
 
 
 
+
+
+
+
                 )}
+
+
+
+
+
+
+
+
 
 
 
@@ -2198,7 +4299,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               {/* GPS */}
+
+
+
+
+
+
+
+
 
 
 
@@ -2214,11 +4331,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <h4>
 
 
 
+
+
+
+
                   📍 Position GPS
+
+
+
+
 
 
 
@@ -2230,7 +4363,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <p>
+
+
+
+
+
+
+
+
 
 
 
@@ -2242,7 +4391,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   {
+
+
+
+
 
 
 
@@ -2250,11 +4407,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       .driverLocation
 
 
 
+
+
+
+
                       ?.lat
+
+
+
+
 
 
 
@@ -2266,7 +4435,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -2282,7 +4467,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   Longitude :
+
+
+
+
 
 
 
@@ -2290,7 +4487,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     order
+
+
+
+
 
 
 
@@ -2298,11 +4503,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       ?.lng
 
 
 
+
+
+
+
                   }
+
+
+
+
+
+
+
+
 
 
 
@@ -2318,7 +4539,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2334,7 +4571,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <div className="priceBox">
+
+
+
+
+
+
+
+
 
 
 
@@ -2350,7 +4603,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <h2>
+
+
+
+
+
+
+
+
 
 
 
@@ -2362,7 +4631,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                   FCFA
+
+
+
+
+
+
+
+
 
 
 
@@ -2378,7 +4659,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2394,7 +4691,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               <div className="deliveryButtons">
+
+
+
+
+
+
+
+
 
 
 
@@ -2410,7 +4723,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <button
+
+
+
+
+
+
+
+
 
 
 
@@ -2426,7 +4755,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   onClick={async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -2442,12 +4787,33 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       if (!isValidObjectId(order._id)) {
+
                         throw new Error("Identifiant de commande invalide.");
+
                       }
 
+
+
                       await secureFetch(
+
                           getSafeApiUrl(`/api/orders/${order._id}`),
+
+
+
+
+
+
+
+
 
 
 
@@ -2459,7 +4825,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           method:
+
+
+
+
 
 
 
@@ -2471,7 +4845,23 @@ export default function Deliveries() {
 
 
 
-                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2483,7 +4873,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                             status:
+
+
+
+
 
 
 
@@ -2491,11 +4889,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           }),
 
 
 
+
+
+
+
                         }
+
+
+
+
+
+
+
+
 
 
 
@@ -2511,7 +4925,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       setOrders(
+
+
+
+
 
 
 
@@ -2523,7 +4949,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                           prev.map(
+
+
+
+
 
 
 
@@ -2535,7 +4973,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                               o._id ===
+
+
+
+
 
 
 
@@ -2547,7 +4997,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                                 ? {
+
+
+
+
 
 
 
@@ -2555,7 +5017,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                                     status:
+
+
+
+
 
 
 
@@ -2563,7 +5033,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                                   }
+
+
+
+
+
+
+
+
 
 
 
@@ -2579,6 +5061,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                           )
 
 
@@ -2587,7 +5077,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -2603,7 +5109,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       console.log(
+
+
+
+
 
 
 
@@ -2611,7 +5129,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -2627,11 +5157,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   }}
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -2647,7 +5197,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </button>
+
+
+
+
+
+
+
+
 
 
 
@@ -2663,7 +5229,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <button
+
+
+
+
+
+
+
+
 
 
 
@@ -2679,7 +5261,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   onClick={async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -2695,12 +5293,33 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       if (!isValidObjectId(order._id)) {
+
                         throw new Error("Identifiant de commande invalide.");
+
                       }
 
+
+
                       await secureFetch(
+
                           getSafeApiUrl(`/api/orders/${order._id}`),
+
+
+
+
+
+
+
+
 
 
 
@@ -2712,7 +5331,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           method:
+
+
+
+
 
 
 
@@ -2724,7 +5351,23 @@ export default function Deliveries() {
 
 
 
-                          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2736,7 +5379,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                             status:
+
+
+
+
 
 
 
@@ -2744,11 +5395,27 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           }),
 
 
 
+
+
+
+
                         }
+
+
+
+
+
+
+
+
 
 
 
@@ -2764,7 +5431,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       setOrders(
+
+
+
+
 
 
 
@@ -2776,7 +5455,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                           prev.map(
+
+
+
+
 
 
 
@@ -2788,7 +5479,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                               o._id ===
+
+
+
+
 
 
 
@@ -2800,7 +5503,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                                 ? {
+
+
+
+
 
 
 
@@ -2808,7 +5523,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                                     status:
+
+
+
+
 
 
 
@@ -2816,7 +5539,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                                   }
+
+
+
+
+
+
+
+
 
 
 
@@ -2832,6 +5567,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                           )
 
 
@@ -2840,7 +5583,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -2856,7 +5615,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       console.log(
+
+
+
+
 
 
 
@@ -2864,7 +5635,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -2880,11 +5663,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   }}
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -2900,7 +5703,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </button>
+
+
+
+
+
+
+
+
 
 
 
@@ -2916,7 +5735,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 <button
+
+
+
+
+
+
+
+
 
 
 
@@ -2932,7 +5767,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   onClick={async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -2948,12 +5799,33 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       if (!isValidObjectId(order._id)) {
+
                         throw new Error("Identifiant de commande invalide.");
+
                       }
 
+
+
                       await secureFetch(
+
                           getSafeApiUrl(`/api/orders/${order._id}`),
+
+
+
+
+
+
+
+
 
 
 
@@ -2965,7 +5837,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           method:
+
+
+
+
 
 
 
@@ -2973,7 +5853,13 @@ export default function Deliveries() {
 
 
 
-                                  
+
+
+
+
+
+
+
 
                         }
 
@@ -2983,7 +5869,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -2995,7 +5897,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         (prev) =>
+
+
+
+
+
+
+
+
 
 
 
@@ -3007,7 +5921,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                             (o) =>
+
+
+
+
 
 
 
@@ -3015,7 +5937,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                               order._id
+
+
+
+
 
 
 
@@ -3027,7 +5957,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -3043,7 +5989,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       console.log(
+
+
+
+
 
 
 
@@ -3051,7 +6009,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -3067,11 +6037,31 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   }}
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -3087,7 +6077,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </button>
+
+
+
+
+
+
+
+
 
 
 
@@ -3103,7 +6109,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
               {/* DELETE BUTTON */}
+
+
+
+
+
+
+
+
 
 
 
@@ -3115,7 +6137,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                 "Livrée" && (
+
+
+
+
+
+
+
+
 
 
 
@@ -3131,7 +6165,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   onClick={async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -3147,12 +6197,33 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       if (!isValidObjectId(order._id)) {
+
                         throw new Error("Identifiant de commande invalide.");
+
                       }
 
+
+
                       await secureFetch(
+
                           getSafeApiUrl(`/api/orders/${order._id}`),
+
+
+
+
+
+
+
+
 
 
 
@@ -3164,7 +6235,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                           method:
+
+
+
+
 
 
 
@@ -3172,7 +6251,13 @@ export default function Deliveries() {
 
 
 
-                                  
+
+
+
+
+
+
+
 
                         }
 
@@ -3182,7 +6267,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -3194,7 +6295,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                         (prev) =>
+
+
+
+
+
+
+
+
 
 
 
@@ -3206,7 +6319,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                             (o) =>
+
+
+
+
 
 
 
@@ -3214,7 +6335,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                               order._id
+
+
+
+
 
 
 
@@ -3226,7 +6355,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -3242,7 +6387,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                       console.log(
+
+
+
+
 
 
 
@@ -3250,7 +6407,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       );
+
+
+
+
+
+
+
+
 
 
 
@@ -3266,7 +6435,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                   }}
+
+
+
+
+
+
+
+
 
 
 
@@ -3278,7 +6463,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                     width: "100%",
+
+
+
+
 
 
 
@@ -3286,7 +6479,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "14px",
+
+
+
+
 
 
 
@@ -3294,7 +6495,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "linear-gradient(135deg,#111827,#1f2937)",
+
+
+
+
 
 
 
@@ -3302,7 +6511,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "white",
+
+
+
+
 
 
 
@@ -3310,7 +6527,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "none",
+
+
+
+
 
 
 
@@ -3318,7 +6543,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "16px",
+
+
+
+
 
 
 
@@ -3326,7 +6559,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "16px",
+
+
+
+
 
 
 
@@ -3334,7 +6575,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "700",
+
+
+
+
 
 
 
@@ -3342,7 +6591,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "pointer",
+
+
+
+
 
 
 
@@ -3350,7 +6607,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "15px",
+
+
+
+
 
 
 
@@ -3358,7 +6623,15 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                       "0 8px 20px rgba(0,0,0,0.25)",
+
+
+
+
 
 
 
@@ -3366,7 +6639,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -3382,7 +6667,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
                 </button>
+
+
+
+
+
+
+
+
 
 
 
@@ -3398,7 +6699,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3410,7 +6727,19 @@ export default function Deliveries() {
 
 
 
+
+
+
+
         )}
+
+
+
+
+
+
+
+
 
 
 
@@ -3426,6 +6755,14 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
 
 
@@ -3434,7 +6771,23 @@ export default function Deliveries() {
 
 
 
+
+
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
 
 
 

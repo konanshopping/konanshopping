@@ -14,6 +14,7 @@ const isValidEmail = (value) =>
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -69,24 +70,23 @@ function Login() {
     setIsLoading(true);
 
     try {
-      const res = await api.post("/api/admin-login", {
-        email: cleanEmail,
-        password: cleanPassword,
-      });
+      const res = await api.post(
+        "/api/admin-login",
+        {
+          email: cleanEmail,
+          password: cleanPassword,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-      const token = res?.data?.token;
       const adminUser = res?.data?.user;
 
-      if (
-        typeof token !== "string" ||
-        !token.trim() ||
-        !adminUser ||
-        typeof adminUser !== "object"
-      ) {
+      if (!adminUser || typeof adminUser !== "object") {
         throw new Error("Réponse de connexion invalide");
       }
 
-      localStorage.setItem("token", token.trim());
       localStorage.setItem("admin", JSON.stringify(adminUser));
 
       toast.success("Connexion réussie 🚀");

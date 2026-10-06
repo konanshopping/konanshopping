@@ -63,31 +63,18 @@ const API_TIMEOUT = 15000;
 // 🔐 AUTHENTIFICATION ADMIN — JWT
 // ======================================================
 
-const getAdminToken = () => {
-  try {
-    return (
-      localStorage.getItem("adminToken") ||
-      localStorage.getItem("token") ||
-      ""
-    );
-  } catch {
-    return "";
-  }
-};
+// ======================================================
+// 🔐 AUTHENTIFICATION ADMIN — COOKIE HTTPONLY
+// ======================================================
 
-const getAuthConfig = () => {
-  const token = getAdminToken();
+axios.defaults.withCredentials = true;
 
-  if (!token) {
-    throw new Error("Session administrateur absente.");
-  }
-
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const getAuthConfig = () => ({
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
 
 // ======================================================
 // 🛡️ CLIENT API SÉCURISÉ
@@ -96,6 +83,7 @@ const getAuthConfig = () => {
 const apiClient = axios.create({
   baseURL: API,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -103,13 +91,9 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAdminToken();
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    config.withCredentials = true;
+    config.headers = config.headers || {};
+    config.headers.Accept = "application/json";
     return config;
   },
   (error) => Promise.reject(error)
@@ -119,10 +103,6 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.status === 401) {
-      try {
-        localStorage.removeItem("adminToken");
-      } catch {}
-
       error.userMessage =
         "Votre session administrateur a expiré. Veuillez vous reconnecter.";
     } else if (error?.response?.status === 403) {
@@ -964,10 +944,7 @@ useEffect(() => {
   // 🔐 PROTECTION ADMIN
   // ====================================================
 
-  if (
-    !admin ||
-    !getAdminToken()
-  ) {
+  if (!admin) {
 
     return (
 

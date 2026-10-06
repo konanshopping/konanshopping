@@ -1,87 +1,111 @@
 import { useEffect, useState } from "react";
 
+
+
 import axios from "axios";
+
+
+
+
 
 
 
 import {
 
+
+
   FaHourglassHalf,
+
+
 
   FaBoxOpen,
 
+
+
   FaClipboardList,
+
+
 
   FaShoppingBag,
 
+
+
   FaMoneyBillWave,
+
+
 
   FaCheckCircle,
 
+
+
   FaTruck,
+
+
 
 } from "react-icons/fa";
 
 
 
 
+
+
+
+
+
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
+
 const MAX_USER_ID_LENGTH = 24;
+
 const MAX_ORDERS = 200;
 
+
+
 const getStoredUser = () => {
+
   try {
+
     const rawUser = localStorage.getItem("user");
+
     if (!rawUser) return null;
+
+
 
     const user = JSON.parse(rawUser);
 
+
+
     if (!user || typeof user !== "object") return null;
 
+
+
     return user;
+
   } catch {
+
     return null;
+
   }
+
 };
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" ? token.trim() : "";
-  } catch {
-    return "";
-  }
-};
 
-const isValidObjectId = (value) => {
-  const id = String(value ?? "").trim();
-  return /^[a-fA-F0-9]{24}$/.test(id);
-};
 
-const normalizeOrders = (data) => {
-  const source = Array.isArray(data)
-    ? data
-    : Array.isArray(data?.orders)
-    ? data.orders
-    : Array.isArray(data?.data)
-    ? data.data
-    : [];
+// ======================================================
+// 🔐 AUTHENTIFICATION PAR COOKIE HTTPONLY
+// ======================================================
+// Le frontend ne lit plus le JWT.
+// Le navigateur envoie automatiquement le cookie HttpOnly.
+// Le backend reste responsable de la vérification de la session.
+// ======================================================
 
-  return source
-    .filter(
-      (order) =>
-        order &&
-        typeof order === "object" &&
-        typeof order._id === "string" &&
-        isValidObjectId(order._id)
-    )
-    .slice(0, MAX_ORDERS);
-};
+axios.defaults.withCredentials = true;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -89,16 +113,11 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
+    if (!config) return config;
 
-    if (!token) {
-      return Promise.reject(
-        new Error("Session utilisateur absente.")
-      );
-    }
-
+    config.withCredentials = true;
     config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Accept = "application/json";
 
     return config;
   },
@@ -127,26 +146,50 @@ api.interceptors.response.use(
 );
 
 const getSafeErrorMessage = (error) => {
+
   const message = error?.response?.data?.message;
 
+
+
   if (typeof message === "string" && message.trim()) {
+
     return message.trim().slice(0, 300);
+
   }
+
+
 
   if (typeof error?.userMessage === "string") {
+
     return error.userMessage;
+
   }
 
+
+
   return "Impossible de récupérer vos commandes.";
+
 };
+
+
 
 export default function PendingOrders() {
 
 
 
+
+
+
+
   const [orders, setOrders] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
@@ -154,42 +197,85 @@ export default function PendingOrders() {
 
 
 
+
+
+
+
   const fetchOrders = async () => {
+
     try {
+
       const user = getStoredUser();
+
       const userId =
+
         typeof user?._id === "string" ? user._id.trim() : "";
 
+
+
       if (
+
         !userId ||
+
         userId.length > MAX_USER_ID_LENGTH ||
+
         !isValidObjectId(userId)
+
       ) {
+
         setOrders([]);
+
         return;
+
       }
 
+
+
       const response = await api.get(
+
         `/api/my-orders/${encodeURIComponent(userId)}`
+
       );
+
+
 
       const safeOrders = normalizeOrders(response?.data);
 
+
+
       const filtered = safeOrders.filter(
+
         (order) => order.status === "En attente"
+
       );
 
+
+
       setOrders(filtered);
+
     } catch (err) {
+
       if (import.meta?.env?.DEV) {
+
         console.warn("[PendingOrders]", getSafeErrorMessage(err));
+
       }
 
+
+
       setOrders([]);
+
     }
+
   };
 
+
+
   fetchOrders();
+
+
+
+
 
 
 
@@ -197,7 +283,15 @@ export default function PendingOrders() {
 
 
 
+
+
+
+
 ;
+
+
+
+
 
 
 
@@ -205,19 +299,39 @@ return (
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#f5f7fb",
+
+
 
       minHeight: "100vh",
 
+
+
       padding: "20px",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -225,23 +339,47 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         background:
+
+
 
           "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
 
 
+
+
+
+
         padding:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "14px"
 
+
+
             : "18px",
+
+
+
+
 
 
 
@@ -249,7 +387,15 @@ return (
 
 
 
+
+
+
+
         color: "#FFFFFF",
+
+
+
+
 
 
 
@@ -257,7 +403,15 @@ return (
 
 
 
+
+
+
+
         position: "relative",
+
+
+
+
 
 
 
@@ -265,13 +419,27 @@ return (
 
 
 
+
+
+
+
         boxShadow:
+
+
 
           "0 8px 20px rgba(37,99,235,0.12)",
 
+
+
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -279,11 +447,23 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           position: "absolute",
+
+
+
+
 
 
 
@@ -291,7 +471,15 @@ return (
 
 
 
+
+
+
+
           right: "-40px",
+
+
+
+
 
 
 
@@ -299,7 +487,15 @@ return (
 
 
 
+
+
+
+
           height: "100px",
+
+
+
+
 
 
 
@@ -307,13 +503,27 @@ return (
 
 
 
+
+
+
+
           background:
+
+
 
             "rgba(255,255,255,0.06)",
 
+
+
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -321,11 +531,23 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           position: "relative",
+
+
+
+
 
 
 
@@ -333,7 +555,15 @@ return (
 
 
 
+
+
+
+
           display: "flex",
+
+
+
+
 
 
 
@@ -341,11 +571,23 @@ return (
 
 
 
+
+
+
+
           gap: "12px",
+
+
 
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -353,27 +595,55 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             width:
+
+
 
               window.innerWidth < 768
 
+
+
                 ? "45px"
 
+
+
                 : "50px",
+
+
+
+
 
 
 
             height:
 
+
+
               window.innerWidth < 768
+
+
 
                 ? "45px"
 
+
+
                 : "50px",
+
+
+
+
 
 
 
@@ -381,9 +651,19 @@ return (
 
 
 
+
+
+
+
             background:
 
+
+
               "rgba(255,255,255,0.15)",
+
+
+
+
 
 
 
@@ -391,7 +671,15 @@ return (
 
 
 
+
+
+
+
             justifyContent: "center",
+
+
+
+
 
 
 
@@ -399,37 +687,75 @@ return (
 
 
 
+
+
+
+
             flexShrink: 0,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaHourglassHalf
+
+
 
             style={{
 
+
+
               fontSize:
+
+
 
                 window.innerWidth < 768
 
+
+
                   ? "18px"
+
+
 
                   : "20px",
 
 
 
+
+
+
+
               color: "#FFFFFF",
 
+
+
             }}
+
+
 
           />
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -437,35 +763,71 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             flex: 1,
+
+
 
             minWidth: 0,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <h1
 
+
+
             style={{
+
+
 
               margin: 0,
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 window.innerWidth < 768
 
+
+
                   ? "20px"
 
+
+
                   : "24px",
+
+
+
+
 
 
 
@@ -473,33 +835,67 @@ return (
 
 
 
+
+
+
+
               lineHeight: 1.2,
+
+
 
             }}
 
+
+
           >
 
+
+
             Commandes en attente
+
+
 
           </h1>
 
 
 
+
+
+
+
           <p
 
+
+
             style={{
+
+
 
               margin: "4px 0 0 0",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 window.innerWidth < 768
 
+
+
                   ? "12px"
 
+
+
                   : "13px",
+
+
+
+
 
 
 
@@ -507,19 +903,39 @@ return (
 
 
 
+
+
+
+
               lineHeight: "18px",
+
+
 
             }}
 
+
+
           >
 
+
+
             Suivez vos commandes en cours de traitement.
+
+
 
           </p>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -527,13 +943,27 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             background:
 
+
+
               "rgba(255,255,255,0.15)",
+
+
+
+
 
 
 
@@ -541,7 +971,15 @@ return (
 
 
 
+
+
+
+
             borderRadius: "999px",
+
+
+
+
 
 
 
@@ -549,15 +987,31 @@ return (
 
 
 
+
+
+
+
             fontWeight: "700",
+
+
 
           }}
 
+
+
         >
+
+
 
           {orders.length}
 
+
+
         </div>
+
+
+
+
 
 
 
@@ -565,7 +1019,17 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
+
+
 
 
 
@@ -575,25 +1039,51 @@ return (
 
 
 
+
+
+
+
 {orders.length === 0 && (
+
+
+
+
 
 
 
   <div
 
+
+
     style={{
+
+
 
       background: "#FFFFFF",
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "28px 18px"
 
+
+
           : "40px 25px",
+
+
+
+
 
 
 
@@ -601,7 +1091,15 @@ return (
 
 
 
+
+
+
+
       textAlign: "center",
+
+
+
+
 
 
 
@@ -609,9 +1107,19 @@ return (
 
 
 
+
+
+
+
       boxShadow:
 
+
+
         "0 8px 20px rgba(15,23,42,0.05)",
+
+
+
+
 
 
 
@@ -619,11 +1127,23 @@ return (
 
 
 
+
+
+
+
       overflow: "hidden",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -631,11 +1151,23 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         position: "absolute",
+
+
+
+
 
 
 
@@ -643,7 +1175,15 @@ return (
 
 
 
+
+
+
+
         right: "-40px",
+
+
+
+
 
 
 
@@ -651,7 +1191,15 @@ return (
 
 
 
+
+
+
+
         height: "100px",
+
+
+
+
 
 
 
@@ -659,13 +1207,27 @@ return (
 
 
 
+
+
+
+
         background:
+
+
 
           "rgba(37,99,235,0.04)",
 
+
+
       }}
 
+
+
     />
+
+
+
+
 
 
 
@@ -673,27 +1235,55 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "70px"
 
+
+
             : "85px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "70px"
 
+
+
             : "85px",
+
+
+
+
 
 
 
@@ -701,13 +1291,27 @@ return (
 
 
 
+
+
+
+
         borderRadius: "20px",
+
+
+
+
 
 
 
         background:
 
+
+
           "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+
+
+
+
 
 
 
@@ -715,41 +1319,83 @@ return (
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
         alignItems: "center",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaBoxOpen
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "28px"
+
+
 
               : "34px",
 
 
 
+
+
+
+
           color: "#2563EB",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -757,15 +1403,31 @@ return (
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         display: "inline-flex",
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
@@ -773,7 +1435,15 @@ return (
 
 
 
+
+
+
+
         background: "#EFF6FF",
+
+
+
+
 
 
 
@@ -781,7 +1451,15 @@ return (
 
 
 
+
+
+
+
         padding: "6px 12px",
+
+
+
+
 
 
 
@@ -789,7 +1467,15 @@ return (
 
 
 
+
+
+
+
         fontSize: "11px",
+
+
+
+
 
 
 
@@ -797,11 +1483,23 @@ return (
 
 
 
+
+
+
+
         marginBottom: "14px",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -809,11 +1507,23 @@ return (
 
 
 
+
+
+
+
       Historique vide
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -821,21 +1531,43 @@ return (
 
 
 
+
+
+
+
     <h2
 
+
+
       style={{
+
+
 
         color: "#111827",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "20px"
 
+
+
             : "24px",
+
+
+
+
 
 
 
@@ -843,19 +1575,39 @@ return (
 
 
 
+
+
+
+
         marginBottom: "8px",
+
+
+
+
 
 
 
         lineHeight: 1.2,
 
+
+
       }}
+
+
 
     >
 
+
+
       Aucune commande en attente
 
+
+
     </h2>
+
+
+
+
 
 
 
@@ -863,21 +1615,43 @@ return (
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#64748B",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "13px"
 
+
+
             : "14px",
+
+
+
+
 
 
 
@@ -885,23 +1659,47 @@ return (
 
 
 
+
+
+
+
         maxWidth: "420px",
+
+
+
+
 
 
 
         margin: "0 auto",
 
+
+
       }}
+
+
 
     >
 
+
+
       Vous n'avez actuellement aucune commande en cours de traitement.
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -909,7 +1707,15 @@ return (
 
 
 
+
+
+
+
 {/* COMMANDES */}
+
+
+
+
 
 
 
@@ -917,21 +1723,43 @@ return (
 
 
 
+
+
+
+
 <div
+
+
 
   key={order._id}
 
+
+
   onClick={() =>
+
+
 
     window.location.href =
 
+
+
       `/order/${order._id}`
+
+
 
   }
 
+
+
   style={{
 
+
+
     background: "#FFFFFF",
+
+
+
+
 
 
 
@@ -939,7 +1767,15 @@ return (
 
 
 
+
+
+
+
     padding: "16px",
+
+
+
+
 
 
 
@@ -947,9 +1783,19 @@ return (
 
 
 
+
+
+
+
     boxShadow:
 
+
+
       "0 4px 15px rgba(15,23,42,0.05)",
+
+
+
+
 
 
 
@@ -957,15 +1803,31 @@ return (
 
 
 
+
+
+
+
     cursor: "pointer",
+
+
+
+
 
 
 
     transition: "0.3s",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -973,11 +1835,23 @@ return (
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -985,7 +1859,15 @@ return (
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -993,7 +1875,15 @@ return (
 
 
 
+
+
+
+
     marginBottom: "12px",
+
+
+
+
 
 
 
@@ -1001,13 +1891,27 @@ return (
 
 
 
+
+
+
+
     borderBottom:
+
+
 
       "1px solid #F1F5F9",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1015,15 +1919,31 @@ return (
 
 
 
+
+
+
+
   <div
 
+
+
     style={{
+
+
 
       display: "flex",
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -1031,15 +1951,31 @@ return (
 
 
 
+
+
+
+
       flex: 1,
+
+
+
+
 
 
 
       minWidth: 0,
 
+
+
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1047,11 +1983,23 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width: "42px",
+
+
+
+
 
 
 
@@ -1059,13 +2007,27 @@ return (
 
 
 
+
+
+
+
         borderRadius: "12px",
+
+
+
+
 
 
 
         background:
 
+
+
           "#EFF6FF",
+
+
+
+
 
 
 
@@ -1073,7 +2035,15 @@ return (
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -1081,31 +2051,63 @@ return (
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaClipboardList
 
+
+
         style={{
+
+
 
           color: "#2563EB",
 
 
 
+
+
+
+
           fontSize: "18px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1113,27 +2115,55 @@ return (
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         flex: 1,
 
 
 
+
+
+
+
         minWidth: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -1141,27 +2171,55 @@ return (
 
 
 
+
+
+
+
           fontSize: "16px",
+
+
+
+
 
 
 
           fontWeight: "800",
 
+
+
         }}
+
+
 
       >
 
+
+
         Commande
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
+
+
 
         style={{
 
+
+
           color: "#64748B",
+
+
+
+
 
 
 
@@ -1169,7 +2227,15 @@ return (
 
 
 
+
+
+
+
           fontSize: "11px",
+
+
+
+
 
 
 
@@ -1177,19 +2243,39 @@ return (
 
 
 
+
+
+
+
           textOverflow: "ellipsis",
+
+
+
+
 
 
 
           whiteSpace: "nowrap",
 
+
+
         }}
+
+
 
       >
 
+
+
         #{order._id}
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1197,7 +2283,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1205,11 +2299,23 @@ return (
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#FEF3C7",
+
+
+
+
 
 
 
@@ -1217,7 +2323,15 @@ return (
 
 
 
+
+
+
+
       padding: "6px 10px",
+
+
+
+
 
 
 
@@ -1225,7 +2339,15 @@ return (
 
 
 
+
+
+
+
       fontSize: "11px",
+
+
+
+
 
 
 
@@ -1233,7 +2355,15 @@ return (
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -1241,11 +2371,23 @@ return (
 
 
 
+
+
+
+
       gap: "5px",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1253,7 +2395,15 @@ return (
 
 
 
+
+
+
+
     En attente
+
+
+
+
 
 
 
@@ -1261,7 +2411,17 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
 
 
 
@@ -1271,21 +2431,43 @@ return (
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     display: "flex",
+
+
 
     flexDirection: "column",
 
+
+
     gap: "10px",
+
+
 
     marginBottom: "15px",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1293,19 +2475,39 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       key={index}
 
+
+
       style={{
+
+
 
         display: "flex",
 
+
+
         alignItems: "center",
+
+
 
         justifyContent: "space-between",
 
+
+
         gap: "12px",
+
+
+
+
 
 
 
@@ -1313,7 +2515,15 @@ return (
 
 
 
+
+
+
+
         borderRadius: "14px",
+
+
+
+
 
 
 
@@ -1321,11 +2531,23 @@ return (
 
 
 
+
+
+
+
         border: "1px solid #E2E8F0",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -1333,15 +2555,31 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display: "flex",
+
+
 
           alignItems: "center",
 
+
+
           gap: "12px",
+
+
+
+
 
 
 
@@ -1349,11 +2587,23 @@ return (
 
 
 
+
+
+
+
           minWidth: 0,
+
+
 
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -1361,43 +2611,87 @@ return (
 
 
 
+
+
+
+
         <img
+
+
 
             src={
 
+
+
               item.image?.includes("localhost:5000")
+
+
 
                 ? item.image.replace(
 
+
+
                     "http://localhost:5000",
+
+
 
                     "https://konanshopping.com/api/"
 
+
+
                   )
 
+
+
                 : item.image || "/logo.jpg"
+
+
 
             }
 
 
 
+
+
+
+
             alt={item.name}
+
+
 
           style={{
 
+
+
             width: "60px",
+
+
 
             height: "60px",
 
+
+
             objectFit: "cover",
+
+
 
             borderRadius: "12px",
 
+
+
             flexShrink: 0,
+
+
 
           }}
 
+
+
         />
+
+
+
+
 
 
 
@@ -1405,25 +2699,51 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             flex: 1,
+
+
 
             minWidth: 0,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <h3
+
+
 
             style={{
 
+
+
               margin: 0,
+
+
+
+
 
 
 
@@ -1431,7 +2751,15 @@ return (
 
 
 
+
+
+
+
               fontSize: "14px",
+
+
+
+
 
 
 
@@ -1439,7 +2767,15 @@ return (
 
 
 
+
+
+
+
               overflow: "hidden",
+
+
+
+
 
 
 
@@ -1447,23 +2783,47 @@ return (
 
 
 
+
+
+
+
               whiteSpace: "nowrap",
+
+
 
             }}
 
+
+
           >
 
+
+
             {item.name}
+
+
 
           </h3>
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               marginTop: "4px",
+
+
+
+
 
 
 
@@ -1471,7 +2831,15 @@ return (
 
 
 
+
+
+
+
               alignItems: "center",
+
+
+
+
 
 
 
@@ -1479,15 +2847,31 @@ return (
 
 
 
+
+
+
+
               color: "#64748B",
+
+
+
+
 
 
 
               fontSize: "12px",
 
+
+
             }}
 
+
+
           >
+
+
+
+
 
 
 
@@ -1495,7 +2879,15 @@ return (
 
 
 
+
+
+
+
             Qté : {item.quantity || 1}
+
+
+
+
 
 
 
@@ -1503,11 +2895,23 @@ return (
 
 
 
+
+
+
+
         </div>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1515,25 +2919,51 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           textAlign: "right",
+
+
 
           flexShrink: 0,
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <span
+
+
 
           style={{
 
+
+
             color: "#2563EB",
+
+
+
+
 
 
 
@@ -1541,15 +2971,31 @@ return (
 
 
 
+
+
+
+
             fontWeight: "800",
+
+
 
           }}
 
+
+
         >
+
+
 
           {item.price} FCFA
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1557,7 +3003,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1565,7 +3019,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -1573,11 +3035,23 @@ return (
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     marginTop: "12px",
+
+
+
+
 
 
 
@@ -1585,9 +3059,19 @@ return (
 
 
 
+
+
+
+
     borderTop:
 
+
+
       "1px solid #E5E7EB",
+
+
+
+
 
 
 
@@ -1595,13 +3079,27 @@ return (
 
 
 
+
+
+
+
     justifyContent:
+
+
 
       "space-between",
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -1609,11 +3107,23 @@ return (
 
 
 
+
+
+
+
     flexWrap: "wrap",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1621,15 +3131,31 @@ return (
 
 
 
+
+
+
+
   <div>
+
+
+
+
 
 
 
     <div
 
+
+
       style={{
 
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -1637,7 +3163,15 @@ return (
 
 
 
+
+
+
+
         gap: "5px",
+
+
+
+
 
 
 
@@ -1645,27 +3179,55 @@ return (
 
 
 
+
+
+
+
         fontSize: "11px",
+
+
+
+
 
 
 
         fontWeight: "600",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaMoneyBillWave
+
+
 
         style={{
 
+
+
           color: "#2563EB",
+
+
 
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -1673,15 +3235,31 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
     <h2
 
+
+
       style={{
 
+
+
         margin: "4px 0 0 0",
+
+
+
+
 
 
 
@@ -1689,29 +3267,59 @@ return (
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "22px"
+
+
 
             : "24px",
 
 
 
+
+
+
+
         fontWeight: "800",
+
+
 
       }}
 
+
+
     >
 
+
+
       {order.total} FCFA
+
+
 
     </h2>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1719,11 +3327,23 @@ return (
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#DCFCE7",
+
+
+
+
 
 
 
@@ -1731,7 +3351,15 @@ return (
 
 
 
+
+
+
+
       padding: "6px 10px",
+
+
+
+
 
 
 
@@ -1739,7 +3367,15 @@ return (
 
 
 
+
+
+
+
       fontSize: "11px",
+
+
+
+
 
 
 
@@ -1747,7 +3383,15 @@ return (
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -1755,11 +3399,23 @@ return (
 
 
 
+
+
+
+
       gap: "5px",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1767,7 +3423,15 @@ return (
 
 
 
+
+
+
+
     Enregistrée
+
+
+
+
 
 
 
@@ -1775,7 +3439,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -1783,11 +3455,23 @@ return (
 
 
 
+
+
+
+
 <button
+
+
 
   style={{
 
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -1795,13 +3479,27 @@ return (
 
 
 
+
+
+
+
     border: "none",
+
+
+
+
 
 
 
     background:
 
+
+
       "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+
+
+
 
 
 
@@ -1809,7 +3507,15 @@ return (
 
 
 
+
+
+
+
     padding: "12px",
+
+
+
+
 
 
 
@@ -1817,7 +3523,15 @@ return (
 
 
 
+
+
+
+
     fontWeight: "700",
+
+
+
+
 
 
 
@@ -1825,7 +3539,15 @@ return (
 
 
 
+
+
+
+
     cursor: "pointer",
+
+
+
+
 
 
 
@@ -1833,7 +3555,15 @@ return (
 
 
 
+
+
+
+
     justifyContent: "center",
+
+
+
+
 
 
 
@@ -1841,11 +3571,23 @@ return (
 
 
 
+
+
+
+
     gap: "8px",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1853,7 +3595,15 @@ return (
 
 
 
+
+
+
+
   Suivre la livraison
+
+
+
+
 
 
 
@@ -1861,7 +3611,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -1869,11 +3627,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   );
+
+
+
+
 
 
 

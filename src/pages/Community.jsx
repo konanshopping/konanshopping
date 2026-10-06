@@ -54,22 +54,11 @@ const MAX_COMMUNITY_TEXT = 5000;
 const MAX_COMMUNITY_SEARCH = 200;
 const COMMUNITY_MUTATION_COOLDOWN_MS = 450;
 
-function getCommunityToken() {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" && token.trim()
-      ? token.trim()
-      : "";
-  } catch {
-    return "";
-  }
-}
-
+// Authentification par cookie HttpOnly
+// Le navigateur envoie automatiquement le cookie de session.
 function communityAuthHeaders(extra = {}) {
-  const token = getCommunityToken();
   return {
     Accept: "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...extra,
   };
 }
@@ -103,7 +92,7 @@ async function secureCommunityFetch(url, options = {}) {
     ...options,
     method,
     headers,
-    credentials: "same-origin",
+    credentials: "include",
   });
 }
 
@@ -2785,15 +2774,10 @@ export default function Community() {
   useEffect(() => {
     if (!SOCKET_URL) return undefined;
 
-    const token = getCommunityToken();
-
     const socket = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
-      autoConnect: Boolean(token),
-
-      auth: token
-        ? { token }
-        : undefined,
+      autoConnect: true,
+      withCredentials: true,
 
       reconnection: true,
       reconnectionAttempts: 5,

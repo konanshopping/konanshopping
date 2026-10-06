@@ -34,6 +34,95 @@ const axios = require("axios");
 
 require("dotenv").config();
 
+// ======================================================
+// 🍪 AUTHENTIFICATION PAR COOKIE HTTPONLY — ÉTAPE 2
+// ======================================================
+// Le JWT conserve exactement sa logique de signature actuelle.
+// La seule modification ici est son transport : il est placé
+// dans un cookie HttpOnly au lieu d'être exposé au JavaScript.
+
+const AUTH_COOKIE_NAMES = Object.freeze({
+  user: "ks_user_token",
+  admin: "ks_admin_token",
+  driver: "ks_driver_token",
+});
+
+function parseCookieMaxAge(value, fallbackMs) {
+  if (value === undefined || value === null || value === "") {
+    return fallbackMs;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value * 1000;
+  }
+
+  const raw = String(value).trim().toLowerCase();
+  const match = raw.match(/^(\d+(?:\.\d+)?)(ms|s|m|h|d|w)?$/);
+
+  if (!match) return fallbackMs;
+
+  const amount = Number(match[1]);
+  const unit = match[2] || "s";
+
+  const multipliers = {
+    ms: 1,
+    s: 1000,
+    m: 60 * 1000,
+    h: 60 * 60 * 1000,
+    d: 24 * 60 * 60 * 1000,
+    w: 7 * 24 * 60 * 60 * 1000,
+  };
+
+  return Math.round(amount * multipliers[unit]);
+}
+
+function getAuthCookieOptions(maxAge) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge,
+  };
+}
+
+function setAuthCookie(res, role, token, maxAge) {
+  const cookieName = AUTH_COOKIE_NAMES[role];
+
+  if (!cookieName) {
+    throw new Error(`Rôle cookie inconnu: ${role}`);
+  }
+
+  res.cookie(cookieName, token, getAuthCookieOptions(maxAge));
+}
+
+function clearAuthCookie(res, role) {
+  const cookieName = AUTH_COOKIE_NAMES[role];
+  if (!cookieName) return;
+
+  res.clearCookie(cookieName, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+  });
+}
+
+const USER_AUTH_COOKIE_MAX_AGE = parseCookieMaxAge(
+  process.env.JWT_EXPIRES_IN || "7d",
+  7 * 24 * 60 * 60 * 1000
+);
+
+const ADMIN_AUTH_COOKIE_MAX_AGE = parseCookieMaxAge(
+  process.env.ADMIN_JWT_EXPIRES_IN || "8h",
+  8 * 60 * 60 * 1000
+);
+
+const DRIVER_AUTH_COOKIE_MAX_AGE = parseCookieMaxAge(
+  process.env.DRIVER_JWT_EXPIRES_IN || "12h",
+  12 * 60 * 60 * 1000
+);
+
 const {
   rateLimit,
   requireAdmin,
@@ -657,7 +746,7 @@ const corsOptions = {
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  allowedHeaders: ["Content-Type", "X-Requested-With"],
 };
 
 const io = new Server(server, {
@@ -675,17 +764,42 @@ const io = new Server(server, {
 // ======================================================
 
 function getSocketToken(socket) {
-  const authToken = socket.handshake?.auth?.token;
-  if (typeof authToken === "string" && authToken.trim()) {
-    return authToken.trim();
+  // Étape 8 : Socket.IO utilise exclusivement les cookies HttpOnly.
+  // Le navigateur les envoie automatiquement pendant le handshake.
+  // Aucun JWT n'est plus accepté via socket.handshake.auth ou Authorization: Bearer.
+  const cookieHeader = socket.handshake?.headers?.cookie || "";
+
+  if (typeof cookieHeader !== "string" || !cookieHeader.trim()) {
+    return null;
   }
 
-  const header = socket.handshake?.headers?.authorization || "";
-  if (typeof header === "string" && header.startsWith("Bearer ")) {
-    return header.slice(7).trim() || null;
+  const cookies = {};
+
+  for (const part of cookieHeader.split(";")) {
+    const separatorIndex = part.indexOf("=");
+
+    if (separatorIndex === -1) continue;
+
+    const name = part.slice(0, separatorIndex).trim();
+    const value = part.slice(separatorIndex + 1).trim();
+
+    if (!name) continue;
+
+    try {
+      cookies[name] = decodeURIComponent(value);
+    } catch (_) {
+      cookies[name] = value;
+    }
   }
 
-  return null;
+  // On conserve les trois rôles existants et leurs secrets respectifs.
+  // L'ordre reste user -> admin -> driver comme dans la logique précédente.
+  return (
+    cookies[AUTH_COOKIE_NAMES.user] ||
+    cookies[AUTH_COOKIE_NAMES.admin] ||
+    cookies[AUTH_COOKIE_NAMES.driver] ||
+    null
+  );
 }
 
 function verifySocketToken(token) {
@@ -747,6 +861,118 @@ app.use(rateLimit({ name: "global", windowMs: 15 * 60 * 1000, max: 600 }));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "200kb" }));
 
+// ======================================================
+// 🛡️ CSRF + ORIGIN PROTECTION — ÉTAPE 6
+// ======================================================
+// Les JWT d'authentification sont maintenant dans des cookies
+// HttpOnly. Le navigateur peut donc les envoyer automatiquement.
+// Cette protection vérifie l'origine des requêtes d'écriture qui
+// portent une session par cookie afin d'empêcher une page tierce
+// d'utiliser la session de l'utilisateur à son insu.
+//
+// La logique métier des routes n'est pas modifiée.
+// Les webhooks externes restent exemptés : ils ne reposent pas sur
+// les cookies de session et disposent de leurs propres contrôles.
+// ======================================================
+
+const CSRF_SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
+const CSRF_EXTERNAL_PATHS = new Set([
+  "/telegram/webhook",
+  "/api/payment/notify",
+  "/api/tiktok/callback",
+]);
+
+function normalizeOrigin(value) {
+  if (typeof value !== "string") return "";
+
+  return value
+    .trim()
+    .replace(/\/$/, "");
+}
+
+const normalizedAllowedOrigins = new Set(
+  allowedOrigins.map(normalizeOrigin).filter(Boolean)
+);
+
+function isAllowedRequestOrigin(origin) {
+  return normalizedAllowedOrigins.has(normalizeOrigin(origin));
+}
+
+function requestUsesAuthCookie(req) {
+  const cookies = req.cookies || {};
+
+  return Boolean(
+    cookies[AUTH_COOKIE_NAMES.user] ||
+    cookies[AUTH_COOKIE_NAMES.admin] ||
+    cookies[AUTH_COOKIE_NAMES.driver]
+  );
+}
+
+function getRequestOriginFromHeaders(req) {
+  const origin =
+    typeof req.headers.origin === "string"
+      ? req.headers.origin.trim()
+      : "";
+
+  if (origin) {
+    return origin;
+  }
+
+  // Certains clients anciens peuvent ne pas envoyer Origin.
+  // Le Referer permet alors de vérifier l'origine de la page appelante.
+  const referer =
+    typeof req.headers.referer === "string"
+      ? req.headers.referer.trim()
+      : "";
+
+  if (!referer) return "";
+
+  try {
+    return new URL(referer).origin;
+  } catch (_) {
+    return "";
+  }
+}
+
+function csrfOriginGuard(req, res, next) {
+  if (CSRF_SAFE_METHODS.has(req.method)) {
+    return next();
+  }
+
+  // Les callbacks externes ne doivent pas être bloqués par la protection
+  // d'origine : leur authentification repose sur leurs propres secrets/signatures.
+  if (CSRF_EXTERNAL_PATHS.has(req.path)) {
+    return next();
+  }
+
+  // Une requête sans cookie de session ne peut pas exploiter une session
+  // HttpOnly. On laisse donc intactes les routes publiques existantes.
+  if (!requestUsesAuthCookie(req)) {
+    return next();
+  }
+
+  const requestOrigin = getRequestOriginFromHeaders(req);
+
+  if (!requestOrigin || !isAllowedRequestOrigin(requestOrigin)) {
+    console.warn(
+      "🛡️ CSRF/ORIGIN BLOCKED:",
+      req.method,
+      req.path,
+      requestOrigin || "ORIGIN ABSENTE"
+    );
+
+    return res.status(403).json({
+      message: "Origine de requête non autorisée.",
+      code: "CSRF_ORIGIN_REJECTED",
+    });
+  }
+
+  return next();
+}
+
+app.use(csrfOriginGuard);
+
 app.use(
   "/uploads",
   express.static(path.join(__dirname, "uploads"))
@@ -763,6 +989,8 @@ function securityGate(req, res, next) {
   // Routes publiques nécessaires au fonctionnement de la boutique.
   const publicExact = new Set([
     "/",
+    "/auth/session",
+    "/auth/logout",
     "/admin-login",
     "/register",
     "/login",
@@ -775,34 +1003,21 @@ function securityGate(req, res, next) {
   ]);
 
   // Création de commande : le checkout invité reste public.
-  // Si un token utilisateur est fourni, son identité sera vérifiée et
+  // Si un cookie utilisateur valide est présent, son identité est vérifiée et
   // utilisée par la route /orders au lieu du userId envoyé par le client.
   if (method === "POST" && pathName === "/orders") {
-    const authorization = String(req.headers.authorization || "");
+    const token = req.cookies?.[AUTH_COOKIE_NAMES.user];
 
-    if (!authorization) return next();
-
-    if (!authorization.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Authentification invalide." });
-    }
-
-    const token = authorization.slice(7).trim();
-
-    if (!token) {
-      return res.status(401).json({ message: "Authentification invalide." });
-    }
+    if (!token) return next();
 
     try {
-      req.user = jwt.verify(
-        token,
-        process.env.JWT_SECRET,
-        {
-          algorithms: ["HS256"],
-          issuer: process.env.JWT_ISSUER || "konanshopping",
-          audience: process.env.JWT_AUDIENCE || "konanshopping-web",
-        }
-      );
+      const payload = verifyAuthCookieToken(token, "user");
 
+      if (!payload) {
+        return res.status(401).json({ message: "Authentification invalide." });
+      }
+
+      req.user = payload;
       return next();
     } catch (_) {
       return res.status(401).json({ message: "Authentification invalide." });
@@ -959,6 +1174,173 @@ function securityGate(req, res, next) {
 
   return next();
 }
+
+
+// ======================================================
+// 🔐 SESSION SERVEUR — ÉTAPE 4
+// ======================================================
+// Le navigateur ne reçoit jamais les JWT. Le serveur vérifie
+// directement les cookies HttpOnly et renvoie uniquement les
+// informations nécessaires à l'interface.
+
+function verifyAuthCookieToken(token, role) {
+  if (!token) {
+    return null;
+  }
+
+  const secrets = {
+    user: process.env.JWT_SECRET,
+    admin: process.env.ADMIN_JWT_SECRET,
+    driver: process.env.DRIVER_JWT_SECRET,
+  };
+
+  const secret = secrets[role];
+  if (!secret) return null;
+
+  try {
+    const payload = jwt.verify(token, secret, {
+      algorithms: ["HS256"],
+      issuer: process.env.JWT_ISSUER || "konanshopping",
+      audience: process.env.JWT_AUDIENCE || "konanshopping-web",
+    });
+
+    if (payload.role && payload.role !== role) return null;
+    return payload;
+  } catch (_) {
+    return null;
+  }
+}
+
+async function getAuthenticatedSession(req, res) {
+  const cookies = req.cookies || {};
+
+  // ADMIN
+  const adminPayload = verifyAuthCookieToken(
+    cookies[AUTH_COOKIE_NAMES.admin],
+    "admin"
+  );
+
+  if (adminPayload) {
+    if (adminPayload.sub !== "admin" ||
+        !ADMIN.email ||
+        String(adminPayload.email || "").toLowerCase() !== String(ADMIN.email).toLowerCase()) {
+      clearAuthCookie(res, "admin");
+    } else {
+      return {
+        authenticated: true,
+        type: "admin",
+        role: "admin",
+        user: {
+          _id: "admin",
+          name: "Konan Admin",
+          email: ADMIN.email,
+          role: "admin",
+        },
+      };
+    }
+  }
+
+  // DRIVER
+  const driverPayload = verifyAuthCookieToken(
+    cookies[AUTH_COOKIE_NAMES.driver],
+    "driver"
+  );
+
+  if (driverPayload) {
+    const driverId = String(driverPayload.sub || driverPayload.id || "");
+
+    if (mongoose.Types.ObjectId.isValid(driverId)) {
+      const driver = await Driver.findById(driverId).lean();
+
+      if (driver) {
+        const safeDriver = { ...driver };
+        delete safeDriver.password;
+        delete safeDriver.telegramToken;
+
+        return {
+          authenticated: true,
+          type: "driver",
+          role: "driver",
+          driver: safeDriver,
+        };
+      }
+    }
+
+    clearAuthCookie(res, "driver");
+  }
+
+  // USER
+  const userPayload = verifyAuthCookieToken(
+    cookies[AUTH_COOKIE_NAMES.user],
+    "user"
+  );
+
+  if (userPayload) {
+    const userId = String(userPayload.sub || userPayload.id || "");
+
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      const user = await User.findById(userId).lean();
+
+      if (user) {
+        const safeUser = { ...user };
+        delete safeUser.password;
+        delete safeUser.passwordHash;
+        delete safeUser.resetToken;
+        delete safeUser.resetTokenExpires;
+
+        return {
+          authenticated: true,
+          type: "user",
+          role: user.role || "user",
+          user: safeUser,
+        };
+      }
+    }
+
+    clearAuthCookie(res, "user");
+  }
+
+  return {
+    authenticated: false,
+    type: null,
+    role: null,
+  };
+}
+
+// Cette route reste publique : elle sert uniquement à vérifier la session.
+app.get("/auth/session", async (req, res) => {
+  try {
+    const session = await getAuthenticatedSession(req, res);
+    return res.json(session);
+  } catch (error) {
+    console.error("AUTH SESSION ERROR:", error.message);
+    return res.status(500).json({
+      authenticated: false,
+      message: "Impossible de vérifier la session.",
+    });
+  }
+});
+
+// Déconnexion complète : toutes les catégories de cookies sont supprimées.
+app.post("/auth/logout", (req, res) => {
+  try {
+    clearAuthCookie(res, "user");
+    clearAuthCookie(res, "admin");
+    clearAuthCookie(res, "driver");
+
+    return res.json({
+      success: true,
+      authenticated: false,
+      message: "Déconnexion réussie.",
+    });
+  } catch (error) {
+    console.error("AUTH LOGOUT ERROR:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Impossible de fermer la session.",
+    });
+  }
+});
 
 app.use(securityGate);
 
@@ -1224,8 +1606,14 @@ app.post("/admin-login", rateLimit({ name: "admin-login", windowMs: 15 * 60 * 10
       }
     );
 
-    return res.json({
+    setAuthCookie(
+      res,
+      "admin",
       token,
+      ADMIN_AUTH_COOKIE_MAX_AGE
+    );
+
+    return res.json({
       message: "Connexion réussie 🚀",
       user: {
         _id: "admin",
@@ -1639,40 +2027,20 @@ app.get(
 
 app.get("/admin", (req, res) => {
 
-  const authHeader = req.headers.authorization;
+  // securityGate a déjà vérifié le cookie administrateur
+  // avant d'arriver ici. On conserve exactement la réponse métier.
+  const verified = req.admin;
 
-  // Vérifie si token existe
-  if (!authHeader) {
-
+  if (!verified) {
     return res.status(401).json({
-      message: "Token manquant",
+      message: "Authentification administrateur requise.",
     });
-
   }
 
-  // Extraction token
-  const token = authHeader.split(" ")[1];
-
-  try {
-
-    // Vérification token
-    const verified = jwt.verify(
-      token,
-      process.env.ADMIN_JWT_SECRET
-    );
-
-    res.json({
-      message: "Bienvenue Admin 🔥",
-      admin: verified.email,
-    });
-
-  } catch (err) {
-
-    res.status(403).json({
-      message: "Token invalide",
-    });
-
-  }
+  return res.json({
+    message: "Bienvenue Admin 🔥",
+    admin: verified.email,
+  });
 
 });
 
@@ -1872,11 +2240,17 @@ const authToken = jwt.sign(
   }
 );
 
+setAuthCookie(
+  res,
+  "user",
+  authToken,
+  USER_AUTH_COOKIE_MAX_AGE
+);
+
 res.json({
   success: true,
   message:
     "Mot de passe modifié avec succès ✅",
-  token: authToken,
   user: {
     _id: user._id,
     name: user.name,
@@ -3377,12 +3751,17 @@ const token = jwt.sign(
 
 // RESPONSE
 
+setAuthCookie(
+  res,
+  "user",
+  token,
+  USER_AUTH_COOKIE_MAX_AGE
+);
+
 res.json({
 
   message:
     "Compte créé ✅",
-
-  token,
 
   user: {
 
@@ -3511,9 +3890,14 @@ if (!user.registerDate) {
 
       // RESPONSE
 
-     res.json({
+      setAuthCookie(
+        res,
+        "user",
+        token,
+        USER_AUTH_COOKIE_MAX_AGE
+      );
 
-  token,
+     res.json({
 
   user: {
 
@@ -5861,9 +6245,15 @@ app.post("/driver-login", rateLimit({ name: "driver-login", windowMs: 15 * 60 * 
     delete safeDriver.password;
     delete safeDriver.telegramToken;
 
+    setAuthCookie(
+      res,
+      "driver",
+      token,
+      DRIVER_AUTH_COOKIE_MAX_AGE
+    );
+
     return res.json({
       ...safeDriver,
-      token,
     });
 
   } catch (error) {

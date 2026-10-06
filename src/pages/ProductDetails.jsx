@@ -96,33 +96,17 @@ const safeParse = (value, fallback) => {
   }
 };
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" ? token.trim() : "";
-  } catch {
-    return "";
-  }
-};
+// Authentification par cookie HttpOnly
+// Le frontend ne lit plus le JWT.
+// Le navigateur envoie automatiquement le cookie de session.
+// Le backend reste responsable de la vérification de l'authentification.
 
-const isValidObjectId = (value) =>
-  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value.trim());
-
-const sanitizeText = (value, maxLength) =>
-  typeof value === "string"
-    ? value.replace(/\u0000/g, "").trim().slice(0, maxLength)
-    : "";
-
-const safeServerMessage = (error, fallback) => {
-  const message = error?.response?.data?.message;
-  return typeof message === "string" && message.trim()
-    ? message.trim().slice(0, 300)
-    : fallback;
-};
+axios.defaults.withCredentials = true;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -130,11 +114,12 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (!config) return config;
+
+    config.withCredentials = true;
+    config.headers = config.headers || {};
+    config.headers.Accept = "application/json";
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -150,6 +135,7 @@ api.interceptors.response.use(
     } else if (!error?.response) {
       error.userMessage = "Impossible de contacter le serveur.";
     }
+
     return Promise.reject(error);
   }
 );

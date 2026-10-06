@@ -53,20 +53,20 @@ const API = (
 
 const API_TIMEOUT = 15000;
 
-const getDriverAuthToken = () => {
-  try {
-    // 🔐 IMPORTANT :
-    // Le centre livreur utilise UNIQUEMENT le token livreur.
-    // On ne réutilise jamais un token client/admin ici.
-    return localStorage.getItem("driverToken") || "";
-  } catch {
-    return "";
-  }
-};
+// ======================================================
+// 🔐 AUTHENTIFICATION LIVREUR PAR COOKIE HTTPONLY
+// ======================================================
+// Le JWT livreur n'est plus lu depuis localStorage.
+// Le navigateur envoie automatiquement le cookie HttpOnly.
+// La logique métier et les appels API restent inchangés.
+// ======================================================
+
+axios.defaults.withCredentials = true;
 
 const apiClient = axios.create({
   baseURL: API,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json"
@@ -75,12 +75,11 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   config => {
-    const token = getDriverAuthToken();
+    if (!config) return config;
 
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    config.withCredentials = true;
+    config.headers = config.headers || {};
+    config.headers.Accept = "application/json";
 
     return config;
   },

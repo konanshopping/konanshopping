@@ -2,13 +2,27 @@ import "./AdminStats.css";
 
 
 
+
+
+
+
 import {
+
+
 
   useEffect,
 
+
+
   useState,
 
+
+
 } from "react";
+
+
+
+
 
 
 
@@ -16,76 +30,139 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
 
   ResponsiveContainer,
 
+
+
   LineChart,
+
+
 
   Line,
 
+
+
   XAxis,
+
+
 
   YAxis,
 
+
+
   Tooltip,
+
+
 
   PieChart,
 
+
+
   Pie,
+
+
 
   Cell,
 
+
+
   BarChart,
+
+
 
   Bar,
 
+
+
   CartesianGrid,
 
+
+
   Legend,
+
+
 
 } from "recharts";
 
 
 
+
+
+
+
 import {
+
+
 
   FaMoneyBillWave,
 
+
+
   FaShoppingCart,
+
+
 
   FaUsers,
 
+
+
   FaBoxOpen,
 
+
+
   FaEye,
+
+
 
 } from "react-icons/fa";
 
 
 
 
-const API_URL = "https://konanshopping.com";
+
+
+
+
+
+const API_URL = "https\://konanshopping.com";
+
 const API_TIMEOUT = 15000;
 
+
+
 const safeParse = (value) => {
+
   try {
+
     return JSON.parse(value);
+
   } catch {
+
     return null;
+
   }
+
 };
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" && token.trim()
-      ? token.trim()
-      : null;
-  } catch {
-    return null;
-  }
-};
+
+
+// =====================================================
+// 🔐 AUTHENTIFICATION ADMIN PAR COOKIE HTTPONLY
+// =====================================================
+// Le JWT n'est plus lu depuis localStorage.
+// Le navigateur envoie automatiquement le cookie HttpOnly.
+// La logique métier et les endpoints restent inchangés.
+// =====================================================
+
+axios.defaults.withCredentials = true;
 
 const getStoredAdmin = () => {
   try {
@@ -107,7 +184,6 @@ const getStoredAdmin = () => {
 
 const clearAdminSession = () => {
   try {
-    localStorage.removeItem("token");
     localStorage.removeItem("admin");
   } catch {
     // Ignore storage errors.
@@ -121,10 +197,9 @@ const redirectToAdminLogin = () => {
 };
 
 const requireAdminSession = () => {
-  const token = getAuthToken();
   const admin = getStoredAdmin();
 
-  if (!token || !admin) {
+  if (!admin) {
     clearAdminSession();
     redirectToAdminLogin();
     return false;
@@ -135,9 +210,12 @@ const requireAdminSession = () => {
 
 const isArrayResponse = (value) => Array.isArray(value);
 
+
+
 const api = axios.create({
   baseURL: API_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -145,12 +223,13 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
-
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
+    if (!config) {
+      return config;
     }
+
+    config.withCredentials = true;
+    config.headers = config.headers || {};
+    config.headers.Accept = "application/json";
 
     return config;
   },
@@ -171,47 +250,93 @@ api.interceptors.response.use(
   }
 );
 
+
+
 function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // STATES
 
+
+
   // =========================
+
+
+
+
 
 
 
   const [products, setProducts] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [orders, setOrders] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [users, setUsers] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [visitors, setVisitors] =
 
+
+
     useState([]);
 
 
 
+
+
+
+
   // =========================
+
+
 
   // FETCH DATA
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -219,7 +344,15 @@ function AdminStats() {
 
 
 
+
+
+
+
     fetchAllData();
+
+
+
+
 
 
 
@@ -227,9 +360,19 @@ function AdminStats() {
 
 
 
+
+
+
+
   const fetchAllData =
 
+
+
     async () => {
+
+
+
+
 
 
 
@@ -237,21 +380,43 @@ function AdminStats() {
 
 
 
+
+
+
+
         // PRODUCTS
+
+
+
+
 
 
 
         const productsRes =
 
+
+
           await api.get("/api/products");
 
 
 
+
+
+
+
         setProducts(
+
           isArrayResponse(productsRes.data)
+
             ? productsRes.data
+
             : []
+
         );
+
+
+
+
 
 
 
@@ -259,17 +424,35 @@ function AdminStats() {
 
 
 
+
+
+
+
         const usersRes =
+
+
 
           await api.get("/api/users");
 
 
 
+
+
+
+
         setUsers(
+
           isArrayResponse(usersRes.data)
+
             ? usersRes.data
+
             : []
+
         );
+
+
+
+
 
 
 
@@ -277,17 +460,35 @@ function AdminStats() {
 
 
 
+
+
+
+
         const visitorsRes =
+
+
 
           await api.get("/api/visitors");
 
 
 
+
+
+
+
         setVisitors(
+
           isArrayResponse(visitorsRes.data)
+
             ? visitorsRes.data
+
             : []
+
         );
+
+
+
+
 
 
 
@@ -295,23 +496,47 @@ function AdminStats() {
 
 
 
+
+
+
+
         try {
+
+
+
+
 
 
 
           const ordersRes =
 
+
+
             await api.get(
+
             "/api/orders"
+
           );
+
+
+
+
 
 
 
           setOrders(
+
             isArrayResponse(ordersRes.data)
+
               ? ordersRes.data
+
               : []
+
           );
+
+
+
+
 
 
 
@@ -319,7 +544,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           setOrders([]);
+
+
+
+
 
 
 
@@ -327,7 +560,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       } catch (err) {
+
+
+
+
 
 
 
@@ -335,7 +576,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -343,95 +592,191 @@ function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // TOTAL REVENUE
 
+
+
   // =========================
+
+
+
+
 
 
 
   const totalRevenue =
 
+
+
     orders.reduce(
+
+
 
       (
 
+
+
         total,
 
+
+
         order
+
+
 
       ) =>
 
 
 
+
+
+
+
         total +
+
+
 
         (
 
+
+
           Number(
+
+
 
             order.total
 
+
+
           ) || 0
+
+
 
         ),
 
 
 
+
+
+
+
       0
+
+
 
     );
 
 
 
+
+
+
+
   // =========================
+
+
 
   // TOTAL ORDERS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const totalOrders =
 
+
+
     orders.length;
 
 
 
+
+
+
+
   // =========================
+
+
 
   // TOTAL USERS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const totalUsers =
 
+
+
     users.length;
 
 
 
+
+
+
+
   // =========================
+
+
 
   // TOTAL VISITORS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const totalVisitors =
 
+
+
     visitors.length;
 
 
 
+
+
+
+
   // =========================
+
+
 
   // PRODUCTS BY CATEGORY
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -439,25 +784,51 @@ function AdminStats() {
 
 
 
+
+
+
+
   products.forEach(
+
+
 
     (product) => {
 
 
 
+
+
+
+
       const cat =
 
+
+
         product.category ||
+
+
 
         "Autres";
 
 
 
+
+
+
+
       if (
+
+
 
         categoryMap[cat]
 
+
+
       ) {
+
+
+
+
 
 
 
@@ -465,7 +836,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -473,23 +852,47 @@ function AdminStats() {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
     }
 
+
+
   );
+
+
+
+
 
 
 
   const categoryData =
 
+
+
     Object.keys(
+
+
 
       categoryMap
 
+
+
     ).map((key) => ({
+
+
+
+
 
 
 
@@ -497,9 +900,19 @@ function AdminStats() {
 
 
 
+
+
+
+
       value:
 
+
+
         categoryMap[key],
+
+
+
+
 
 
 
@@ -507,11 +920,23 @@ function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // VISITORS BY COUNTRY
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -519,25 +944,51 @@ function AdminStats() {
 
 
 
+
+
+
+
   visitors.forEach(
+
+
 
     (visitor) => {
 
 
 
+
+
+
+
       const country =
 
+
+
         visitor.country ||
+
+
 
         "Inconnu";
 
 
 
+
+
+
+
       if (
+
+
 
         countryMap[country]
 
+
+
       ) {
+
+
+
+
 
 
 
@@ -545,7 +996,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       } else {
+
+
+
+
 
 
 
@@ -553,23 +1012,47 @@ function AdminStats() {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
     }
 
+
+
   );
+
+
+
+
 
 
 
   const visitorsData =
 
+
+
     Object.keys(
+
+
 
       countryMap
 
+
+
     ).map((key) => ({
+
+
+
+
 
 
 
@@ -577,9 +1060,19 @@ function AdminStats() {
 
 
 
+
+
+
+
       visiteurs:
 
+
+
         countryMap[key],
+
+
+
+
 
 
 
@@ -587,11 +1080,23 @@ function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // MONTHLY SALES
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -599,29 +1104,59 @@ function AdminStats() {
 
 
 
+
+
+
+
     Jan:0,
+
+
 
     Fev:0,
 
+
+
     Mar:0,
+
+
 
     Avr:0,
 
+
+
     Mai:0,
+
+
 
     Juin:0,
 
+
+
     Juil:0,
+
+
 
     Aout:0,
 
+
+
     Sept:0,
+
+
 
     Oct:0,
 
+
+
     Nov:0,
 
+
+
     Dec:0,
+
+
+
+
 
 
 
@@ -629,25 +1164,51 @@ function AdminStats() {
 
 
 
+
+
+
+
   orders.forEach(
+
+
 
     (order) => {
 
 
 
+
+
+
+
       const date =
+
+
 
         new Date(
 
+
+
           order.createdAt
+
+
 
         );
 
 
 
+
+
+
+
       const month =
 
+
+
         date.getMonth();
+
+
+
+
 
 
 
@@ -655,29 +1216,59 @@ function AdminStats() {
 
 
 
+
+
+
+
         "Jan",
+
+
 
         "Fev",
 
+
+
         "Mar",
+
+
 
         "Avr",
 
+
+
         "Mai",
+
+
 
         "Juin",
 
+
+
         "Juil",
+
+
 
         "Aout",
 
+
+
         "Sept",
+
+
 
         "Oct",
 
+
+
         "Nov",
 
+
+
         "Dec",
+
+
+
+
 
 
 
@@ -685,39 +1276,79 @@ function AdminStats() {
 
 
 
+
+
+
+
       const monthName =
+
+
 
         months[month];
 
 
 
+
+
+
+
       salesMap[
+
+
 
         monthName
 
+
+
       ] +=
+
+
 
         Number(
 
+
+
           order.total
+
+
 
         ) || 0;
 
 
 
+
+
+
+
     }
+
+
 
   );
 
 
 
+
+
+
+
   const salesData =
+
+
 
     Object.keys(
 
+
+
       salesMap
 
+
+
     ).map((key) => ({
+
+
+
+
 
 
 
@@ -725,9 +1356,19 @@ function AdminStats() {
 
 
 
+
+
+
+
       ventes:
 
+
+
         salesMap[key],
+
+
+
+
 
 
 
@@ -735,11 +1376,23 @@ function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // COLORS
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -747,17 +1400,35 @@ function AdminStats() {
 
 
 
+
+
+
+
     "#4F46E5",
+
+
 
     "#06B6D4",
 
+
+
     "#22C55E",
+
+
 
     "#F59E0B",
 
+
+
     "#EF4444",
 
+
+
     "#8B5CF6",
+
+
+
+
 
 
 
@@ -765,11 +1436,23 @@ function AdminStats() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // RETURN
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -777,7 +1460,15 @@ function AdminStats() {
 
 
 
+
+
+
+
     <div className="adminStats">
+
+
+
+
 
 
 
@@ -785,7 +1476,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       <div className="statsHeader">
+
+
+
+
 
 
 
@@ -793,7 +1492,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           <h1>
+
+
+
+
 
 
 
@@ -801,7 +1508,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           </h1>
+
+
+
+
 
 
 
@@ -809,9 +1524,19 @@ function AdminStats() {
 
 
 
+
+
+
+
             Statistiques réelles
 
+
+
             de votre boutique ecommerce
+
+
+
+
 
 
 
@@ -819,11 +1544,23 @@ function AdminStats() {
 
 
 
+
+
+
+
         </div>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -831,7 +1568,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       <div className="statsCards">
+
+
+
+
 
 
 
@@ -839,7 +1584,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="statsCard">
+
+
+
+
 
 
 
@@ -847,7 +1600,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             <FaMoneyBillWave />
+
+
+
+
 
 
 
@@ -855,11 +1616,23 @@ function AdminStats() {
 
 
 
+
+
+
+
           <div>
 
 
 
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -867,7 +1640,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             </p>
+
+
+
+
 
 
 
@@ -875,11 +1656,23 @@ function AdminStats() {
 
 
 
+
+
+
+
               {
+
+
 
                 totalRevenue.toLocaleString()
 
+
+
               } FCFA
+
+
+
+
 
 
 
@@ -887,11 +1680,23 @@ function AdminStats() {
 
 
 
+
+
+
+
           </div>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -899,7 +1704,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="statsCard">
+
+
+
+
 
 
 
@@ -907,7 +1720,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             <FaShoppingCart />
+
+
+
+
 
 
 
@@ -915,11 +1736,23 @@ function AdminStats() {
 
 
 
+
+
+
+
           <div>
 
 
 
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -927,11 +1760,23 @@ function AdminStats() {
 
 
 
+
+
+
+
             </p>
 
 
 
+
+
+
+
             <h2>
+
+
+
+
 
 
 
@@ -939,7 +1784,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             </h2>
+
+
+
+
 
 
 
@@ -947,7 +1800,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -955,7 +1816,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="statsCard">
+
+
+
+
 
 
 
@@ -963,7 +1832,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             <FaUsers />
+
+
+
+
 
 
 
@@ -971,11 +1848,23 @@ function AdminStats() {
 
 
 
+
+
+
+
           <div>
 
 
 
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -983,11 +1872,23 @@ function AdminStats() {
 
 
 
+
+
+
+
             </p>
 
 
 
+
+
+
+
             <h2>
+
+
+
+
 
 
 
@@ -995,7 +1896,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             </h2>
+
+
+
+
 
 
 
@@ -1003,11 +1912,23 @@ function AdminStats() {
 
 
 
+
+
+
+
         </div>
 
 
 
+
+
+
+
         {/* VISITORS */}
+
+
+
+
 
 
 
@@ -1015,7 +1936,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           <div className="cardIcon orange">
+
+
+
+
 
 
 
@@ -1023,7 +1952,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -1031,7 +1968,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             <p>
+
+
+
+
 
 
 
@@ -1039,7 +1984,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             </p>
+
+
+
+
 
 
 
@@ -1047,7 +2000,15 @@ function AdminStats() {
 
 
 
+
+
+
+
               {totalVisitors}
+
+
+
+
 
 
 
@@ -1055,7 +2016,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -1063,7 +2032,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1071,7 +2048,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       <div className="chartsGrid">
+
+
+
+
 
 
 
@@ -1079,11 +2064,23 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="chartBox">
 
 
 
+
+
+
+
           <h2>
+
+
+
+
 
 
 
@@ -1091,41 +2088,83 @@ function AdminStats() {
 
 
 
+
+
+
+
           </h2>
+
+
+
+
 
 
 
           <ResponsiveContainer
 
+
+
             width="100%"
 
+
+
             height={300}
+
+
 
           >
 
 
 
+
+
+
+
             <LineChart
 
+
+
               data={salesData}
+
+
 
             >
 
 
 
+
+
+
+
               <CartesianGrid
+
+
 
                 strokeDasharray="3 3"
 
+
+
               />
+
+
+
+
 
 
 
               <XAxis
 
+
+
                 dataKey="month"
 
+
+
               />
+
+
+
+
 
 
 
@@ -1133,7 +2172,15 @@ function AdminStats() {
 
 
 
+
+
+
+
               <Tooltip />
+
+
+
+
 
 
 
@@ -1141,17 +2188,35 @@ function AdminStats() {
 
 
 
+
+
+
+
               <Line
+
+
 
                 type="monotone"
 
+
+
                 dataKey="ventes"
+
+
 
                 stroke="#4F46E5"
 
+
+
                 strokeWidth={4}
 
+
+
               />
+
+
+
+
 
 
 
@@ -1159,11 +2224,23 @@ function AdminStats() {
 
 
 
+
+
+
+
           </ResponsiveContainer>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1171,11 +2248,23 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="chartBox">
 
 
 
+
+
+
+
           <h2>
+
+
+
+
 
 
 
@@ -1183,17 +2272,35 @@ function AdminStats() {
 
 
 
+
+
+
+
           </h2>
+
+
+
+
 
 
 
           <ResponsiveContainer
 
+
+
             width="100%"
+
+
 
             height={300}
 
+
+
           >
+
+
+
+
 
 
 
@@ -1201,59 +2308,119 @@ function AdminStats() {
 
 
 
+
+
+
+
               <Pie
+
+
 
                 data={
 
+
+
                   categoryData
+
+
 
                 }
 
+
+
                 dataKey="value"
+
+
 
                 outerRadius={100}
 
+
+
                 label
+
+
 
               >
 
 
 
+
+
+
+
                 {categoryData.map(
+
+
 
                   (
 
+
+
                     entry,
 
+
+
                     index
+
+
 
                   ) => (
 
 
 
+
+
+
+
                     <Cell
+
+
 
                       key={index}
 
+
+
                       fill={
+
+
 
                         COLORS[
 
+
+
                           index %
+
+
 
                           COLORS.length
 
+
+
                         ]
 
+
+
                       }
+
+
 
                     />
 
 
 
+
+
+
+
                   )
 
+
+
                 )}
+
+
+
+
 
 
 
@@ -1261,7 +2428,15 @@ function AdminStats() {
 
 
 
+
+
+
+
               <Tooltip />
+
+
+
+
 
 
 
@@ -1269,7 +2444,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           </ResponsiveContainer>
+
+
+
+
 
 
 
@@ -1277,7 +2460,15 @@ function AdminStats() {
 
 
 
+
+
+
+
 <div className="chartLegend">
+
+
+
+
 
 
 
@@ -1285,21 +2476,43 @@ function AdminStats() {
 
 
 
+
+
+
+
     const colors = [
+
+
 
       "#4F46E5",
 
+
+
       "#22C55E",
+
+
 
       "#F59E0B",
 
+
+
       "#EF4444",
+
+
 
       "#06B6D4",
 
+
+
       "#8B5CF6",
 
+
+
     ];
+
+
+
+
 
 
 
@@ -1307,35 +2520,71 @@ function AdminStats() {
 
 
 
+
+
+
+
       <div
+
+
 
         key={index}
 
+
+
         className="legendItem"
+
+
 
       >
 
 
 
+
+
+
+
         <span
+
+
 
           className="legendColor"
 
+
+
           style={{
+
+
 
             background:
 
+
+
               colors[
+
+
 
                 index %
 
+
+
                 colors.length
+
+
 
               ],
 
+
+
           }}
 
+
+
         ></span>
+
+
+
+
 
 
 
@@ -1343,17 +2592,35 @@ function AdminStats() {
 
 
 
+
+
+
+
           {item.name}
+
+
+
+
 
 
 
           <strong>
 
+
+
             {" "}
+
+
 
             ({item.value})
 
+
+
           </strong>
+
+
+
+
 
 
 
@@ -1361,7 +2628,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1369,7 +2644,15 @@ function AdminStats() {
 
 
 
+
+
+
+
   })}
+
+
+
+
 
 
 
@@ -1377,7 +2660,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1385,7 +2676,15 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="chartBox full">
+
+
+
+
 
 
 
@@ -1393,7 +2692,15 @@ function AdminStats() {
 
 
 
+
+
+
+
             Visiteurs par pays
+
+
+
+
 
 
 
@@ -1401,41 +2708,83 @@ function AdminStats() {
 
 
 
+
+
+
+
           <ResponsiveContainer
+
+
 
             width="100%"
 
+
+
             height={350}
+
+
 
           >
 
 
 
+
+
+
+
             <BarChart
+
+
 
               data={
 
+
+
                 visitorsData
 
+
+
               }
+
+
 
             >
 
 
 
+
+
+
+
               <CartesianGrid
+
+
 
                 strokeDasharray="3 3"
 
+
+
               />
+
+
+
+
 
 
 
               <XAxis
 
+
+
                 dataKey="country"
 
+
+
               />
+
+
+
+
 
 
 
@@ -1443,19 +2792,39 @@ function AdminStats() {
 
 
 
+
+
+
+
               <Tooltip />
+
+
+
+
 
 
 
               <Bar
 
+
+
                 dataKey="visiteurs"
+
+
 
                 fill="#4F46E5"
 
+
+
                 radius={[8,8,0,0]}
 
+
+
               />
+
+
+
+
 
 
 
@@ -1463,7 +2832,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           </ResponsiveContainer>
+
+
+
+
 
 
 
@@ -1471,7 +2848,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1479,7 +2864,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       <div className="recentProducts">
+
+
+
+
 
 
 
@@ -1487,7 +2880,15 @@ function AdminStats() {
 
 
 
+
+
+
+
           Produits récents
+
+
+
+
 
 
 
@@ -1495,47 +2896,95 @@ function AdminStats() {
 
 
 
+
+
+
+
         <div className="recentGrid">
+
+
+
+
 
 
 
           {products
 
+
+
             .slice(0,6)
+
+
 
             .map(
 
+
+
               (
+
+
 
                 product,
 
+
+
                 index
+
+
 
               ) => (
 
 
 
+
+
+
+
                 <div
+
+
 
                   key={index}
 
+
+
                   className="recentCard"
+
+
 
                 >
 
 
 
+
+
+
+
                   <img
+
+
 
                     src={
 
+
+
                       product.image
+
+
 
                     }
 
+
+
                      alt=""
 
+
+
                   />
+
+
+
+
 
 
 
@@ -1543,11 +2992,23 @@ function AdminStats() {
 
 
 
+
+
+
+
                     {
+
+
 
                       product.name
 
+
+
                     }
+
+
+
+
 
 
 
@@ -1555,15 +3016,31 @@ function AdminStats() {
 
 
 
+
+
+
+
                   <p>
+
+
+
+
 
 
 
                     {
 
+
+
                       product.price
 
+
+
                     } FCFA
+
+
+
+
 
 
 
@@ -1571,15 +3048,31 @@ function AdminStats() {
 
 
 
+
+
+
+
                   <span>
+
+
+
+
 
 
 
                     {
 
+
+
                       product.category
 
+
+
                     }
+
+
+
+
 
 
 
@@ -1587,13 +3080,27 @@ function AdminStats() {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
               )
 
+
+
             )}
+
+
+
+
 
 
 
@@ -1601,7 +3108,15 @@ function AdminStats() {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1609,11 +3124,23 @@ function AdminStats() {
 
 
 
+
+
+
+
   );
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

@@ -97,50 +97,29 @@ const safeParse = (value, fallback = null) => {
 const readStoredUser = () =>
   safeParse(localStorage.getItem("user"), {});
 
-const getAuthToken = () => {
-  const candidates = [
-    localStorage.getItem("userToken"),
-    localStorage.getItem("token"),
-  ];
+// Authentification par cookie HttpOnly
+axios.defaults.withCredentials = true;
 
-  const token = candidates.find(
-    (value) =>
-      typeof value === "string" &&
-      value.trim().length >= 20
-  );
-
-  return token ? token.trim() : null;
-};
-
-const getAuthConfig = () => {
-  const token = getAuthToken();
-
-  return {
-    headers: {
-      Accept: "application/json",
-      ...(token
-        ? { Authorization: `Bearer ${token}` }
-        : {}),
-    },
-  };
-};
+const getAuthConfig = () => ({
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = getAuthToken();
-
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
   return config;
 });
 

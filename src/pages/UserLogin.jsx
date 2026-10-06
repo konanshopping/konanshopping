@@ -2,8 +2,6 @@ import { useState } from "react";
 
 import axios from "axios";
 
-
-
 import {
 
   FaArrowLeft,
@@ -22,72 +20,79 @@ import {
 
 } from "react-icons/fa";
 
-
-
 import { toast, ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
 // ======================================================
+
 // 🔐 SÉCURITÉ CONNEXION — ALIGNÉE SUR LE BACKEND
+
 // ======================================================
 
 const API_BASE_URL = "https://konanshopping.com/api";
+
 const API_TIMEOUT = 15000;
+
 const LOGIN_ENDPOINT = "/login";
 
 const MAX_EMAIL_LENGTH = 254;
+
 const MAX_PASSWORD_LENGTH = 256;
 
 const normalizeEmail = (value) =>
+
   String(value ?? "").trim().toLowerCase();
 
 const isValidEmail = (value) =>
+
   value.length > 0 &&
+
   value.length <= MAX_EMAIL_LENGTH &&
+
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const isValidLoginResponse = (data) =>
+
   data &&
+
   typeof data === "object" &&
-  typeof data.token === "string" &&
-  data.token.trim().length > 0 &&
+
   data.user &&
+
   typeof data.user === "object";
 
 const api = axios.create({
+
   baseURL: API_BASE_URL,
+
   timeout: API_TIMEOUT,
+
+  withCredentials: true,
+
   headers: {
+
     Accept: "application/json",
+
     "Content-Type": "application/json",
+
   },
+
 });
 
-
-
-
 function UserLogin() {
-
-
 
   const [email, setEmail] =
 
     useState("");
 
-
-
   const [password, setPassword] =
 
     useState("");
 
-
-
   const [loading, setLoading] =
 
     useState(false);
-
-
 
     const [showPassword,
 
@@ -95,108 +100,151 @@ function UserLogin() {
 
   useState(false);
 
-
-
 const mobile =
 
   window.innerWidth < 768;
 
-
-
   const login = async () => {
+
     if (loading) return;
 
     const normalizedEmail = normalizeEmail(email);
 
     // Ne jamais trim le mot de passe : les espaces peuvent être valides.
+
     const enteredPassword = String(password ?? "");
 
     if (!normalizedEmail || !enteredPassword) {
+
       toast.error("Veuillez remplir tous les champs");
+
       return;
+
     }
 
     if (!isValidEmail(normalizedEmail)) {
+
       toast.error("Veuillez entrer une adresse email valide");
+
       return;
+
     }
 
     if (enteredPassword.length > MAX_PASSWORD_LENGTH) {
+
       toast.error("Mot de passe trop long");
+
       return;
+
     }
 
     try {
+
       setLoading(true);
 
       // Backend réel : POST /login
+
       const res = await api.post(LOGIN_ENDPOINT, {
+
         email: normalizedEmail,
+
         password: enteredPassword,
+
       });
 
       if (!isValidLoginResponse(res.data)) {
+
         throw new Error("Réponse de connexion invalide");
+
       }
 
-      const { token, user } = res.data;
-
-      // SAVE TOKEN
-      localStorage.setItem("token", token);
+      const { user } = res.data;
 
       // SUCCESS
+
       toast.success(
+
         "Bienvenue sur Konan Shopping 🚀"
+
       );
 
       // ADMIN
+
       if (user.isAdmin) {
+
         localStorage.setItem(
+
           "admin",
+
           JSON.stringify(user)
+
         );
 
         setTimeout(() => {
+
           window.location.href = "/admin";
+
         }, 1500);
+
       }
 
       // CLIENT
+
       else {
+
         localStorage.setItem(
+
           "user",
+
           JSON.stringify(user)
+
         );
 
         setTimeout(() => {
+
           window.location.href = "/account";
+
         }, 1500);
+
       }
 
     } catch (err) {
+
       const serverMessage =
+
         typeof err?.response?.data?.message === "string"
+
           ? err.response.data.message.trim()
+
           : "";
 
       const networkMessage =
+
         !err?.response && err?.message
+
           ? "Impossible de joindre le serveur. Vérifiez votre connexion."
+
           : "";
 
       toast.error(
+
         serverMessage ||
+
         networkMessage ||
+
         "Erreur connexion"
+
       );
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
 return (
-
-
 
     <div
 
@@ -204,27 +252,15 @@ return (
 
         minHeight: "100vh",
 
-
-
         display: "flex",
-
-
 
         justifyContent: "center",
 
-
-
         alignItems: "center",
-
-
 
         overflow: "hidden",
 
-
-
         position: "relative",
-
-
 
        background:
 
@@ -234,11 +270,7 @@ return (
 
     >
 
-
-
-      {/* BACKGROUND LIGHTS */}
-
-
+      {/\* BACKGROUND LIGHTS \*/}
 
       <div
 
@@ -246,45 +278,27 @@ return (
 
           position: "absolute",
 
-
-
           width: "500px",
 
-
-
           height: "500px",
-
-
 
           background:
 
             "#7C3AED",
 
-
-
           borderRadius: "50%",
-
-
 
           top: "-180px",
 
-
-
           left: "-120px",
 
-
-
           opacity: 0.25,
-
-
 
           filter: "blur(120px)",
 
         }}
 
       />
-
-
 
       <div
 
@@ -292,37 +306,21 @@ return (
 
           position: "absolute",
 
-
-
           width: "450px",
 
-
-
           height: "450px",
-
-
 
           background:
 
             "#2563EB",
 
-
-
           borderRadius: "50%",
-
-
 
           bottom: "-180px",
 
-
-
           right: "-120px",
 
-
-
           opacity: 0.25,
-
-
 
           filter: "blur(120px)",
 
@@ -330,11 +328,7 @@ return (
 
       />
 
-
-
-      {/* CARD */}
-
-
+      {/\* CARD \*/}
 
       <div
 
@@ -342,19 +336,11 @@ return (
 
   width: "100%",
 
-
-
   maxWidth: "720px",
-
-
 
   background: "#ffffff",
 
-
-
   borderRadius: "40px",
-
-
 
   padding:
 
@@ -364,23 +350,15 @@ return (
 
       : "50px",
 
-
-
   boxShadow:
 
     "0 20px 50px rgba(0,0,0,0.08)",
-
-
 
   border:
 
     "1px solid #e5e7eb",
 
-
-
   position: "relative",
-
-
 
   zIndex: 5,
 
@@ -388,11 +366,7 @@ return (
 
       >
 
-
-
-        {/* LOGO */}
-
-
+        {/\* LOGO \*/}
 
 <div
 
@@ -424,8 +398,6 @@ return (
 
           : "170px",
 
-
-
       height:
 
         window.innerWidth < 768
@@ -434,29 +406,17 @@ return (
 
           : "170px",
 
-
-
       borderRadius: "50%",
-
-
 
       objectFit: "cover",
 
-
-
       background: "#fff",
-
-
 
       border:
 
         "3px solid #2563eb",
 
-
-
       padding: "8px",
-
-
 
       boxShadow:
 
@@ -468,15 +428,7 @@ return (
 
 </div>
 
-
-
-
-
-
-
-       {/* TITLE */}
-
-
+       {/\* TITLE \*/}
 
 <div
 
@@ -490,8 +442,6 @@ return (
 
 >
 
-
-
   <h1
 
     style={{
@@ -504,19 +454,11 @@ return (
 
           : "70px",
 
-
-
       fontWeight: "900",
-
-
 
       color: "#0f172a",
 
-
-
       marginBottom: "10px",
-
-
 
       lineHeight: "1",
 
@@ -528,27 +470,17 @@ return (
 
   </h1>
 
-
-
   <div
 
     style={{
 
       width: "60px",
 
-
-
       height: "5px",
-
-
 
       borderRadius: "999px",
 
-
-
       background: "#2563eb",
-
-
 
       margin: "0 auto 25px auto",
 
@@ -556,15 +488,11 @@ return (
 
   />
 
-
-
   <p
 
     style={{
 
       color: "#64748b",
-
-
 
       fontSize:
 
@@ -574,15 +502,9 @@ return (
 
           : "16px",
 
-
-
       lineHeight: "28px",
 
-
-
       maxWidth: "450px",
-
-
 
       margin: "0 auto",
 
@@ -596,15 +518,9 @@ return (
 
   </p>
 
-
-
 </div>
 
-
-
-        {/* EMAIL */}
-
-
+        {/\* EMAIL \*/}
 
 <div
 
@@ -616,23 +532,15 @@ return (
 
 >
 
-
-
   <p
 
     style={{
 
       color: "#0f172a",
 
-
-
       marginBottom: "10px",
 
-
-
       fontWeight: "700",
-
-
 
       fontSize: "15px",
 
@@ -644,8 +552,6 @@ return (
 
   </p>
 
-
-
   <div
 
     style={{
@@ -656,27 +562,17 @@ return (
 
   >
 
-
-
     <FaEnvelope
 
       style={{
 
         position: "absolute",
 
-
-
         left: "18px",
-
-
 
         top: "21px",
 
-
-
         color: "#94a3b8",
-
-
 
         fontSize: "16px",
 
@@ -684,21 +580,13 @@ return (
 
     />
 
-
-
     <input
 
       type="email"
 
-
-
       placeholder="Entrez votre email"
 
-
-
       value={email}
-
-
 
       onChange={(e) =>
 
@@ -710,63 +598,37 @@ return (
 
       }
 
-
-
       style={{
 
         width: "100%",
 
-
-
         height: "60px",
-
-
 
         paddingLeft: "50px",
 
-
-
         paddingRight: "15px",
 
-
-
         borderRadius: "18px",
-
-
 
         border:
 
           "1px solid #dbe2ea",
 
-
-
         background: "#ffffff",
 
-
-
         color: "#111827",
-
-
 
         WebkitTextFillColor:
 
           "#111827",
 
-
-
         fontSize: "15px",
 
-
-
         outline: "none",
-
-
 
         boxSizing:
 
           "border-box",
-
-
 
         boxShadow:
 
@@ -776,19 +638,11 @@ return (
 
     />
 
-
-
   </div>
-
-
 
 </div>
 
-
-
-{/* PASSWORD */}
-
-
+{/\* PASSWORD \*/}
 
 <div
 
@@ -800,23 +654,15 @@ return (
 
 >
 
-
-
   <p
 
     style={{
 
       color: "#0f172a",
 
-
-
       marginBottom: "10px",
 
-
-
       fontWeight: "700",
-
-
 
       fontSize: "15px",
 
@@ -828,8 +674,6 @@ return (
 
   </p>
 
-
-
   <div
 
     style={{
@@ -840,35 +684,23 @@ return (
 
   >
 
-
-
     <FaLock
 
       style={{
 
         position: "absolute",
 
-
-
         left: "18px",
-
-
 
         top: "21px",
 
-
-
         color: "#94a3b8",
-
-
 
         fontSize: "16px",
 
       }}
 
     />
-
-
 
     <input
 
@@ -882,15 +714,9 @@ return (
 
       }
 
-
-
       placeholder="Entrez votre mot de passe"
 
-
-
       value={password}
-
-
 
       onChange={(e) =>
 
@@ -902,63 +728,37 @@ return (
 
       }
 
-
-
       style={{
 
         width: "100%",
 
-
-
         height: "60px",
-
-
 
         paddingLeft: "50px",
 
-
-
         paddingRight: "50px",
 
-
-
         borderRadius: "18px",
-
-
 
         border:
 
           "1px solid #dbe2ea",
 
-
-
         background: "#ffffff",
 
-
-
         color: "#111827",
-
-
 
         WebkitTextFillColor:
 
           "#111827",
 
-
-
         fontSize: "15px",
 
-
-
         outline: "none",
-
-
 
         boxSizing:
 
           "border-box",
-
-
 
         boxShadow:
 
@@ -967,8 +767,6 @@ return (
       }}
 
     />
-
-
 
     <FaEye
 
@@ -982,25 +780,15 @@ return (
 
       }
 
-
-
       style={{
 
         position: "absolute",
 
-
-
         right: "18px",
-
-
 
         top: "21px",
 
-
-
         color: "#94a3b8",
-
-
 
         cursor: "pointer",
 
@@ -1008,19 +796,11 @@ return (
 
     />
 
-
-
   </div>
-
-
 
 </div>
 
-
-
-{/* MOT DE PASSE OUBLIÉ */}
-
-
+{/\* MOT DE PASSE OUBLIÉ \*/}
 
 <div
 
@@ -1028,19 +808,11 @@ return (
 
     display: "flex",
 
-
-
     justifyContent: "space-between",
-
-
 
     alignItems: "center",
 
-
-
     marginTop: "-10px",
-
-
 
     marginBottom: "25px",
 
@@ -1048,15 +820,11 @@ return (
 
 >
 
-
-
   <span
 
     style={{
 
       color: "#94a3b8",
-
-
 
       fontSize: "13px",
 
@@ -1068,8 +836,6 @@ return (
 
   </span>
 
-
-
   <button
 
     onClick={() =>
@@ -1080,33 +846,19 @@ return (
 
     }
 
-
-
     style={{
 
       border: "none",
 
-
-
       background: "transparent",
-
-
 
       color: "#4f46e5",
 
-
-
       fontWeight: "700",
-
-
 
       fontSize: "14px",
 
-
-
       cursor: "pointer",
-
-
 
       padding: 0,
 
@@ -1118,35 +870,21 @@ return (
 
   </button>
 
-
-
 </div>
 
-
-
-        {/* LOGIN BUTTON */}
-
-
+        {/\* LOGIN BUTTON \*/}
 
 <button
 
   onClick={login}
 
-
-
   disabled={loading}
 
-
-
   onMouseEnter={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(-3px)";
-
-
 
     e.target.style.boxShadow =
 
@@ -1154,17 +892,11 @@ return (
 
   }}
 
-
-
   onMouseLeave={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(0px)";
-
-
 
     e.target.style.boxShadow =
 
@@ -1172,53 +904,31 @@ return (
 
   }}
 
-
-
   style={{
 
     width: "100%",
 
-
-
     height: "62px",
-
-
 
     border: "none",
 
-
-
     borderRadius: "18px",
-
-
 
     background:
 
       "linear-gradient(135deg,#2563eb,#1d4ed8)",
 
-
-
     color: "white",
-
-
 
     fontSize: "18px",
 
-
-
     fontWeight: "800",
 
-
-
     cursor: "pointer",
-
-
 
     boxShadow:
 
       "0 10px 25px rgba(37,99,235,0.20)",
-
-
 
     transition: "0.3s",
 
@@ -1226,39 +936,21 @@ return (
 
 >
 
-
-
   {loading ? (
-
-
 
     "Connexion..."
 
-
-
   ) : (
-
-
 
     "Se connecter"
 
-
-
   )}
-
-
 
 </button>
 
-
-
-        {/* CREATE ACCOUNT */}
-
-
+        {/\* CREATE ACCOUNT \*/}
 
         <button
-
-
 
   onClick={() =>
 
@@ -1268,23 +960,15 @@ return (
 
   }
 
-
-
   onMouseEnter={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(-2px)";
 
-
-
     e.target.style.background =
 
       "#eff6ff";
-
-
 
     e.target.style.border =
 
@@ -1292,23 +976,15 @@ return (
 
   }}
 
-
-
   onMouseLeave={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(0px)";
 
-
-
     e.target.style.background =
 
       "#ffffff";
-
-
 
     e.target.style.border =
 
@@ -1316,55 +992,31 @@ return (
 
   }}
 
-
-
   style={{
 
     width: "100%",
 
-
-
     height: "60px",
 
-
-
     marginTop: "16px",
-
-
 
     border:
 
       "1px solid #dbeafe",
 
-
-
     borderRadius: "18px",
-
-
 
     background: "#ffffff",
 
-
-
     color: "#2563eb",
-
-
 
     fontSize: "16px",
 
-
-
     fontWeight: "700",
-
-
 
     cursor: "pointer",
 
-
-
     transition: "0.3s",
-
-
 
     boxShadow:
 
@@ -1374,19 +1026,11 @@ return (
 
 >
 
-
-
   Créer un compte
-
-
 
 </button>
 
-
-
 <button
-
-
 
   onClick={() =>
 
@@ -1394,17 +1038,11 @@ return (
 
   }
 
-
-
   onMouseEnter={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(-2px)";
-
-
 
     e.target.style.background =
 
@@ -1412,17 +1050,11 @@ return (
 
   }}
 
-
-
   onMouseLeave={(e) => {
-
-
 
     e.target.style.transform =
 
       "translateY(0px)";
-
-
 
     e.target.style.background =
 
@@ -1430,73 +1062,39 @@ return (
 
   }}
 
-
-
   style={{
-
-
 
     width: "100%",
 
-
-
     height: "60px",
 
-
-
     marginTop: "16px",
-
-
 
     border:
 
       "1px solid #e5e7eb",
 
-
-
     borderRadius: "18px",
-
-
 
     background: "#ffffff",
 
-
-
     color: "#374151",
-
-
 
     fontSize: "16px",
 
-
-
     fontWeight: "700",
-
-
 
     cursor: "pointer",
 
-
-
     transition: "0.3s",
-
-
 
     display: "flex",
 
-
-
     justifyContent: "center",
-
-
 
     alignItems: "center",
 
-
-
     gap: "10px",
-
-
 
     boxShadow:
 
@@ -1504,27 +1102,15 @@ return (
 
   }}
 
-
-
 >
-
-
 
   <FaArrowLeft />
 
-
-
   Retour accueil
-
-
 
 </button>
 
-
-
-       {/* FOOTER PREMIUM */}
-
-
+       {/\* FOOTER PREMIUM \*/}
 
 <div
 
@@ -1532,15 +1118,9 @@ return (
 
     marginTop: "30px",
 
-
-
     paddingTop: "22px",
 
-
-
     borderTop: "1px solid #e5e7eb",
-
-
 
     textAlign: "center",
 
@@ -1548,23 +1128,15 @@ return (
 
 >
 
-
-
   <p
 
     style={{
 
       margin: 0,
 
-
-
       color: "#64748b",
 
-
-
       fontSize: "13px",
-
-
 
       fontWeight: "500",
 
@@ -1576,19 +1148,13 @@ return (
 
   </p>
 
-
-
   <p
 
     style={{
 
       marginTop: "8px",
 
-
-
       color: "#94a3b8",
-
-
 
       fontSize: "12px",
 
@@ -1600,13 +1166,9 @@ return (
 
   </p>
 
-
-
 </div>
 
-
-
-      {/* PROFESSIONAL NOTIFICATIONS */}
+      {/\* PROFESSIONAL NOTIFICATIONS \*/}
 
       <ToastContainer
 
@@ -1634,8 +1196,6 @@ return (
 
       />
 
-
-
       <style>{`
 
         .konan-toast {
@@ -1662,23 +1222,17 @@ return (
 
         }
 
-
-
         .konan-toast.Toastify__toast--success {
 
           border-left-color: #16a34a !important;
 
         }
 
-
-
         .konan-toast.Toastify__toast--error {
 
           border-left-color: #dc2626 !important;
 
         }
-
-
 
         .konan-toast .Toastify__toast-icon {
 
@@ -1689,8 +1243,6 @@ return (
           margin-right: 4px !important;
 
         }
-
-
 
         .konan-toast-body {
 
@@ -1708,8 +1260,6 @@ return (
 
         }
 
-
-
         .konan-toast .Toastify__close-button {
 
           color: #64748b !important;
@@ -1720,15 +1270,11 @@ return (
 
         }
 
-
-
         .konan-toast .Toastify__close-button:hover {
 
           opacity: 1 !important;
 
         }
-
-
 
         .konan-toast .Toastify__progress-bar {
 
@@ -1736,23 +1282,17 @@ return (
 
         }
 
-
-
         .konan-toast.Toastify__toast--success .Toastify__progress-bar {
 
           background: #16a34a !important;
 
         }
 
-
-
         .konan-toast.Toastify__toast--error .Toastify__progress-bar {
 
           background: #dc2626 !important;
 
         }
-
-
 
         @media (max-width: 768px) {
 
@@ -1770,8 +1310,6 @@ return (
 
           }
 
-
-
           .konan-toast {
 
             width: 100% !important;
@@ -1781,8 +1319,6 @@ return (
             border-radius: 15px !important;
 
           }
-
-
 
           .konan-toast-body {
 
@@ -1794,20 +1330,12 @@ return (
 
       `}</style>
 
-
-
     </div>
 
     </div>
-
-
 
   );
 
-
-
 }
-
-
 
 export default UserLogin;

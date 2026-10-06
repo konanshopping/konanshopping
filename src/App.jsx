@@ -1,7 +1,9 @@
 import {
   useEffect,
   useState,
-  useMemo
+  useMemo,
+  createContext,
+  useContext
 } from "react";
 
 import AiMode from "./pages/AiMode";
@@ -18,6 +20,10 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
+
+// Les JWT sont maintenant transportés uniquement par les cookies HttpOnly.
+// Aucun token d'authentification n'est lu ou envoyé depuis localStorage.
+axios.defaults.withCredentials = true;
 
 import Login from "./pages/Login";
 import Admin from "./pages/Admin";
@@ -183,51 +189,155 @@ import PageLoader from "./components/PageLoader";
 import InstallButton from "./components/InstallButton";
 
 // ======================================================
-// 🔐 PROTECTION FRONTEND ALIGNÉE SUR LE BACKEND
+// 🔐 SESSION FRONTEND — AUTORITÉ DU SERVEUR
 // ======================================================
-// Le frontend bloque l'accès aux interfaces sensibles.
-// Le backend reste l'autorité réelle et vérifie toujours les JWT.
-// Aucun secret backend n'est stocké ici.
+// Le backend reste l'autorité réelle.
+// Le frontend ne considère jamais localStorage comme une preuve de connexion.
+// Les JWT sont dans des cookies HttpOnly et sont envoyés automatiquement par Axios.
 
-function readStoredJSON(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch (_) {
-    return null;
-  }
+const AuthSessionContext = createContext({
+  loading: true,
+  authenticated: false,
+  role: null,
+  user: null,
+  admin: null,
+  driver: null,
+  refreshSession: async () => {},
+});
+
+function AuthSessionProvider({ children }) {
+  const [session, setSession] = useState({
+    loading: true,
+    authenticated: false,
+    role: null,
+    user: null,
+    admin: null,
+    driver: null,
+  });
+
+  const refreshSession = async () => {
+    try {
+      const response = await axios.get(
+        "https://konanshopping.com/api/auth/session",
+        { withCredentials: true }
+      );
+
+      const data = response.data || {};
+
+      setSession({
+        loading: false,
+        authenticated: Boolean(data.authenticated),
+        role: data.role || null,
+        user: data.user || null,
+        admin: data.admin || null,
+        driver: data.driver || null,
+      });
+
+      // Le cache local reste uniquement utile à l'interface existante.
+      // Il ne sert plus à autoriser une route sensible.
+      if (data.authenticated) {
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
+
+        if (data.admin) {
+          localStorage.setItem("admin", JSON.stringify(data.admin));
+        }
+
+        if (data.driver) {
+          localStorage.setItem("driver", JSON.stringify(data.driver));
+        }
+      }
+
+      return data;
+    } catch (error) {
+      setSession({
+        loading: false,
+        authenticated: false,
+        role: null,
+        user: null,
+        admin: null,
+        driver: null,
+      });
+
+      return { authenticated: false };
+    }
+  };
+
+  useEffect(() => {
+    refreshSession();
+  }, []);
+
+  return (
+    <AuthSessionContext.Provider
+      value={{ ...session, refreshSession }}
+    >
+      {children}
+    </AuthSessionContext.Provider>
+  );
 }
 
-function hasUserSession() {
-  return Boolean(localStorage.getItem("token") && readStoredJSON("user"));
+function useAuthSession() {
+  return useContext(AuthSessionContext);
 }
 
-function hasAdminSession() {
-  const token = localStorage.getItem("token");
-  const admin = readStoredJSON("admin");
-  return Boolean(token && admin && (admin.role === "admin" || admin.isAdmin === true));
-}
-
-function hasDriverSession() {
-  const driver = readStoredJSON("driver");
-  const driverToken = driver?.token || localStorage.getItem("driverToken");
-  return Boolean(driverToken && driver);
+function AuthLoading() {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#ffffff",
+        color: "#0b5ed7",
+        fontFamily: "Arial, sans-serif",
+        fontWeight: 600,
+      }}
+    >
+      Vérification de votre session...
+    </div>
+  );
 }
 
 function RequireUser({ children }) {
-  return hasUserSession() ? children : <Navigate to="/login" replace />;
+  const { loading, authenticated, role } = useAuthSession();
+
+  if (loading) return <AuthLoading />;
+
+  return authenticated && role === "user"
+    ? children
+    : <Navigate to="/login" replace />;
 }
 
 function RequireAdmin({ children }) {
-  return hasAdminSession() ? children : <Navigate to="/admin-login" replace />;
+  const { loading, authenticated, role } = useAuthSession();
+
+  if (loading) return <AuthLoading />;
+
+  return authenticated && role === "admin"
+    ? children
+    : <Navigate to="/admin-login" replace />;
 }
 
 function RequireDriver({ children }) {
-  return hasDriverSession() ? children : <Navigate to="/driver-login" replace />;
+  const { loading, authenticated, role } = useAuthSession();
+
+  if (loading) return <AuthLoading />;
+
+  return authenticated && role === "driver"
+    ? children
+    : <Navigate to="/driver-login" replace />;
 }
 
 function RequireUserOrAdmin({ children }) {
-  return hasUserSession() || hasAdminSession() ? children : <Navigate to="/login" replace />;
+  const { loading, authenticated, role } = useAuthSession();
+
+  if (loading) return <AuthLoading />;
+
+  return authenticated && (role === "user" || role === "admin")
+    ? children
+    : <Navigate to="/login" replace />;
 }
 
 function Home() {
@@ -335,10 +445,7 @@ const clientId =
   );
 
 // JWT uniquement pour les appels backend nécessitant l'identité du client.
-const authToken = localStorage.getItem("token");
-const authHeaders = authToken
-  ? { Authorization: `Bearer ${authToken}` }
-  : {};
+const authHeaders = {};
 
 const favoritesKey =
   `favorites_${clientId}`;
@@ -5593,6 +5700,8 @@ function App() {
 
     <BrowserRouter>
 
+      <AuthSessionProvider>
+
 <PageLoader />
 
       <Routes>
@@ -5930,7 +6039,9 @@ function App() {
   bodyClassName="konan-toast-body"
 />
 
-</BrowserRouter>
+      </AuthSessionProvider>
+
+    </BrowserRouter>
 
   );
 

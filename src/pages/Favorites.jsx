@@ -1,10 +1,20 @@
 import {
 
+
+
   useState,
+
+
 
   useEffect
 
+
+
 } from "react";
+
+
+
+
 
 
 
@@ -12,11 +22,23 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
 
   useNavigate
 
+
+
 } from "react-router-dom";
+
+
+
+
 
 
 
@@ -24,148 +46,229 @@ import { toast } from "react-toastify";
 
 
 
+
+
+
+
 import {
+
+
 
   FaHeart,
 
+
+
   FaTrash,
+
+
 
   FaShoppingCart,
 
+
+
   FaBoxOpen
 
+
+
 } from "react-icons/fa";
+
+
+
+
 
 
 
 import {
 
+
+
   FaBolt
 
+
+
 } from "react-icons/fa";
+
+
+
+
+
 
 
 
 
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
 
+
+
 const isValidObjectId = (value) =>
+
   typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
 
+
+
 const safeParse = (value, fallback = null) => {
+
   try {
+
     return value ? JSON.parse(value) : fallback;
+
   } catch {
+
     return fallback;
+
   }
+
 };
+
+
 
 const getStoredUser = () =>
+
   safeParse(localStorage.getItem("user"), null);
 
-const getAuthToken = () => {
-  const candidates = [
-    localStorage.getItem("token"),
-    localStorage.getItem("userToken"),
-  ];
 
-  const token = candidates.find(
-    (value) =>
-      typeof value === "string" && value.trim()
-  );
 
-  return token ? token.trim() : "";
-};
+// Authentification par cookie HttpOnly
+axios.defaults.withCredentials = true;
 
-const getAuthConfig = () => {
-  const token = getAuthToken();
-
-  if (!token) {
-    return {};
-  }
-
-  return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
+const getAuthConfig = () => ({
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
 });
 
 api.interceptors.request.use((config) => {
-  const token = getAuthToken();
-
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
   return config;
 });
 
 api.interceptors.response.use(
+
   (response) => response,
+
   (error) => {
+
     if (error?.response?.status === 401) {
+
       localStorage.removeItem("user");
+
       localStorage.removeItem("token");
+
       localStorage.removeItem("userToken");
+
     }
 
+
+
     return Promise.reject(error);
+
   }
+
 );
 
+
+
 const getErrorMessage = (error) => {
+
   if (error?.response?.status === 401) {
+
     return "Votre session a expiré. Veuillez vous reconnecter.";
+
   }
+
+
 
   if (error?.response?.status === 403) {
+
     return "Accès non autorisé.";
+
   }
+
+
 
   if (error?.response?.status === 429) {
+
     return "Trop de demandes. Veuillez patienter.";
+
   }
+
+
 
   if (error?.code === "ECONNABORTED") {
+
     return "La demande a expiré. Veuillez réessayer.";
+
   }
 
+
+
   return (
+
     error?.response?.data?.message ||
+
     "Une erreur est survenue."
+
   );
+
 };
+
+
 
 function Favorites() {
 
 
 
+
+
+
+
   const navigate =
+
+
 
     useNavigate();
 
 
 
+
+
+
+
   const [favorites, setFavorites] =
+
+
 
     useState([]);
 
 
 
+
+
+
+
   const [loading, setLoading] =
 
+
+
     useState(true);
+
+
+
+
 
 
 
@@ -173,57 +276,115 @@ function Favorites() {
 
 
 
+
+
+
+
   useEffect(() => {
 
 
 
+
+
+
+
     // ======================
+
+
 
     // CLIENT CONNECTÉ
 
+
+
     // ======================
+
+
+
+
 
 
 
     if (user?._id) {
 
+
+
       const userId = String(user._id);
 
-      if (!isValidObjectId(userId) || !getAuthToken()) {
+
+
+      if (!isValidObjectId(userId)) {
+
         localStorage.removeItem("user");
+
         localStorage.removeItem("token");
+
         localStorage.removeItem("userToken");
+
         navigate("/login");
+
         setLoading(false);
+
         return;
+
       }
 
+
+
       api
+
         .get(`/api/favorites/${userId}`, getAuthConfig())
+
         .then((res) => {
+
           const data = Array.isArray(res?.data)
+
             ? res.data
+
             : [];
 
+
+
           setFavorites(data);
+
         })
+
         .catch((err) => {
+
           console.log(err);
+
           toast.error(getErrorMessage(err));
+
         })
+
         .finally(() => {
+
           setLoading(false);
+
         });
+
+
 
     }
 
 
 
+
+
+
+
     // ======================
+
+
 
     // CLIENT NON CONNECTÉ
 
+
+
     // ======================
+
+
+
+
 
 
 
@@ -231,9 +392,19 @@ function Favorites() {
 
 
 
+
+
+
+
   const savedFavorites =
 
+
+
     safeParse(localStorage.getItem("favorites"), []) || [];
+
+
+
+
 
 
 
@@ -241,11 +412,23 @@ function Favorites() {
 
 
 
+
+
+
+
   setLoading(false);
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
@@ -253,11 +436,23 @@ function Favorites() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // FAVORITES COUNT
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -265,13 +460,27 @@ function Favorites() {
 
 
 
+
+
+
+
     localStorage.setItem(
+
+
 
       "favoritesCount",
 
+
+
       favorites.length
 
+
+
     );
+
+
+
+
 
 
 
@@ -279,13 +488,27 @@ function Favorites() {
 
 
 
+
+
+
+
 useEffect(() => {
+
+
+
+
 
 
 
   const updateFavorites =
 
+
+
     () => {
+
+
+
+
 
 
 
@@ -293,7 +516,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       const clientId =
+
+
+
+
 
 
 
@@ -301,17 +532,35 @@ useEffect(() => {
 
 
 
+
+
+
+
         localStorage.getItem(
 
+
+
           "guestId"
+
+
 
         );
 
 
 
+
+
+
+
       const favoritesKey =
 
+
+
         `favorites_${clientId}`;
+
+
+
+
 
 
 
@@ -319,19 +568,39 @@ useEffect(() => {
 
 
 
+
+
+
+
         safeParse(localStorage.getItem(favoritesKey), []) || [];
+
+
+
+
 
 
 
       setFavorites(
 
+
+
         updatedFavorites
+
+
 
       );
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -339,13 +608,27 @@ useEffect(() => {
 
 
 
+
+
+
+
   window.addEventListener(
+
+
 
     "favoritesUpdated",
 
+
+
     updateFavorites
 
+
+
   );
+
+
+
+
 
 
 
@@ -353,17 +636,35 @@ useEffect(() => {
 
 
 
+
+
+
+
     window.removeEventListener(
+
+
 
       "favoritesUpdated",
 
+
+
       updateFavorites
+
+
 
     );
 
 
 
+
+
+
+
   };
+
+
+
+
 
 
 
@@ -371,36 +672,73 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // ADD TO CART
 
+
+
   // =========================
+
+
+
+
 
 
 
   const addToCart =
 
+
+
     async (product) => {
+
+
+
+
 
 
 
       try {
 
+
+
         const productId = String(product?._id || "");
 
+
+
         if (!isValidObjectId(productId)) {
+
           toast.error("Produit invalide.");
+
           return;
+
         }
+
+
+
+
 
 
 
         localStorage.removeItem(
 
+
+
           "checkoutProduct"
 
+
+
         );
+
+
+
+
 
 
 
@@ -408,11 +746,23 @@ useEffect(() => {
 
 
 
+
+
+
+
         // =====================
+
+
 
         // IDENTIFIANT CLIENT
 
+
+
         // =====================
+
+
+
+
 
 
 
@@ -420,15 +770,31 @@ useEffect(() => {
 
 
 
+
+
+
+
           user?._id ||
+
+
+
+
 
 
 
           localStorage.getItem(
 
+
+
             "guestId"
 
+
+
           ) ||
+
+
+
+
 
 
 
@@ -436,23 +802,47 @@ useEffect(() => {
 
 
 
+
+
+
+
             const newGuestId =
+
+
+
+
 
 
 
               "guest_" +
 
+
+
               Date.now();
+
+
+
+
 
 
 
             localStorage.setItem(
 
+
+
               "guestId",
+
+
 
               newGuestId
 
+
+
             );
+
+
+
+
 
 
 
@@ -460,21 +850,43 @@ useEffect(() => {
 
 
 
+
+
+
+
           })();
 
 
 
+
+
+
+
         // =====================
+
+
 
         // PANIER PRIVÉ CLIENT
 
+
+
         // =====================
+
+
+
+
 
 
 
         const clientCartKey =
 
+
+
           `cart_${clientId}`;
+
+
+
+
 
 
 
@@ -482,15 +894,31 @@ useEffect(() => {
 
 
 
+
+
+
+
           safeParse(localStorage.getItem(clientCartKey), []) || [];
 
 
 
+
+
+
+
         // =====================
+
+
 
         // VERIFIER EXISTE
 
+
+
         // =====================
+
+
+
+
 
 
 
@@ -498,21 +926,43 @@ useEffect(() => {
 
 
 
+
+
+
+
           clientCart.find(
+
+
 
             (item) =>
 
+
+
               String(item?._id) === productId
+
+
 
           );
 
 
 
+
+
+
+
         // =====================
+
+
 
         // AJOUT PRODUIT
 
+
+
         // =====================
+
+
+
+
 
 
 
@@ -520,7 +970,15 @@ useEffect(() => {
 
 
 
+
+
+
+
           const productData = {
+
+
+
+
 
 
 
@@ -528,7 +986,15 @@ useEffect(() => {
 
 
 
+
+
+
+
             quantity: 1
+
+
+
+
 
 
 
@@ -536,11 +1002,23 @@ useEffect(() => {
 
 
 
+
+
+
+
           clientCart.push(
+
+
 
             productData
 
+
+
           );
+
+
+
+
 
 
 
@@ -548,15 +1026,31 @@ useEffect(() => {
 
 
 
+
+
+
+
             clientCartKey,
+
+
+
+
 
 
 
             JSON.stringify(
 
+
+
               clientCart
 
+
+
             )
+
+
+
+
 
 
 
@@ -564,19 +1058,39 @@ useEffect(() => {
 
 
 
+
+
+
+
         }
 
 
 
+
+
+
+
         // =====================
+
+
 
         // UPDATE COUNT
 
+
+
         // =====================
+
+
+
+
 
 
 
         localStorage.setItem(
+
+
+
+
 
 
 
@@ -584,7 +1098,15 @@ useEffect(() => {
 
 
 
+
+
+
+
           clientCart.length
+
+
+
+
 
 
 
@@ -592,31 +1114,63 @@ useEffect(() => {
 
 
 
+
+
+
+
         // =====================
+
+
 
         // EVENT UPDATE
 
+
+
         // =====================
+
+
+
+
 
 
 
         window.dispatchEvent(
 
+
+
           new Event("cartUpdated")
+
+
 
         );
 
 
 
+
+
+
+
         toast.success(
 
+
+
   "Produit ajouté au panier 🛒"
+
+
 
 );
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -624,11 +1178,23 @@ useEffect(() => {
 
 
 
+
+
+
+
         console.log(err);
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -636,11 +1202,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     // =========================
+
+
 
 // ACHETER MAINTENANT
 
+
+
 // =========================
+
+
+
+
 
 
 
@@ -648,14 +1226,29 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   try {
+
+
 
     const productId = String(product?._id || "");
 
+
+
     if (!isValidObjectId(productId)) {
+
       toast.error("Produit invalide.");
+
       return;
+
     }
+
+
+
+
 
 
 
@@ -663,25 +1256,51 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     // =====================
+
+
 
     // IDENTIFIANT CLIENT
 
+
+
     // =====================
+
+
+
+
 
 
 
     const clientId =
 
+
+
       currentUser?._id ||
+
+
+
+
 
 
 
       localStorage.getItem(
 
+
+
         "guestId"
 
+
+
       ) ||
+
+
+
+
 
 
 
@@ -689,19 +1308,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         const newGuestId =
+
+
 
           "guest_" + Date.now();
 
 
 
+
+
+
+
         localStorage.setItem(
+
+
 
           "guestId",
 
+
+
           newGuestId
 
+
+
         );
+
+
+
+
 
 
 
@@ -709,47 +1348,95 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       })();
 
 
 
+
+
+
+
     // =====================
+
+
 
     // PANIER CLIENT
 
+
+
     // =====================
+
+
+
+
 
 
 
     const cartKey =
 
+
+
       `cart_${clientId}`;
+
+
+
+
 
 
 
     let cart =
 
+
+
       safeParse(localStorage.getItem(cartKey), []) || [];
 
 
 
+
+
+
+
     // =====================
+
+
 
     // VÉRIFIER SI PRODUIT EXISTE
 
+
+
     // =====================
+
+
+
+
 
 
 
     const existing =
 
+
+
       cart.find(
+
+
 
         (item) =>
 
+
+
           String(item?._id) === productId
 
+
+
       );
+
+
+
+
 
 
 
@@ -757,7 +1444,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       existing.quantity += 1;
+
+
+
+
 
 
 
@@ -765,7 +1460,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       cart.push({
+
+
+
+
 
 
 
@@ -773,7 +1476,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         quantity: 1,
+
+
+
+
 
 
 
@@ -781,83 +1492,167 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
     // =====================
+
+
 
     // SAUVEGARDER LE PANIER
 
+
+
     // =====================
 
 
 
+
+
+
+
     localStorage.setItem(
+
+
 
       cartKey,
 
+
+
       JSON.stringify(cart)
+
+
 
     );
 
 
 
+
+
+
+
     // =====================
+
+
 
     // COMPTEUR PANIER
 
+
+
     // =====================
+
+
+
+
 
 
 
     localStorage.setItem(
 
+
+
       "cartCount",
 
+
+
       cart.length
+
+
 
     );
 
 
 
+
+
+
+
     // =====================
+
+
 
     // ACTUALISER L'INTERFACE
 
+
+
     // =====================
+
+
+
+
 
 
 
     window.dispatchEvent(
 
+
+
       new Event("cartUpdated")
+
+
 
     );
 
 
 
+
+
+
+
     // =====================
+
+
 
     // RETIRER DES FAVORIS
 
+
+
     // =====================
+
+
+
+
 
 
 
     await removeFavorite(
 
+
+
       product._id
+
+
 
     );
 
 
 
+
+
+
+
     // =====================
+
+
 
     // ALLER AU CHECKOUT
 
+
+
     // =====================
+
+
+
+
 
 
 
@@ -865,21 +1660,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   } catch (error) {
+
+
+
+
 
 
 
     console.log(
 
+
+
       "Erreur achat favori :",
 
+
+
       error
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -887,11 +1704,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // REMOVE FAVORITE
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -899,55 +1728,88 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   try {
+
+
 
     const safeProductId = String(productId || "");
 
+
+
     if (!isValidObjectId(safeProductId)) {
+
       toast.error("Produit invalide.");
+
       return;
+
     }
+
+
 
     console.log("user =", user);
 
 
 
+
+
+
+
     if (user?._id) {
 
+
+
       const userId = String(user._id);
+
       const favoriteProductId = safeProductId;
 
+
+
       if (!isValidObjectId(userId) || !isValidObjectId(favoriteProductId)) {
+
         throw new Error("Identifiant favori invalide.");
+
       }
+await api.delete(
 
-      const token = getAuthToken();
-
-      if (!token) {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
-        navigate("/login");
-        return;
-      }
-
-      await api.delete(
         `/api/favorites/${userId}/${favoriteProductId}`,
+
         getAuthConfig()
+
       );
+
     }
+
+
+
+
 
 
 
     const updatedFavorites =
 
+
+
       favorites.filter(
+
+
 
         (item) =>
 
+
+
           String(item?._id) !== safeProductId
 
+
+
       );
+
+
+
+
 
 
 
@@ -955,11 +1817,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       // =====================
+
+
 
       // CLIENT ID
 
+
+
       // =====================
+
+
+
+
 
 
 
@@ -967,37 +1841,75 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         user?._id ||
+
+
+
+
 
 
 
         localStorage.getItem(
 
+
+
           "guestId"
+
+
 
         );
 
 
 
+
+
+
+
       // =====================
+
+
 
       // FAVORITES KEY
 
+
+
       // =====================
+
+
+
+
 
 
 
       const favoritesKey =
 
+
+
         `favorites_${clientId}`;
 
 
 
+
+
+
+
       // =====================
+
+
 
       // SAVE LOCAL
 
+
+
       // =====================
+
+
+
+
 
 
 
@@ -1005,15 +1917,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         favoritesKey,
+
+
+
+
 
 
 
         JSON.stringify(
 
+
+
           updatedFavorites
 
+
+
         )
+
+
+
+
 
 
 
@@ -1021,31 +1949,63 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       // =====================
+
+
 
       // UPDATE COUNT
 
+
+
       // =====================
+
+
+
+
 
 
 
       if (
 
+
+
         updatedFavorites.length <= 0
+
+
 
       ) {
 
 
 
+
+
+
+
         localStorage.removeItem(
 
+
+
           "favoritesCount"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -1053,7 +2013,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         localStorage.setItem(
+
+
+
+
 
 
 
@@ -1061,7 +2029,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           updatedFavorites.length
+
+
+
+
 
 
 
@@ -1069,31 +2045,63 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       }
 
 
 
+
+
+
+
       // =====================
+
+
 
       // UPDATE UI
 
+
+
       // =====================
+
+
+
+
 
 
 
       window.dispatchEvent(
 
+
+
         new Event(
+
+
 
           "favoritesUpdated"
 
+
+
         )
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1101,7 +2109,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       console.log(err);
+
+
+
+
 
 
 
@@ -1109,17 +2125,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   };
+
+
+
+
 
 
 
   console.log(
 
+
+
   "favorites =",
+
+
 
   favorites
 
+
+
 );
+
+
+
+
 
 
 
@@ -1127,17 +2161,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         minHeight: "100vh",
 
 
 
+
+
+
+
         background:
 
+
+
           "linear-gradient(180deg,#f8fafc,#ffffff)",
+
+
+
+
 
 
 
@@ -1145,13 +2197,27 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         fontFamily:
+
+
 
           "'Inter', sans-serif",
 
+
+
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -1159,17 +2225,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       <div
 
+
+
         style={{
+
+
 
           display: "flex",
 
 
 
+
+
+
+
           justifyContent:
 
+
+
             "space-between",
+
+
+
+
 
 
 
@@ -1177,7 +2261,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           flexWrap: "wrap",
+
+
+
+
 
 
 
@@ -1185,11 +2277,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           marginBottom: "28px",
+
+
 
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -1197,11 +2301,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           <h1
+
+
 
             style={{
 
+
+
               fontSize: "34px",
+
+
+
+
 
 
 
@@ -1209,11 +2325,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               margin: 0,
 
 
 
+
+
+
+
               color: "#111827",
+
+
+
+
 
 
 
@@ -1221,15 +2349,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               alignItems: "center",
+
+
+
+
 
 
 
               gap: "10px",
 
+
+
             }}
 
+
+
           >
+
+
+
+
 
 
 
@@ -1237,7 +2381,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             Mes Favoris
+
+
+
+
 
 
 
@@ -1245,11 +2397,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           <p
+
+
 
             style={{
 
+
+
               color: "#6b7280",
+
+
+
+
 
 
 
@@ -1257,21 +2421,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               fontSize: "14px",
+
+
 
             }}
 
+
+
           >
+
+
 
             Retrouvez rapidement
 
+
+
             vos produits préférés
+
+
 
           </p>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1279,13 +2465,27 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             background:
 
+
+
               "linear-gradient(135deg,#2563eb,#3b82f6)",
+
+
+
+
 
 
 
@@ -1293,7 +2493,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             padding: "10px 16px",
+
+
+
+
 
 
 
@@ -1301,7 +2509,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             fontWeight: "700",
+
+
+
+
 
 
 
@@ -1309,9 +2525,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             boxShadow:
 
+
+
               "0 8px 18px rgba(37,99,235,0.20)",
+
+
+
+
 
 
 
@@ -1319,15 +2545,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             alignItems: "center",
+
+
+
+
 
 
 
             gap: "8px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -1335,13 +2577,27 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
           {favorites.length}
+
+
 
           {" "}produit(s)
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1349,7 +2605,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       {/* LOADING */}
+
+
+
+
 
 
 
@@ -1357,11 +2621,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             textAlign: "center",
+
+
+
+
 
 
 
@@ -1369,19 +2645,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             fontSize: "18px",
+
+
+
+
 
 
 
             color: "#6b7280",
 
+
+
           }}
+
+
 
         >
 
+
+
           Chargement...
 
+
+
         </div>
+
+
+
+
 
 
 
@@ -1389,15 +2685,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         // EMPTY STATE
+
+
+
+
 
 
 
         <div
 
+
+
           style={{
 
+
+
             background: "#fff",
+
+
+
+
 
 
 
@@ -1405,7 +2717,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             padding: "70px 20px",
+
+
+
+
 
 
 
@@ -1413,41 +2733,83 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             boxShadow:
+
+
 
               "0 12px 35px rgba(0,0,0,0.06)",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
 
+
+
             style={{
+
+
 
               fontSize: "80px",
 
 
 
+
+
+
+
               color: "#2563eb",
+
+
 
             }}
 
+
+
           >
 
+
+
             <FaHeart />
+
+
 
           </div>
 
 
 
+
+
+
+
           <h2
+
+
 
             style={{
 
+
+
               marginTop: "18px",
+
+
+
+
 
 
 
@@ -1455,27 +2817,55 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               color: "#111827",
+
+
+
+
 
 
 
               fontWeight: "800",
 
+
+
             }}
+
+
 
           >
 
+
+
             Aucun favori
+
+
 
           </h2>
 
 
 
+
+
+
+
           <p
+
+
 
             style={{
 
+
+
               marginTop: "10px",
+
+
+
+
 
 
 
@@ -1483,17 +2873,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               fontSize: "15px",
+
+
 
             }}
 
+
+
           >
+
+
 
             Les produits que vous aimez
 
+
+
             apparaîtront ici.
 
+
+
           </p>
+
+
+
+
 
 
 
@@ -1501,23 +2909,47 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             onClick={() =>
 
+
+
               navigate("/boutique")
+
+
 
             }
 
 
 
+
+
+
+
             style={{
+
+
 
               marginTop: "24px",
 
 
 
+
+
+
+
               background:
 
+
+
                 "linear-gradient(135deg,#16a34a,#22c55e)",
+
+
+
+
 
 
 
@@ -1525,7 +2957,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               border: "none",
+
+
+
+
 
 
 
@@ -1533,7 +2973,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               borderRadius: "14px",
+
+
+
+
 
 
 
@@ -1541,7 +2989,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               cursor: "pointer",
+
+
+
+
 
 
 
@@ -1549,17 +3005,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
               boxShadow:
+
+
 
                 "0 10px 22px rgba(34,197,94,0.22)",
 
 
 
+
+
+
+
               transition:
+
+
 
                 "0.3s ease",
 
+
+
             }}
+
+
+
+
 
 
 
@@ -1567,7 +3041,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             Découvrir les produits
+
+
+
+
 
 
 
@@ -1575,7 +3057,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1583,47 +3073,95 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
         // PRODUCTS GRID
+
+
+
+
 
 
 
         <div
 
+
+
           style={{
+
+
 
             display: "grid",
 
 
 
+
+
+
+
             gridTemplateColumns:
+
+
 
               "repeat(auto-fill,minmax(220px,1fr))",
 
 
 
+
+
+
+
             gap: "18px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           {favorites.map(
+
+
 
             (product, index) => (
 
 
 
+
+
+
+
               <div
+
+
 
                 key={index}
 
 
 
+
+
+
+
                 style={{
 
+
+
                   background: "#fff",
+
+
+
+
 
 
 
@@ -1631,19 +3169,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                   overflow: "hidden",
+
+
+
+
 
 
 
                   boxShadow:
 
+
+
                     "0 10px 25px rgba(0,0,0,0.05)",
+
+
+
+
 
 
 
                   transition:
 
+
+
                     "0.3s ease",
+
+
+
+
 
 
 
@@ -1651,9 +3209,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                   cursor: "pointer",
 
+
+
                 }}
+
+
+
+
 
 
 
@@ -1661,19 +3229,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                   e.currentTarget.style.transform =
+
+
 
                     "translateY(-5px)";
 
 
 
+
+
+
+
                   e.currentTarget.style.boxShadow =
+
+
 
                     "0 18px 35px rgba(0,0,0,0.10)";
 
 
 
+
+
+
+
                 }}
+
+
+
+
 
 
 
@@ -1681,21 +3269,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                   e.currentTarget.style.transform =
+
+
 
                     "translateY(0px)";
 
 
 
+
+
+
+
                   e.currentTarget.style.boxShadow =
+
+
 
                     "0 10px 25px rgba(0,0,0,0.05)";
 
 
 
+
+
+
+
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -1703,11 +3313,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     position: "absolute",
+
+
+
+
 
 
 
@@ -1715,7 +3337,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     right: "12px",
+
+
+
+
 
 
 
@@ -1723,7 +3353,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     height: "36px",
+
+
+
+
 
 
 
@@ -1731,9 +3369,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     background:
 
+
+
                       "rgba(255,255,255,0.96)",
+
+
+
+
 
 
 
@@ -1741,7 +3389,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     alignItems: "center",
+
+
+
+
 
 
 
@@ -1749,7 +3405,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     fontSize: "15px",
+
+
+
+
 
 
 
@@ -1757,9 +3421,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     boxShadow:
 
+
+
                       "0 4px 12px rgba(0,0,0,0.08)",
+
+
+
+
 
 
 
@@ -1767,23 +3441,47 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     zIndex: 10,
+
+
 
                   }}
 
 
 
+
+
+
+
                   onClick={() =>
+
+
 
                     removeFavorite(
 
+
+
                       product._id
+
+
 
                     )
 
+
+
                   }
 
+
+
                 >
+
+
+
+
 
 
 
@@ -1791,7 +3489,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -1799,9 +3505,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                 <img
 
+
+
   src={product.image}
+
+
+
+
 
 
 
@@ -1809,21 +3525,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   onClick={() =>
+
+
 
     navigate(
 
+
+
       `/product/${product._id}`
 
+
+
     )
+
+
 
   }
 
 
 
+
+
+
+
   style={{
 
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -1831,7 +3569,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     objectFit: "cover",
+
+
+
+
 
 
 
@@ -1839,11 +3585,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     transition:
+
+
 
       "0.3s ease",
 
+
+
   }}
+
+
+
+
 
 
 
@@ -1851,13 +3609,27 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "scale(1.05)";
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -1865,15 +3637,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "scale(1)";
 
 
 
+
+
+
+
   }}
 
+
+
 />
+
+
+
+
 
 
 
@@ -1881,23 +3669,47 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     padding: "14px",
 
+
+
                   }}
+
+
 
                 >
 
 
 
+
+
+
+
                   <h3
+
+
 
                     style={{
 
+
+
                       fontSize: "17px",
+
+
+
+
 
 
 
@@ -1905,27 +3717,55 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                       color: "#111827",
+
+
+
+
 
 
 
                       margin: 0,
 
+
+
                     }}
+
+
 
                   >
 
+
+
                     {product.name}
+
+
 
                   </h3>
 
 
 
+
+
+
+
                   <p
+
+
 
                     style={{
 
+
+
                       marginTop: "8px",
+
+
+
+
 
 
 
@@ -1933,21 +3773,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                       fontWeight: "900",
+
+
+
+
 
 
 
                       fontSize: "18px",
 
+
+
                     }}
+
+
 
                   >
 
+
+
                     {product.price}
+
+
 
                     {" "}FCFA
 
+
+
                   </p>
+
+
+
+
 
 
 
@@ -1955,11 +3817,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                   <div
+
+
 
                     style={{
 
+
+
                       display: "flex",
+
+
+
+
 
 
 
@@ -1967,11 +3841,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                       marginTop: "14px",
+
+
 
                     }}
 
+
+
                   >
+
+
+
+
 
 
 
@@ -1979,7 +3865,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                     <button
+
+
+
+
 
 
 
@@ -1987,15 +3881,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     await addToCart(product);
+
+
+
+
 
 
 
     removeFavorite(
 
+
+
       product._id
 
+
+
     );
+
+
+
+
 
 
 
@@ -2003,15 +3913,31 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   style={{
+
+
 
     flex: 1,
 
 
 
+
+
+
+
     background:
 
+
+
       "linear-gradient(135deg,#111827,#1f2937)",
+
+
+
+
 
 
 
@@ -2019,7 +3945,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     border: "none",
+
+
+
+
 
 
 
@@ -2027,7 +3961,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     borderRadius: "12px",
+
+
+
+
 
 
 
@@ -2035,7 +3977,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     fontWeight: "800",
+
+
+
+
 
 
 
@@ -2043,9 +3993,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     boxShadow:
 
+
+
       "0 6px 15px rgba(0,0,0,0.10)",
+
+
+
+
 
 
 
@@ -2053,7 +4013,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -2061,21 +4029,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     gap: "6px",
+
+
+
+
 
 
 
     transition:
 
+
+
       "all 0.3s ease",
+
+
+
+
 
 
 
     transform:
 
+
+
       "translateY(0px)",
 
+
+
   }}
+
+
+
+
 
 
 
@@ -2083,25 +4073,51 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(-2px)";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
 
       "0 10px 20px rgba(0,0,0,0.18)";
 
 
 
+
+
+
+
     e.currentTarget.style.opacity =
+
+
 
       "0.92";
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -2109,21 +4125,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(0px)";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
 
       "0 6px 15px rgba(0,0,0,0.10)";
 
 
 
+
+
+
+
     e.currentTarget.style.opacity =
 
+
+
       "1";
+
+
+
+
 
 
 
@@ -2131,19 +4169,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
   <FaShoppingCart
 
+
+
     style={{
+
+
 
       fontSize: "13px"
 
+
+
     }}
 
+
+
   />
+
+
+
+
 
 
 
@@ -2151,7 +4209,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 </button>
+
+
+
+
 
 
 
@@ -2159,19 +4225,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
              <button
+
+
+
+
 
 
 
   onClick={() =>
 
+
+
     buyNow(product)
+
+
 
   }
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -2179,9 +4265,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     background:
 
+
+
       "linear-gradient(135deg,#2563eb,#3b82f6)",
+
+
+
+
 
 
 
@@ -2189,7 +4285,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     border: "none",
+
+
+
+
 
 
 
@@ -2197,11 +4301,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     borderRadius: "12px",
 
 
 
+
+
+
+
     cursor: "pointer",
+
+
+
+
 
 
 
@@ -2209,7 +4325,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     fontSize: "11px",
+
+
+
+
 
 
 
@@ -2217,11 +4341,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     alignItems: "center",
 
 
 
+
+
+
+
     justifyContent: "center",
+
+
+
+
 
 
 
@@ -2229,25 +4365,51 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 6px 15px rgba(37,99,235,0.22)",
 
 
 
+
+
+
+
     transition:
+
+
 
       "all 0.3s ease",
 
 
 
+
+
+
+
     transform:
+
+
 
       "translateY(0px)",
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -2255,25 +4417,51 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(-2px)";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
 
       "0 10px 22px rgba(37,99,235,0.32)";
 
 
 
+
+
+
+
     e.currentTarget.style.opacity =
+
+
 
       "0.94";
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -2281,21 +4469,43 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(0px)";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
 
       "0 6px 15px rgba(37,99,235,0.22)";
 
 
 
+
+
+
+
     e.currentTarget.style.opacity =
 
+
+
       "1";
+
+
+
+
 
 
 
@@ -2303,19 +4513,39 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
   <FaBolt
 
+
+
     style={{
+
+
 
       fontSize: "13px"
 
+
+
     }}
 
+
+
   />
+
+
+
+
 
 
 
@@ -2323,7 +4553,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 </button>
+
+
+
+
 
 
 
@@ -2331,31 +4569,63 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 <button
+
+
+
+
 
 
 
   onClick={() =>
 
+
+
     removeFavorite(
+
+
 
       product._id
 
+
+
     )
+
+
 
   }
 
 
 
+
+
+
+
   style={{
+
+
 
     width: "42px",
 
 
 
+
+
+
+
     background:
 
+
+
       "#eff6ff",
+
+
+
+
 
 
 
@@ -2363,7 +4633,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     border: "none",
+
+
+
+
 
 
 
@@ -2371,7 +4649,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     cursor: "pointer",
+
+
+
+
 
 
 
@@ -2379,7 +4665,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     fontWeight: "700",
+
+
+
+
 
 
 
@@ -2387,7 +4681,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -2395,17 +4697,35 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     transition:
+
+
 
       "all 0.3s ease",
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 4px 10px rgba(37,99,235,0.08)",
 
+
+
   }}
+
+
+
+
 
 
 
@@ -2413,31 +4733,63 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(-2px) scale(1.05)";
 
 
 
+
+
+
+
     e.currentTarget.style.background =
+
+
 
       "#2563eb";
 
 
 
+
+
+
+
     e.currentTarget.style.color =
+
+
 
       "white";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
 
       "0 8px 18px rgba(37,99,235,0.22)";
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -2445,27 +4797,55 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
 
       "translateY(0px) scale(1)";
 
 
 
+
+
+
+
     e.currentTarget.style.background =
+
+
 
       "#eff6ff";
 
 
 
+
+
+
+
     e.currentTarget.style.color =
+
+
 
       "#2563eb";
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
 
+
+
       "0 4px 10px rgba(37,99,235,0.08)";
+
+
+
+
 
 
 
@@ -2473,7 +4853,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2481,7 +4869,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
 </button>
+
+
+
+
 
 
 
@@ -2489,7 +4885,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
 
 
 
@@ -2497,9 +4901,19 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
             )
 
+
+
           )}
+
+
+
+
 
 
 
@@ -2507,7 +4921,15 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
       )}
+
+
+
+
 
 
 
@@ -2515,11 +4937,23 @@ const buyNow = async (product) => {
 
 
 
+
+
+
+
   );
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 
 
 
+
+
+
+
 import { useNavigate } from "react-router-dom";
+
+
+
+
 
 
 
@@ -10,89 +18,179 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
 
   FaHome,
 
+
+
   FaBox,
+
+
 
   FaUsers,
 
+
+
   FaTruck,
+
+
 
   FaChartPie,
 
+
+
   FaCog,
+
+
 
   FaShoppingCart,
 
+
+
   FaMoneyBillWave,
+
+
 
   FaBell,
 
+
+
   FaSearch,
+
+
 
   FaPlus,
 
+
+
   FaPlusCircle,
+
+
 
   FaEdit,
 
+
+
   FaTrash,
+
+
 
   FaCheckCircle,
 
+
+
   FaChartLine,
+
+
 
   FaFileAlt,
 
+
+
   FaEnvelope,
+
+
 
   FaStore,
 
+
+
   FaCrown,
+
+
 
   FaFire,
 
+
+
   FaArrowUp,
+
+
 
   FaEye,
 
+
+
   FaPhone,
+
+
 
   FaClipboardCheck,
 
+
+
   FaUserCircle,
 
+
+
   FaShareAlt
+
+
 
 } from "react-icons/fa";
 
 
 
+
+
+
+
 import {
+
+
 
   ResponsiveContainer,
 
+
+
   AreaChart,
+
+
 
   Area,
 
+
+
   XAxis,
+
+
 
   YAxis,
 
+
+
   Tooltip,
+
+
 
   CartesianGrid,
 
+
+
   PieChart,
+
+
 
   Pie,
 
+
+
   Cell,
 
+
+
 } from "recharts";
+
+
+
+
 
 
 
@@ -100,7 +198,15 @@ import { FaGift } from "react-icons/fa";
 
 
 
+
+
+
+
 import { Link } from "react-router-dom";
+
+
+
+
 
 
 
@@ -109,43 +215,38 @@ import "./Admin.css";
 
 
 
+
+
+
+
+
 const API_BASE_URL = (
+
   import.meta.env?.VITE_API_URL || "https://konanshopping.com"
+
 ).replace(/\/$/, "");
+
+
 
 const API_TIMEOUT = 15000;
 
+
+
 const isValidObjectId = (value) =>
+
   typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
 
-const getAuthToken = () => {
-  const candidates = [
-    localStorage.getItem("adminToken"),
-    localStorage.getItem("token"),
-    localStorage.getItem("userToken"),
-  ];
 
-  const token = candidates.find(
-    (value) =>
-      typeof value === "string" &&
-      value.trim().length >= 20
-  );
 
-  return token ? token.trim() : null;
-};
+// Authentification par cookie HttpOnly
+axios.defaults.withCredentials = true;
 
-const getAuthConfig = () => {
-  const token = getAuthToken();
-
-  return {
-    headers: {
-      Accept: "application/json",
-      ...(token
-        ? { Authorization: `Bearer ${token}` }
-        : {}),
-    },
-  };
-};
+const getAuthConfig = () => ({
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -156,34 +257,51 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = getAuthToken();
-
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
   return config;
 });
 
 const isValidImageFile = (file) => {
+
   if (!file || typeof file !== "object") return false;
 
+
+
   const allowedTypes = [
+
     "image/jpeg",
+
     "image/png",
+
     "image/webp",
+
     "image/gif",
+
   ];
 
+
+
   return (
+
     allowedTypes.includes(file.type) &&
+
     Number(file.size || 0) > 0 &&
+
     Number(file.size || 0) <= 5 * 1024 * 1024
+
   );
+
 };
 
+
+
 function Admin() {
+
+
+
+
 
 
 
@@ -191,15 +309,31 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   const [orders, setOrders] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [products, setProducts] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
@@ -207,7 +341,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
     fetchOrders();
+
+
+
+
 
 
 
@@ -215,13 +357,27 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   }, []);
+
+
+
+
 
 
 
   const fetchOrders =
 
+
+
     async () => {
+
+
+
+
 
 
 
@@ -229,28 +385,57 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
         const res =
 
+
+
           await apiClient.get(
+
             "/api/orders",
+
             getAuthConfig()
+
           );
 
 
 
+
+
+
+
         const data = Array.isArray(res.data)
+
           ? res.data.filter(
+
               (order) =>
+
                 order &&
+
                 typeof order === "object"
+
             )
+
           : [];
+
+
 
         setOrders(data);
 
 
 
+
+
+
+
       } catch (err) {
+
+
+
+
 
 
 
@@ -258,7 +443,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -266,9 +459,19 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   const fetchProducts =
 
+
+
     async () => {
+
+
+
+
 
 
 
@@ -276,25 +479,51 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
         const res =
 
+
+
           await apiClient.get(
+
             "/api/products",
+
             getAuthConfig()
+
           );
 
 
 
+
+
+
+
         const data = Array.isArray(res.data)
+
           ? res.data.filter(
+
               (product) =>
+
                 product &&
+
                 typeof product === "object" &&
+
                 typeof product._id === "string"
+
             )
+
           : [];
 
+
+
         setProducts(data);
+
+
+
+
 
 
 
@@ -302,7 +531,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
         console.log(err);
+
+
+
+
 
 
 
@@ -310,233 +547,467 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
     };
 
 
 
+
+
+
+
   // =========================
+
+
 
   // REVENUS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const totalRevenue =
 
+
+
     orders.reduce(
+
+
 
       (acc, order) =>
 
+
+
         acc +
+
+
 
         Number(order.total || 0),
 
+
+
       0
+
+
 
     );
 
 
 
+
+
+
+
   // =========================
+
+
 
   // CLIENTS UNIQUES
 
+
+
   // =========================
+
+
+
+
 
 
 
   const uniqueClients =
 
+
+
     [
+
+
 
       ...new Set(
 
+
+
         orders.map(
+
+
 
           (o) => o.phone
 
+
+
         )
 
+
+
       ),
+
+
 
     ].length;
 
 
 
+
+
+
+
   // =========================
+
+
 
   // STATUS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const delivered =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status === "Livrée"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const pending =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
+
+
 
         "En attente"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const shipping =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
+
+
 
         "En livraison"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const cancelled =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
 
+
+
         "Annulée"
+
+
 
     ).length;
 
 
 
+
+
+
+
   // =========================
+
+
 
   // GRAPH VENTES REELLES
 
+
+
   // =========================
+
+
+
+
 
 
 
   const salesData = orders.map(
 
+
+
     (order) => ({
+
+
+
+
 
 
 
       day: new Date(
 
+
+
         order.createdAt
+
+
 
       ).toLocaleDateString(
 
+
+
         "fr-FR",
+
+
 
         {
 
+
+
           weekday: "short",
+
+
 
         }
 
+
+
       ),
+
+
+
+
 
 
 
       ventes: Number(
 
+
+
         order.total || 0
+
+
 
       ),
 
 
 
+
+
+
+
     })
+
+
 
   );
 
 
 
+
+
+
+
   // =========================
+
+
 
   // PIE DATA
 
+
+
   // =========================
+
+
+
+
 
 
 
   const pieData = [
 
+
+
     {
+
+
 
       name: "Livrée",
 
+
+
       value: delivered,
+
+
 
       color: "#7c3aed",
 
+
+
     },
 
 
 
+
+
+
+
     {
+
+
 
       name: "En livraison",
 
+
+
       value: shipping,
+
+
 
       color: "#8b5cf6",
 
+
+
     },
 
 
 
+
+
+
+
     {
+
+
 
       name: "En attente",
 
+
+
       value: pending,
+
+
 
       color: "#a78bfa",
 
+
+
     },
+
+
+
+
 
 
 
     {
 
+
+
       name: "Annulées",
+
+
 
       value: cancelled,
 
+
+
       color: "#c4b5fd",
 
+
+
     },
+
+
 
   ];
 
 
 
+
+
+
+
   // =========================
+
+
 
   // PRODUITS VENDUS REELS
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -544,7 +1015,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   orders.forEach((order) => {
+
+
+
+
 
 
 
@@ -552,21 +1031,43 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
       order.items.forEach((item) => {
+
+
+
+
 
 
 
         if (
 
+
+
           soldProducts[item.name]
+
+
 
         ) {
 
 
 
+
+
+
+
           soldProducts[item.name]
 
+
+
           += item.quantity || 1;
+
+
+
+
 
 
 
@@ -574,13 +1075,27 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
           soldProducts[item.name]
+
+
 
           = item.quantity || 1;
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -588,7 +1103,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -596,108 +1119,217 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   const topSellingProducts =
+
+
 
     Object.entries(
 
+
+
       soldProducts
+
+
 
     ).sort(
 
+
+
       (a,b) => b[1] - a[1]
+
+
 
     );
 
 
 
+
+
+
+
 const [name, setName] =
 
+
+
   useState("");
+
+
+
+
 
 
 
 const [price, setPrice] =
 
+
+
   useState("");
+
+
+
+
 
 
 
 const [image, setImage] =
 
+
+
   useState(null);
+
+
+
+
 
 
 
 const [
 
+
+
   showProducts,
 
+
+
   setShowProducts
+
+
 
 ] = useState(false);
 
 
 
+
+
+
+
 const [
+
+
 
   editingProduct,
 
+
+
   setEditingProduct
+
+
 
 ] = useState(null);
 
 
 
+
+
+
+
 const [
+
+
 
   editName,
 
+
+
   setEditName
 
+
+
 ] = useState("");
+
+
+
+
 
 
 
 const [
 
+
+
   editPrice,
+
+
 
   setEditPrice
 
+
+
 ] = useState("");
+
+
+
+
 
 
 
 const deleteProduct =
+
   async (id) => {
 
+
+
     if (!isValidObjectId(id)) {
+
       console.log("Identifiant produit invalide.");
+
       return;
+
     }
+
+
 
     try {
 
+
+
       await apiClient.delete(
+
         `/api/delete-product/${id}`,
+
         getAuthConfig()
+
       );
+
+
 
       fetchProducts();
 
+
+
     } catch (err) {
+
+
 
       console.log(err);
 
+
+
     }
+
+
 
   };
 
 
 
+
+
+
+
 const startEdit =
 
+
+
   (product) => {
+
+
+
+
 
 
 
@@ -705,7 +1337,15 @@ const startEdit =
 
 
 
+
+
+
+
     setEditName(product.name);
+
+
+
+
 
 
 
@@ -713,120 +1353,241 @@ const startEdit =
 
 
 
+
+
+
+
   };
+
+
+
+
 
 
 
 const saveEdit =
+
   async (id) => {
 
+
+
     if (!isValidObjectId(id)) {
+
       console.log("Identifiant produit invalide.");
+
       return;
+
     }
+
+
 
     const safeName = String(editName || "").trim();
+
     const safePrice = Number(editPrice);
 
+
+
     if (!safeName || !Number.isFinite(safePrice) || safePrice <= 0) {
+
       console.log("Données produit invalides.");
+
       return;
+
     }
+
+
 
     try {
 
+
+
       await apiClient.put(
+
         `/api/update-product/${id}`,
+
         {
+
           name: safeName,
+
           price: safePrice,
+
         },
+
         getAuthConfig()
+
       );
+
+
 
       setEditingProduct(null);
 
+
+
       fetchProducts();
+
+
 
     } catch (err) {
 
+
+
       console.log(err);
+
+
 
     }
 
+
+
   };
+
+
+
+
 
 
 
 const addProduct =
+
   async () => {
 
+
+
     const safeName = String(name || "").trim();
+
     const safePrice = Number(price);
 
+
+
     if (!safeName) {
+
       console.log("Nom du produit invalide.");
+
       return;
+
     }
+
+
 
     if (!Number.isFinite(safePrice) || safePrice <= 0) {
+
       console.log("Prix du produit invalide.");
+
       return;
+
     }
 
+
+
     if (!isValidImageFile(image)) {
+
       console.log(
+
         "Image invalide : JPEG, PNG, WEBP ou GIF de 5 Mo maximum."
+
       );
+
       return;
+
     }
+
+
 
     try {
 
+
+
       const formData = new FormData();
+
+
 
       formData.append("image", image);
 
+
+
       const uploadRes = await apiClient.post(
+
         "/api/upload",
+
         formData,
+
         getAuthConfig()
+
       );
+
+
 
       const imageUrl = uploadRes?.data?.imageUrl;
 
+
+
       if (
+
         typeof imageUrl !== "string" ||
+
         !imageUrl.trim()
+
       ) {
+
         throw new Error("Réponse upload invalide.");
+
       }
 
+
+
       await apiClient.post(
+
         "/api/add-product",
+
         {
+
           name: safeName,
+
           price: safePrice,
+
           image: imageUrl,
+
         },
+
         getAuthConfig()
+
       );
+
+
 
       fetchProducts();
 
+
+
       setName("");
+
       setPrice("");
+
       setImage(null);
+
+
 
       alert("Produit ajouté ✅");
 
+
+
     } catch (err) {
+
+
 
       console.log(err);
 
+
+
     }
 
+
+
   };
+
+
+
+
 
 
 
@@ -834,7 +1595,15 @@ return (
 
 
 
+
+
+
+
   <div className="admin">
+
+
+
+
 
 
 
@@ -842,7 +1611,15 @@ return (
 
 
 
+
+
+
+
     <div className="sidebar">
+
+
+
+
 
 
 
@@ -850,7 +1627,15 @@ return (
 
 
 
+
+
+
+
   <div>
+
+
+
+
 
 
 
@@ -858,13 +1643,27 @@ return (
 
 
 
+
+
+
+
       <img
+
+
 
         src="/logo.jpg"
 
+
+
         alt="Konan Shopping"
 
+
+
       />
+
+
+
+
 
 
 
@@ -872,19 +1671,39 @@ return (
 
 
 
+
+
+
+
         <h2>
 
+
+
           KONAN
+
+
 
         </h2>
 
 
 
+
+
+
+
         <span>
+
+
 
           SHOPPING CAMEROUN
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -892,7 +1711,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -900,31 +1727,63 @@ return (
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         padding: "0 22px",
+
+
 
         marginBottom: "14px",
 
+
+
         fontSize: "11px",
+
+
 
         textTransform: "uppercase",
 
+
+
         letterSpacing: "1px",
+
+
 
         color: "#94a3b8",
 
+
+
         fontWeight: "700",
+
+
 
       }}
 
+
+
     >
+
+
 
       Administration
 
+
+
     </div>
+
+
+
+
 
 
 
@@ -932,7 +1791,15 @@ return (
 
 
 
+
+
+
+
     <div className="menu">
+
+
+
+
 
 
 
@@ -940,15 +1807,31 @@ return (
 
 
 
+
+
+
+
         <FaHome />
+
+
+
+
 
 
 
         <span>
 
+
+
           Tableau de bord
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -956,15 +1839,31 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           navigate("/admin-orders")
+
+
 
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -972,11 +1871,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Commandes
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -984,17 +1895,35 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           window.location.href =
+
+
 
             "/admin-products"
 
+
+
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -1002,11 +1931,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Produits
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1014,15 +1955,31 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           navigate("/admin-messages")
+
+
 
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -1030,11 +1987,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Messages
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1042,39 +2011,79 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
   onClick={() =>
 
+
+
     navigate("/admin-social")
+
+
 
   }
 
+
+
 >
+
+
 
   <FaShareAlt />
 
 
 
+
+
+
+
   <span>
+
+
 
     Social Studio
 
+
+
   </span>
+
+
 
 </button>
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           navigate("/admin-clients")
+
+
 
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -1082,11 +2091,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Clients
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1094,29 +2115,59 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
   onClick={() => navigate("/admin-coupons")}
 
+
+
 >
+
+
 
   <FaGift />
 
+
+
   <span>Coupons</span>
+
+
 
 </button>
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           navigate("/deliveries")
+
+
 
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -1124,11 +2175,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Livraisons
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1136,15 +2199,31 @@ return (
 
 
 
+
+
+
+
       <button
+
+
 
         onClick={() =>
 
+
+
           navigate("/admin-stats")
+
+
 
         }
 
+
+
       >
+
+
+
+
 
 
 
@@ -1152,11 +2231,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Statistiques
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1164,13 +2255,27 @@ return (
 
 
 
+
+
+
+
       <Link
+
+
 
         to="/admin/settings"
 
+
+
         className="menuLink"
 
+
+
       >
+
+
+
+
 
 
 
@@ -1178,11 +2283,23 @@ return (
 
 
 
+
+
+
+
         <span>
+
+
 
           Paramètres
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -1190,11 +2307,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1202,77 +2331,155 @@ return (
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       margin: "20px",
+
+
 
       padding: "20px",
 
+
+
       borderRadius: "20px",
+
+
 
       background:
 
+
+
         "linear-gradient(135deg,#7c3aed,#8b5cf6)",
+
+
 
       color: "#fff",
 
+
+
       boxShadow:
+
+
 
         "0 15px 35px rgba(124,58,237,0.35)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         display: "flex",
+
+
 
         alignItems: "center",
 
+
+
         gap: "10px",
+
+
 
         marginBottom: "12px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaCrown
+
+
 
         style={{
 
+
+
           fontSize: "22px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
       <h3
+
+
 
         style={{
 
+
+
           margin: 0,
+
+
 
           fontSize: "17px",
 
+
+
         }}
+
+
 
       >
 
+
+
         Dashboard Premium
 
+
+
       </h3>
+
+
+
+
 
 
 
@@ -1280,71 +2487,143 @@ return (
 
 
 
+
+
+
+
     <p
+
+
 
       style={{
 
+
+
         fontSize: "13px",
+
+
 
         lineHeight: "1.6",
 
+
+
         opacity: 0.95,
+
+
 
       }}
 
+
+
     >
+
+
 
       Gérez les commandes,
 
+
+
       produits, clients,
+
+
 
       livraisons et revenus
 
+
+
       depuis un tableau de bord
 
+
+
       moderne.
+
+
 
     </p>
 
 
 
+
+
+
+
     <button
+
+
 
       style={{
 
+
+
         width: "100%",
+
+
 
         height: "44px",
 
+
+
         border: "none",
+
+
 
         borderRadius: "12px",
 
+
+
         marginTop: "12px",
+
+
 
         background: "#fff",
 
+
+
         color: "#7c3aed",
+
+
 
         fontWeight: "700",
 
+
+
         cursor: "pointer",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaStore
+
+
 
         style={{
 
+
+
           marginRight: "8px",
+
+
 
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -1352,7 +2631,15 @@ return (
 
 
 
+
+
+
+
     </button>
+
+
+
+
 
 
 
@@ -1360,7 +2647,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -1368,7 +2663,15 @@ return (
 
 
 
+
+
+
+
     <div className="main">
+
+
+
+
 
 
 
@@ -1376,7 +2679,15 @@ return (
 
 
 
+
+
+
+
 <div className="topbar">
+
+
+
+
 
 
 
@@ -1384,7 +2695,15 @@ return (
 
 
 
+
+
+
+
   <div className="topLeft">
+
+
+
+
 
 
 
@@ -1392,7 +2711,15 @@ return (
 
 
 
+
+
+
+
       <div className="welcomeBadge">
+
+
+
+
 
 
 
@@ -1400,15 +2727,31 @@ return (
 
 
 
+
+
+
+
         <span>
 
+
+
           Tableau de bord Premium
+
+
 
         </span>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1416,7 +2759,15 @@ return (
 
 
 
+
+
+
+
         Bonjour Konan
+
+
+
+
 
 
 
@@ -1424,15 +2775,31 @@ return (
 
 
 
+
+
+
+
       <p className="welcomeText">
+
+
+
+
 
 
 
         Suivez vos ventes,
 
+
+
         commandes, clients et
 
+
+
         performances en temps réel.
+
+
+
+
 
 
 
@@ -1440,11 +2807,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1452,7 +2831,15 @@ return (
 
 
 
+
+
+
+
   <div className="topActions">
+
+
+
+
 
 
 
@@ -1460,29 +2847,59 @@ return (
 
 
 
+
+
+
+
     <div className="searchBox">
+
+
+
+
 
 
 
       <FaSearch
 
+
+
         className="searchIcon"
 
+
+
       />
+
+
+
+
 
 
 
       <input
 
+
+
         type="text"
 
+
+
         placeholder="Rechercher un produit, commande ou client..."
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1490,11 +2907,23 @@ return (
 
 
 
+
+
+
+
     <button
+
+
 
       className="notif"
 
+
+
     >
+
+
+
+
 
 
 
@@ -1502,11 +2931,23 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         className="notifDot"
 
+
+
       >
+
+
+
+
 
 
 
@@ -1514,7 +2955,15 @@ return (
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1522,29 +2971,59 @@ return (
 
 
 
+
+
+
+
     {/* PROFIL ADMIN */}
+
+
+
+
 
 
 
     <div
 
+
+
       className="adminProfile"
+
+
 
     >
 
 
 
+
+
+
+
       <img
+
+
 
         src="/logo.jpg"
 
+
+
         alt="Konan Shopping"
+
+
 
       />
 
 
 
+
+
+
+
       <div>
+
+
+
+
 
 
 
@@ -1552,7 +3031,15 @@ return (
 
 
 
+
+
+
+
           Konan Shopping
+
+
+
+
 
 
 
@@ -1560,7 +3047,15 @@ return (
 
 
 
+
+
+
+
         <p>
+
+
+
+
 
 
 
@@ -1568,7 +3063,15 @@ return (
 
 
 
+
+
+
+
         </p>
+
+
+
+
 
 
 
@@ -1576,7 +3079,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1584,15 +3095,31 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
       {/* =========================
 
+
+
    STATS PREMIUM
 
+
+
 \========================= */}
+
+
+
+
 
 
 
@@ -1600,7 +3127,15 @@ return (
 
 
 
+
+
+
+
   {/* REVENUS */}
+
+
+
+
 
 
 
@@ -1608,7 +3143,15 @@ return (
 
 
 
+
+
+
+
     <div className="statHeader">
+
+
+
+
 
 
 
@@ -1616,25 +3159,51 @@ return (
 
 
 
+
+
+
+
         <p className="statMini">
 
+
+
           Revenus Totaux
+
+
 
         </p>
 
 
 
+
+
+
+
         <h2>
+
+
 
           {totalRevenue.toLocaleString()}
 
+
+
           FCFA
+
+
 
         </h2>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1642,7 +3211,15 @@ return (
 
 
 
+
+
+
+
         <FaMoneyBillWave />
+
+
+
+
 
 
 
@@ -1650,11 +3227,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
     <div className="statFooter">
+
+
+
+
 
 
 
@@ -1662,7 +3251,15 @@ return (
 
 
 
+
+
+
+
         +12%
+
+
+
+
 
 
 
@@ -1670,11 +3267,23 @@ return (
 
 
 
+
+
+
+
       <p>
+
+
 
         Croissance ce mois
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1682,11 +3291,23 @@ return (
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
   {/* COMMANDES */}
+
+
+
+
 
 
 
@@ -1694,7 +3315,15 @@ return (
 
 
 
+
+
+
+
     <div className="statHeader">
+
+
+
+
 
 
 
@@ -1702,23 +3331,47 @@ return (
 
 
 
+
+
+
+
         <p className="statMini">
 
+
+
           Commandes
+
+
 
         </p>
 
 
 
+
+
+
+
         <h2>
 
+
+
           {orders.length}
+
+
 
         </h2>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1726,7 +3379,15 @@ return (
 
 
 
+
+
+
+
         <FaShoppingCart />
+
+
+
+
 
 
 
@@ -1734,11 +3395,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
     <div className="statFooter">
+
+
+
+
 
 
 
@@ -1746,7 +3419,15 @@ return (
 
 
 
+
+
+
+
         +8%
+
+
+
+
 
 
 
@@ -1754,11 +3435,23 @@ return (
 
 
 
+
+
+
+
       <p>
+
+
 
         Commandes enregistrées
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1766,7 +3459,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1774,7 +3475,15 @@ return (
 
 
 
+
+
+
+
   <div className="statCard clientsCard">
+
+
+
+
 
 
 
@@ -1782,27 +3491,55 @@ return (
 
 
 
+
+
+
+
       <div>
+
+
+
+
 
 
 
         <p className="statMini">
 
+
+
           Clients
+
+
 
         </p>
 
 
 
+
+
+
+
         <h2>
 
+
+
           {uniqueClients}
+
+
 
         </h2>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1810,7 +3547,15 @@ return (
 
 
 
+
+
+
+
         <FaUsers />
+
+
+
+
 
 
 
@@ -1818,11 +3563,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
     <div className="statFooter">
+
+
+
+
 
 
 
@@ -1830,7 +3587,15 @@ return (
 
 
 
+
+
+
+
         +5%
+
+
+
+
 
 
 
@@ -1838,11 +3603,23 @@ return (
 
 
 
+
+
+
+
       <p>
+
+
 
         Clients actifs
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1850,11 +3627,23 @@ return (
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
   {/* PRODUITS */}
+
+
+
+
 
 
 
@@ -1862,7 +3651,15 @@ return (
 
 
 
+
+
+
+
     <div className="statHeader">
+
+
+
+
 
 
 
@@ -1870,23 +3667,47 @@ return (
 
 
 
+
+
+
+
         <p className="statMini">
 
+
+
           Produits
+
+
 
         </p>
 
 
 
+
+
+
+
         <h2>
 
+
+
           {products.length}
+
+
 
         </h2>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -1894,7 +3715,15 @@ return (
 
 
 
+
+
+
+
         <FaBox />
+
+
+
+
 
 
 
@@ -1902,7 +3731,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1910,7 +3747,15 @@ return (
 
 
 
+
+
+
+
       <span className="greenText">
+
+
+
+
 
 
 
@@ -1918,15 +3763,31 @@ return (
 
 
 
+
+
+
+
       </span>
+
+
+
+
 
 
 
       <p>
 
+
+
         Produits en boutique
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1934,7 +3795,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1942,11 +3811,23 @@ return (
 
 
 
+
+
+
+
 {/* =========================
+
+
 
    ULTRA PREMIUM CHARTS
 
+
+
 \========================= */}
+
+
+
+
 
 
 
@@ -1954,7 +3835,15 @@ return (
 
 
 
+
+
+
+
   {/* SALES */}
+
+
+
+
 
 
 
@@ -1962,7 +3851,15 @@ return (
 
 
 
+
+
+
+
     {/* HEADER */}
+
+
+
+
 
 
 
@@ -1970,7 +3867,15 @@ return (
 
 
 
+
+
+
+
       <div>
+
+
+
+
 
 
 
@@ -1978,15 +3883,31 @@ return (
 
 
 
+
+
+
+
           <FaChartLine
+
+
 
             style={{
 
+
+
               marginRight: "6px",
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -1994,31 +3915,63 @@ return (
 
 
 
+
+
+
+
         </p>
+
+
+
+
 
 
 
         <h3
 
+
+
           style={{
+
+
 
             display: "flex",
 
+
+
             alignItems: "center",
+
+
 
             gap: "10px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaMoneyBillWave
+
+
 
             color="#16a34a"
 
+
+
           />
+
+
+
+
 
 
 
@@ -2026,11 +3979,23 @@ return (
 
 
 
+
+
+
+
         </h3>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -2038,7 +4003,15 @@ return (
 
 
 
+
+
+
+
         <FaFileAlt />
+
+
+
+
 
 
 
@@ -2046,11 +4019,23 @@ return (
 
 
 
+
+
+
+
       </button>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2058,7 +4043,15 @@ return (
 
 
 
+
+
+
+
     <div className="chartNumbers">
+
+
+
+
 
 
 
@@ -2066,37 +4059,75 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display: "flex",
+
+
 
             alignItems: "center",
 
+
+
             gap: "10px",
+
+
 
             marginBottom: "10px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaMoneyBillWave
 
+
+
             color="#16a34a"
+
+
 
           />
 
 
 
+
+
+
+
           <span>
+
+
 
             Revenus
 
+
+
           </span>
+
+
+
+
 
 
 
@@ -2104,13 +4135,27 @@ return (
 
 
 
+
+
+
+
         <h2>
+
+
+
+
 
 
 
           {totalRevenue.toLocaleString()}
 
+
+
           FCFA
+
+
+
+
 
 
 
@@ -2118,7 +4163,15 @@ return (
 
 
 
+
+
+
+
         <p>
+
+
+
+
 
 
 
@@ -2126,11 +4179,23 @@ return (
 
 
 
+
+
+
+
         </p>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -2138,41 +4203,83 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display: "flex",
+
+
 
             alignItems: "center",
 
+
+
             gap: "10px",
+
+
 
             marginBottom: "10px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaShoppingCart
 
+
+
             color="#7c3aed"
+
+
 
           />
 
 
 
+
+
+
+
           <span>
 
+
+
             Commandes
+
+
 
           </span>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -2180,7 +4287,15 @@ return (
 
 
 
+
+
+
+
           {orders.length}
+
+
+
+
 
 
 
@@ -2188,7 +4303,15 @@ return (
 
 
 
+
+
+
+
         <p>
+
+
+
+
 
 
 
@@ -2196,7 +4319,15 @@ return (
 
 
 
+
+
+
+
         </p>
+
+
+
+
 
 
 
@@ -2204,7 +4335,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2212,7 +4351,15 @@ return (
 
 
 
+
+
+
+
     <div className="miniChart">
+
+
+
+
 
 
 
@@ -2220,11 +4367,23 @@ return (
 
 
 
+
+
+
+
         <AreaChart
+
+
 
           data={salesData}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2232,43 +4391,87 @@ return (
 
 
 
+
+
+
+
             <linearGradient
+
+
 
               id="premiumGradient"
 
+
+
               x1="0"
+
+
 
               y1="0"
 
+
+
               x2="0"
 
+
+
               y2="1"
+
+
 
             >
 
 
 
+
+
+
+
               <stop
+
+
 
                 offset="0%"
 
+
+
                 stopColor="#8b5cf6"
+
+
 
                 stopOpacity={0.45}
 
+
+
               />
+
+
+
+
 
 
 
               <stop
 
+
+
                 offset="100%"
+
+
 
                 stopColor="#8b5cf6"
 
+
+
                 stopOpacity={0}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2276,47 +4479,95 @@ return (
 
 
 
+
+
+
+
           </defs>
+
+
+
+
 
 
 
           <CartesianGrid
 
+
+
             strokeDasharray="4 4"
+
+
 
             stroke="#ede9fe"
 
+
+
           />
+
+
+
+
 
 
 
           <XAxis
 
+
+
             dataKey="day"
+
+
 
             tick={{
 
+
+
               fill:"#6b7280",
+
+
 
               fontSize:12,
 
+
+
             }}
 
+
+
           />
+
+
+
+
 
 
 
           <YAxis
 
+
+
             tick={{
+
+
 
               fill:"#6b7280",
 
+
+
               fontSize:12,
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2324,19 +4575,39 @@ return (
 
 
 
+
+
+
+
           <Area
+
+
 
             type="monotone"
 
+
+
             dataKey="ventes"
+
+
 
             stroke="#7c3aed"
 
+
+
             fill="url(#premiumGradient)"
+
+
 
             strokeWidth={3}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2344,7 +4615,15 @@ return (
 
 
 
+
+
+
+
       </ResponsiveContainer>
+
+
+
+
 
 
 
@@ -2352,7 +4631,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -2360,7 +4647,15 @@ return (
 
 
 
+
+
+
+
   <div className="chartCard pieCard">
+
+
+
+
 
 
 
@@ -2368,7 +4663,15 @@ return (
 
 
 
+
+
+
+
       <div>
+
+
+
+
 
 
 
@@ -2376,15 +4679,31 @@ return (
 
 
 
+
+
+
+
           <FaChartPie
+
+
 
             style={{
 
+
+
               marginRight: "6px",
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2392,31 +4711,63 @@ return (
 
 
 
+
+
+
+
         </p>
+
+
+
+
 
 
 
         <h3
 
+
+
           style={{
+
+
 
             display: "flex",
 
+
+
             alignItems: "center",
+
+
 
             gap: "10px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaChartPie
+
+
 
             color="#7c3aed"
 
+
+
           />
+
+
+
+
 
 
 
@@ -2424,7 +4775,15 @@ return (
 
 
 
+
+
+
+
         </h3>
+
+
+
+
 
 
 
@@ -2432,7 +4791,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2440,65 +4807,131 @@ return (
 
 
 
+
+
+
+
 <div className="smallPie">
+
+
+
+
 
 
 
   <PieChart
 
+
+
     width={260}
 
+
+
     height={260}
+
+
 
   >
 
 
 
+
+
+
+
     <Pie
+
+
 
       data={pieData}
 
+
+
       innerRadius={70}
+
+
 
       outerRadius={100}
 
+
+
       paddingAngle={4}
 
+
+
       dataKey="value"
+
+
 
     >
 
 
 
+
+
+
+
       {pieData.map(
+
+
 
         (
 
+
+
           entry,
 
+
+
           index
+
+
 
         ) => (
 
 
 
+
+
+
+
           <Cell
+
+
 
             key={index}
 
+
+
             fill={
+
+
 
               entry.color
 
+
+
             }
+
+
 
           />
 
 
 
+
+
+
+
         )
 
+
+
       )}
+
+
+
+
 
 
 
@@ -2506,7 +4939,15 @@ return (
 
 
 
+
+
+
+
   </PieChart>
+
+
+
+
 
 
 
@@ -2514,59 +4955,119 @@ return (
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       position: "absolute",
+
+
 
       textAlign: "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <h2
+
+
 
       style={{
 
+
+
         margin: 0,
+
+
 
         fontSize: "26px",
 
+
+
         fontWeight: "800",
+
+
 
         color: "#0f172a",
 
+
+
       }}
+
+
 
     >
 
+
+
       {orders.length}
+
+
 
     </h2>
 
 
 
+
+
+
+
     <p
+
+
 
       style={{
 
+
+
         margin: 0,
+
+
 
         color: "#64748b",
 
+
+
         fontSize: "12px",
+
+
 
       }}
 
+
+
     >
+
+
 
       Commandes
 
+
+
     </p>
+
+
+
+
 
 
 
@@ -2574,7 +5075,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2582,51 +5091,103 @@ return (
 
 
 
+
+
+
+
 <div className="premiumLegend">
+
+
+
+
 
 
 
   {pieData.map(
 
+
+
     (
+
+
 
       item,
 
+
+
       index
+
+
 
     ) => (
 
 
 
+
+
+
+
       <div
+
+
 
         key={index}
 
+
+
         className="premiumLegendItem"
+
+
 
       >
 
 
 
+
+
+
+
         <div
 
+
+
           className="legendLeft"
+
+
 
         >
 
 
 
+
+
+
+
           <span
+
+
 
             style={{
 
+
+
               background:
+
+
 
                 item.color,
 
+
+
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2634,43 +5195,87 @@ return (
 
 
 
+
+
+
+
             <h5
+
+
 
               style={{
 
+
+
                 margin: 0,
+
+
 
                 fontSize: "14px",
 
+
+
                 color: "#0f172a",
+
+
 
                 fontWeight: "700",
 
+
+
               }}
+
+
 
             >
 
+
+
               {item.name}
+
+
 
             </h5>
 
 
 
+
+
+
+
             <small
+
+
 
               style={{
 
+
+
                 color: "#94a3b8",
+
+
 
                 fontSize: "11px",
 
+
+
               }}
+
+
 
             >
 
+
+
               Statut commande
 
+
+
             </small>
+
+
+
+
 
 
 
@@ -2678,21 +5283,43 @@ return (
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
         <strong
 
+
+
           style={{
+
+
 
             color: "#0f172a",
 
+
+
             fontSize: "16px",
+
+
 
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2700,31 +5327,63 @@ return (
 
 
 
+
+
+
+
         </strong>
+
+
+
+
 
 
 
       </div>
 
+
+
     )
+
+
 
   )}
 
 
 
-</div>
+
+
+
 
 </div>
 
+
+
 </div>
+
+
+
+</div>
+
+
+
+
 
 
 
 {/* =========================
 
+
+
    PREMIUM TABLE SECTION
 
+
+
 \========================= */}
+
+
+
+
 
 
 
@@ -2732,7 +5391,15 @@ return (
 
 
 
+
+
+
+
   {/* COMMANDES */}
+
+
+
+
 
 
 
@@ -2740,7 +5407,15 @@ return (
 
 
 
+
+
+
+
     <div className="tableTop">
+
+
+
+
 
 
 
@@ -2748,21 +5423,43 @@ return (
 
 
 
+
+
+
+
         <p className="tableMini">
+
+
+
+
 
 
 
           <FaShoppingCart
 
+
+
             style={{
+
+
 
               marginRight: "6px",
 
+
+
               color: "#7c3aed",
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2770,11 +5467,23 @@ return (
 
 
 
+
+
+
+
         </p>
 
 
 
+
+
+
+
         <h3>
+
+
+
+
 
 
 
@@ -2782,7 +5491,15 @@ return (
 
 
 
+
+
+
+
         </h3>
+
+
+
+
 
 
 
@@ -2790,25 +5507,51 @@ return (
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display: "flex",
+
+
 
           gap: "10px",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <button
+
+
 
           className="tableBtn"
 
+
+
         >
+
+
+
+
 
 
 
@@ -2816,7 +5559,15 @@ return (
 
 
 
+
+
+
+
           Voir tout
+
+
+
+
 
 
 
@@ -2824,11 +5575,23 @@ return (
 
 
 
+
+
+
+
         <button
+
+
 
           className="tableBtn"
 
+
+
         >
+
+
+
+
 
 
 
@@ -2836,7 +5599,15 @@ return (
 
 
 
+
+
+
+
           Gérer
+
+
+
+
 
 
 
@@ -2844,11 +5615,23 @@ return (
 
 
 
+
+
+
+
       </div>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2856,7 +5639,15 @@ return (
 
 
 
+
+
+
+
     <div className="tableWrapper">
+
+
+
+
 
 
 
@@ -2864,7 +5655,15 @@ return (
 
 
 
+
+
+
+
         <thead>
+
+
+
+
 
 
 
@@ -2872,19 +5671,39 @@ return (
 
 
 
+
+
+
+
             <th>
+
+
+
+
 
 
 
               <FaUserCircle
 
+
+
                 style={{
+
+
 
                   marginRight: "6px",
 
+
+
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2892,7 +5711,15 @@ return (
 
 
 
+
+
+
+
             </th>
+
+
+
+
 
 
 
@@ -2900,15 +5727,31 @@ return (
 
 
 
+
+
+
+
               <FaPhone
+
+
 
                 style={{
 
+
+
                   marginRight: "6px",
+
+
 
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2916,7 +5759,15 @@ return (
 
 
 
+
+
+
+
             </th>
+
+
+
+
 
 
 
@@ -2924,15 +5775,31 @@ return (
 
 
 
+
+
+
+
               <FaMoneyBillWave
+
+
 
                 style={{
 
+
+
                   marginRight: "6px",
+
+
 
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2940,7 +5807,15 @@ return (
 
 
 
+
+
+
+
             </th>
+
+
+
+
 
 
 
@@ -2948,15 +5823,31 @@ return (
 
 
 
+
+
+
+
               <FaBox
+
+
 
                 style={{
 
+
+
                   marginRight: "6px",
+
+
 
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2964,7 +5855,15 @@ return (
 
 
 
+
+
+
+
             </th>
+
+
+
+
 
 
 
@@ -2972,15 +5871,31 @@ return (
 
 
 
+
+
+
+
               <FaClipboardCheck
+
+
 
                 style={{
 
+
+
                   marginRight: "6px",
+
+
 
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -2988,7 +5903,15 @@ return (
 
 
 
+
+
+
+
             </th>
+
+
+
+
 
 
 
@@ -2996,7 +5919,15 @@ return (
 
 
 
+
+
+
+
         </thead>
+
+
+
+
 
 
 
@@ -3004,11 +5935,23 @@ return (
 
 
 
+
+
+
+
           {orders
+
+
 
             .slice(0, 8)
 
+
+
             .map((order, index) => (
+
+
+
+
 
 
 
@@ -3016,7 +5959,15 @@ return (
 
 
 
+
+
+
+
                 <td>
+
+
+
+
 
 
 
@@ -3024,19 +5975,39 @@ return (
 
 
 
+
+
+
+
                     <div className="clientAvatar">
+
+
+
+
 
 
 
                       {
 
+
+
                         order.customerName?.charAt(0)
+
+
 
                       }
 
 
 
+
+
+
+
                     </div>
+
+
+
+
 
 
 
@@ -3044,15 +6015,31 @@ return (
 
 
 
+
+
+
+
                       <h4>
+
+
+
+
 
 
 
                         {
 
+
+
                           order.customerName
 
+
+
                         }
+
+
+
+
 
 
 
@@ -3060,17 +6047,35 @@ return (
 
 
 
+
+
+
+
                       <p>
+
+
+
+
 
 
 
                         {
 
+
+
                           order.city ||
+
+
 
                           "Douala"
 
+
+
                         }
+
+
+
+
 
 
 
@@ -3078,7 +6083,15 @@ return (
 
 
 
+
+
+
+
                     </div>
+
+
+
+
 
 
 
@@ -3086,19 +6099,39 @@ return (
 
 
 
+
+
+
+
                 </td>
 
 
 
+
+
+
+
                 <td>
+
+
 
                   {order.phone}
 
+
+
                 </td>
 
 
 
+
+
+
+
                 <td>
+
+
+
+
 
 
 
@@ -3106,21 +6139,43 @@ return (
 
 
 
+
+
+
+
                     {
+
+
 
                       Number(
 
+
+
                         order.total || 0
 
+
+
                       ).toLocaleString()
+
+
 
                     }
 
 
 
+
+
+
+
                     {" "}
 
+
+
                     FCFA
+
+
+
+
 
 
 
@@ -3128,11 +6183,23 @@ return (
 
 
 
+
+
+
+
                 </td>
 
 
 
+
+
+
+
                 <td>
+
+
+
+
 
 
 
@@ -3140,31 +6207,63 @@ return (
 
 
 
+
+
+
+
                     <FaBox
+
+
 
                       style={{
 
+
+
                         marginRight: "5px",
 
+
+
                       }}
+
+
 
                     />
 
 
 
+
+
+
+
                     {
+
+
 
                       order.items
 
+
+
                         ?.length || 0
+
+
 
                     }
 
 
 
+
+
+
+
                     {" "}
 
+
+
                     produits
+
+
+
+
 
 
 
@@ -3172,7 +6271,15 @@ return (
 
 
 
+
+
+
+
                 </td>
+
+
+
+
 
 
 
@@ -3180,11 +6287,23 @@ return (
 
 
 
+
+
+
+
                   <span
+
+
 
                     className={`statusBadge ${order.status}`}
 
+
+
                   >
+
+
+
+
 
 
 
@@ -3192,7 +6311,15 @@ return (
 
 
 
+
+
+
+
                   </span>
+
+
+
+
 
 
 
@@ -3200,7 +6327,15 @@ return (
 
 
 
+
+
+
+
               </tr>
+
+
+
+
 
 
 
@@ -3208,7 +6343,15 @@ return (
 
 
 
+
+
+
+
         </tbody>
+
+
+
+
 
 
 
@@ -3216,11 +6359,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3228,7 +6383,15 @@ return (
 
 
 
+
+
+
+
   <div className="productsCard">
+
+
+
+
 
 
 
@@ -3236,7 +6399,15 @@ return (
 
 
 
+
+
+
+
       <div>
+
+
+
+
 
 
 
@@ -3244,17 +6415,35 @@ return (
 
 
 
+
+
+
+
           <FaFire
+
+
 
             style={{
 
+
+
               marginRight: "6px",
+
+
 
               color: "#f97316",
 
+
+
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -3262,7 +6451,15 @@ return (
 
 
 
+
+
+
+
         </p>
+
+
+
+
 
 
 
@@ -3270,7 +6467,15 @@ return (
 
 
 
+
+
+
+
           Produits populaires
+
+
+
+
 
 
 
@@ -3278,15 +6483,31 @@ return (
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
       <button
 
+
+
         className="tableBtn"
 
+
+
       >
+
+
+
+
 
 
 
@@ -3294,7 +6515,15 @@ return (
 
 
 
+
+
+
+
         Tendances
+
+
+
+
 
 
 
@@ -3302,7 +6531,15 @@ return (
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -3310,27 +6547,55 @@ return (
 
 
 
+
+
+
+
 <div className="productsList">
+
+
+
+
 
 
 
   {topSellingProducts
 
+
+
     .slice(0, 5)
+
+
 
     .map(([name, qty], index) => {
 
 
 
+
+
+
+
       const product =
+
+
 
         products.find(
 
+
+
           (p) =>
+
+
 
             p.name === name
 
+
+
         );
+
+
+
+
 
 
 
@@ -3338,35 +6603,71 @@ return (
 
 
 
+
+
+
+
         <div
+
+
 
           key={index}
 
+
+
           className="premiumProduct"
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             className="productRank"
 
+
+
           >
 
+
+
             #{index + 1}
+
+
 
           </div>
 
 
 
+
+
+
+
           <img
+
+
 
             src={product?.image}
 
+
+
              alt=""
 
+
+
           />
+
+
+
+
 
 
 
@@ -3374,21 +6675,43 @@ return (
 
 
 
+
+
+
+
             <h4>
+
+
+
+
 
 
 
               <FaBox
 
+
+
                 style={{
+
+
 
                   marginRight: "6px",
 
+
+
                   color: "#7c3aed",
+
+
 
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -3396,7 +6719,15 @@ return (
 
 
 
+
+
+
+
             </h4>
+
+
+
+
 
 
 
@@ -3404,21 +6735,43 @@ return (
 
 
 
+
+
+
+
               <FaMoneyBillWave
+
+
 
                 style={{
 
+
+
                   marginRight: "5px",
 
+
+
                 }}
+
+
 
               />
 
 
 
+
+
+
+
               {product?.price}
 
+
+
               FCFA
+
+
+
+
 
 
 
@@ -3426,7 +6779,15 @@ return (
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -3434,19 +6795,39 @@ return (
 
 
 
+
+
+
+
             <strong>
 
+
+
               {qty}
+
+
 
             </strong>
 
 
 
+
+
+
+
             <span>
+
+
 
               ventes
 
+
+
             </span>
+
+
+
+
 
 
 
@@ -3454,7 +6835,15 @@ return (
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -3462,7 +6851,15 @@ return (
 
 
 
+
+
+
+
     })}
+
+
+
+
 
 
 
@@ -3470,7 +6867,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3478,11 +6883,23 @@ return (
 
 
 
+
+
+
+
 {/* =========================
+
+
 
    PRODUITS PANEL
 
+
+
 \========================= */}
+
+
+
+
 
 
 
@@ -3490,7 +6907,15 @@ return (
 
 
 
+
+
+
+
   <div className="productsManager">
+
+
+
+
 
 
 
@@ -3498,7 +6923,15 @@ return (
 
 
 
+
+
+
+
       <h2>
+
+
+
+
 
 
 
@@ -3506,7 +6939,15 @@ return (
 
 
 
+
+
+
+
       </h2>
+
+
+
+
 
 
 
@@ -3514,7 +6955,15 @@ return (
 
 
 
+
+
+
+
    {/* AJOUT */}
+
+
+
+
 
 
 
@@ -3522,7 +6971,15 @@ return (
 
 
 
+
+
+
+
   <div className="cardHeader">
+
+
+
+
 
 
 
@@ -3530,17 +6987,35 @@ return (
 
 
 
+
+
+
+
       <FaPlusCircle
+
+
 
         style={{
 
+
+
           marginRight: "8px",
+
+
 
           color: "#7c3aed",
 
+
+
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -3548,7 +7023,15 @@ return (
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
@@ -3556,7 +7039,15 @@ return (
 
 
 
+
+
+
+
       Catalogue
+
+
+
+
 
 
 
@@ -3564,71 +7055,143 @@ return (
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
   <input
 
+
+
     type="text"
+
+
 
     placeholder="Nom du produit"
 
+
+
     value={name}
 
+
+
     onChange={(e) =>
+
+
 
       setName(e.target.value)
 
+
+
     }
+
+
 
   />
 
 
 
+
+
+
+
   <input
+
+
 
     type="text"
 
+
+
     placeholder="Prix en FCFA"
+
+
 
     value={price}
 
+
+
     onChange={(e) =>
+
+
 
       setPrice(e.target.value)
 
+
+
     }
 
+
+
   />
+
+
+
+
 
 
 
   <input
 
+
+
     type="file"
+
+
 
     onChange={(e) =>
 
+
+
       setImage(
+
+
 
         e.target.files[0]
 
+
+
       )
+
+
 
     }
 
+
+
   />
+
+
+
+
 
 
 
   <button
 
+
+
     className="saveBtn"
+
+
 
     onClick={addProduct}
 
+
+
   >
+
+
+
+
 
 
 
@@ -3636,7 +7199,15 @@ return (
 
 
 
+
+
+
+
     Ajouter le produit
+
+
+
+
 
 
 
@@ -3644,7 +7215,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3652,23 +7231,47 @@ return (
 
 
 
+
+
+
+
 <div className="productsGrid">
+
+
+
+
 
 
 
   {products.map(
 
+
+
     (product, index) => (
+
+
+
+
 
 
 
       <div
 
+
+
         key={index}
+
+
 
         className="productManageCard"
 
+
+
       >
+
+
+
+
 
 
 
@@ -3676,13 +7279,27 @@ return (
 
 
 
+
+
+
+
           <img
+
+
 
             src={product.image}
 
+
+
              alt=""
 
+
+
           />
+
+
+
+
 
 
 
@@ -3690,9 +7307,19 @@ return (
 
 
 
+
+
+
+
         {editingProduct ===
 
+
+
         product._id ? (
+
+
+
+
 
 
 
@@ -3700,57 +7327,115 @@ return (
 
 
 
+
+
+
+
             <input
+
+
 
               value={editName}
 
+
+
               onChange={(e) =>
+
+
 
                 setEditName(
 
+
+
                   e.target.value
+
+
 
                 )
 
+
+
               }
 
+
+
             />
+
+
+
+
 
 
 
             <input
 
+
+
               value={editPrice}
+
+
 
               onChange={(e) =>
 
+
+
                 setEditPrice(
+
+
 
                   e.target.value
 
+
+
                 )
+
+
 
               }
 
+
+
             />
+
+
+
+
 
 
 
             <button
 
+
+
               className="saveBtn"
+
+
 
               onClick={() =>
 
+
+
                 saveEdit(
+
+
 
                   product._id
 
+
+
                 )
+
+
 
               }
 
+
+
             >
+
+
+
+
 
 
 
@@ -3758,7 +7443,15 @@ return (
 
 
 
+
+
+
+
               Sauvegarder
+
+
+
+
 
 
 
@@ -3766,7 +7459,15 @@ return (
 
 
 
+
+
+
+
           </>
+
+
+
+
 
 
 
@@ -3774,7 +7475,15 @@ return (
 
 
 
+
+
+
+
           <>
+
+
+
+
 
 
 
@@ -3782,17 +7491,35 @@ return (
 
 
 
+
+
+
+
               <FaBox
+
+
 
                 style={{
 
+
+
                   marginRight: "6px",
+
+
 
                   color: "#7c3aed",
 
+
+
                 }}
 
+
+
               />
+
+
+
+
 
 
 
@@ -3800,7 +7527,15 @@ return (
 
 
 
+
+
+
+
             </h4>
+
+
+
+
 
 
 
@@ -3808,21 +7543,43 @@ return (
 
 
 
+
+
+
+
               <FaMoneyBillWave
+
+
 
                 style={{
 
+
+
                   marginRight: "5px",
 
+
+
                 }}
+
+
 
               />
 
 
 
+
+
+
+
               {product.price}
 
+
+
               FCFA
+
+
+
+
 
 
 
@@ -3830,25 +7587,51 @@ return (
 
 
 
+
+
+
+
             <div className="manageBtns">
+
+
+
+
 
 
 
               <button
 
+
+
                 className="editBtn"
+
+
 
                 onClick={() =>
 
+
+
                   startEdit(
+
+
 
                     product
 
+
+
                   )
+
+
 
                 }
 
+
+
               >
+
+
+
+
 
 
 
@@ -3856,7 +7639,15 @@ return (
 
 
 
+
+
+
+
                 Modifier
+
+
+
+
 
 
 
@@ -3864,21 +7655,43 @@ return (
 
 
 
+
+
+
+
               <button
+
+
 
                 className="deleteBtn"
 
+
+
                 onClick={() =>
+
+
 
                   deleteProduct(
 
+
+
                     product._id
+
+
 
                   )
 
+
+
                 }
 
+
+
               >
+
+
+
+
 
 
 
@@ -3886,7 +7699,15 @@ return (
 
 
 
+
+
+
+
                 Supprimer
+
+
+
+
 
 
 
@@ -3894,7 +7715,15 @@ return (
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -3902,7 +7731,15 @@ return (
 
 
 
+
+
+
+
         )}
+
+
+
+
 
 
 
@@ -3910,13 +7747,27 @@ return (
 
 
 
+
+
+
+
     )
+
+
 
   )}
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3924,15 +7775,31 @@ return (
 
 
 
+
+
+
+
 )}
 
 
 
+
+
+
+
 </div>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3940,7 +7807,15 @@ return (
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

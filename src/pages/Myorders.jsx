@@ -1,10 +1,20 @@
 import {
 
+
+
   useEffect,
+
+
 
   useState,
 
+
+
 } from "react";
+
+
+
+
 
 
 
@@ -12,47 +22,95 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
 
+
+
   useNavigate,
+
+
 
 } from "react-router-dom";
 
 
 
+
+
+
+
 import {
+
+
 
   FaBoxOpen,
 
+
+
   FaTruck,
+
+
 
   FaCheckCircle,
 
+
+
   FaTimesCircle,
+
+
 
   FaClipboardList,
 
+
+
   FaEye,
+
+
 
   FaChevronDown,
 
+
+
   FaHeadset,
+
+
 
   FaShieldAlt,
 
+
+
    FaClock
+
+
 
 } from "react-icons/fa";
 
 
 
+
+
+
+
 import {
+
+
 
   MdLocalShipping,
 
+
+
 } from "react-icons/md";
 
+
+
 import PendingOrders from "./PendingOrders";
+
+
+
+
 
 
 
@@ -60,104 +118,131 @@ function MyOrders() {
 
 
 
+
+
+
+
   const [orders, setOrders] =
+
+
 
     useState([]);
 
 
 
+
+
+
+
   const [
+
+
 
     recommendedProducts,
 
+
+
     setRecommendedProducts,
+
+
 
   ] = useState([]);
 
 
 
+
+
+
+
   const [filter, setFilter] =
+
+
 
     useState("Tous");
 
 
 
+
+
+
+
   const navigate =
+
+
 
     useNavigate();
 
 
 
+
+
+
+
   useEffect(() => {
+
     let mounted = true;
 
+
+
     const getStoredUser = () => {
+
       try {
+
         const rawUser = localStorage.getItem("user");
+
         if (!rawUser) return null;
+
+
 
         const parsedUser = JSON.parse(rawUser);
 
+
+
         if (!parsedUser || typeof parsedUser !== "object") {
+
           return null;
+
         }
 
+
+
         return parsedUser;
+
       } catch {
+
         return null;
+
       }
+
     };
 
-    const getAuthToken = () => {
-      try {
-        const token = localStorage.getItem("token");
-        return typeof token === "string" ? token.trim() : "";
-      } catch {
-        return "";
-      }
-    };
 
-    const user = getStoredUser();
-    const token = getAuthToken();
 
-    if (!user?._id || !/^[a-fA-F0-9]{24}$/.test(String(user._id))) {
-      return () => {
-        mounted = false;
-      };
-    }
+    // ======================================================
+    // 🔐 AUTHENTIFICATION UTILISATEUR PAR COOKIE HTTPONLY
+    // ======================================================
+    // Le JWT utilisateur n'est plus lu depuis localStorage.
+    // Le navigateur envoie automatiquement le cookie HttpOnly.
+    // La logique métier de la page reste inchangée.
+    // ======================================================
 
-    if (!token) {
-      try {
-        localStorage.removeItem("user");
-      } catch {
-        // Ignore localStorage errors.
-      }
-
-      navigate("/login", { replace: true });
-
-      return () => {
-        mounted = false;
-      };
-    }
-
-    const API_BASE_URL = "https://konanshopping.com";
-    const API_TIMEOUT = 15000;
+    axios.defaults.withCredentials = true;
 
     const api = axios.create({
       baseURL: API_BASE_URL,
       timeout: API_TIMEOUT,
+      withCredentials: true,
       headers: {
         Accept: "application/json",
       },
     });
 
     api.interceptors.request.use((config) => {
-      const currentToken = getAuthToken();
+      if (!config) return config;
 
-      if (currentToken) {
-        config.headers = config.headers || {};
-        config.headers.Authorization = `Bearer ${currentToken}`;
-      }
+      config.withCredentials = true;
+      config.headers = config.headers || {};
+      config.headers.Accept = "application/json";
 
       return config;
     });
@@ -169,7 +254,6 @@ function MyOrders() {
 
         if (status === 401 || status === 403) {
           try {
-            localStorage.removeItem("token");
             localStorage.removeItem("user");
           } catch {
             // Ignore localStorage errors.
@@ -186,84 +270,167 @@ function MyOrders() {
 
     const userId = String(user._id).trim();
 
+
+
     // LOAD ORDERS
+
     api
+
       .get(`/my-orders/${encodeURIComponent(userId)}`)
+
       .then((res) => {
+
         if (!mounted) return;
+
+
 
         const data = Array.isArray(res.data)
+
           ? res.data
+
           : Array.isArray(res.data?.orders)
+
             ? res.data.orders
+
             : [];
+
+
 
         setOrders(data);
+
       })
+
       .catch((err) => {
+
         if (!mounted) return;
 
+
+
         if (import.meta.env?.DEV) {
+
           console.warn(
+
             "Chargement des commandes impossible :",
+
             err?.response?.status || err?.message || "Erreur réseau"
+
           );
+
         }
+
+
 
         setOrders([]);
+
       });
+
+
 
     // LOAD PRODUCTS
+
     api
+
       .get("/api/products")
+
       .then((res) => {
+
         if (!mounted) return;
+
+
 
         const products = Array.isArray(res.data)
+
           ? res.data
+
           : Array.isArray(res.data?.products)
+
             ? res.data.products
+
             : [];
 
+
+
         setRecommendedProducts(products.slice(0, 8));
+
       })
+
       .catch((err) => {
+
         if (!mounted) return;
 
+
+
         if (import.meta.env?.DEV) {
+
           console.warn(
+
             "Chargement des produits impossible :",
+
             err?.response?.status || err?.message || "Erreur réseau"
+
           );
+
         }
 
+
+
         setRecommendedProducts([]);
+
       });
 
+
+
     return () => {
+
       mounted = false;
+
     };
+
   }, [navigate]);
+
+
 
   // FILTERS
 
 
 
+
+
+
+
   const filteredOrders =
+
+
 
     filter === "Tous"
 
+
+
       ? orders
+
+
 
       : orders.filter(
 
+
+
           (order) =>
+
+
 
             order.status ===
 
+
+
             filter
 
+
+
         );
+
+
+
+
 
 
 
@@ -271,59 +438,119 @@ function MyOrders() {
 
 
 
+
+
+
+
   const pendingOrders =
+
+
 
     orders.filter(
 
+
+
       (o) =>
+
+
 
         o.status ===
 
+
+
         "En attente"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const shippedOrders =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
+
+
 
         "En livraison"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const deliveredOrders =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
+
+
 
         "Livrée"
 
+
+
     ).length;
+
+
+
+
 
 
 
   const cancelledOrders =
 
+
+
     orders.filter(
+
+
 
       (o) =>
 
+
+
         o.status ===
+
+
 
         "Annulée"
 
+
+
     ).length;
+
+
+
+
 
 
 
@@ -331,9 +558,19 @@ function MyOrders() {
 
 
 
+
+
+
+
   const getStatusStyle =
 
+
+
     (status) => {
+
+
+
+
 
 
 
@@ -341,67 +578,135 @@ function MyOrders() {
 
 
 
+
+
+
+
         case "Livrée":
+
+
 
           return {
 
+
+
             background:
+
+
 
               "#DCFCE7",
 
+
+
             color:
+
+
 
               "#16A34A",
 
+
+
           };
+
+
+
+
 
 
 
         case "En livraison":
 
+
+
           return {
+
+
 
             background:
 
+
+
               "#DBEAFE",
+
+
 
             color:
 
+
+
               "#2563EB",
 
+
+
           };
+
+
+
+
 
 
 
         case "Annulée":
 
+
+
           return {
+
+
 
             background:
 
+
+
               "#FEE2E2",
+
+
 
             color:
 
+
+
               "#DC2626",
 
+
+
           };
+
+
+
+
 
 
 
         default:
 
+
+
           return {
+
+
 
             background:
 
+
+
               "#FEF3C7",
+
+
 
             color:
 
+
+
               "#D97706",
 
+
+
           };
+
+
+
+
 
 
 
@@ -409,7 +714,15 @@ function MyOrders() {
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -417,11 +730,23 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#F8FAFC",
+
+
+
+
 
 
 
@@ -429,7 +754,15 @@ function MyOrders() {
 
 
 
+
+
+
+
       width: "100%",
+
+
+
+
 
 
 
@@ -437,25 +770,51 @@ function MyOrders() {
 
 
 
+
+
+
+
       overflowX: "hidden",
+
+
+
+
 
 
 
       padding:
 
+
+
         window.innerWidth < 768
 
+
+
           ? "10px"
+
+
 
           : "20px",
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -463,19 +822,39 @@ function MyOrders() {
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     background:
+
+
 
       "linear-gradient(135deg,#FFFFFF,#F8FAFC)",
 
 
 
+
+
+
+
     border:
 
+
+
       "1px solid #E5E7EB",
+
+
+
+
 
 
 
@@ -483,13 +862,27 @@ function MyOrders() {
 
 
 
+
+
+
+
     padding:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "18px"
 
+
+
         : "30px",
+
+
+
+
 
 
 
@@ -497,17 +890,35 @@ function MyOrders() {
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
     gap:
 
+
+
       window.innerWidth < 768
+
+
 
         ? "14px"
 
+
+
         : "22px",
+
+
+
+
 
 
 
@@ -515,13 +926,27 @@ function MyOrders() {
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 10px 30px rgba(0,0,0,0.05)",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -529,27 +954,55 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       width:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "65px"
 
+
+
           : "85px",
+
+
+
+
 
 
 
       height:
 
+
+
         window.innerWidth < 768
+
+
 
           ? "65px"
 
+
+
           : "85px",
+
+
+
+
 
 
 
@@ -557,9 +1010,19 @@ function MyOrders() {
 
 
 
+
+
+
+
       background:
 
+
+
         "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+
+
+
 
 
 
@@ -567,7 +1030,15 @@ function MyOrders() {
 
 
 
+
+
+
+
       justifyContent: "center",
+
+
+
+
 
 
 
@@ -575,43 +1046,87 @@ function MyOrders() {
 
 
 
+
+
+
+
       flexShrink: 0,
+
+
+
+
 
 
 
       boxShadow:
 
+
+
         "0 10px 25px rgba(37,99,235,0.20)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaBoxOpen
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "28px"
+
+
 
             : "38px",
 
 
 
+
+
+
+
         color: "#fff",
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -619,29 +1134,59 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       flex: 1,
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <h1
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "30px"
 
+
+
             : "58px",
+
+
+
+
 
 
 
@@ -649,7 +1194,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
@@ -657,33 +1210,67 @@ function MyOrders() {
 
 
 
+
+
+
+
         lineHeight: 1.1,
+
+
 
       }}
 
+
+
     >
 
+
+
       Mes commandes
+
+
 
     </h1>
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#6B7280",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "14px"
 
+
+
             : "16px",
+
+
+
+
 
 
 
@@ -691,21 +1278,43 @@ function MyOrders() {
 
 
 
+
+
+
+
         marginBottom: 0,
+
+
+
+
 
 
 
         lineHeight: "1.5",
 
+
+
       }}
+
+
 
     >
 
+
+
       Suivez vos achats, livraisons et
+
+
 
       commandes Konan Shopping en temps réel.
 
+
+
     </p>
+
+
+
+
 
 
 
@@ -713,7 +1322,21 @@ function MyOrders() {
 
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -727,39 +1350,79 @@ function MyOrders() {
 
 
 
+
+
+
+
 <div
 
+
+
   style={{
+
+
 
     display: "grid",
 
 
 
+
+
+
+
     gridTemplateColumns:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "repeat(2,1fr)"
+
+
 
         : "repeat(5,1fr)",
 
 
 
+
+
+
+
     gap:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "10px"
+
+
 
         : "16px",
 
 
 
+
+
+
+
     marginTop: "10px",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -767,19 +1430,39 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -787,13 +1470,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "12px"
 
+
+
           : "18px",
+
+
+
+
 
 
 
@@ -801,13 +1498,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       gap:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "10px"
 
+
+
           : "14px",
+
+
+
+
 
 
 
@@ -815,47 +1526,95 @@ function MyOrders() {
 
 
 
+
+
+
+
       minHeight:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "85px"
+
+
 
           : "105px",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 6px 18px rgba(0,0,0,0.04)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
@@ -863,7 +1622,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         background: "#EEF2FF",
+
+
+
+
 
 
 
@@ -871,7 +1638,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -879,37 +1654,75 @@ function MyOrders() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaClipboardList
 
+
+
         style={{
+
+
 
           color: "#2563EB",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -917,17 +1730,35 @@ function MyOrders() {
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "24px"
 
+
+
               : "30px",
+
+
+
+
 
 
 
@@ -935,7 +1766,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -943,33 +1782,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           lineHeight: 1,
+
+
 
         }}
 
+
+
       >
 
+
+
         {orders.length}
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
 
+
+
         style={{
+
+
 
           color: "#6B7280",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "12px"
 
+
+
               : "13px",
+
+
+
+
 
 
 
@@ -977,19 +1850,39 @@ function MyOrders() {
 
 
 
+
+
+
+
           marginBottom: 0,
+
+
+
+
 
 
 
           fontWeight: "500",
 
+
+
         }}
+
+
 
       >
 
+
+
         Total commandes
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -997,7 +1890,17 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
+
+
 
 
 
@@ -1007,19 +1910,39 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -1027,13 +1950,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "12px"
 
+
+
           : "18px",
+
+
+
+
 
 
 
@@ -1041,13 +1978,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       gap:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "10px"
 
+
+
           : "14px",
+
+
+
+
 
 
 
@@ -1055,47 +2006,95 @@ function MyOrders() {
 
 
 
+
+
+
+
       minHeight:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "85px"
+
+
 
           : "105px",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 6px 18px rgba(0,0,0,0.04)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
@@ -1103,7 +2102,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         background: "#FEF3C7",
+
+
+
+
 
 
 
@@ -1111,7 +2118,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -1119,37 +2134,75 @@ function MyOrders() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaClock
 
+
+
         style={{
+
+
 
           color: "#D97706",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1157,17 +2210,35 @@ function MyOrders() {
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "24px"
 
+
+
               : "30px",
+
+
+
+
 
 
 
@@ -1175,7 +2246,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -1183,33 +2262,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           lineHeight: 1,
+
+
 
         }}
 
+
+
       >
 
+
+
         {pendingOrders}
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
 
+
+
         style={{
+
+
 
           color: "#6B7280",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "12px"
 
+
+
               : "13px",
+
+
+
+
 
 
 
@@ -1217,19 +2330,39 @@ function MyOrders() {
 
 
 
+
+
+
+
           marginBottom: 0,
+
+
+
+
 
 
 
           fontWeight: "500",
 
+
+
         }}
+
+
 
       >
 
+
+
         En attente
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1237,7 +2370,17 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
+
+
 
 
 
@@ -1247,19 +2390,39 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -1267,13 +2430,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "12px"
 
+
+
           : "18px",
+
+
+
+
 
 
 
@@ -1281,13 +2458,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       gap:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "10px"
 
+
+
           : "14px",
+
+
+
+
 
 
 
@@ -1295,47 +2486,95 @@ function MyOrders() {
 
 
 
+
+
+
+
       minHeight:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "85px"
+
+
 
           : "105px",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 6px 18px rgba(0,0,0,0.04)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
@@ -1343,7 +2582,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         background: "#DBEAFE",
+
+
+
+
 
 
 
@@ -1351,7 +2598,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -1359,37 +2614,75 @@ function MyOrders() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaTruck
 
+
+
         style={{
+
+
 
           color: "#2563EB",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1397,17 +2690,35 @@ function MyOrders() {
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "24px"
 
+
+
               : "30px",
+
+
+
+
 
 
 
@@ -1415,7 +2726,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -1423,33 +2742,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           lineHeight: 1,
+
+
 
         }}
 
+
+
       >
 
+
+
         {shippedOrders}
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
 
+
+
         style={{
+
+
 
           color: "#6B7280",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "12px"
 
+
+
               : "13px",
+
+
+
+
 
 
 
@@ -1457,19 +2810,39 @@ function MyOrders() {
 
 
 
+
+
+
+
           marginBottom: 0,
+
+
+
+
 
 
 
           fontWeight: "500",
 
+
+
         }}
+
+
 
       >
 
+
+
         En livraison
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1477,7 +2850,17 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
+
+
 
 
 
@@ -1487,19 +2870,39 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -1507,13 +2910,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "12px"
 
+
+
           : "18px",
+
+
+
+
 
 
 
@@ -1521,13 +2938,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       gap:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "10px"
 
+
+
           : "14px",
+
+
+
+
 
 
 
@@ -1535,47 +2966,95 @@ function MyOrders() {
 
 
 
+
+
+
+
       minHeight:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "85px"
+
+
 
           : "105px",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 6px 18px rgba(0,0,0,0.04)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
@@ -1583,7 +3062,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         background: "#DCFCE7",
+
+
+
+
 
 
 
@@ -1591,7 +3078,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -1599,37 +3094,75 @@ function MyOrders() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaCheckCircle
 
+
+
         style={{
+
+
 
           color: "#16A34A",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1637,17 +3170,35 @@ function MyOrders() {
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "24px"
 
+
+
               : "30px",
+
+
+
+
 
 
 
@@ -1655,7 +3206,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -1663,33 +3222,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           lineHeight: 1,
+
+
 
         }}
 
+
+
       >
 
+
+
         {deliveredOrders}
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
 
+
+
         style={{
+
+
 
           color: "#6B7280",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "12px"
 
+
+
               : "13px",
+
+
+
+
 
 
 
@@ -1697,19 +3290,39 @@ function MyOrders() {
 
 
 
+
+
+
+
           marginBottom: 0,
+
+
+
+
 
 
 
           fontWeight: "500",
 
+
+
         }}
+
+
 
       >
 
+
+
         Livrées
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1717,7 +3330,17 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
+
+
 
 
 
@@ -1727,19 +3350,39 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -1747,13 +3390,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "12px"
 
+
+
           : "18px",
+
+
+
+
 
 
 
@@ -1761,13 +3418,27 @@ function MyOrders() {
 
 
 
+
+
+
+
       gap:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "10px"
 
+
+
           : "14px",
+
+
+
+
 
 
 
@@ -1775,47 +3446,95 @@ function MyOrders() {
 
 
 
+
+
+
+
       minHeight:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "85px"
+
+
 
           : "105px",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 6px 18px rgba(0,0,0,0.04)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "42px"
 
+
+
             : "52px",
+
+
+
+
 
 
 
@@ -1823,7 +3542,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         background: "#FEE2E2",
+
+
+
+
 
 
 
@@ -1831,7 +3558,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -1839,37 +3574,75 @@ function MyOrders() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaTimesCircle
 
+
+
         style={{
+
+
 
           color: "#DC2626",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1877,17 +3650,35 @@ function MyOrders() {
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "24px"
 
+
+
               : "30px",
+
+
+
+
 
 
 
@@ -1895,7 +3686,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -1903,33 +3702,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           lineHeight: 1,
+
+
 
         }}
 
+
+
       >
 
+
+
         {cancelledOrders}
+
+
 
       </h2>
 
 
 
+
+
+
+
       <p
 
+
+
         style={{
+
+
 
           color: "#6B7280",
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "12px"
 
+
+
               : "13px",
+
+
+
+
 
 
 
@@ -1937,19 +3770,39 @@ function MyOrders() {
 
 
 
+
+
+
+
           marginBottom: 0,
+
+
+
+
 
 
 
           fontWeight: "500",
 
+
+
         }}
+
+
 
       >
 
+
+
         Annulées
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1957,11 +3810,29 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1975,21 +3846,43 @@ function MyOrders() {
 
 
 
+
+
+
+
 <div
 
+
+
   style={{
+
+
 
     marginTop: "12px",
 
 
 
+
+
+
+
     marginBottom:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "28px"
 
+
+
         : "35px",
+
+
+
+
 
 
 
@@ -1997,23 +3890,47 @@ function MyOrders() {
 
 
 
+
+
+
+
     scrollbarWidth: "none",
+
+
+
+
 
 
 
     msOverflowStyle: "none",
 
+
+
   }}
+
+
 
 >
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -2021,7 +3938,15 @@ function MyOrders() {
 
 
 
+
+
+
+
       flexWrap: "nowrap",
+
+
+
+
 
 
 
@@ -2029,63 +3954,127 @@ function MyOrders() {
 
 
 
+
+
+
+
       paddingBottom: "4px",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     {[
+
+
 
       {
 
+
+
         name: "Tous",
+
+
 
         count: orders.length,
 
+
+
       },
+
+
+
+
 
 
 
 {
 
+
+
   name: "En attente",
 
+
+
   count: pendingOrders,
+
+
 
 },
 
 
 
+
+
+
+
       {
+
+
 
         name: "En livraison",
 
+
+
         count: shippedOrders,
+
+
 
       },
 
 
 
+
+
+
+
       {
+
+
 
         name: "Livrée",
 
+
+
         count: deliveredOrders,
 
+
+
       },
+
+
+
+
 
 
 
       {
 
+
+
         name: "Annulée",
+
+
 
         count: cancelledOrders,
 
+
+
       },
+
+
+
+
 
 
 
@@ -2093,39 +4082,79 @@ function MyOrders() {
 
 
 
+
+
+
+
       <button
+
+
 
         key={item.name}
 
 
 
+
+
+
+
         onClick={() =>
 
+
+
           setFilter(item.name)
+
+
 
         }
 
 
 
+
+
+
+
         style={{
+
+
 
           border:
 
+
+
             filter === item.name
 
+
+
               ? "none"
+
+
 
               : "1px solid #E5E7EB",
 
 
 
+
+
+
+
           padding:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "10px 16px"
 
+
+
               : "14px 22px",
+
+
+
+
 
 
 
@@ -2133,7 +4162,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           fontWeight: "700",
+
+
+
+
 
 
 
@@ -2141,33 +4178,67 @@ function MyOrders() {
 
 
 
+
+
+
+
           background:
+
+
 
             filter === item.name
 
+
+
               ? "#2563EB"
+
+
 
               : "#FFFFFF",
 
 
 
+
+
+
+
           color:
+
+
 
             filter === item.name
 
+
+
               ? "white"
+
+
 
               : "#111827",
 
 
 
+
+
+
+
           boxShadow:
+
+
 
             filter === item.name
 
+
+
               ? "0 8px 20px rgba(37,99,235,0.18)"
 
+
+
               : "0 4px 12px rgba(0,0,0,0.04)",
+
+
+
+
 
 
 
@@ -2175,23 +4246,47 @@ function MyOrders() {
 
 
 
+
+
+
+
           flexShrink: 0,
+
+
+
+
 
 
 
           transition: "all .25s ease",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display: "flex",
+
+
+
+
 
 
 
@@ -2199,43 +4294,87 @@ function MyOrders() {
 
 
 
+
+
+
+
             gap: "8px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <span>
 
+
+
             {item.name}
+
+
 
           </span>
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               background:
+
+
 
                 filter === item.name
 
+
+
                   ? "rgba(255,255,255,0.2)"
+
+
 
                   : "#EEF2F7",
 
 
 
+
+
+
+
               color:
+
+
 
                 filter === item.name
 
+
+
                   ? "#FFFFFF"
 
+
+
                   : "#475569",
+
+
+
+
 
 
 
@@ -2243,7 +4382,15 @@ function MyOrders() {
 
 
 
+
+
+
+
               borderRadius: "20px",
+
+
+
+
 
 
 
@@ -2251,19 +4398,39 @@ function MyOrders() {
 
 
 
+
+
+
+
               fontWeight: "800",
+
+
 
             }}
 
+
+
           >
 
+
+
             {item.count}
+
+
 
           </div>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -2271,7 +4438,15 @@ function MyOrders() {
 
 
 
+
+
+
+
     ))}
+
+
+
+
 
 
 
@@ -2279,7 +4454,15 @@ function MyOrders() {
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2287,11 +4470,23 @@ function MyOrders() {
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     background: "#FFFFFF",
+
+
+
+
 
 
 
@@ -2299,7 +4494,15 @@ function MyOrders() {
 
 
 
+
+
+
+
     overflow: "hidden",
+
+
+
+
 
 
 
@@ -2307,13 +4510,27 @@ function MyOrders() {
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 10px 30px rgba(0,0,0,0.04)",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -2321,47 +4538,95 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       padding:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "18px"
+
+
 
           : "24px",
 
 
 
+
+
+
+
       borderBottom:
+
+
 
         "1px solid #F1F5F9",
 
 
 
+
+
+
+
       background:
+
+
 
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <h2
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "20px"
 
+
+
             : "28px",
+
+
+
+
 
 
 
@@ -2369,27 +4634,55 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
         margin: 0,
 
+
+
       }}
+
+
 
     >
 
+
+
       Historique de vos commandes
+
+
 
     </h2>
 
 
 
+
+
+
+
     <p
+
+
 
       style={{
 
+
+
         color: "#6B7280",
+
+
+
+
 
 
 
@@ -2397,23 +4690,47 @@ function MyOrders() {
 
 
 
+
+
+
+
         marginTop: "6px",
+
+
+
+
 
 
 
         marginBottom: 0,
 
+
+
       }}
+
+
 
     >
 
+
+
       Consultez toutes vos commandes et leur statut en temps réel.
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -2421,27 +4738,55 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     key={index}
 
+
+
     style={{
+
+
 
       background: "#FFFFFF",
 
+
+
       border: "1px solid #EEF2F7",
+
+
 
       borderRadius: "20px",
 
+
+
       padding: "16px",
+
+
 
       marginBottom: "16px",
 
+
+
       boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -2449,59 +4794,119 @@ function MyOrders() {
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         display: "flex",
+
+
 
         justifyContent: "space-between",
 
+
+
         alignItems: "center",
+
+
 
         marginBottom: "16px",
 
+
+
         flexWrap: "wrap",
+
+
 
         gap: "10px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           background: "#EEF2FF",
+
+
 
           color: "#2563EB",
 
+
+
           padding: "8px 14px",
+
+
 
           borderRadius: "999px",
 
+
+
           fontSize: "12px",
+
+
 
           fontWeight: "800",
 
+
+
         }}
+
+
 
       >
 
+
+
         Commande #{order._id.slice(-8)}
+
+
 
       </div>
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           ...getStatusStyle(order.status),
+
+
+
+
 
 
 
@@ -2509,7 +4914,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           borderRadius: "999px",
+
+
+
+
 
 
 
@@ -2517,7 +4930,15 @@ function MyOrders() {
 
 
 
+
+
+
+
           fontWeight: "700",
+
+
+
+
 
 
 
@@ -2525,31 +4946,63 @@ function MyOrders() {
 
 
 
+
+
+
+
           alignItems: "center",
+
+
+
+
 
 
 
           gap: "6px",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         {order.status === "Livrée" ? (
+
+
 
           <FaCheckCircle />
 
+
+
         ) : order.status === "En livraison" ? (
+
+
 
           <FaTruck />
 
+
+
         ) : (
+
+
 
           <FaTimesCircle />
 
+
+
         )}
+
+
+
+
 
 
 
@@ -2557,11 +5010,23 @@ function MyOrders() {
 
 
 
+
+
+
+
       </div>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2569,19 +5034,39 @@ function MyOrders() {
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         display: "flex",
+
+
 
         flexDirection: "column",
 
+
+
         gap: "12px",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -2589,49 +5074,99 @@ function MyOrders() {
 
 
 
+
+
+
+
         <div
+
+
 
           key={i}
 
+
+
           style={{
+
+
 
             display: "flex",
 
+
+
             alignItems: "center",
+
+
 
             gap: "12px",
 
+
+
             padding: "12px",
+
+
 
             borderRadius: "14px",
 
+
+
             background: "#F8FAFC",
+
+
 
             border: "1px solid #EEF2F7",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <img
+
+
 
             src={
 
+
+
               item.image?.includes("localhost:5000")
+
+
 
                 ? item.image.replace(
 
-                    "http://localhost:5000",
 
-                    "https://konanshopping.com/api/"
+
+                    "http\://localhost:5000",
+
+
+
+                    "https\://konanshopping.com/api/"
+
+
 
                   )
 
+
+
                 : item.image || "/logo.jpg"
 
+
+
             }
+
+
+
+
 
 
 
@@ -2639,105 +5174,211 @@ function MyOrders() {
 
 
 
+
+
+
+
             onError={(e) => {
+
+
 
               e.target.src = "/logo.jpg";
 
+
+
             }}
+
+
+
+
 
 
 
             style={{
 
+
+
               width: "70px",
+
+
 
               height: "70px",
 
+
+
               borderRadius: "12px",
+
+
 
               objectFit: "cover",
 
+
+
               border: "1px solid #E5E7EB",
+
+
 
               flexShrink: 0,
 
+
+
             }}
+
+
 
           />
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               flex: 1,
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <h3
+
+
 
               style={{
 
+
+
                 margin: 0,
+
+
 
                 color: "#111827",
 
+
+
                 fontSize: "14px",
+
+
 
                 fontWeight: "700",
 
+
+
               }}
+
+
 
             >
 
+
+
               {item.name}
+
+
 
             </h3>
 
 
 
+
+
+
+
             <p
+
+
 
               style={{
 
+
+
                 margin: "6px 0",
+
+
 
                 color: "#6B7280",
 
+
+
                 fontSize: "13px",
+
+
 
               }}
 
+
+
             >
 
+
+
               Quantité : {item.quantity}
+
+
 
             </p>
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 color: "#2563EB",
+
+
 
                 fontWeight: "800",
 
+
+
                 fontSize: "15px",
+
+
 
               }}
 
+
+
             >
+
+
 
               {item.price} FCFA
 
+
+
             </div>
+
+
+
+
 
 
 
@@ -2745,7 +5386,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -2753,7 +5402,15 @@ function MyOrders() {
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2761,15 +5418,31 @@ function MyOrders() {
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         marginTop: "16px",
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -2777,7 +5450,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
@@ -2785,11 +5466,23 @@ function MyOrders() {
 
 
 
+
+
+
+
         gap: "10px",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -2797,111 +5490,223 @@ function MyOrders() {
 
 
 
+
+
+
+
         <p
+
+
 
           style={{
 
+
+
             margin: 0,
+
+
 
             color: "#94A3B8",
 
+
+
             fontSize: "12px",
+
+
 
           }}
 
+
+
         >
+
+
 
           Date
 
+
+
         </p>
+
+
+
+
 
 
 
         <strong>
 
+
+
           {new Date(
+
+
 
             order.createdAt
 
+
+
           ).toLocaleDateString(
+
+
 
             "fr-FR",
 
+
+
             {
+
+
 
               day: "numeric",
 
+
+
               month: "long",
+
+
 
               year: "numeric",
 
+
+
             }
 
+
+
           )}
+
+
 
         </strong>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
       <div
 
+
+
         style={{
+
+
 
           textAlign: "right",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <p
+
+
 
           style={{
 
+
+
             margin: 0,
+
+
 
             color: "#94A3B8",
 
+
+
             fontSize: "12px",
+
+
 
           }}
 
+
+
         >
 
+
+
           Total
+
+
 
         </p>
 
 
 
+
+
+
+
         <h2
+
+
 
           style={{
 
+
+
             margin: 0,
+
+
 
             color: "#2563EB",
 
+
+
             fontWeight: "900",
+
+
 
             fontSize: "24px",
 
+
+
           }}
+
+
 
         >
 
+
+
           {order.total} FCFA
+
+
 
         </h2>
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -2909,27 +5714,55 @@ function MyOrders() {
 
 
 
+
+
+
+
     {/* BOUTON */}
+
+
+
+
 
 
 
     <button
 
+
+
       onClick={() =>
+
+
 
         navigate(
 
+
+
           `/track-order/${order._id}`
 
+
+
         )
+
+
 
       }
 
 
 
+
+
+
+
       style={{
 
+
+
         width: "100%",
+
+
+
+
 
 
 
@@ -2937,13 +5770,27 @@ function MyOrders() {
 
 
 
+
+
+
+
         border: "none",
+
+
+
+
 
 
 
         background:
 
+
+
           "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+
+
+
 
 
 
@@ -2951,7 +5798,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         padding: "13px",
+
+
+
+
 
 
 
@@ -2959,7 +5814,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         fontWeight: "700",
+
+
+
+
 
 
 
@@ -2967,7 +5830,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -2975,7 +5846,15 @@ function MyOrders() {
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
@@ -2983,13 +5862,27 @@ function MyOrders() {
 
 
 
+
+
+
+
         boxShadow:
+
+
 
           "0 8px 20px rgba(37,99,235,0.20)",
 
+
+
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -2997,7 +5890,15 @@ function MyOrders() {
 
 
 
+
+
+
+
       Voir les détails
+
+
+
+
 
 
 
@@ -3005,7 +5906,15 @@ function MyOrders() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3013,15 +5922,31 @@ function MyOrders() {
 
 
 
+
+
+
+
       {/* FOOTER */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
 
+
+
     marginTop: "24px",
+
+
+
+
 
 
 
@@ -3029,7 +5954,15 @@ function MyOrders() {
 
 
 
+
+
+
+
     border: "1px solid #EEF2F7",
+
+
+
+
 
 
 
@@ -3037,13 +5970,27 @@ function MyOrders() {
 
 
 
+
+
+
+
     padding:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "16px"
 
+
+
         : "24px",
+
+
+
+
 
 
 
@@ -3051,33 +5998,67 @@ function MyOrders() {
 
 
 
+
+
+
+
     gridTemplateColumns:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "repeat(2,1fr)"
+
+
 
         : "repeat(4,1fr)",
 
 
 
+
+
+
+
     gap:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "14px"
+
+
 
         : "20px",
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 8px 25px rgba(0,0,0,0.04)",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -3085,55 +6066,111 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       textAlign: "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaShieldAlt
 
+
+
       style={{
+
+
 
         color: "#2563EB",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "22px"
+
+
 
             : "28px",
 
 
 
+
+
+
+
         marginBottom: "8px",
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "13px"
 
+
+
             : "15px",
+
+
+
+
 
 
 
@@ -3141,53 +6178,107 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
         marginBottom: "4px",
 
+
+
       }}
+
+
 
     >
 
+
+
       Paiement sécurisé
+
+
 
     </h3>
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#6B7280",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "11px"
+
+
 
             : "13px",
 
 
 
+
+
+
+
         margin: 0,
+
+
 
       }}
 
+
+
     >
 
+
+
       Transactions protégées
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3195,55 +6286,111 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       textAlign: "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaTruck
 
+
+
       style={{
+
+
 
         color: "#2563EB",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "22px"
+
+
 
             : "28px",
 
 
 
+
+
+
+
         marginBottom: "8px",
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "13px"
 
+
+
             : "15px",
+
+
+
+
 
 
 
@@ -3251,53 +6398,107 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
         marginBottom: "4px",
 
+
+
       }}
+
+
 
     >
 
+
+
       Livraison rapide
+
+
 
     </h3>
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#6B7280",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "11px"
+
+
 
             : "13px",
 
 
 
+
+
+
+
         margin: 0,
+
+
 
       }}
 
+
+
     >
 
+
+
       Partout au Cameroun
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3305,55 +6506,111 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       textAlign: "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaHeadset
 
+
+
       style={{
+
+
 
         color: "#2563EB",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "22px"
+
+
 
             : "28px",
 
 
 
+
+
+
+
         marginBottom: "8px",
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "13px"
 
+
+
             : "15px",
+
+
+
+
 
 
 
@@ -3361,53 +6618,107 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
         marginBottom: "4px",
 
+
+
       }}
+
+
 
     >
 
+
+
       Support 24/7
+
+
 
     </h3>
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#6B7280",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "11px"
+
+
 
             : "13px",
 
 
 
+
+
+
+
         margin: 0,
+
+
 
       }}
 
+
+
     >
 
+
+
       Assistance premium
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3415,55 +6726,111 @@ function MyOrders() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       textAlign: "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaCheckCircle
 
+
+
       style={{
+
+
 
         color: "#16A34A",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "22px"
+
+
 
             : "28px",
 
 
 
+
+
+
+
         marginBottom: "8px",
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "13px"
 
+
+
             : "15px",
+
+
+
+
 
 
 
@@ -3471,49 +6838,99 @@ function MyOrders() {
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
         marginBottom: "4px",
 
+
+
       }}
+
+
 
     >
 
+
+
       Satisfaction garantie
+
+
 
     </h3>
 
 
 
+
+
+
+
     <p
 
+
+
       style={{
+
+
 
         color: "#6B7280",
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "11px"
+
+
 
             : "13px",
 
 
 
+
+
+
+
         margin: 0,
+
+
 
       }}
 
+
+
     >
+
+
 
       Qualité assurée
 
+
+
     </p>
+
+
+
+
 
 
 
@@ -3521,21 +6938,43 @@ function MyOrders() {
 
 
 
-</div>
 
-
-
-</div>
 
 
 
 </div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
 
   );
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

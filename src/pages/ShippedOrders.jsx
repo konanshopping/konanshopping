@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 
 
 
+
+
+
+
 import { useNavigate } from "react-router-dom";
+
+
+
+
 
 
 
@@ -10,7 +18,15 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
+
+
 
 
 
@@ -18,7 +34,15 @@ import {
 
 
 
+
+
+
+
   FaShippingFast,
+
+
+
+
 
 
 
@@ -26,7 +50,15 @@ import {
 
 
 
+
+
+
+
   FaMoneyBillWave,
+
+
+
+
 
 
 
@@ -34,7 +66,19 @@ import {
 
 
 
+
+
+
+
 } from "react-icons/fa";
+
+
+
+
+
+
+
+
 
 
 
@@ -50,11 +94,27 @@ import { FaTruckFast } from "react-icons/fa6";
 
 
 
+
+
+
+
+
+
+
+
 import {
 
 
 
+
+
+
+
   FaClipboardList
+
+
+
+
 
 
 
@@ -66,285 +126,127 @@ import {
 
 
 
+
+
+
+
+
+
+
+
 /* =========================================================
+
+
 
    🔐 SÉCURITÉ FRONTEND
 
+
+
    Le backend reste l'autorité finale.
 
-\========================================================= */
+
+
+\\========================================================= */
+
+
+
+
 
 
 
 const API_BASE_URL = "https://konanshopping.com/api";
 
+
+
 const API_TIMEOUT = 15000;
 
+
+
 const MAX_USER_ID_LENGTH = 24;
+
+
 
 const MAX_STORED_USER_LENGTH = 10000;
 
 
 
-const getAuthToken = () => {
 
-  try {
 
-    if (typeof window === "undefined" || !window.localStorage) {
 
-      return "";
 
-    }
+// ======================================================
+// 🔐 AUTHENTIFICATION PAR COOKIE HTTPONLY
+// ======================================================
+// Le frontend ne lit plus le JWT depuis localStorage.
+// Le navigateur envoie automatiquement le cookie HttpOnly.
+// Le backend reste l'autorité finale.
+// ======================================================
 
+axios.defaults.withCredentials = true;
 
-
-    const token = window.localStorage.getItem("token");
-
-
-
-    return typeof token === "string"
-
-      ? token.trim()
-
-      : "";
-
-  } catch {
-
-    return "";
-
-  }
-
-};
-
-
-
-const getStoredUser = () => {
-
-  try {
-
-    if (typeof window === "undefined" || !window.localStorage) {
-
-      return null;
-
-    }
-
-
-
-    const raw = window.localStorage.getItem("user");
-
-
-
-    if (
-
-      !raw ||
-
-      raw.length > MAX_STORED_USER_LENGTH
-
-    ) {
-
-      return null;
-
-    }
-
-
-
-    const parsed = JSON.parse(raw);
-
-
-
-    if (
-
-      parsed === null ||
-
-      typeof parsed !== "object" ||
-
-      Array.isArray(parsed)
-
-    ) {
-
-      return null;
-
-    }
-
-
-
-    return parsed;
-
-  } catch {
-
-    return null;
-
-  }
-
-};
-
-
-
-const isValidObjectId = (value) => {
-
-  const id = String(value ?? "").trim();
-
-
-
-  return (
-
-    id.length === MAX_USER_ID_LENGTH &&
-
-    /^[a-fA-F0-9]{24}$/.test(id)
-
-  );
-
-};
-
-
-
-const normalizeOrdersResponse = (data) => {
-
-  if (!Array.isArray(data)) {
-
-    return [];
-
-  }
-
-
-
-  return data.filter(
-
-    (order) =>
-
-      order &&
-
-      typeof order === "object" &&
-
-      !Array.isArray(order)
-
-  );
-
-};
-
-
-
-const safeServerMessage = (error) => {
-
-  const message = error?.response?.data?.message;
-
-
-
-  if (
-
-    typeof message !== "string" ||
-
-    !message.trim()
-
-  ) {
-
-    return "";
-
-  }
-
-
-
-  return message.trim().slice(0, 300);
-
-};
-
-
-
-const api = axios.create({
-
-  baseURL: API_BASE_URL,
-
-  timeout: API_TIMEOUT,
-
+const getAuthConfig = () => ({
+  withCredentials: true,
   headers: {
-
     Accept: "application/json",
-
   },
-
 });
 
-
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
+  withCredentials: true,
+  headers: {
+    Accept: "application/json",
+  },
+});
 
 api.interceptors.request.use(
-
   (config) => {
-
-    const token = getAuthToken();
-
-
-
-    if (!token) {
-
-      return Promise.reject(
-
-        new Error("Session utilisateur absente.")
-
-      );
-
+    if (!config) {
+      return config;
     }
 
-
-
+    config.withCredentials = true;
     config.headers = config.headers || {};
-
-    config.headers.Authorization = `Bearer ${token}`;
-
-
+    config.headers.Accept = "application/json";
 
     return config;
-
   },
-
   (error) => Promise.reject(error)
-
 );
-
-
 
 api.interceptors.response.use(
-
   (response) => response,
-
   (error) => {
-
     if (
-
       error?.response?.status === 401 ||
-
       error?.response?.status === 403
-
     ) {
-
       error.userMessage =
-
         "Votre session a expiré ou l'accès à vos commandes est refusé.";
-
-    } else if (
-
-      error?.code === "ECONNABORTED"
-
-    ) {
-
+    } else if (error?.code === "ECONNABORTED") {
       error.userMessage =
-
         "Le serveur met trop de temps à répondre.";
-
     } else if (!error?.response) {
-
       error.userMessage =
-
         "Impossible de contacter le serveur.";
-
     }
 
-
-
     return Promise.reject(error);
-
   }
-
 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -364,7 +266,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   const navigate = useNavigate();
+
+
+
+
+
+
+
+
 
 
 
@@ -376,7 +294,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     useState([]);
+
+
+
+
+
+
+
+
 
 
 
@@ -392,125 +322,228 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   const fetchOrders = async () => {
+
+
 
       try {
 
+
+
         const user = getStoredUser();
-
-        const token = getAuthToken();
-
+const userId = String(
 
 
-        if (!token) {
-
-          navigate("/login", { replace: true });
-
-          return;
-
-        }
-
-
-
-        const userId = String(
 
           user?._id ?? ""
+
+
 
         ).trim();
 
 
 
+
+
+
+
         if (!isValidObjectId(userId)) {
+
+
 
           navigate("/login", { replace: true });
 
+
+
           return;
 
+
+
         }
+
+
+
+
 
 
 
         const res = await api.get(
 
+
+
           `/api/my-orders/${encodeURIComponent(userId)}`
+
+
 
         );
 
 
 
+
+
+
+
         const ordersData =
+
+
 
           normalizeOrdersResponse(res.data);
 
 
 
+
+
+
+
         const filtered =
+
+
 
           ordersData.filter(
 
+
+
             (o) =>
+
+
 
               o.status ===
 
+
+
               "En livraison"
 
+
+
           );
+
+
+
+
 
 
 
         setOrders(filtered);
 
+
+
       } catch (err) {
+
+
 
         if (
 
+
+
           err?.response?.status === 401 ||
+
+
 
           err?.response?.status === 403
 
+
+
         ) {
+
+
 
           navigate("/login", {
 
+
+
             replace: true,
+
+
 
           });
 
+
+
           return;
 
+
+
         }
+
+
+
+
 
 
 
         if (import.meta.env?.DEV) {
 
+
+
           const message =
+
+
 
             err?.userMessage ||
 
+
+
             safeServerMessage(err) ||
+
+
 
             "Erreur lors du chargement des commandes.";
 
 
 
+
+
+
+
           console.warn(
+
+
 
             "[ShippedOrders]",
 
+
+
             message
+
+
 
           );
 
+
+
         }
 
+
+
       }
+
+
 
     };
 
 
 
+
+
+
+
     fetchOrders();
+
+
+
+
+
+
+
+
 
 
 
@@ -526,7 +559,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   return (
+
+
+
+
+
+
+
+
 
 
 
@@ -538,7 +587,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -546,7 +603,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         minHeight: "100vh",
+
+
+
+
 
 
 
@@ -554,11 +619,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
+
+
+
+
 
 
 
@@ -574,7 +655,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -582,7 +675,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     background:
+
+
+
+
 
 
 
@@ -594,7 +695,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     padding:
+
+
+
+
 
 
 
@@ -602,7 +715,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         ? "16px"
+
+
+
+
 
 
 
@@ -614,7 +735,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     borderRadius: "20px",
+
+
+
+
+
+
+
+
 
 
 
@@ -630,7 +767,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     marginBottom: "18px",
+
+
+
+
+
+
+
+
 
 
 
@@ -646,7 +799,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     overflow: "hidden",
+
+
+
+
+
+
+
+
 
 
 
@@ -658,7 +827,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       "0 8px 20px rgba(37,99,235,0.15)",
+
+
+
+
 
 
 
@@ -666,7 +843,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
 >
+
+
+
+
+
+
+
+
 
 
 
@@ -682,7 +871,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -690,7 +891,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       position: "absolute",
+
+
+
+
 
 
 
@@ -698,7 +907,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       right: "-60px",
+
+
+
+
 
 
 
@@ -706,7 +923,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       height: "120px",
+
+
+
+
 
 
 
@@ -714,7 +939,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -722,7 +955,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -734,7 +975,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -742,7 +995,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       position: "relative",
+
+
+
+
 
 
 
@@ -750,7 +1011,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -758,7 +1027,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       justifyContent:
+
+
+
+
 
 
 
@@ -766,7 +1043,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       gap: "12px",
+
+
+
+
 
 
 
@@ -774,7 +1059,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   >
+
+
+
+
+
+
+
+
 
 
 
@@ -790,7 +1087,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -798,7 +1107,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -806,7 +1123,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         gap: "12px",
+
+
+
+
 
 
 
@@ -814,11 +1139,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
+
+
+
+
 
 
 
@@ -834,7 +1175,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <div
+
+
+
+
 
 
 
@@ -842,7 +1195,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           width:
+
+
+
+
 
 
 
@@ -850,11 +1211,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               ? "50px"
 
 
 
+
+
+
+
               : "58px",
+
+
+
+
+
+
+
+
 
 
 
@@ -866,7 +1243,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             window.innerWidth < 768
+
+
+
+
 
 
 
@@ -874,7 +1259,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               : "58px",
+
+
+
+
+
+
+
+
 
 
 
@@ -890,7 +1287,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           background:
+
+
+
+
 
 
 
@@ -902,7 +1311,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           display: "flex",
+
+
+
+
+
+
+
+
 
 
 
@@ -918,7 +1343,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           alignItems: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -930,7 +1371,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -942,7 +1391,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         <FaTruckFast
+
+
+
+
 
 
 
@@ -950,7 +1411,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             fontSize:
+
+
+
+
 
 
 
@@ -958,7 +1427,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
                 ? "22px"
+
+
+
+
 
 
 
@@ -970,11 +1447,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             color: "#FFFFFF",
 
 
 
+
+
+
+
           }}
+
+
+
+
 
 
 
@@ -986,7 +1479,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1002,7 +1511,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <div
+
+
+
+
 
 
 
@@ -1010,11 +1531,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           minWidth: 0,
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -1026,11 +1559,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         <h1
 
 
 
+
+
+
+
           style={{
+
+
+
+
 
 
 
@@ -1042,7 +1591,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             fontSize:
+
+
+
+
 
 
 
@@ -1050,11 +1611,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
                 ? "18px"
 
 
 
+
+
+
+
                 : "26px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1070,7 +1647,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             lineHeight: 1.2,
+
+
+
+
 
 
 
@@ -1078,11 +1667,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         >
 
 
 
+
+
+
+
           Commandes expédiées
+
+
+
+
 
 
 
@@ -1094,11 +1695,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         <p
 
 
 
+
+
+
+
           style={{
+
+
+
+
 
 
 
@@ -1110,7 +1727,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             fontSize:
+
+
+
+
 
 
 
@@ -1118,11 +1747,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
                 ? "12px"
 
 
 
+
+
+
+
                 : "14px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1138,7 +1783,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             lineHeight: "20px",
+
+
+
+
 
 
 
@@ -1146,7 +1803,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         >
+
+
+
+
 
 
 
@@ -1154,7 +1819,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1170,7 +1847,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1186,7 +1879,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -1194,11 +1899,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         background:
 
 
 
+
+
+
+
           "rgba(255,255,255,0.15)",
+
+
+
+
+
+
+
+
 
 
 
@@ -1214,7 +1935,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         borderRadius: "999px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1230,7 +1967,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontWeight: "800",
+
+
+
+
 
 
 
@@ -1238,7 +1987,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -1246,7 +2003,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1262,7 +2031,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1278,7 +2063,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 {orders.length === 0 && (
+
+
+
+
+
+
+
+
 
 
 
@@ -1290,7 +2091,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -1302,7 +2111,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       padding:
+
+
+
+
 
 
 
@@ -1310,11 +2131,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           ? "32px 18px"
 
 
 
+
+
+
+
           : "45px 28px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1330,7 +2167,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       textAlign: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -1346,11 +2199,31 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       boxShadow:
 
 
 
+
+
+
+
         "0 8px 25px rgba(15,23,42,0.05)",
+
+
+
+
+
+
+
+
 
 
 
@@ -1366,7 +2239,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       overflow: "hidden",
+
+
+
+
 
 
 
@@ -1374,7 +2259,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   >
+
+
+
+
+
+
+
+
 
 
 
@@ -1390,7 +2287,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -1398,7 +2307,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         position: "absolute",
+
+
+
+
+
+
+
+
 
 
 
@@ -1414,7 +2335,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         right: "-50px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1430,7 +2367,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         height: "120px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1446,7 +2399,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         background:
+
+
+
+
 
 
 
@@ -1454,11 +2419,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     />
+
+
+
+
+
+
+
+
 
 
 
@@ -1474,7 +2455,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -1482,7 +2475,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         width:
+
+
+
+
 
 
 
@@ -1490,11 +2491,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "75px"
 
 
 
+
+
+
+
             : "90px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1506,7 +2523,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           window.innerWidth < 768
+
+
+
+
 
 
 
@@ -1514,7 +2539,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             : "90px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1530,7 +2567,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         borderRadius: "22px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1542,7 +2595,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           "linear-gradient(135deg,#DBEAFE,#BFDBFE)",
+
+
+
+
+
+
+
+
 
 
 
@@ -1558,7 +2623,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         justifyContent: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -1570,7 +2651,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -1582,7 +2671,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <FaBoxOpen
+
+
+
+
 
 
 
@@ -1590,7 +2691,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           fontSize:
+
+
+
+
 
 
 
@@ -1598,7 +2707,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               ? "34px"
+
+
+
+
 
 
 
@@ -1610,11 +2727,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           color: "#2563EB",
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -1626,7 +2759,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1642,11 +2791,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -1658,7 +2823,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         alignItems: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -1674,6 +2855,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         background: "#EFF6FF",
 
 
@@ -1682,7 +2871,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         color: "#2563EB",
+
+
+
+
+
+
+
+
 
 
 
@@ -1698,6 +2903,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         borderRadius: "999px",
 
 
@@ -1706,7 +2919,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontSize: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1722,7 +2951,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         marginBottom: "16px",
+
+
+
+
 
 
 
@@ -1730,7 +2971,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     >
+
+
+
+
+
+
+
+
 
 
 
@@ -1746,6 +2999,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       Historique vide
 
 
@@ -1754,7 +3015,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1770,11 +3047,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <h2
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -1786,7 +3079,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontSize:
+
+
+
+
 
 
 
@@ -1794,7 +3099,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "22px"
+
+
+
+
 
 
 
@@ -1806,7 +3119,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontWeight: "900",
+
+
+
+
+
+
+
+
 
 
 
@@ -1822,7 +3151,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         lineHeight: 1.2,
+
+
+
+
 
 
 
@@ -1830,7 +3171,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -1838,7 +3187,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     </h2>
+
+
+
+
+
+
+
+
 
 
 
@@ -1854,11 +3215,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <p
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -1870,7 +3247,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontSize:
+
+
+
+
 
 
 
@@ -1878,11 +3267,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "14px"
 
 
 
+
+
+
+
             : "15px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1898,7 +3303,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         maxWidth: "420px",
+
+
+
+
+
+
+
+
 
 
 
@@ -1914,7 +3335,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontWeight: "500",
+
+
+
+
 
 
 
@@ -1922,7 +3355,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -1930,11 +3371,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       automatiquement dès leur mise en livraison.
 
 
 
+
+
+
+
     </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1950,7 +3407,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 )}
+
+
+
+
+
+
+
+
 
 
 
@@ -1966,7 +3439,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 {orders.map((order) => (
+
+
+
+
+
+
+
+
 
 
 
@@ -1978,7 +3467,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   key={order._id}
+
+
+
+
 
 
 
@@ -1986,7 +3483,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     navigate(`/order/${order._id}`)
+
+
+
+
 
 
 
@@ -1994,7 +3499,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   role="button"
+
+
+
+
 
 
 
@@ -2002,7 +3515,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   onKeyDown={(e) => {
+
+
+
+
 
 
 
@@ -2010,7 +3531,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       e.preventDefault();
+
+
+
+
 
 
 
@@ -2018,7 +3547,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -2026,11 +3563,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   style={{
 
 
 
+
+
+
+
     background: "#FFFFFF",
+
+
+
+
+
+
+
+
 
 
 
@@ -2046,7 +3599,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     padding:
+
+
+
+
 
 
 
@@ -2054,11 +3619,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         ? "16px"
 
 
 
+
+
+
+
         : "18px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2074,7 +3655,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     border: "1px solid #E5E7EB",
+
+
+
+
+
+
+
+
 
 
 
@@ -2086,7 +3683,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       "0 4px 12px rgba(15,23,42,0.05)",
+
+
+
+
+
+
+
+
 
 
 
@@ -2102,7 +3711,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     cursor: "pointer",
+
+
+
+
 
 
 
@@ -2110,7 +3731,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     transition: "transform 0.18s ease, box-shadow 0.18s ease",
+
+
+
+
 
 
 
@@ -2118,7 +3747,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
 >
+
+
+
+
+
+
+
+
 
 
 
@@ -2134,7 +3775,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -2142,7 +3795,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
+
+
+
+
 
 
 
@@ -2158,7 +3823,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     alignItems:
+
+
+
+
 
 
 
@@ -2166,7 +3843,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         ? "flex-start"
+
+
+
+
 
 
 
@@ -2178,7 +3863,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     gap: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2194,7 +3895,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     marginBottom: "15px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2210,7 +3927,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     borderBottom:
+
+
+
+
 
 
 
@@ -2218,7 +3947,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -2230,11 +3967,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   <div
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2246,7 +3999,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       alignItems: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -2262,7 +4031,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       flex: 1,
+
+
+
+
+
+
+
+
 
 
 
@@ -2274,7 +4059,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2286,7 +4079,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -2294,7 +4099,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         width: "48px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2310,7 +4127,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         borderRadius: "14px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2322,6 +4155,10 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           "linear-gradient(135deg,#DBEAFE,#BFDBFE)",
 
 
@@ -2330,7 +4167,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         display: "flex",
+
+
+
+
+
+
+
+
 
 
 
@@ -2346,7 +4199,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         alignItems: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -2358,7 +4227,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -2370,11 +4247,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <FaTruckFast
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -2386,7 +4279,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           fontSize: "22px",
+
+
+
+
 
 
 
@@ -2394,7 +4299,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       />
+
+
+
+
+
+
+
+
 
 
 
@@ -2410,7 +4327,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -2418,11 +4347,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         minWidth: 0,
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -2434,7 +4375,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <h2
+
+
+
+
 
 
 
@@ -2442,7 +4395,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           margin: 0,
+
+
+
+
+
+
+
+
 
 
 
@@ -2458,7 +4423,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           fontSize:
+
+
+
+
 
 
 
@@ -2466,7 +4443,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               ? "17px"
+
+
+
+
 
 
 
@@ -2478,7 +4463,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           fontWeight: "800",
+
+
+
+
+
+
+
+
 
 
 
@@ -2494,7 +4495,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           textOverflow: "ellipsis",
+
+
+
+
+
+
+
+
 
 
 
@@ -2506,7 +4523,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -2514,7 +4539,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         {order.customerName}
+
+
+
+
 
 
 
@@ -2526,7 +4559,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <p
+
+
+
+
 
 
 
@@ -2534,7 +4579,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           marginTop: "4px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2550,7 +4607,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           color: "#64748B",
+
+
+
+
+
+
+
+
 
 
 
@@ -2566,7 +4639,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           fontWeight: "500",
+
+
+
+
 
 
 
@@ -2574,7 +4659,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -2582,7 +4675,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -2598,7 +4703,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2610,11 +4731,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     style={{
 
 
 
+
+
+
+
       background: "#DBEAFE",
+
+
+
+
+
+
+
+
 
 
 
@@ -2630,7 +4767,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       padding: "8px 14px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2646,7 +4799,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       fontSize: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2662,6 +4831,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       display: "flex",
 
 
@@ -2670,7 +4847,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       alignItems: "center",
+
+
+
+
+
+
+
+
 
 
 
@@ -2686,7 +4879,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       border:
+
+
+
+
 
 
 
@@ -2694,11 +4899,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
+
+
+
+
 
 
 
@@ -2714,7 +4935,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     En livraison
+
+
+
+
+
+
+
+
 
 
 
@@ -2730,7 +4967,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2746,7 +4999,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 {order.items.map(
+
+
+
+
 
 
 
@@ -2758,7 +5023,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -2766,7 +5043,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -2774,7 +5059,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
@@ -2782,7 +5075,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         gap: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2798,7 +5103,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         borderBottom:
+
+
+
+
 
 
 
@@ -2806,7 +5123,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "1px solid #F1F5F9"
+
+
+
+
 
 
 
@@ -2814,11 +5139,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
+
+
+
+
 
 
 
@@ -2834,7 +5175,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <div
+
+
+
+
 
 
 
@@ -2842,7 +5195,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           display: "flex",
+
+
+
+
 
 
 
@@ -2850,7 +5211,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           gap: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2866,11 +5239,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           minWidth: 0,
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -2882,7 +5271,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         <img
+
+
+
+
 
 
 
@@ -2890,7 +5291,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               item.image?.includes("localhost:5000")
+
+
+
+
 
 
 
@@ -2898,7 +5307,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
                     "http://localhost:5000",
+
+
+
+
 
 
 
@@ -2906,7 +5323,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
                   )
+
+
+
+
 
 
 
@@ -2914,7 +5339,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             }
+
+
+
+
+
+
+
+
 
 
 
@@ -2930,7 +5367,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             onError={(e) => {
+
+
+
+
 
 
 
@@ -2938,7 +5387,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             }}
+
+
+
+
 
 
 
@@ -2946,11 +5403,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             width: "60px",
 
 
 
+
+
+
+
             height: "60px",
+
+
+
+
+
+
+
+
 
 
 
@@ -2966,7 +5439,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             objectFit: "cover",
+
+
+
+
+
+
+
+
 
 
 
@@ -2978,7 +5467,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           }}
+
+
+
+
 
 
 
@@ -2990,7 +5487,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         <div
+
+
+
+
 
 
 
@@ -2998,7 +5507,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             flex: 1,
+
+
+
+
 
 
 
@@ -3006,7 +5523,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           }}
+
+
+
+
 
 
 
@@ -3018,7 +5543,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           <h3
+
+
+
+
 
 
 
@@ -3026,7 +5563,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               margin: 0,
+
+
+
+
+
+
+
+
 
 
 
@@ -3042,7 +5591,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
               fontSize: "15px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3058,7 +5623,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
               overflow: "hidden",
+
+
+
+
+
+
+
+
 
 
 
@@ -3074,7 +5655,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
               whiteSpace: "nowrap",
+
+
+
+
 
 
 
@@ -3082,11 +5675,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           >
 
 
 
+
+
+
+
             {item.name}
+
+
+
+
 
 
 
@@ -3098,7 +5703,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           <div
+
+
+
+
 
 
 
@@ -3106,7 +5723,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               display: "flex",
+
+
+
+
 
 
 
@@ -3114,7 +5739,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               gap: "6px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3130,7 +5767,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
               color: "#64748B",
+
+
+
+
+
+
+
+
 
 
 
@@ -3142,11 +5795,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             }}
 
 
 
+
+
+
+
           >
+
+
+
+
+
+
+
+
 
 
 
@@ -3162,7 +5831,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
             Qté : {item.quantity}
+
+
+
+
+
+
+
+
 
 
 
@@ -3178,6 +5863,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         </div>
 
 
@@ -3186,7 +5879,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3202,7 +5911,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <div
+
+
+
+
 
 
 
@@ -3210,7 +5931,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           color: "#2563EB",
+
+
+
+
+
+
+
+
 
 
 
@@ -3226,7 +5959,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           fontSize:
+
+
+
+
 
 
 
@@ -3234,7 +5979,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
               ? "15px"
+
+
+
+
 
 
 
@@ -3246,7 +5999,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
           whiteSpace: "nowrap",
+
+
+
+
 
 
 
@@ -3254,7 +6019,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -3262,7 +6035,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3278,11 +6063,31 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   )
 
 
 
+
+
+
+
 )}
+
+
+
+
+
+
+
+
 
 
 
@@ -3298,7 +6103,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -3306,7 +6123,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     marginTop: "14px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3322,7 +6151,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     borderTop: "1px solid #E5E7EB",
+
+
+
+
+
+
+
+
 
 
 
@@ -3338,7 +6183,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     justifyContent: "space-between",
+
+
+
+
+
+
+
+
 
 
 
@@ -3350,11 +6211,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       window.innerWidth < 768
 
 
 
+
+
+
+
         ? "flex-start"
+
+
+
+
 
 
 
@@ -3366,7 +6239,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     flexDirection:
+
+
+
+
 
 
 
@@ -3374,7 +6259,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         ? "column"
+
+
+
+
 
 
 
@@ -3386,7 +6279,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     gap: "12px",
+
+
+
+
 
 
 
@@ -3394,7 +6299,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
 >
+
+
+
+
+
+
+
+
 
 
 
@@ -3410,7 +6327,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -3418,7 +6347,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
+
+
+
+
 
 
 
@@ -3434,7 +6375,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       gap: "8px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3450,7 +6407,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       fontSize: "13px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3462,7 +6435,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3474,7 +6455,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <FaMapMarkerAlt
+
+
+
+
 
 
 
@@ -3482,7 +6475,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         color: "#2563EB",
+
+
+
+
 
 
 
@@ -3490,7 +6491,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     />
+
+
+
+
+
+
+
+
 
 
 
@@ -3506,7 +6519,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3522,7 +6551,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -3530,7 +6571,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       textAlign:
+
+
+
+
 
 
 
@@ -3538,7 +6587,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           ? "left"
+
+
+
+
 
 
 
@@ -3546,7 +6603,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3558,7 +6623,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -3566,7 +6643,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
+
+
+
+
 
 
 
@@ -3582,7 +6671,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         gap: "6px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3598,7 +6703,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontSize: "12px",
+
+
+
+
+
+
+
+
 
 
 
@@ -3614,7 +6735,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         justifyContent:
+
+
+
+
 
 
 
@@ -3622,7 +6755,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "flex-start"
+
+
+
+
 
 
 
@@ -3630,7 +6771,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -3642,7 +6791,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
       <FaMoneyBillWave
+
+
+
+
 
 
 
@@ -3650,7 +6811,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
           color: "#2563EB",
+
+
+
+
 
 
 
@@ -3658,7 +6827,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       />
+
+
+
+
+
+
+
+
 
 
 
@@ -3674,7 +6855,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3686,11 +6883,27 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
       style={{
 
 
 
+
+
+
+
         margin: "4px 0 0 0",
+
+
+
+
+
+
+
+
 
 
 
@@ -3706,7 +6919,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontSize:
+
+
+
+
 
 
 
@@ -3714,7 +6939,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
             ? "20px"
+
+
+
+
 
 
 
@@ -3726,7 +6959,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
         fontWeight: "900",
+
+
+
+
 
 
 
@@ -3734,7 +6979,15 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -3742,7 +6995,19 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
     </h2>
+
+
+
+
+
+
+
+
 
 
 
@@ -3758,6 +7023,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 </div>
 
 
@@ -3766,7 +7039,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3782,6 +7071,14 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
     </div>
 
 
@@ -3790,7 +7087,23 @@ export default function ShippedOrders() {
 
 
 
+
+
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
 
 
 

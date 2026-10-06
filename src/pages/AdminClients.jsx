@@ -1,10 +1,20 @@
 import {
 
+
+
   useEffect,
+
+
 
   useState
 
+
+
 } from "react";
+
+
+
+
 
 
 
@@ -12,33 +22,67 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
 
   FaUsers,
 
+
+
   FaUserCheck,
+
+
 
   FaGlobe,
 
+
+
   FaSearch,
+
+
 
   FaEnvelope,
 
+
+
   FaPhoneAlt,
+
+
 
 } from "react-icons/fa";
 
 
 
+
+
+
+
 import {
+
+
 
   ComposableMap,
 
+
+
   Geographies,
+
+
 
   Geography
 
+
+
 } from "react-simple-maps";
+
+
+
+
 
 
 
@@ -47,29 +91,42 @@ import "./AdminClients.css";
 
 
 
+
+
+
+
+
 /* =========================================================
+
    SECURITY LAYER — ADMIN CLIENTS
+
    Compatible avec le JWT administrateur du backend.
+
    ========================================================= */
 
+
+
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
 
+
+
 const safeParse = (value, fallback = null) => {
+
   try {
+
     return value ? JSON.parse(value) : fallback;
+
   } catch {
+
     return fallback;
+
   }
+
 };
 
-const getAuthToken = () => {
-  const token = localStorage.getItem("token");
 
-  return typeof token === "string" && token.trim()
-    ? token.trim()
-    : "";
-};
 
 const getStoredAdmin = () => {
   const admin = safeParse(localStorage.getItem("admin"), null);
@@ -79,21 +136,27 @@ const getStoredAdmin = () => {
     : null;
 };
 
+// =========================================================
+// 🔐 AUTHENTIFICATION ADMIN PAR COOKIE HTTPONLY
+// =========================================================
+
+axios.defaults.withCredentials = true;
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
 });
 
 api.interceptors.request.use((config) => {
-  const token = getAuthToken();
+  if (!config) return config;
 
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
 
   return config;
 });
@@ -106,7 +169,7 @@ api.interceptors.response.use(
       error?.response?.status === 403
     ) {
       localStorage.removeItem("admin");
-      localStorage.removeItem("token");
+      error.userMessage = "Session administrateur expirée ou accès refusé.";
     }
 
     return Promise.reject(error);
@@ -114,66 +177,127 @@ api.interceptors.response.use(
 );
 
 const normalizeArrayResponse = (data, key) => {
+
   if (Array.isArray(data)) return data;
 
+
+
   if (data && Array.isArray(data[key])) {
+
     return data[key];
+
   }
+
+
 
   if (data && Array.isArray(data.data)) {
+
     return data.data;
+
   }
 
+
+
   return null;
+
 };
+
+
 
 function AdminClients() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // STATES
 
+
+
   // =========================
+
+
+
+
 
 
 
   const [users, setUsers] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [visitors, setVisitors] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [search, setSearch] =
 
+
+
     useState("");
 
 
 
+
+
+
+
   // =========================
+
+
 
   // FETCH DATA
 
+
+
   // =========================
+
+
+
+
 
 
 
   useEffect(() => {
 
-    const admin = getStoredAdmin();
-    const token = getAuthToken();
 
-    if (!admin || !token) {
+
+    const admin = getStoredAdmin();
+
+    if (!admin) {
+
       window.location.href = "/admin-login";
+
       return;
+
     }
+
+
+
+
+
 
 
 
@@ -182,7 +306,15 @@ function AdminClients() {
 
 
 
+
+
+
+
     fetchVisitors();
+
+
+
+
 
 
 
@@ -190,25 +322,31 @@ function AdminClients() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // USERS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const fetchUsers =
 
+
+
     async () => {
-
-      const token = getAuthToken();
-
-      if (!token) {
-        window.location.href = "/admin-login";
-        return;
-      }
-
 
 
 
@@ -216,35 +354,71 @@ function AdminClients() {
 
 
 
+
+
+
+
         const res =
+
+
 
           await api.get("/api/users");
 
 
 
+
+
+
+
         const data = normalizeArrayResponse(res.data, "users");
 
+
+
         if (!data) {
+
           console.error("Réponse utilisateurs invalide.");
+
           setUsers([]);
+
           return;
+
         }
+
+
 
         setUsers(data);
 
 
 
+
+
+
+
       } catch (err) {
+
         if (
+
           err?.response?.status === 401 ||
+
           err?.response?.status === 403
+
         ) {
+
           window.location.href = "/admin-login";
+
           return;
+
         }
 
+
+
         console.error("Erreur API.", err);
+
       }
+
+
+
+
 
 
 
@@ -252,25 +426,31 @@ function AdminClients() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // VISITORS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const fetchVisitors =
 
+
+
     async () => {
-
-      const token = getAuthToken();
-
-      if (!token) {
-        window.location.href = "/admin-login";
-        return;
-      }
-
 
 
 
@@ -278,35 +458,71 @@ function AdminClients() {
 
 
 
+
+
+
+
         const res =
+
+
 
           await api.get("/api/visitors");
 
 
 
+
+
+
+
         const data = normalizeArrayResponse(res.data, "visitors");
 
+
+
         if (!data) {
+
           console.error("Réponse visiteurs invalide.");
+
           setVisitors([]);
+
           return;
+
         }
+
+
 
         setVisitors(data);
 
 
 
+
+
+
+
       } catch (err) {
+
         if (
+
           err?.response?.status === 401 ||
+
           err?.response?.status === 403
+
         ) {
+
           window.location.href = "/admin-login";
+
           return;
+
         }
 
+
+
         console.error("Erreur API.", err);
+
       }
+
+
+
+
 
 
 
@@ -314,29 +530,59 @@ function AdminClients() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // FILTER USERS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const filteredUsers =
 
+
+
     users.filter((user)=>
+
+
+
+
 
 
 
       user.name
 
+
+
         ?.toLowerCase()
+
+
 
         .includes(
 
+
+
           search.toLowerCase()
 
+
+
         )
+
+
+
+
 
 
 
@@ -344,45 +590,91 @@ function AdminClients() {
 
 
 
+
+
+
+
   // =========================
+
+
 
   // CONNECTED USERS
 
+
+
   // =========================
+
+
+
+
 
 
 
   const connectedUsers =
 
+
+
     users.filter(
+
+
 
       (u)=>
 
+
+
         u.status ===
 
+
+
         "Connecté"
+
+
 
     ).length;
 
 
 
+
+
+
+
 const onlineVisitors =
+
+
 
   visitors.filter(
 
+
+
     (v)=>v.online
+
+
 
   ).length;
 
 
 
+
+
+
+
 const visitedCountries =
+
+
 
   visitors.map(
 
+
+
     (v)=>v.country
 
+
+
   );
+
+
+
+
 
 
 
@@ -390,7 +682,15 @@ const countryStats = {};
 
 
 
+
+
+
+
 visitors.forEach((visitor)=>{
+
+
+
+
 
 
 
@@ -398,7 +698,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
     countryStats[visitor.country] =
+
+
+
+
 
 
 
@@ -406,7 +714,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -414,11 +730,23 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
   // =========================
+
+
 
   // RETURN
 
+
+
   // =========================
+
+
+
+
 
 
 
@@ -426,15 +754,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
     <div className="adminClients">
+
+
+
+
 
 
 
       {/* =========================
 
+
+
           HEADER
 
+
+
       ========================= */}
+
+
+
+
 
 
 
@@ -442,7 +786,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         <div>
+
+
+
+
 
 
 
@@ -450,7 +802,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             Clients & Visiteurs
+
+
+
+
 
 
 
@@ -458,15 +818,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
           <p>
+
+
+
+
 
 
 
             Analyse complète des
 
+
+
             utilisateurs connectés
 
+
+
             sur Konan Shopping
+
+
+
+
 
 
 
@@ -474,7 +850,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -482,7 +866,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         <div className="searchBox">
+
+
+
+
 
 
 
@@ -490,25 +882,51 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
           <input
+
+
 
             type="text"
 
+
+
             placeholder="Rechercher un utilisateur..."
+
+
 
             value={search}
 
+
+
             onChange={(e)=>
+
+
 
               setSearch(
 
+
+
                 e.target.value
+
+
 
               )
 
+
+
             }
 
+
+
           />
+
+
+
+
 
 
 
@@ -516,15 +934,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
       {/* =========================
 
+
+
           STATS
 
+
+
       ========================= */}
+
+
+
+
 
 
 
@@ -532,7 +966,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         {/* USERS */}
+
+
+
+
 
 
 
@@ -540,19 +982,39 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
           <div>
+
+
+
+
 
 
 
             <p>
 
+
+
               Utilisateurs
+
+
 
             </p>
 
 
 
+
+
+
+
             <h2>
+
+
+
+
 
 
 
@@ -560,11 +1022,23 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             </h2>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -572,7 +1046,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             <FaUsers />
+
+
+
+
 
 
 
@@ -580,7 +1062,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -588,7 +1078,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         <div className="clientCard">
+
+
+
+
 
 
 
@@ -596,15 +1094,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             <p>
 
+
+
               Connectés
+
+
 
             </p>
 
 
 
+
+
+
+
             <h2>
+
+
+
+
 
 
 
@@ -612,11 +1126,23 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             </h2>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -624,7 +1150,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             <FaUserCheck />
+
+
+
+
 
 
 
@@ -632,7 +1166,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -640,7 +1182,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         <div className="clientCard">
+
+
+
+
 
 
 
@@ -648,11 +1198,23 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             <p>
+
+
 
               Visiteurs
 
+
+
             </p>
+
+
+
+
 
 
 
@@ -660,7 +1222,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
               {visitors.length}
+
+
+
+
 
 
 
@@ -668,7 +1238,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -676,7 +1254,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
             <FaGlobe />
+
+
+
+
 
 
 
@@ -684,7 +1270,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -692,7 +1286,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
       <div className="clientCard">
+
+
+
+
 
 
 
@@ -700,15 +1302,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
     <p>
 
+
+
       En ligne
+
+
 
     </p>
 
 
 
+
+
+
+
     <h2>
+
+
+
+
 
 
 
@@ -716,11 +1334,23 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
     </h2>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -728,7 +1358,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
     <FaUserCheck />
+
+
+
+
 
 
 
@@ -736,7 +1374,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -744,23 +1390,47 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
   <div className="mapHeader">
+
+
+
+
 
 
 
     <h2>
 
+
+
       Visiteurs dans le monde 🌍
+
+
 
     </h2>
 
 
 
+
+
+
+
     <p>
+
+
 
       Pays visitant votre boutique
 
+
+
     </p>
+
+
+
+
 
 
 
@@ -768,37 +1438,75 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
   <ComposableMap
+
+
 
     projectionConfig={{
 
+
+
       scale: 140
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <Geographies
 
-      geography="https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
+
+
+      geography="https://cdn.jsdelivr.net/npm/world-atlas\@2/countries-110m.json"
+
+
 
     >
 
 
 
+
+
+
+
       {({
 
+
+
         geographies
+
+
 
       }) =>
 
 
 
+
+
+
+
         geographies.map(
 
+
+
           (geo)=>(
+
+
+
+
 
 
 
@@ -806,7 +1514,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
               key={geo.rsmKey}
+
+
+
+
 
 
 
@@ -814,7 +1530,15 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
               style={{
+
+
+
+
 
 
 
@@ -822,15 +1546,31 @@ visitors.forEach((visitor)=>{
 
 
 
+
+
+
+
                   fill:
+
+
+
+
 
 
 
 visitedCountries.includes(
 
+
+
   geo.properties.NAME
 
+
+
 )
+
+
+
+
 
 
 
@@ -838,7 +1578,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
 : "#e5e7eb",
+
+
+
+
 
 
 
@@ -846,7 +1594,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                 },
+
+
+
+
 
 
 
@@ -854,7 +1610,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   fill:"#f59e0b",
+
+
+
+
 
 
 
@@ -862,7 +1626,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                 },
+
+
+
+
 
 
 
@@ -870,7 +1642,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   fill:"#4c1d95",
+
+
+
+
 
 
 
@@ -878,7 +1658,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                 },
+
+
+
+
 
 
 
@@ -886,15 +1674,31 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             />
+
+
+
+
 
 
 
           )
 
+
+
         )
 
+
+
       }
+
+
+
+
 
 
 
@@ -902,11 +1706,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
   </ComposableMap>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -914,27 +1730,55 @@ visitedCountries.includes(
 
 
 
+
+
+
+
   <div className="countriesHeader">
+
+
+
+
 
 
 
     <h2>
 
+
+
       Visiteurs par pays
+
+
 
     </h2>
 
 
 
+
+
+
+
     <p>
 
+
+
       Pays les plus actifs
+
+
 
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -942,7 +1786,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
     {
+
+
+
+
 
 
 
@@ -950,7 +1802,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
       .sort((a,b)=>b[1]-a[1])
+
+
+
+
 
 
 
@@ -958,13 +1818,27 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         <div
+
+
 
           key={index}
 
+
+
           className="countryItem"
 
+
+
         >
+
+
+
+
 
 
 
@@ -972,19 +1846,39 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             <h4>
 
+
+
               {country}
+
+
 
             </h4>
 
 
 
+
+
+
+
             <p>
+
+
 
               {count} visiteurs
 
+
+
             </p>
+
+
+
+
 
 
 
@@ -992,7 +1886,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           <span>
+
+
+
+
 
 
 
@@ -1000,11 +1902,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           </span>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1012,11 +1926,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1024,11 +1950,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
       {/* =========================
+
+
 
           USERS TABLE
 
+
+
       ========================= */}
+
+
+
+
 
 
 
@@ -1036,7 +1974,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         <div className="tableHeader">
+
+
+
+
 
 
 
@@ -1044,7 +1990,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             Utilisateurs inscrits
+
+
+
+
 
 
 
@@ -1052,7 +2006,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1060,7 +2022,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           <thead>
+
+
+
+
 
 
 
@@ -1068,43 +2038,87 @@ visitedCountries.includes(
 
 
 
+
+
+
+
               <th>
+
+
 
                 Utilisateur
 
+
+
               </th>
 
 
 
+
+
+
+
               <th>
+
+
 
                 Email
 
+
+
               </th>
 
 
 
+
+
+
+
               <th>
+
+
 
                 Téléphone
 
+
+
               </th>
 
 
 
+
+
+
+
               <th>
+
+
 
                 Adresse
 
+
+
               </th>
+
+
+
+
 
 
 
               <th>
 
+
+
                 Statut
 
+
+
               </th>
+
+
+
+
 
 
 
@@ -1112,7 +2126,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           </thead>
+
+
+
+
 
 
 
@@ -1120,15 +2142,31 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             {filteredUsers.map(
+
+
 
               (
 
+
+
                 user,
+
+
 
                 index
 
+
+
               ) => (
+
+
+
+
 
 
 
@@ -1136,7 +2174,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   {/* USER */}
+
+
+
+
 
 
 
@@ -1144,7 +2190,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
   <div className="userBox">
+
+
+
+
 
 
 
@@ -1152,22 +2206,45 @@ visitedCountries.includes(
 
 
 
+
+
+
+
      <img
 
+
+
   src={
+
                       typeof user.avatar === "string" &&
+
                       user.avatar.trim()
+
                         ? user.avatar
+
                         : "/logo.jpg"
+
                     }
 
+
+
   alt={user.name || "Konan Shopping"}
+
+
 
 />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1175,19 +2252,39 @@ visitedCountries.includes(
 
 
 
+
+
+
+
       <h4>
 
+
+
         {user.name}
+
+
 
       </h4>
 
 
 
+
+
+
+
       <p>
+
+
 
         Client Konan Shopping
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1195,11 +2292,27 @@ visitedCountries.includes(
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
 </td>
+
+
+
+
+
+
+
+
 
 
 
@@ -1211,11 +2324,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
 
 
 
+
+
+
+
                     <div className="miniInfo">
+
+
+
+
 
 
 
@@ -1223,7 +2348,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                       {user.email}
+
+
+
+
 
 
 
@@ -1231,7 +2364,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1239,7 +2380,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
@@ -1247,17 +2396,35 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                       <FaPhoneAlt />
+
+
+
+
 
 
 
                       {
 
+
+
                         user.phone ||
+
+
 
                         "Aucun"
 
+
+
                       }
+
+
+
+
 
 
 
@@ -1265,7 +2432,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1273,21 +2448,43 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
                     {
 
+
+
                       user.address ||
 
+
+
                       "Non renseignée"
+
+
 
                     }
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1295,17 +2492,35 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
                     <span
 
+
+
                       className={
+
+
 
                         user.status ===
 
+
+
                         "Connecté"
+
+
+
+
 
 
 
@@ -1313,19 +2528,39 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                           : "offline"
 
+
+
                       }
+
+
 
                     >
 
 
 
+
+
+
+
                       {
+
+
 
                         user.status
 
+
+
                       }
+
+
+
+
 
 
 
@@ -1333,7 +2568,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1341,9 +2584,19 @@ visitedCountries.includes(
 
 
 
+
+
+
+
               )
 
+
+
             )}
+
+
+
+
 
 
 
@@ -1351,7 +2604,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         </table>
+
+
+
+
 
 
 
@@ -1359,11 +2620,23 @@ visitedCountries.includes(
 
 
 
+
+
+
+
       {/* =========================
+
+
 
           VISITORS
 
+
+
       ========================= */}
+
+
+
+
 
 
 
@@ -1371,7 +2644,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         <div className="tableHeader">
+
+
+
+
 
 
 
@@ -1379,7 +2660,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             Activité visiteurs
+
+
+
+
 
 
 
@@ -1387,7 +2676,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1395,7 +2692,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           <thead>
+
+
+
+
 
 
 
@@ -1403,43 +2708,87 @@ visitedCountries.includes(
 
 
 
+
+
+
+
               <th>
+
+
 
                 IP
 
+
+
               </th>
 
 
 
+
+
+
+
               <th>
+
+
 
                 Pays
 
+
+
               </th>
+
+
+
+
 
 
 
               <th>
 
+
+
   Ville
+
+
 
 </th>
 
 
 
+
+
+
+
               <th>
+
+
 
                 Appareil
 
+
+
               </th>
+
+
+
+
 
 
 
               <th>
 
+
+
                 Heure
 
+
+
               </th>
+
+
+
+
 
 
 
@@ -1447,7 +2796,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
           </thead>
+
+
+
+
 
 
 
@@ -1455,15 +2812,31 @@ visitedCountries.includes(
 
 
 
+
+
+
+
             {visitors.map(
+
+
 
               (
 
+
+
                 visitor,
+
+
 
                 index
 
+
+
               ) => (
+
+
+
+
 
 
 
@@ -1471,7 +2844,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
@@ -1479,7 +2860,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1487,15 +2876,31 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                     {
 
+
+
                       visitor.country
+
+
 
                     }
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1503,7 +2908,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
   {visitor.city}
+
+
+
+
 
 
 
@@ -1511,15 +2924,31 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
                     {
 
+
+
                       visitor.device
 
+
+
                     }
+
+
+
+
 
 
 
@@ -1527,7 +2956,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   <td>
+
+
+
+
 
 
 
@@ -1535,7 +2972,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
                   </td>
+
+
+
+
 
 
 
@@ -1543,9 +2988,19 @@ visitedCountries.includes(
 
 
 
+
+
+
+
               )
 
+
+
             )}
+
+
+
+
 
 
 
@@ -1553,7 +3008,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
         </table>
+
+
+
+
 
 
 
@@ -1561,7 +3024,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1569,7 +3040,15 @@ visitedCountries.includes(
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

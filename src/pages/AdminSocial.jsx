@@ -1,12 +1,24 @@
 import {
 
+
+
   useState,
+
+
 
   useRef,
 
+
+
   useEffect
 
+
+
 } from "react";
+
+
+
+
 
 
 
@@ -14,35 +26,71 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
 
   FaCloudUploadAlt,
 
+
+
   FaVideo,
+
+
 
   FaFacebook,
 
+
+
   FaInstagram,
+
+
 
   FaTiktok,
 
+
+
   FaYoutube,
+
+
 
   FaTrash,
 
+
+
   FaPaperPlane,
+
+
 
   FaCheckCircle,
 
+
+
   FaClock,
+
+
 
   FaExclamationCircle,
 
+
+
   FaHashtag,
+
+
 
   FaImage,
 
+
+
 } from "react-icons/fa";
+
+
+
+
 
 
 
@@ -52,59 +100,103 @@ import "./AdminSocial.css";
 
 
 
+
+
+
+
+
+
 function AdminSocial() {
 
 
 
+
+
+
+
   // =====================================================
+
+
 
   // 🌐 URL API
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const API_URL =
 
-    "https://konanshopping.com";
+
+
+    "https\://konanshopping.com";
+
+
 
   // =====================================================
+
   // 🔐 SÉCURITÉ ADMIN / API
+
   // =====================================================
+
+
 
   const API_TIMEOUT = 30000;
+
   const VIDEO_UPLOAD_TIMEOUT = 180000;
+
   const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // Aligné sur la limite backend
+
   const MAX_TITLE_LENGTH = 150;
+
   const MAX_DESCRIPTION_LENGTH = 2200;
+
   const MAX_HASHTAGS_LENGTH = 1000;
 
+
+
   const ALLOWED_VIDEO_TYPES = new Set([
+
     "video/mp4",
+
     "video/quicktime",
+
     "video/x-msvideo",
+
     "video/webm",
+
     "video/mpeg",
+
   ]);
 
+
+
   const safeParse = (value) => {
+
     try {
+
       return JSON.parse(value);
+
     } catch {
+
       return null;
+
     }
+
   };
 
-  const getAuthToken = () => {
-    try {
-      const token = localStorage.getItem("token");
-      return typeof token === "string" && token.trim()
-        ? token.trim()
-        : "";
-    } catch {
-      return "";
-    }
-  };
+
+
+  // =====================================================
+  // 🔐 AUTHENTIFICATION ADMIN PAR COOKIE HTTPONLY
+  // =====================================================
+
+  axios.defaults.withCredentials = true;
 
   const getStoredAdmin = () => {
     try {
@@ -126,7 +218,6 @@ function AdminSocial() {
 
   const clearAdminSession = () => {
     try {
-      localStorage.removeItem("token");
       localStorage.removeItem("admin");
     } catch {
       // Ne pas bloquer l'application si le stockage est indisponible.
@@ -140,10 +231,9 @@ function AdminSocial() {
   };
 
   const requireAdminSession = () => {
-    const token = getAuthToken();
     const admin = getStoredAdmin();
 
-    if (!token || !admin) {
+    if (!admin) {
       clearAdminSession();
       redirectToAdminLogin();
       return false;
@@ -155,6 +245,7 @@ function AdminSocial() {
   const api = axios.create({
     baseURL: API_URL,
     timeout: API_TIMEOUT,
+    withCredentials: true,
     headers: {
       Accept: "application/json",
     },
@@ -162,19 +253,10 @@ function AdminSocial() {
 
   api.interceptors.request.use(
     (config) => {
-      const token = getAuthToken();
-
-      if (!token) {
-        clearAdminSession();
-        redirectToAdminLogin();
-        return Promise.reject(
-          new Error("Session administrateur absente.")
-        );
-      }
-
+      if (!config) return config;
+      config.withCredentials = true;
       config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-
+      config.headers.Accept = "application/json";
       return config;
     },
     (requestError) => Promise.reject(requestError)
@@ -195,141 +277,278 @@ function AdminSocial() {
   );
 
   const normalizeText = (value, maxLength) =>
+
     String(value ?? "")
+
       .trim()
+
       .slice(0, maxLength);
 
+
+
   const normalizeSocialPosts = (data) => {
+
     if (Array.isArray(data)) {
+
       return data;
+
     }
+
+
 
     if (Array.isArray(data?.posts)) {
+
       return data.posts;
+
     }
 
+
+
     return [];
+
   };
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🎬 VIDÉO
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const [video, setVideo] =
 
+
+
     useState(null);
+
+
+
+
 
 
 
   const [videoPreview, setVideoPreview] =
 
+
+
     useState("");
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📝 CONTENU
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const [title, setTitle] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [description, setDescription] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [hashtags, setHashtags] =
 
+
+
     useState("");
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📱 PLATEFORMES
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const [selectedPlatforms, setSelectedPlatforms] =
 
+
+
     useState([]);
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🚀 PUBLICATION
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const [publishing, setPublishing] =
 
+
+
     useState(false);
+
+
+
+
 
 
 
   const [published, setPublished] =
 
+
+
     useState(false);
+
+
+
+
 
 
 
   const [error, setError] =
 
+
+
     useState("");
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📚 HISTORIQUE
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const [socialPosts, setSocialPosts] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [loadingPosts, setLoadingPosts] =
 
+
+
     useState(true);
 
 
 
+
+
+
+
   const [postsError, setPostsError] =
+
+
 
     useState("");
 
@@ -337,15 +556,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📁 INPUT VIDÉO
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const fileInputRef =
+
+
 
     useRef(null);
 
@@ -353,11 +588,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📱 PLATEFORMES
 
+
+
   // =====================================================
+
+
+
+
 
 
 
@@ -365,59 +614,119 @@ function AdminSocial() {
 
 
 
+
+
+
+
     {
+
+
 
       id: "facebook",
 
+
+
       name: "Facebook",
+
+
 
       icon: <FaFacebook />,
 
+
+
       color: "#1877F2",
+
+
 
     },
 
 
 
+
+
+
+
     {
+
+
 
       id: "instagram",
 
+
+
       name: "Instagram",
+
+
 
       icon: <FaInstagram />,
 
+
+
       color: "#E1306C",
+
+
 
     },
 
 
 
+
+
+
+
     {
+
+
 
       id: "tiktok",
 
+
+
       name: "TikTok",
+
+
 
       icon: <FaTiktok />,
 
+
+
       color: "#111111",
 
+
+
     },
+
+
+
+
 
 
 
     {
 
+
+
       id: "youtube",
+
+
 
       name: "YouTube",
 
+
+
       icon: <FaYoutube />,
+
+
 
       color: "#FF0000",
 
+
+
     },
+
+
+
+
 
 
 
@@ -427,15 +736,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📚 CHARGER HISTORIQUE
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   useEffect(() => {
+
+
+
+
 
 
 
@@ -445,7 +772,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     const loadSocialPosts = async () => {
+
+
+
+
 
 
 
@@ -453,7 +790,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         setLoadingPosts(true);
+
+
+
+
 
 
 
@@ -463,11 +808,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
         console.log(
+
+
 
           "📚 Chargement des publications sociales..."
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -475,7 +836,15 @@ function AdminSocial() {
 
         const response =
 
+
+
           await api.get("/api/social");
+
+
+
+
+
+
 
 
 
@@ -483,9 +852,15 @@ function AdminSocial() {
 
         console.log(
 
+
+
           "📱 SOCIAL POSTS chargés :",
 
+
+
           normalizeSocialPosts(response.data).length
+
+
 
         );
 
@@ -493,11 +868,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
         if (cancelled) {
+
+
 
           return;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -505,17 +896,33 @@ function AdminSocial() {
 
         if (
 
+
+
           response.data?.success
+
+
 
         ) {
 
 
 
+
+
+
+
           setSocialPosts(
+
+
 
             normalizeSocialPosts(response.data)
 
+
+
           );
+
+
+
+
 
 
 
@@ -523,7 +930,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           setSocialPosts([]);
+
+
+
+
 
 
 
@@ -531,7 +946,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -539,11 +962,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
         if (cancelled) {
+
+
 
           return;
 
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -551,11 +988,23 @@ function AdminSocial() {
 
         console.error(
 
+
+
           "❌ CHARGEMENT SOCIAL POSTS :",
+
+
 
           error
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -563,15 +1012,29 @@ function AdminSocial() {
 
         setPostsError(
 
+
+
           error?.response?.data?.message ||
 
+
+
           "Impossible de récupérer les publications."
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -579,7 +1042,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         if (!cancelled) {
+
+
+
+
 
 
 
@@ -587,7 +1058,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -595,7 +1074,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
     };
+
+
+
+
+
+
 
 
 
@@ -607,7 +1096,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     return () => {
+
+
+
+
 
 
 
@@ -615,7 +1114,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -625,11 +1132,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🎬 SÉLECTION VIDÉO
 
+
+
   // =====================================================
+
+
+
+
 
 
 
@@ -637,7 +1158,13 @@ function AdminSocial() {
 
 
 
+
+
+
+
     const file =
+
+
 
       e.target.files?.[0];
 
@@ -645,11 +1172,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     if (!file) {
+
+
 
       return;
 
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -659,33 +1202,69 @@ function AdminSocial() {
 
 
 
+
+
+
+
     setPublished(false);
 
 
 
 
 
+
+
+
+
+
+
     // ===================================================
+
+
 
     // TYPE
 
+
+
     // ===================================================
 
 
 
+
+
+
+
     if (
+
+
 
       !file.type.startsWith("video/")
 
+
+
     ) {
+
+
+
+
 
 
 
       setError(
 
+
+
         "Veuillez sélectionner une vidéo valide."
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -695,9 +1274,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
         fileInputRef.current.value =
 
+
+
           "";
+
+
+
+
 
 
 
@@ -707,7 +1296,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       return;
+
+
+
+
 
 
 
@@ -717,29 +1316,63 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     // ===================================================
+
+
 
     // TAILLE
 
+
+
     // ===================================================
+
+
+
+
 
 
 
     if (
 
+
+
       file.size>
 
+
+
       200 * 1024 * 1024
+
+
 
     ) {
 
 
 
+
+
+
+
       setError(
+
+
 
         "La vidéo ne doit pas dépasser 100 MB."
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -749,9 +1382,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
         fileInputRef.current.value =
 
+
+
           "";
+
+
+
+
 
 
 
@@ -761,7 +1404,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       return;
+
+
+
+
 
 
 
@@ -771,11 +1424,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     // ===================================================
+
+
 
     // SUPPRIMER ANCIEN APERÇU
 
+
+
     // ===================================================
+
+
+
+
 
 
 
@@ -783,11 +1450,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
       URL.revokeObjectURL(
+
+
 
         videoPreview
 
+
+
       );
+
+
+
+
 
 
 
@@ -797,13 +1476,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     const preview =
+
+
 
       URL.createObjectURL(
 
+
+
         file
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -813,11 +1510,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
     setVideoPreview(
+
+
 
       preview
 
+
+
     );
+
+
+
+
 
 
 
@@ -827,11 +1536,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🗑️ SUPPRIMER VIDÉO
 
+
+
   // =====================================================
+
+
+
+
 
 
 
@@ -839,19 +1562,41 @@ function AdminSocial() {
 
 
 
+
+
+
+
     if (videoPreview) {
+
+
+
+
 
 
 
       URL.revokeObjectURL(
 
+
+
         videoPreview
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -861,7 +1606,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     setVideoPreview("");
+
+
+
+
 
 
 
@@ -869,7 +1622,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
     setError("");
+
+
+
+
+
+
 
 
 
@@ -879,13 +1642,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
       fileInputRef.current.value =
+
+
 
         "";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -895,43 +1672,89 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📱 PLATEFORME
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const togglePlatform = (
 
+
+
     platform
+
+
 
   ) => {
 
 
 
+
+
+
+
     setSelectedPlatforms(
+
+
 
       (prev) => {
 
 
 
+
+
+
+
         if (
 
+
+
           prev.includes(platform)
+
+
 
         ) {
 
 
 
+
+
+
+
           return prev.filter(
+
+
 
             (item) =>
 
+
+
               item !== platform
 
+
+
           );
+
+
+
+
 
 
 
@@ -941,19 +1764,43 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
         return [
+
+
 
           ...prev,
 
+
+
           platform,
+
+
 
         ];
 
 
 
+
+
+
+
       }
 
+
+
     );
+
+
+
+
+
+
 
 
 
@@ -963,37 +1810,73 @@ function AdminSocial() {
 
 
 
+
+
+
+
   };
 
 
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // #️⃣ HASHTAGS
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const prepareHashtags = () => {
 
+
+
     const normalized = normalizeText(
+
       hashtags,
+
       MAX_HASHTAGS_LENGTH
+
     );
 
+
+
     return normalized
+
       .split(/\s+/)
+
       .map((tag) => tag.trim())
+
       .filter(Boolean)
+
       .map((tag) =>
+
         tag.startsWith("#")
+
           ? tag.slice(0, 101)
+
           : `#${tag.slice(0, 100)}`
+
       )
-      .filter((tag) => /^#[\p{L}\p{N}_-]+$/u.test(tag));
+
+      .filter((tag) => /^#[**\p**{L}**\p**{N}_-]+$/u.test(tag));
+
+
 
   };
 
@@ -1001,11 +1884,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🚀 PUBLICATION
 
+
+
   // =====================================================
+
+
+
+
 
 
 
@@ -1013,7 +1910,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     setError("");
+
+
+
+
 
 
 
@@ -1023,11 +1928,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     // ===================================================
+
+
 
     // VIDÉO
 
+
+
     // ===================================================
+
+
+
+
 
 
 
@@ -1035,15 +1954,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
       setError(
 
+
+
         "Veuillez sélectionner une vidéo avant de publier."
+
+
 
       );
 
 
 
+
+
+
+
       return;
+
+
+
+
 
 
 
@@ -1053,27 +1988,57 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
     // ===================================================
+
+
 
     // PLATEFORMES
 
+
+
     // ===================================================
+
+
+
+
 
 
 
     if (
 
+
+
       selectedPlatforms.length === 0
+
+
 
     ) {
 
 
 
+
+
+
+
       setError(
+
+
 
         "Sélectionnez au moins un réseau social."
 
+
+
       );
+
+
+
+
 
 
 
@@ -1081,47 +2046,97 @@ function AdminSocial() {
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
 
 
     const allowedPlatformIds = new Set(
+
       platforms.map((platform) => platform.id)
+
     );
+
+
 
     const invalidPlatform = selectedPlatforms.some(
+
       (platform) => !allowedPlatformIds.has(platform)
+
     );
 
+
+
     if (invalidPlatform) {
+
       setError("Réseau social invalide.");
+
       return;
+
     }
+
+
 
     if (title.length > MAX_TITLE_LENGTH) {
+
       setError(
+
         `Le titre ne peut pas dépasser ${MAX_TITLE_LENGTH} caractères.`
+
       );
+
       return;
+
     }
+
+
 
     if (description.length > MAX_DESCRIPTION_LENGTH) {
+
       setError(
+
         `La description ne peut pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères.`
+
       );
+
       return;
+
     }
+
+
 
     if (hashtags.length > MAX_HASHTAGS_LENGTH) {
+
       setError(
+
         `Les hashtags ne peuvent pas dépasser ${MAX_HASHTAGS_LENGTH} caractères.`
+
       );
+
       return;
+
     }
 
+
+
     setPublishing(true);
+
+
+
+
+
+
 
 
 
@@ -1131,15 +2146,29 @@ function AdminSocial() {
 
 
 
+
+
+
+
       // =================================================
+
+
 
       // 1️⃣ FORM DATA
 
+
+
       // =================================================
+
+
+
+
 
 
 
       const formData =
+
+
 
         new FormData();
 
@@ -1147,11 +2176,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       formData.append(
+
+
 
         "video",
 
+
+
         video
+
+
 
       );
 
@@ -1159,25 +2200,51 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       console.log(
+
+
 
         "=========================================="
 
+
+
       );
 
 
 
+
+
+
+
       console.log(
+
+
 
         "🎬 SOCIAL STUDIO"
 
+
+
       );
+
+
+
+
 
 
 
       console.log(
 
+
+
         "🎬 Upload de la vidéo..."
+
+
 
       );
 
@@ -1185,27 +2252,55 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 2️⃣ CLOUDINARY
 
+
+
       // =================================================
+
+
+
+
 
 
 
       const uploadResponse =
 
+
+
         await api.post(
+
+
 
           "/api/social/upload-video",
 
+
+
           formData,
+
+
 
           {
 
+
+
             timeout: VIDEO_UPLOAD_TIMEOUT,
 
+
+
           }
+
+
 
         );
 
@@ -1213,9 +2308,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       console.log(
 
+
+
         "✅ UPLOAD DE LA VIDÉO RÉUSSI"
+
+
 
       );
 
@@ -1223,15 +2328,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       if (
 
+
+
         !uploadResponse.data?.success
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
+
+
+
+
 
 
 
@@ -1239,7 +2362,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           "La vidéo n'a pas pu être uploadée."
+
+
+
+
 
 
 
@@ -1247,7 +2378,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -1255,7 +2396,15 @@ function AdminSocial() {
 
       const uploadedVideo =
 
+
+
         uploadResponse.data?.video;
+
+
+
+
+
+
 
 
 
@@ -1263,17 +2412,33 @@ function AdminSocial() {
 
       if (
 
+
+
         !uploadedVideo?.url
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
+
+
 
           "Cloudinary n'a pas retourné l'URL de la vidéo."
 
+
+
         );
+
+
+
+
 
 
 
@@ -1283,9 +2448,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       console.log(
 
+
+
         "☁️ VIDÉO CLOUDINARY REÇUE"
+
+
 
       );
 
@@ -1293,15 +2468,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 3️⃣ HASHTAGS
 
+
+
       // =================================================
+
+
+
+
 
 
 
       const hashtagArray =
+
+
 
         prepareHashtags();
 
@@ -1309,11 +2500,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 4️⃣ PLATEFORMES
 
+
+
       // =================================================
+
+
+
+
 
 
 
@@ -1321,43 +2526,87 @@ function AdminSocial() {
 
 
 
+
+
+
+
         facebook:
+
+
 
           selectedPlatforms.includes(
 
+
+
             "facebook"
 
+
+
           ),
+
+
+
+
 
 
 
         instagram:
 
+
+
           selectedPlatforms.includes(
+
+
 
             "instagram"
 
+
+
           ),
+
+
+
+
 
 
 
         tiktok:
 
+
+
           selectedPlatforms.includes(
+
+
 
             "tiktok"
 
+
+
           ),
+
+
+
+
 
 
 
         youtube:
 
+
+
           selectedPlatforms.includes(
+
+
 
             "youtube"
 
+
+
           ),
+
+
+
+
 
 
 
@@ -1367,11 +2616,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       console.log(
+
+
 
         "📱 PLATEFORMES :",
 
+
+
         platformsData
+
+
 
       );
 
@@ -1379,19 +2640,43 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 5️⃣ MONGODB
 
+
+
       // =================================================
+
+
+
+
 
 
 
       console.log(
 
+
+
         "💾 Enregistrement SocialPost..."
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1399,50 +2684,101 @@ function AdminSocial() {
 
       const postResponse =
 
+
+
         await api.post(
+
+
 
           "/api/social",
 
+
+
           {
+
+
 
             videoUrl:
 
+
+
               uploadedVideo.url,
+
+
 
             videoPublicId:
 
+
+
               uploadedVideo.publicId ||
 
+
+
               null,
+
+
 
             thumbnailUrl:
 
+
+
               uploadedVideo.thumbnailUrl ||
+
+
 
               null,
 
+
+
             title:
+
+
 
               normalizeText(title, MAX_TITLE_LENGTH),
 
+
+
             description:
 
+
+
               normalizeText(
+
                 description,
+
                 MAX_DESCRIPTION_LENGTH
+
               ),
+
+
 
             hashtags:
 
+
+
               hashtagArray,
+
+
 
             platforms:
 
+
+
               platformsData,
+
+
 
           }
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -1450,7 +2786,11 @@ function AdminSocial() {
 
       console.log(
 
+
+
         "✅ SOCIAL POST ENREGISTRÉ"
+
+
 
       );
 
@@ -1458,11 +2798,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       if (
+
+
 
         !postResponse.data?.success
 
+
+
       ) {
+
+
+
+
 
 
 
@@ -1470,7 +2824,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           postResponse.data?.message ||
+
+
+
+
 
 
 
@@ -1478,7 +2840,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         );
+
+
+
+
 
 
 
@@ -1488,17 +2858,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 6️⃣ AJOUT IMMÉDIAT À L'HISTORIQUE
 
+
+
       // =================================================
+
+
+
+
 
 
 
       const createdPost =
 
+
+
         postResponse.data?.post;
+
+
+
+
+
+
 
 
 
@@ -1508,9 +2900,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
         setSocialPosts(
 
+
+
           (prev) => [
+
+
+
+
 
 
 
@@ -1518,13 +2920,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
             ...prev,
+
+
+
+
 
 
 
           ]
 
+
+
         );
+
+
+
+
 
 
 
@@ -1534,11 +2950,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       // =================================================
+
+
 
       // 7️⃣ SUCCÈS
 
+
+
       // =================================================
+
+
+
+
 
 
 
@@ -1548,11 +2978,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       console.log(
+
+
 
         "🎉 PUBLICATION ENREGISTRÉE AVEC SUCCÈS"
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1560,11 +3006,23 @@ function AdminSocial() {
 
       console.log(
 
+
+
         "🆔 SOCIAL POST :",
+
+
 
         createdPost?._id
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1574,15 +3032,29 @@ function AdminSocial() {
 
 
 
+
+
+
+
     catch (error) {
+
+
+
+
 
 
 
       console.error(
 
+
+
         "❌ SOCIAL PUBLISH ERROR :",
 
+
+
         error
+
+
 
       );
 
@@ -1590,7 +3062,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       let message =
+
+
 
         "Une erreur est survenue pendant l'envoi de la vidéo.";
 
@@ -1598,39 +3078,83 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       if (
 
+
+
         error?.response?.data?.message
+
+
 
       ) {
 
 
 
+
+
+
+
         message =
+
+
 
           error.response.data.message;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
       else if (
 
+
+
         error?.message
+
+
 
       ) {
 
 
 
+
+
+
+
         message =
+
+
 
           error.message;
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -1640,7 +3164,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1648,11 +3180,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
       setPublishing(false);
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1662,11 +3206,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🧹 NETTOYAGE URL VIDÉO
 
+
+
   // =====================================================
+
+
+
+
 
 
 
@@ -1674,7 +3232,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     return () => {
+
+
+
+
 
 
 
@@ -1682,11 +3248,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
         URL.revokeObjectURL(
+
+
 
           videoPreview
 
+
+
         );
+
+
+
+
 
 
 
@@ -1694,7 +3272,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     };
+
+
+
+
 
 
 
@@ -1704,19 +3290,41 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 🏷️ LABEL STATUT
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const getStatusLabel = (
 
+
+
     status
 
+
+
   ) => {
+
+
+
+
 
 
 
@@ -1724,45 +3332,91 @@ function AdminSocial() {
 
 
 
+
+
+
+
       case "published":
+
+
 
         return "Publié";
 
 
 
+
+
+
+
       case "publishing":
+
+
 
         return "Publication";
 
 
 
+
+
+
+
       case "uploading":
+
+
 
         return "Upload";
 
 
 
+
+
+
+
       case "partial":
+
+
 
         return "Partiellement publié";
 
 
 
+
+
+
+
       case "failed":
+
+
 
         return "Échec";
 
 
 
+
+
+
+
       case "draft":
 
+
+
       default:
+
+
 
         return "Brouillon";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1772,27 +3426,59 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // 📅 DATE
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   const formatDate = (
 
+
+
     date
+
+
 
   ) => {
 
 
 
+
+
+
+
     if (!date) {
+
+
 
       return "Date inconnue";
 
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -1802,27 +3488,55 @@ function AdminSocial() {
 
 
 
+
+
+
+
       return new Date(
+
+
 
         date
 
+
+
       ).toLocaleString(
+
+
 
         "fr-FR",
 
+
+
         {
+
+
 
           dateStyle: "medium",
 
+
+
           timeStyle: "short",
 
+
+
         }
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1830,11 +3544,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
       return "Date inconnue";
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1844,15 +3570,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
   // =====================================================
+
+
 
   // RENDER
 
+
+
   // =====================================================
+
+
+
+
 
 
 
   return (
+
+
+
+
 
 
 
@@ -1862,11 +3606,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
       {/* =================================================
+
+
 
           HEADER
 
+
+
       ================================================= */}
+
+
+
+
 
 
 
@@ -1874,7 +3632,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         <div>
+
+
+
+
 
 
 
@@ -1882,11 +3648,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <FaPaperPlane />
 
 
 
+
+
+
+
             SOCIAL STUDIO
+
+
+
+
 
 
 
@@ -1896,9 +3674,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
           <h1>
 
+
+
             Centre de publication
+
+
 
           </h1>
 
@@ -1906,17 +3694,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
           <p>
+
+
 
             Publiez vos contenus KONAN SHOPPING
 
+
+
             sur plusieurs réseaux depuis un seul espace.
+
+
 
           </p>
 
 
 
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -1926,11 +3736,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <FaVideo />
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1942,11 +3764,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
       {/* =================================================
+
+
 
           ERREUR
 
+
+
       ================================================= */}
+
+
+
+
 
 
 
@@ -1954,7 +3792,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         <div className="social-alert error">
+
+
+
+
 
 
 
@@ -1962,15 +3808,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <span>
 
+
+
             {error}
+
+
 
           </span>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1982,11 +3844,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
       {/* =================================================
+
+
 
           SUCCÈS
 
+
+
       ================================================= */}
+
+
+
+
 
 
 
@@ -1994,7 +3872,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         <div className="social-alert success">
+
+
+
+
 
 
 
@@ -2002,15 +3888,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <span>
 
+
+
             La vidéo a été enregistrée avec succès.
+
+
 
           </span>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -2022,11 +3924,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
       {/* =================================================
+
+
 
           CRÉATION
 
+
+
       ================================================= */}
+
+
+
+
 
 
 
@@ -2036,11 +3954,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
         {/* =================================================
+
+
 
             GAUCHE
 
+
+
         ================================================= */}
+
+
+
+
 
 
 
@@ -2050,11 +3982,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
           {/* =================================================
+
+
 
               VIDÉO
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -2062,7 +4008,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-card-header">
+
+
+
+
 
 
 
@@ -2070,19 +4024,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <h2>
 
+
+
                   Votre contenu
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                   Ajoutez la vidéo que vous souhaitez publier.
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -2090,11 +4064,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <FaVideo />
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2104,19 +4092,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <button
+
+
 
                 type="button"
 
+
+
                 className="video-upload-zone"
+
+
 
                 onClick={() =>
 
+
+
                   fileInputRef.current?.click()
+
+
 
                 }
 
+
+
              >
+
+
+
+
 
 
 
@@ -2124,7 +4132,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   <FaCloudUploadAlt />
+
+
+
+
 
 
 
@@ -2134,9 +4150,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                 <h3>
 
+
+
                   Importer une vidéo
+
+
 
                 </h3>
 
@@ -2144,9 +4170,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                 <p>
 
+
+
                   Cliquez pour sélectionner votre vidéo
+
+
 
                 </p>
 
@@ -2154,11 +4190,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                 <span>
+
+
 
                   MP4, MOV, AVI • 100 MB maximum
 
+
+
                 </span>
+
+
+
+
 
 
 
@@ -2166,7 +4216,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             ) : (
+
+
+
+
 
 
 
@@ -2174,17 +4232,37 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <video
+
+
 
                   src={videoPreview}
 
+
+
                   controls
+
+
 
                   playsInline
 
+
+
                   className="social-video-preview"
 
+
+
                 />
+
+
+
+
+
+
 
 
 
@@ -2194,33 +4272,67 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   <div>
+
+
+
+
 
 
 
                     <strong>
 
+
+
                       {video.name}
+
+
 
                     </strong>
 
 
 
+
+
+
+
                     <span>
+
+
 
                       {(
 
+
+
                         video.size /
+
+
 
                         1024 /
 
+
+
                         1024
+
+
 
                       ).toFixed(2)}
 
+
+
                       {" "}MB
 
+
+
                     </span>
+
+
+
+
 
 
 
@@ -2230,15 +4342,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                   <button
+
+
 
                     type="button"
 
+
+
                     onClick={removeVideo}
+
+
 
                     className="remove-video-button"
 
+
+
                  >
+
+
+
+
 
 
 
@@ -2246,7 +4376,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                     Supprimer
+
+
+
+
 
 
 
@@ -2254,11 +4392,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 </div>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -2268,27 +4418,57 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
             <input
+
+
 
               ref={fileInputRef}
 
+
+
               type="file"
+
+
 
               accept="video/*"
 
+
+
               onChange={
+
+
 
                 handleVideoChange
 
+
+
               }
+
+
 
               style={{
 
+
+
                 display: "none",
+
+
 
               }}
 
+
+
             />
+
+
+
+
 
 
 
@@ -2300,11 +4480,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
           {/* =================================================
+
+
 
               INFORMATIONS
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -2312,7 +4508,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-card-header">
+
+
+
+
 
 
 
@@ -2320,19 +4524,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <h2>
 
+
+
                   Informations de publication
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                   Préparez le contenu qui accompagnera votre vidéo.
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -2340,11 +4564,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <FaImage />
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2354,13 +4592,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-field">
+
+
+
+
 
 
 
               <label>
 
+
+
                 Titre
+
+
 
               </label>
 
@@ -2368,27 +4618,59 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
               <input
+
+
 
                 type="text"
 
+
+
                 value={title}
+
+
 
                 onChange={(e) =>
 
+
+
                   setTitle(
+
+
 
                     e.target.value
 
+
+
                   )
+
+
 
                 }
 
+
+
                 placeholder="Ex : Nouvelle collection disponible 🔥"
+
+
 
                 maxLength={150}
 
+
+
               />
+
+
+
+
+
+
 
 
 
@@ -2398,7 +4680,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 {title.length}/150
+
+
+
+
 
 
 
@@ -2406,7 +4696,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2416,13 +4716,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-field">
+
+
+
+
 
 
 
               <label>
 
+
+
                 Description
+
+
 
               </label>
 
@@ -2430,27 +4742,59 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
               <textarea
+
+
 
                 value={description}
 
+
+
                 onChange={(e) =>
+
+
 
                   setDescription(
 
+
+
                     e.target.value
+
+
 
                   )
 
+
+
                 }
+
+
 
                 placeholder="Écrivez la description de votre publication..."
 
+
+
                 rows={6}
+
+
 
                 maxLength={2200}
 
+
+
               />
+
+
+
+
+
+
 
 
 
@@ -2460,7 +4804,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 {description.length}/2200
+
+
+
+
 
 
 
@@ -2468,7 +4820,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2478,7 +4840,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-field">
+
+
+
+
 
 
 
@@ -2486,11 +4856,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <FaHashtag />
 
 
 
+
+
+
+
                 Hashtags
+
+
+
+
 
 
 
@@ -2500,23 +4882,47 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
               <input
+
+
 
                 type="text"
 
+
+
                 value={hashtags}
+
+
 
                 onChange={(e) =>
 
+
+
                   setHashtags(
+
+
 
                     e.target.value
 
+
+
                   )
+
+
 
                 }
 
+
+
                 placeholder="#KonanShopping #Cameroun #Shopping"
+
+
 
               />
 
@@ -2524,15 +4930,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
               <small>
 
+
+
                 Séparez les hashtags par des espaces.
+
+
 
               </small>
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -2544,11 +4968,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
           {/* =================================================
+
+
 
               APERÇU
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -2556,7 +4996,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-card-header">
+
+
+
+
 
 
 
@@ -2564,19 +5012,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <h2>
 
+
+
                   Aperçu
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                   Vérifiez votre contenu avant publication.
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -2584,11 +5052,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <FaCheckCircle />
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2598,19 +5080,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
               {videoPreview ? (
+
+
+
+
 
 
 
                 <video
 
+
+
                   src={videoPreview}
+
+
 
                   controls
 
+
+
                   playsInline
 
+
+
                 />
+
+
+
+
 
 
 
@@ -2618,7 +5120,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <div className="preview-empty">
+
+
+
+
 
 
 
@@ -2626,11 +5136,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   <span>
+
+
 
                     Votre vidéo apparaîtra ici
 
+
+
                   </span>
+
+
+
+
 
 
 
@@ -2638,7 +5160,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
               )}
+
+
+
+
+
+
 
 
 
@@ -2648,13 +5180,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <strong>
+
+
+
+
 
 
 
                   {title ||
 
+
+
                     "Titre de votre publication"}
+
+
+
+
 
 
 
@@ -2664,17 +5210,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                 <p>
+
+
+
+
 
 
 
                   {description ||
 
+
+
                     "Votre description apparaîtra ici..."}
 
 
 
+
+
+
+
                 </p>
+
+
+
+
+
+
 
 
 
@@ -2684,7 +5252,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   <div className="preview-hashtags">
+
+
+
+
 
 
 
@@ -2692,7 +5268,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   </div>
+
+
+
+
 
 
 
@@ -2700,7 +5284,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -2708,7 +5300,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -2720,11 +5320,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
         {/* =================================================
+
+
 
             DROITE
 
+
+
         ================================================= */}
+
+
+
+
 
 
 
@@ -2734,11 +5350,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
           {/* =================================================
+
+
 
               RÉSEAUX
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -2746,7 +5376,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-card-header">
+
+
+
+
 
 
 
@@ -2754,19 +5392,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <h2>
 
+
+
                   Réseaux sociaux
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                   Où souhaitez-vous publier ?
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -2774,7 +5432,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2784,19 +5452,41 @@ function AdminSocial() {
 
 
 
+
+
+
+
               {platforms.map(
+
+
 
                 (platform) => {
 
 
 
+
+
+
+
                   const selected =
+
+
 
                     selectedPlatforms.includes(
 
+
+
                       platform.id
 
+
+
                     );
+
+
+
+
+
+
 
 
 
@@ -2806,53 +5496,107 @@ function AdminSocial() {
 
 
 
+
+
+
+
                     <button
+
+
 
                       type="button"
 
+
+
                       key={
+
+
 
                         platform.id
 
+
+
                       }
+
+
 
                       onClick={() =>
 
+
+
                         togglePlatform(
+
+
 
                           platform.id
 
+
+
                         )
+
+
 
                       }
 
+
+
                       className={`platform-card ${
+
+
 
                         selected
 
+
+
                           ? "selected"
+
+
 
                           : ""
 
+
+
                       }`}
+
+
 
                    >
 
 
 
+
+
+
+
                       <div
+
+
 
                         className="platform-icon"
 
+
+
                         style={{
+
+
 
                           color:
 
+
+
                             platform.color,
+
+
 
                         }}
 
+
+
                      >
+
+
+
+
 
 
 
@@ -2860,7 +5604,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       </div>
+
+
+
+
+
+
 
 
 
@@ -2870,11 +5624,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         <strong>
+
+
 
                           {platform.name}
 
+
+
                         </strong>
+
+
+
+
 
 
 
@@ -2882,11 +5648,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           {selected
+
+
 
                             ? "Sélectionné"
 
+
+
                             : "Non sélectionné"}
+
+
+
+
 
 
 
@@ -2894,7 +5672,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       </div>
+
+
+
+
+
+
 
 
 
@@ -2902,17 +5690,33 @@ function AdminSocial() {
 
                       <div
 
+
+
                         className={`platform-check ${
+
+
 
                           selected
 
+
+
                             ? "active"
+
+
 
                             : ""
 
+
+
                         }`}
 
+
+
                      >
+
+
+
+
 
 
 
@@ -2920,7 +5724,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           <FaCheckCircle />
+
+
+
+
 
 
 
@@ -2928,7 +5740,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       </div>
+
+
+
+
 
 
 
@@ -2936,17 +5756,37 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   );
+
+
+
+
 
 
 
                 }
 
+
+
               )}
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -2956,7 +5796,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
               {selectedPlatforms.length}
+
+
+
+
 
 
 
@@ -2964,11 +5812,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
               {selectedPlatforms.length> 1
+
+
 
                 ? "x"
 
+
+
                 : ""}
+
+
+
+
 
 
 
@@ -2976,15 +5836,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
               {selectedPlatforms.length> 1
 
+
+
                 ? "s"
+
+
 
                 : ""}
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -2996,11 +5872,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
           {/* =================================================
+
+
 
               PUBLICATION
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -3008,7 +5900,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-card-header">
+
+
+
+
 
 
 
@@ -3016,19 +5916,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <h2>
 
+
+
                   Publication
+
+
 
                 </h2>
 
 
 
+
+
+
+
                 <p>
+
+
 
                   Enregistrez votre contenu.
 
+
+
                 </p>
+
+
+
+
 
 
 
@@ -3036,11 +5956,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <FaClock />
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3050,7 +5984,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <div className="publish-mode-icon">
+
+
+
+
 
 
 
@@ -3058,7 +6000,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
               </div>
+
+
+
+
+
+
 
 
 
@@ -3068,25 +6020,51 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <strong>
 
+
+
                   Préparation de la publication
+
+
 
                 </strong>
 
 
 
+
+
+
+
                 <span>
+
+
 
                   La vidéo sera d'abord enregistrée
 
+
+
                   dans votre espace sécurisé.
+
+
 
                 </span>
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -3096,25 +6074,53 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
             <button
+
+
 
               type="button"
 
+
+
               className="publish-button"
+
+
 
               onClick={
 
+
+
                 handlePublish
 
+
+
               }
+
+
 
               disabled={
 
+
+
                 publishing
+
+
 
               }
 
+
+
            >
+
+
+
+
 
 
 
@@ -3122,7 +6128,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <>
+
+
+
+
 
 
 
@@ -3130,11 +6144,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   Upload en cours...
 
 
 
+
+
+
+
                 </>
+
+
+
+
 
 
 
@@ -3142,7 +6168,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                 <>
+
+
+
+
 
 
 
@@ -3150,7 +6184,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   Enregistrer la publication
+
+
+
+
 
 
 
@@ -3158,7 +6200,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
               )}
+
+
+
+
 
 
 
@@ -3166,7 +6216,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
           </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3176,9 +6238,17 @@ function AdminSocial() {
 
           {/* =================================================
 
+
+
               SÉCURITÉ
 
+
+
           ================================================= */}
+
+
+
+
 
 
 
@@ -3186,7 +6256,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <FaCheckCircle />
+
+
+
+
 
 
 
@@ -3194,21 +6272,43 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <strong>
 
+
+
                 Publication sécurisée
+
+
 
               </strong>
 
 
 
+
+
+
+
               <span>
+
+
 
                 Vos contenus restent contrôlés depuis
 
+
+
                 votre espace administrateur.
 
+
+
               </span>
+
+
+
+
 
 
 
@@ -3216,11 +6316,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
           </div>
 
 
 
+
+
+
+
         </aside>
+
+
+
+
 
 
 
@@ -3232,11 +6344,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
       {/* =====================================================
+
+
 
           📚 HISTORIQUE
 
+
+
       ===================================================== */}
+
+
+
+
 
 
 
@@ -3246,7 +6374,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
         <div className="social-history-header">
+
+
+
+
 
 
 
@@ -3254,7 +6392,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <div className="social-history-title">
+
+
+
+
 
 
 
@@ -3262,11 +6408,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
               <h2>
+
+
 
                 Publications récentes
 
+
+
               </h2>
+
+
+
+
 
 
 
@@ -3276,17 +6434,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
             <p>
+
+
 
               Retrouvez ici les contenus enregistrés
 
+
+
               dans votre Social Studio.
+
+
 
             </p>
 
 
 
+
+
+
+
           </div>
+
+
+
+
+
+
 
 
 
@@ -3296,11 +6476,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
             {socialPosts.length}
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -3312,11 +6504,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
         {/* =================================================
+
+
 
             CHARGEMENT
 
+
+
         ================================================= */}
+
+
+
+
 
 
 
@@ -3324,7 +6532,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <div className="social-history-loading">
+
+
+
+
 
 
 
@@ -3332,11 +6548,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
             Chargement des publications...
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -3344,7 +6572,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <div className="social-history-empty error">
+
+
+
+
 
 
 
@@ -3352,11 +6588,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
             {postsError}
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -3364,7 +6612,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
           <div className="social-history-empty">
+
+
+
+
 
 
 
@@ -3372,19 +6628,39 @@ function AdminSocial() {
 
 
 
+
+
+
+
             <strong>
 
+
+
               Aucune publication
+
+
 
             </strong>
 
 
 
+
+
+
+
             <span>
+
+
 
               Vos prochaines publications apparaîtront ici.
 
+
+
             </span>
+
+
+
+
 
 
 
@@ -3392,7 +6668,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         ) : (
+
+
+
+
 
 
 
@@ -3400,17 +6684,33 @@ function AdminSocial() {
 
 
 
+
+
+
+
             {socialPosts.map(
+
+
 
               (post) => (
 
 
 
+
+
+
+
                 <div
+
+
 
                   className="social-post-item"
 
+
+
                   key={post._id}
+
+
 
                >
 
@@ -3418,11 +6718,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                   {/* =========================================
+
+
 
                       VIDÉO
 
+
+
                   ========================================= */}
+
+
+
+
 
 
 
@@ -3430,25 +6744,51 @@ function AdminSocial() {
 
 
 
+
+
+
+
                     {post.videoUrl ? (
+
+
+
+
 
 
 
                       <video
 
+
+
                         src={
+
+
 
                           post.videoUrl
 
+
+
                         }
+
+
 
                         muted
 
+
+
                         playsInline
+
+
 
                         controls
 
+
+
                       />
+
+
+
+
 
 
 
@@ -3456,7 +6796,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       <div className="social-post-no-video">
+
+
+
+
 
 
 
@@ -3464,11 +6812,23 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       </div>
 
 
 
+
+
+
+
                     )}
+
+
+
+
 
 
 
@@ -3480,11 +6840,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
                   {/* =========================================
+
+
 
                       INFORMATIONS
 
+
+
                   ========================================= */}
+
+
+
+
 
 
 
@@ -3494,7 +6870,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                     <div className="social-post-top">
+
+
+
+
 
 
 
@@ -3502,13 +6888,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         <h3>
+
+
+
+
 
 
 
                           {post.title ||
 
+
+
                             "Sans titre"}
+
+
+
+
 
 
 
@@ -3518,17 +6918,37 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                         <p>
+
+
+
+
 
 
 
                           {post.description ||
 
+
+
                             "Aucune description"}
 
 
 
+
+
+
+
                         </p>
+
+
+
+
 
 
 
@@ -3538,29 +6958,61 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
                       <span
+
+
 
                         className={`social-status ${
 
+
+
                           post.status ||
+
+
 
                           "draft"
 
+
+
                         }`}
+
+
 
                      >
 
 
 
+
+
+
+
                         {getStatusLabel(
 
+
+
                           post.status
+
+
 
                         )}
 
 
 
+
+
+
+
                       </span>
+
+
+
+
 
 
 
@@ -3572,11 +7024,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
                     {/* =======================================
+
+
 
                         RÉSEAUX
 
+
+
                     ======================================= */}
+
+
+
+
 
 
 
@@ -3584,7 +7052,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       {post.platforms?.facebook && (
+
+
+
+
 
 
 
@@ -3592,7 +7068,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           <FaFacebook />
+
+
+
+
 
 
 
@@ -3600,11 +7084,25 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         </span>
 
 
 
+
+
+
+
                       )}
+
+
+
+
+
+
 
 
 
@@ -3614,7 +7112,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         <span className="social-platform instagram">
+
+
+
+
 
 
 
@@ -3622,7 +7128,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           Instagram
+
+
+
+
 
 
 
@@ -3630,7 +7144,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       )}
+
+
+
+
+
+
 
 
 
@@ -3640,7 +7164,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         <span className="social-platform tiktok">
+
+
+
+
 
 
 
@@ -3648,7 +7180,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           TikTok
+
+
+
+
 
 
 
@@ -3656,7 +7196,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       )}
+
+
+
+
+
+
 
 
 
@@ -3666,7 +7216,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         <span className="social-platform youtube">
+
+
+
+
 
 
 
@@ -3674,7 +7232,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                           YouTube
+
+
+
+
 
 
 
@@ -3682,7 +7248,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       )}
+
+
+
+
 
 
 
@@ -3694,21 +7268,47 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
                     {/* =======================================
 
+
+
                         HASHTAGS
+
+
 
                     ======================================= */}
 
 
 
+
+
+
+
                     {Array.isArray(
+
+
 
                       post.hashtags
 
+
+
                     ) &&
 
+
+
                     post.hashtags.length> 0 && (
+
+
+
+
 
 
 
@@ -3716,27 +7316,55 @@ function AdminSocial() {
 
 
 
+
+
+
+
                         {post.hashtags.map(
+
+
 
                           (
 
+
+
                             tag,
 
+
+
                             index
+
+
 
                           ) => (
 
 
 
+
+
+
+
                             <span
+
+
 
                               key={
 
+
+
                                 index
+
+
 
                               }
 
+
+
                            >
+
+
+
+
 
 
 
@@ -3744,17 +7372,35 @@ function AdminSocial() {
 
 
 
+
+
+
+
                             </span>
+
+
+
+
 
 
 
                           )
 
+
+
                         )}
 
 
 
+
+
+
+
                       </div>
+
+
+
+
 
 
 
@@ -3766,11 +7412,27 @@ function AdminSocial() {
 
 
 
+
+
+
+
+
+
+
+
                     {/* =======================================
+
+
 
                         DATE
 
+
+
                     ======================================= */}
+
+
+
+
 
 
 
@@ -3778,15 +7440,31 @@ function AdminSocial() {
 
 
 
+
+
+
+
                       <FaClock />
+
+
+
+
 
 
 
                       {formatDate(
 
+
+
                         post.createdAt
 
+
+
                       )}
+
+
+
+
 
 
 
@@ -3794,7 +7472,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
                   </div>
+
+
+
+
 
 
 
@@ -3802,9 +7488,19 @@ function AdminSocial() {
 
 
 
+
+
+
+
               )
 
+
+
             )}
+
+
+
+
 
 
 
@@ -3812,7 +7508,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
         )}
+
+
+
+
 
 
 
@@ -3820,7 +7524,15 @@ function AdminSocial() {
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -3828,7 +7540,17 @@ function AdminSocial() {
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
 
 
 

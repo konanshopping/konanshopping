@@ -1,231 +1,450 @@
 import { useState, useEffect } from "react";
 
+
+
 import axios from "axios";
+
+
+
+
 
 
 
 import {
 
+
+
   FaEnvelope,
+
+
 
   FaPaperPlane,
 
+
+
   FaUsers,
+
+
 
   FaBell,
 
+
+
   FaBullhorn,
+
+
 
   FaCheckCircle,
 
+
+
   FaClock,
+
+
 
   FaArrowRight,
 
+
+
   FaEdit,
+
+
 
   FaTrash,
 
+
+
   FaTimes,
+
+
 
   FaSave,
 
+
+
   FaExclamationTriangle,
+
+
 
 } from "react-icons/fa";
 
+
+
 // ======================================================
+
 // 🔐 SECURITY LAYER — ADMIN MESSAGES
+
 // ======================================================
+
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
+
 const MAX_TITLE_LENGTH = 150;
+
 const MAX_MESSAGE_LENGTH = 5000;
 
+
+
 const safeParse = (value, fallback = null) => {
+
   try { return value ? JSON.parse(value) : fallback; } catch { return fallback; }
+
 };
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" && token.trim() ? token.trim() : "";
-  } catch { return ""; }
-};
+
+// ======================================================
+// 🔐 AUTHENTIFICATION ADMINISTRATEUR PAR COOKIE HTTPONLY
+// ======================================================
+// Le JWT n'est plus lu depuis localStorage.
+// Le navigateur envoie automatiquement le cookie sécurisé.
+// ======================================================
+
 const getStoredAdmin = () => {
+
   try {
+
     const admin = safeParse(localStorage.getItem("admin"), null);
+
     return admin && typeof admin === "object" ? admin : null;
+
   } catch { return null; }
+
 };
+
 const isValidObjectId = (value) =>
+
   typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
+
 const normalizeText = (value, maxLength) =>
+
   typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+
 const normalizeTarget = (value) => value === "new" ? "new" : "all";
+
 const normalizeArrayResponse = (data, key) => {
+
   if (Array.isArray(data)) return data;
+
   if (data && Array.isArray(data[key])) return data[key];
+
   if (data && Array.isArray(data.data)) return data.data;
+
   return null;
+
 };
+
+
+
+axios.defaults.withCredentials = true;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: { Accept: "application/json" },
 });
+
 api.interceptors.request.use((config) => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (!config) return config;
+
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
+
   return config;
 });
+
 api.interceptors.response.use(
+
   (response) => response,
+
   (error) => {
+
     if (error?.response?.status === 401 || error?.response?.status === 403) {
+
       try {
+
         localStorage.removeItem("admin");
-        localStorage.removeItem("token");
+
+        
+
       } catch {}
+
     }
+
     return Promise.reject(error);
+
   }
+
 );
+
 const redirectIfUnauthorized = (error) => {
+
   if (error?.response?.status === 401 || error?.response?.status === 403) {
+
     window.location.href = "/admin-login";
+
     return true;
+
   }
+
   return false;
+
 };
+
 const requireAdminSession = () => {
-  if (!getStoredAdmin() || !getAuthToken()) {
+
+  if (!getStoredAdmin()) {
+
     window.location.href = "/admin-login";
+
     return false;
+
   }
+
   return true;
+
 };
+
+
+
+
+
 
 
 
 
 function AdminMessages() {
 
+
+
   useEffect(() => {
+
     requireAdminSession();
+
   }, []);
+
+
+
+
 
 
 
   const [title, setTitle] =
 
+
+
     useState("");
+
+
+
+
 
 
 
   const [message, setMessage] =
 
+
+
     useState("");
+
+
+
+
 
 
 
     const [target, setTarget] =
 
+
+
   useState("all");
+
+
+
+
 
 
 
   const [messages, setMessages] =
 
+
+
     useState([]);
+
+
+
+
 
 
 
   const [messagesCount, setMessagesCount] =
 
+
+
     useState(0);
+
+
+
+
 
 
 
   const [clientsCount, setClientsCount] =
 
+
+
     useState(0);
+
+
+
+
 
 
 
   /* =========================
 
+
+
      MODE ÉDITION
 
+
+
   ========================= */
+
+
+
+
 
 
 
   const [editingMessage, setEditingMessage] =
 
+
+
     useState(null);
+
+
+
+
 
 
 
   /* =========================
 
+
+
      SUPPRESSION
 
+
+
   ========================= */
+
+
+
+
 
 
 
   const [deletingMessage, setDeletingMessage] =
 
+
+
     useState(null);
+
+
+
+
 
 
 
   /* =========================
 
+
+
      ENVOI MESSAGE
+
+
 
   ========================= */
 
 
 
+
+
+
+
   const sendMessage = async () => {
+
     if (!title.trim() || !message.trim()) return;
+
     if (!requireAdminSession()) return;
 
+
+
     const safeTitle = normalizeText(title, MAX_TITLE_LENGTH);
+
     const safeMessage = normalizeText(message, MAX_MESSAGE_LENGTH);
+
     const safeTarget = normalizeTarget(target);
+
     if (!safeTitle || !safeMessage) return;
 
+
+
     try {
+
       const response = await api.post("/api/messages", {
+
         title: safeTitle,
+
         content: safeMessage,
+
         target: safeTarget,
+
       });
 
+
+
       if (!response?.data || typeof response.data !== "object") {
+
         throw new Error("Réponse serveur invalide.");
+
       }
 
+
+
       setMessages((prev) => [response.data, ...prev]);
+
       setMessagesCount((prev) => prev + 1);
+
       setTitle("");
+
       setMessage("");
+
       setTarget("all");
+
       alert("Message envoyé avec succès");
+
     } catch (error) {
+
       if (redirectIfUnauthorized(error)) return;
+
       console.error(error);
+
       alert("Erreur lors de l'envoi");
+
     }
+
   };
 
+
+
 useEffect(() => {
+
+
+
+
 
 
 
@@ -233,25 +452,51 @@ useEffect(() => {
 
 
 
+
+
+
+
   }, []);
 
 
 
+
+
+
+
   const fetchMessages = async () => {
+
       if (!requireAdminSession()) return;
+
       try {
+
         const res = await api.get("/api/messages");
+
         const data = normalizeArrayResponse(res.data, "messages");
+
         if (!data) throw new Error("Réponse messages invalide.");
+
         setMessages(data);
+
         setMessagesCount(data.length);
+
       } catch (err) {
+
         if (redirectIfUnauthorized(err)) return;
+
         console.error(err);
+
       }
+
     };
 
+
+
 useEffect(() => {
+
+
+
+
 
 
 
@@ -259,62 +504,125 @@ useEffect(() => {
 
 
 
+
+
+
+
   }, []);
 
 
 
+
+
+
+
   const fetchUsers = async () => {
+
       if (!requireAdminSession()) return;
+
       try {
+
         const res = await api.get("/api/users");
+
         const data = normalizeArrayResponse(res.data, "users");
+
         if (!data) throw new Error("Réponse utilisateurs invalide.");
+
         setClientsCount(data.length);
+
       } catch (err) {
+
         if (redirectIfUnauthorized(err)) return;
+
         console.error(err);
+
       }
+
     };
+
+
 
 const startEdit = (msg) => {
 
 
 
+
+
+
+
     setEditingMessage(
+
+
 
       msg
 
+
+
     );
+
+
+
+
 
 
 
     setTitle(
 
+
+
       msg.title || ""
 
+
+
     );
+
+
+
+
 
 
 
     setMessage(
 
+
+
       msg.content ||
+
+
 
       msg.message ||
 
+
+
       ""
+
+
 
     );
 
 
 
+
+
+
+
     window.scrollTo({
+
+
 
       top: 0,
 
+
+
       behavior: "smooth",
 
+
+
     });
+
+
+
+
 
 
 
@@ -322,11 +630,23 @@ const startEdit = (msg) => {
 
 
 
+
+
+
+
   /* =========================
+
+
 
      ANNULER MODIFICATION
 
+
+
   ========================= */
+
+
+
+
 
 
 
@@ -334,11 +654,23 @@ const startEdit = (msg) => {
 
 
 
+
+
+
+
     setEditingMessage(
+
+
 
       null
 
+
+
     );
+
+
+
+
 
 
 
@@ -346,450 +678,901 @@ const startEdit = (msg) => {
 
 
 
+
+
+
+
     setMessage("");
 
 
 
+
+
+
+
   };
+
+
+
+
 
 
 
   /* =========================
 
+
+
      ENREGISTRER MODIFICATION
+
+
 
   ========================= */
 
 
 
+
+
+
+
   const updateMessage = async () => {
+
     if (!editingMessage) return;
+
     if (!title.trim() || !message.trim()) return;
+
     if (!requireAdminSession()) return;
+
+
 
     if (!isValidObjectId(String(editingMessage._id))) {
+
       alert("Identifiant du message invalide.");
+
       return;
+
     }
+
+
 
     const safeTitle = normalizeText(title, MAX_TITLE_LENGTH);
+
     const safeMessage = normalizeText(message, MAX_MESSAGE_LENGTH);
+
     if (!safeTitle || !safeMessage) return;
 
+
+
     try {
+
       const response = await api.put(
+
         `/api/messages/${editingMessage._id}`,
+
         {
+
           title: safeTitle,
+
           content: safeMessage,
+
         }
+
       );
+
+
 
       if (!response?.data || typeof response.data !== "object") {
+
         throw new Error("Réponse serveur invalide.");
+
       }
 
+
+
       setMessages((prev) =>
+
         prev.map((msg) =>
+
           msg._id === editingMessage._id ? response.data : msg
+
         )
+
       );
+
+
 
       setEditingMessage(null);
+
       setTitle("");
+
       setMessage("");
+
       alert("Message modifié avec succès");
+
     } catch (error) {
+
       if (redirectIfUnauthorized(error)) return;
+
       console.error(error);
+
       alert("Erreur lors de la modification");
+
     }
+
   };
+
+
 
 const deleteMessage = async () => {
+
     if (!deletingMessage) return;
+
     if (!requireAdminSession()) return;
 
+
+
     if (!isValidObjectId(String(deletingMessage._id))) {
+
       alert("Identifiant du message invalide.");
+
       return;
+
     }
+
+
 
     try {
+
       await api.delete(`/api/messages/${deletingMessage._id}`);
 
+
+
       setMessages((prev) =>
+
         prev.filter((msg) => msg._id !== deletingMessage._id)
+
       );
 
+
+
       setMessagesCount((prev) => Math.max(0, prev - 1));
+
       setDeletingMessage(null);
+
     } catch (error) {
+
       if (redirectIfUnauthorized(error)) return;
+
       console.error(error);
+
       alert("Erreur lors de la suppression");
+
     }
+
   };
+
+
 
   const isReady =
 
+
+
     title.trim() &&
+
+
 
     message.trim();
 
 
 
+
+
+
+
   return (
+
+
 
     <div
 
+
+
       style={{
 
+
+
         minHeight:
+
+
 
           "100vh",
 
 
 
+
+
+
+
         background:
+
+
 
           "#f4f7fb",
 
 
 
+
+
+
+
         padding:
+
+
 
           "20px",
 
 
 
+
+
+
+
         color:
+
+
 
           "#111827",
 
 
 
+
+
+
+
         fontFamily:
+
+
 
           "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       {/* =====================================================
 
+
+
           HEADER
+
+
 
       ===================================================== */}
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           background:
+
+
 
             "linear-gradient(135deg,#312e81 0%,#4f46e5 48%,#7c3aed 100%)",
 
 
 
+
+
+
+
           borderRadius:
+
+
 
             "28px",
 
 
 
+
+
+
+
           padding:
+
+
 
             "26px",
 
 
 
+
+
+
+
           color:
+
+
 
             "#fff",
 
 
 
+
+
+
+
           position:
+
+
 
             "relative",
 
 
 
+
+
+
+
           overflow:
+
+
 
             "hidden",
 
 
 
+
+
+
+
           boxShadow:
+
+
 
             "0 18px 45px rgba(79,70,229,.20)",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             position:
+
+
 
               "absolute",
 
 
 
+
+
+
+
             width:
 
+
+
               "180px",
+
+
+
+
 
 
 
             height:
 
+
+
               "180px",
+
+
+
+
 
 
 
             borderRadius:
 
+
+
               "50%",
 
 
 
+
+
+
+
             background:
+
+
 
               "rgba(255,255,255,.07)",
 
 
 
+
+
+
+
             right:
+
+
 
               "-50px",
 
 
 
+
+
+
+
             top:
+
+
 
               "-70px",
 
+
+
           }}
+
+
 
         />
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             position:
+
+
 
               "absolute",
 
 
 
+
+
+
+
             width:
 
+
+
               "120px",
+
+
+
+
 
 
 
             height:
 
+
+
               "120px",
+
+
+
+
 
 
 
             borderRadius:
 
+
+
               "50%",
+
+
+
+
 
 
 
             background:
 
+
+
               "rgba(255,255,255,.05)",
+
+
+
+
 
 
 
             right:
 
+
+
               "100px",
+
+
+
+
 
 
 
             bottom:
 
+
+
               "-80px",
 
+
+
           }}
+
+
 
         />
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             position:
+
+
 
               "relative",
 
 
 
+
+
+
+
             zIndex:
+
+
 
               2,
 
 
 
+
+
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             justifyContent:
+
+
 
               "space-between",
 
 
 
+
+
+
+
             alignItems:
+
+
 
               "center",
 
 
 
+
+
+
+
             gap:
+
+
 
               "20px",
 
 
 
+
+
+
+
             flexWrap:
+
+
 
               "wrap",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               alignItems:
+
+
 
                 "center",
 
 
 
+
+
+
+
               gap:
+
+
 
                 "15px",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "58px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "58px",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "18px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "rgba(255,255,255,.15)",
+
+
+
+
 
 
 
                 border:
 
+
+
                   "1px solid rgba(255,255,255,.20)",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 backdropFilter:
 
+
+
                   "blur(10px)",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <FaBullhorn
+
+
 
                 style={{
 
+
+
                   fontSize:
+
+
 
                     "24px",
 
+
+
                 }}
+
+
 
               />
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -797,117 +1580,235 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   fontSize:
+
+
 
                     "11px",
 
 
 
+
+
+
+
                   fontWeight:
+
+
 
                     "700",
 
 
 
+
+
+
+
                   letterSpacing:
+
+
 
                     "1.5px",
 
 
 
+
+
+
+
                   textTransform:
+
+
 
                     "uppercase",
 
 
 
+
+
+
+
                   opacity:
+
+
 
                     ".75",
 
 
 
+
+
+
+
                   marginBottom:
+
+
 
                     "4px",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 Centre de communication
+
+
 
               </div>
 
 
 
+
+
+
+
               <h1
+
+
 
                 style={{
 
+
+
                   margin:
+
+
 
                     0,
 
 
 
+
+
+
+
                   fontSize:
+
+
 
                     "25px",
 
 
 
+
+
+
+
                   fontWeight:
+
+
 
                     "850",
 
 
 
+
+
+
+
                   letterSpacing:
+
+
 
                     "-.5px",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 Messages Clients
+
+
 
               </h1>
 
 
 
+
+
+
+
               <p
+
+
 
                 style={{
 
+
+
                   margin:
+
+
 
                     "5px 0 0",
 
 
 
+
+
+
+
                   fontSize:
+
+
 
                     "13px",
 
 
 
+
+
+
+
                   opacity:
+
+
 
                     ".88",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 Communiquez efficacement avec votre clientèle.
 
+
+
               </p>
+
+
+
+
 
 
 
@@ -915,69 +1816,139 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               alignItems:
+
+
 
                 "center",
 
 
 
+
+
+
+
               gap:
+
+
 
                 "8px",
 
 
 
+
+
+
+
               background:
+
+
 
                 "rgba(255,255,255,.12)",
 
 
 
+
+
+
+
               border:
+
+
 
                 "1px solid rgba(255,255,255,.15)",
 
 
 
+
+
+
+
               padding:
+
+
 
                 "9px 13px",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "14px",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "12px",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "700",
 
+
+
             }}
 
+
+
           >
+
+
+
+
 
 
 
@@ -985,7 +1956,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             Communication active
+
+
+
+
 
 
 
@@ -993,7 +1972,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1003,43 +1990,89 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
       {/* =====================================================
 
+
+
           KPI
+
+
 
       ===================================================== */}
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display:
+
+
 
             "grid",
 
 
 
+
+
+
+
           gridTemplateColumns:
+
+
 
             "repeat(2,minmax(0,1fr))",
 
 
 
+
+
+
+
           gap:
+
+
 
             "14px",
 
 
 
+
+
+
+
           marginTop:
+
+
 
             "16px",
 
+
+
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -1047,123 +2080,247 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             background:
+
+
 
               "#fff",
 
 
 
+
+
+
+
             border:
+
+
 
               "1px solid #e8ebf2",
 
 
 
+
+
+
+
             borderRadius:
+
+
 
               "22px",
 
 
 
+
+
+
+
             padding:
+
+
 
               "18px",
 
 
 
+
+
+
+
             boxShadow:
+
+
 
               "0 8px 25px rgba(15,23,42,.045)",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               justifyContent:
+
+
 
                 "space-between",
 
 
 
+
+
+
+
               alignItems:
+
+
 
                 "flex-start",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "42px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "42px",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "13px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#eef2ff",
+
+
+
+
 
 
 
                 color:
 
+
+
                   "#4f46e5",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
 
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -1171,129 +2328,261 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
             <span
 
+
+
               style={{
 
+
+
                 fontSize:
+
+
 
                   "11px",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#16a34a",
 
 
 
+
+
+
+
                 background:
+
+
 
                   "#f0fdf4",
 
 
 
+
+
+
+
                 padding:
+
+
 
                   "5px 8px",
 
 
 
+
+
+
+
                 borderRadius:
+
+
 
                   "8px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "700",
 
+
+
               }}
+
+
 
             >
 
+
+
               Audience
+
+
 
             </span>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               marginTop:
+
+
 
                 "15px",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "27px",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "850",
 
 
 
+
+
+
+
               letterSpacing:
+
+
 
                 "-.5px",
 
+
+
             }}
+
+
 
           >
 
+
+
             {clientsCount}
 
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               color:
+
+
 
                 "#64748b",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "12px",
 
 
 
+
+
+
+
               marginTop:
+
+
 
                 "2px",
 
+
+
             }}
+
+
 
           >
 
+
+
             Clients enregistrés
+
+
 
           </div>
 
 
 
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -1303,123 +2592,247 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             background:
+
+
 
               "#fff",
 
 
 
+
+
+
+
             border:
+
+
 
               "1px solid #e8ebf2",
 
 
 
+
+
+
+
             borderRadius:
+
+
 
               "22px",
 
 
 
+
+
+
+
             padding:
+
+
 
               "18px",
 
 
 
+
+
+
+
             boxShadow:
+
+
 
               "0 8px 25px rgba(15,23,42,.045)",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               justifyContent:
+
+
 
                 "space-between",
 
 
 
+
+
+
+
               alignItems:
+
+
 
                 "flex-start",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "42px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "42px",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "13px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#f5f3ff",
+
+
+
+
 
 
 
                 color:
 
+
+
                   "#7c3aed",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
 
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -1427,129 +2840,259 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
             <span
 
+
+
               style={{
 
+
+
                 fontSize:
+
+
 
                   "11px",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#7c3aed",
 
 
 
+
+
+
+
                 background:
+
+
 
                   "#f5f3ff",
 
 
 
+
+
+
+
                 padding:
+
+
 
                   "5px 8px",
 
 
 
+
+
+
+
                 borderRadius:
+
+
 
                   "8px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "700",
 
+
+
               }}
+
+
 
             >
 
+
+
               Historique
+
+
 
             </span>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               marginTop:
+
+
 
                 "15px",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "27px",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "850",
 
 
 
+
+
+
+
               letterSpacing:
+
+
 
                 "-.5px",
 
+
+
             }}
+
+
 
           >
 
+
+
             {messagesCount}
 
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               color:
+
+
 
                 "#64748b",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "12px",
 
 
 
+
+
+
+
               marginTop:
+
+
 
                 "2px",
 
+
+
             }}
+
+
 
           >
 
+
+
             Messages envoyés
+
+
 
           </div>
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -1559,59 +3102,121 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
       {/* =====================================================
 
+
+
           COMPOSER
+
+
 
       ===================================================== */}
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           marginTop:
+
+
 
             "16px",
 
 
 
+
+
+
+
           background:
+
+
 
             "#fff",
 
 
 
+
+
+
+
           border:
+
+
 
             editingMessage
 
+
+
               ? "1px solid #c4b5fd"
+
+
 
               : "1px solid #e8ebf2",
 
 
 
+
+
+
+
           borderRadius:
+
+
 
             "26px",
 
 
 
+
+
+
+
           padding:
+
+
 
             "20px",
 
 
 
+
+
+
+
           boxShadow:
+
+
 
             "0 10px 30px rgba(15,23,42,.05)",
 
+
+
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -1619,41 +3224,83 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             justifyContent:
+
+
 
               "space-between",
 
 
 
+
+
+
+
             alignItems:
+
+
 
               "center",
 
 
 
+
+
+
+
             gap:
+
+
 
               "10px",
 
 
 
+
+
+
+
             marginBottom:
+
+
 
               "18px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -1661,97 +3308,195 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 display:
+
+
 
                   "flex",
 
 
 
+
+
+
+
                 alignItems:
+
+
 
                   "center",
 
 
 
+
+
+
+
                 gap:
+
+
 
                   "9px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   width:
 
+
+
                     "34px",
+
+
+
+
 
 
 
                   height:
 
+
+
                     "34px",
+
+
+
+
 
 
 
                   borderRadius:
 
+
+
                     "10px",
+
+
+
+
 
 
 
                   background:
 
+
+
                     editingMessage
 
+
+
                       ? "#f5f3ff"
+
+
 
                       : "#eef2ff",
 
 
 
+
+
+
+
                   color:
+
+
 
                     "#4f46e5",
 
 
 
+
+
+
+
                   display:
+
+
 
                     "flex",
 
 
 
+
+
+
+
                   alignItems:
 
+
+
                     "center",
+
+
+
+
 
 
 
                   justifyContent:
 
+
+
                     "center",
 
+
+
                 }}
+
+
 
               >
 
 
 
+
+
+
+
                 {editingMessage
+
+
 
                   ? <FaEdit />
 
+
+
                   : <FaEnvelope />}
+
+
+
+
 
 
 
@@ -1759,37 +3504,75 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               <h2
+
+
 
                 style={{
 
+
+
                   margin:
+
+
 
                     0,
 
 
 
+
+
+
+
                   fontSize:
+
+
 
                     "18px",
 
 
 
+
+
+
+
                   fontWeight:
+
+
 
                     "850",
 
+
+
                 }}
+
+
 
               >
 
 
 
+
+
+
+
                 {editingMessage
+
+
 
                   ? "Modifier le message"
 
+
+
                   : "Nouvelle communication"}
+
+
+
+
 
 
 
@@ -1797,41 +3580,83 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
             <p
 
+
+
               style={{
 
+
+
                 margin:
+
+
 
                   "7px 0 0 43px",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "12px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               {editingMessage
+
+
 
                 ? "Modifiez le contenu de cette communication."
 
+
+
                 : "Le message sera envoyé à tous vos clients."}
+
+
+
+
 
 
 
@@ -1839,7 +3664,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
@@ -1847,79 +3680,159 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <button
+
+
 
               type="button"
 
+
+
               onClick={
+
+
 
                 cancelEdit
 
+
+
               }
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "38px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "38px",
+
+
+
+
 
 
 
                 border:
 
+
+
                   "none",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "11px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#f1f5f9",
+
+
+
+
 
 
 
                 color:
 
+
+
                   "#64748b",
+
+
+
+
 
 
 
                 cursor:
 
+
+
                   "pointer",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
 
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -1927,7 +3840,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </button>
+
+
+
+
 
 
 
@@ -1935,7 +3856,17 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -1945,147 +3876,297 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <label
+
+
 
           style={{
 
+
+
             display:
+
+
 
               "block",
 
 
 
+
+
+
+
             fontSize:
+
+
 
               "12px",
 
 
 
+
+
+
+
             fontWeight:
+
+
 
               "800",
 
 
 
+
+
+
+
             color:
+
+
 
               "#374151",
 
 
 
+
+
+
+
             marginBottom:
+
+
 
               "7px",
 
+
+
           }}
+
+
 
         >
 
+
+
           TITRE
+
+
 
         </label>
 
 
 
+
+
+
+
         <input
+
+
 
           value={
 
+
+
             title
 
+
+
           }
+
+
+
+
 
 
 
           onChange={(e) =>
 
+
+
             setTitle(
+
+
 
               e.target.value
 
+
+
             )
 
+
+
           }
+
+
+
+
 
 
 
           placeholder={
 
+
+
             "Ex. Nouvelle collection disponible"
+
+
 
           }
 
 
 
+
+
+
+
           style={{
 
+
+
             width:
+
+
 
               "100%",
 
 
 
+
+
+
+
             height:
+
+
 
               "50px",
 
 
 
+
+
+
+
             boxSizing:
+
+
 
               "border-box",
 
 
 
+
+
+
+
             border:
+
+
 
               "1px solid #e2e8f0",
 
 
 
+
+
+
+
             borderRadius:
 
+
+
               "14px",
+
+
+
+
 
 
 
             padding:
 
+
+
               "0 15px",
+
+
+
+
 
 
 
             outline:
 
+
+
               "none",
+
+
+
+
 
 
 
             fontSize:
 
+
+
               "14px",
+
+
+
+
 
 
 
             fontWeight:
 
+
+
               "600",
+
+
+
+
 
 
 
             background:
 
+
+
               "#f8fafc",
+
+
+
+
 
 
 
             color:
 
+
+
               "#111827",
+
+
 
           }}
 
+
+
         />
+
+
+
+
+
+
 
 
 
@@ -2095,105 +4176,211 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             justifyContent:
+
+
 
               "space-between",
 
 
 
+
+
+
+
             alignItems:
+
+
 
               "center",
 
 
 
+
+
+
+
             marginTop:
+
+
 
               "15px",
 
 
 
+
+
+
+
             marginBottom:
+
+
 
               "7px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <label
+
+
 
             style={{
 
+
+
               fontSize:
+
+
 
                 "12px",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "800",
 
 
 
+
+
+
+
               color:
+
+
 
                 "#374151",
 
+
+
             }}
+
+
 
           >
 
+
+
             MESSAGE
+
+
 
           </label>
 
 
 
+
+
+
+
           <span
+
+
 
             style={{
 
+
+
               fontSize:
+
+
 
                 "11px",
 
 
 
+
+
+
+
               color:
+
+
 
                 message.length > 900
 
+
+
                   ? "#dc2626"
+
+
 
                   : "#94a3b8",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "600",
 
+
+
             }}
+
+
 
           >
 
+
+
             {message.length} caractères
 
+
+
           </span>
+
+
+
+
 
 
 
@@ -2201,121 +4388,241 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <textarea
+
+
 
           value={
 
+
+
             message
 
+
+
           }
+
+
+
+
 
 
 
           onChange={(e) =>
 
+
+
             setMessage(
+
+
 
               e.target.value
 
+
+
             )
 
+
+
           }
+
+
+
+
 
 
 
           placeholder={
 
+
+
             "Écrivez votre message ici..."
+
+
 
           }
 
 
 
+
+
+
+
           style={{
 
+
+
             width:
+
+
 
               "100%",
 
 
 
+
+
+
+
             height:
+
+
 
               "155px",
 
 
 
+
+
+
+
             boxSizing:
+
+
 
               "border-box",
 
 
 
+
+
+
+
             border:
+
+
 
               "1px solid #e2e8f0",
 
 
 
+
+
+
+
             borderRadius:
 
+
+
               "14px",
+
+
+
+
 
 
 
             padding:
 
+
+
               "15px",
+
+
+
+
 
 
 
             resize:
 
+
+
               "vertical",
+
+
+
+
 
 
 
             minHeight:
 
+
+
               "120px",
+
+
+
+
 
 
 
             outline:
 
+
+
               "none",
+
+
+
+
 
 
 
             fontSize:
 
+
+
               "14px",
+
+
+
+
 
 
 
             fontWeight:
 
+
+
               "500",
+
+
+
+
 
 
 
             background:
 
+
+
               "#f8fafc",
+
+
+
+
 
 
 
             color:
 
+
+
               "#111827",
+
+
+
+
 
 
 
             lineHeight:
 
+
+
               "1.65",
 
+
+
           }}
+
+
 
         />
 
@@ -2323,63 +4630,129 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
         {/* =====================================================
+
+
 
     DESTINATAIRES
 
-\===================================================== */}
+
+
+===================================================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     marginTop: "16px",
 
+
+
   }}
+
+
 
 >
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       fontSize: "12px",
+
+
 
       fontWeight: "800",
 
+
+
       color: "#374151",
+
+
 
       marginBottom: "9px",
 
+
+
     }}
+
+
 
   >
 
+
+
     DESTINATAIRES
+
+
 
   </div>
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       display: "grid",
+
+
 
       gridTemplateColumns:
 
+
+
         "repeat(2, minmax(0, 1fr))",
+
+
 
       gap: "10px",
 
+
+
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -2387,35 +4760,71 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
     <button
+
+
 
       type="button"
 
+
+
       onClick={() =>
+
+
 
         setTarget("all")
 
+
+
       }
+
+
 
       style={{
 
+
+
         border:
+
+
 
           target === "all"
 
+
+
             ? "2px solid #4f46e5"
+
+
 
             : "1px solid #e2e8f0",
 
 
 
+
+
+
+
         background:
+
+
 
           target === "all"
 
+
+
             ? "#eef2ff"
 
+
+
             : "#f8fafc",
+
+
+
+
 
 
 
@@ -2423,7 +4832,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         padding: "14px",
+
+
+
+
 
 
 
@@ -2431,85 +4848,171 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         cursor: "pointer",
+
+
+
+
 
 
 
         transition:
 
+
+
           "all .2s ease",
+
+
+
+
 
 
 
         color: "#111827",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display: "flex",
+
+
 
           alignItems: "center",
 
+
+
           gap: "10px",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             width: "38px",
 
+
+
             height: "38px",
+
+
 
             borderRadius: "11px",
 
 
 
+
+
+
+
             background:
+
+
 
               target === "all"
 
+
+
                 ? "#4f46e5"
+
+
 
                 : "#e2e8f0",
 
 
 
+
+
+
+
             color:
+
+
 
               target === "all"
 
+
+
                 ? "#fff"
+
+
 
                 : "#64748b",
 
 
 
+
+
+
+
             display: "flex",
 
+
+
             alignItems: "center",
+
+
 
             justifyContent: "center",
 
 
 
+
+
+
+
             flexShrink: 0,
+
+
 
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2517,63 +5020,127 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
         <div
 
+
+
           style={{
+
+
 
             minWidth: 0,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
 
+
+
             style={{
+
+
 
               fontSize: "13px",
 
+
+
               fontWeight: "800",
+
+
 
             }}
 
+
+
           >
+
+
 
             Tous les clients
 
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
+
+
 
               marginTop: "3px",
 
+
+
               fontSize: "10px",
+
+
 
               color: "#64748b",
 
+
+
               lineHeight: "1.4",
+
+
 
             }}
 
+
+
           >
+
+
 
             Envoyer à toute votre clientèle
 
+
+
           </div>
+
+
+
+
 
 
 
         </div>
+
+
+
+
 
 
 
@@ -2581,19 +5148,39 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           <FaCheckCircle
+
+
 
             style={{
 
+
+
               marginLeft: "auto",
+
+
 
               color: "#4f46e5",
 
+
+
               flexShrink: 0,
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2601,11 +5188,25 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
       </div>
 
 
 
+
+
+
+
     </button>
+
+
+
+
+
+
 
 
 
@@ -2615,35 +5216,71 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
     <button
+
+
 
       type="button"
 
+
+
       onClick={() =>
+
+
 
         setTarget("new")
 
+
+
       }
+
+
 
       style={{
 
+
+
         border:
+
+
 
           target === "new"
 
+
+
             ? "2px solid #7c3aed"
+
+
 
             : "1px solid #e2e8f0",
 
 
 
+
+
+
+
         background:
+
+
 
           target === "new"
 
+
+
             ? "#f5f3ff"
 
+
+
             : "#f8fafc",
+
+
+
+
 
 
 
@@ -2651,7 +5288,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         padding: "14px",
+
+
+
+
 
 
 
@@ -2659,85 +5304,171 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         cursor: "pointer",
+
+
+
+
 
 
 
         transition:
 
+
+
           "all .2s ease",
+
+
+
+
 
 
 
         color: "#111827",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display: "flex",
+
+
 
           alignItems: "center",
 
+
+
           gap: "10px",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             width: "38px",
 
+
+
             height: "38px",
+
+
 
             borderRadius: "11px",
 
 
 
+
+
+
+
             background:
+
+
 
               target === "new"
 
+
+
                 ? "#7c3aed"
+
+
 
                 : "#e2e8f0",
 
 
 
+
+
+
+
             color:
+
+
 
               target === "new"
 
+
+
                 ? "#fff"
+
+
 
                 : "#64748b",
 
 
 
+
+
+
+
             display: "flex",
 
+
+
             alignItems: "center",
+
+
 
             justifyContent: "center",
 
 
 
+
+
+
+
             flexShrink: 0,
+
+
 
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2745,63 +5476,127 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
         <div
 
+
+
           style={{
+
+
 
             minWidth: 0,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
 
+
+
             style={{
+
+
 
               fontSize: "13px",
 
+
+
               fontWeight: "800",
+
+
 
             }}
 
+
+
           >
+
+
 
             Nouveaux clients
 
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
+
+
 
               marginTop: "3px",
 
+
+
               fontSize: "10px",
+
+
 
               color: "#64748b",
 
+
+
               lineHeight: "1.4",
+
+
 
             }}
 
+
+
           >
+
+
 
             Cibler les nouveaux inscrits
 
+
+
           </div>
+
+
+
+
 
 
 
         </div>
+
+
+
+
 
 
 
@@ -2809,19 +5604,39 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           <FaCheckCircle
+
+
 
             style={{
 
+
+
               marginLeft: "auto",
+
+
 
               color: "#7c3aed",
 
+
+
               flexShrink: 0,
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -2829,7 +5644,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -2837,7 +5660,17 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
   </div>
+
+
+
+
+
+
 
 
 
@@ -2847,49 +5680,99 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       marginTop: "9px",
+
+
 
       padding: "9px 11px",
 
+
+
       borderRadius: "10px",
+
+
 
       background:
 
+
+
         target === "all"
+
+
 
           ? "#f8fafc"
 
+
+
           : "#faf5ff",
+
+
 
       color:
 
+
+
         target === "all"
+
+
 
           ? "#64748b"
 
+
+
           : "#7c3aed",
+
+
 
       fontSize: "10px",
 
+
+
       lineHeight: "1.5",
+
+
 
       fontWeight: "600",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     {target === "all"
+
+
 
       ? "👥 Ce message sera destiné à tous les clients."
 
+
+
       : "🆕 Ce message sera identifié comme une communication destinée aux nouveaux clients."}
+
+
+
+
 
 
 
@@ -2897,7 +5780,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2905,29 +5796,59 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             gap:
+
+
 
               "10px",
 
 
 
+
+
+
+
             marginTop:
+
+
 
               "14px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2935,79 +5856,159 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <button
+
+
 
               type="button"
 
+
+
               onClick={
+
+
 
                 cancelEdit
 
+
+
               }
+
+
 
               style={{
 
+
+
                 flex:
+
+
 
                   "0 0 48px",
 
 
 
+
+
+
+
                 height:
+
+
 
                   "52px",
 
 
 
+
+
+
+
                 border:
+
+
 
                   "none",
 
 
 
+
+
+
+
                 borderRadius:
+
+
 
                   "15px",
 
 
 
+
+
+
+
                 background:
+
+
 
                   "#f1f5f9",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 cursor:
+
+
 
                   "pointer",
 
 
 
+
+
+
+
                 display:
+
+
 
                   "flex",
 
 
 
+
+
+
+
                 justifyContent:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
 
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -3015,7 +6016,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </button>
+
+
+
+
 
 
 
@@ -3023,167 +6032,335 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           <button
+
+
 
             type="button"
 
+
+
             onClick={
+
+
 
               editingMessage
 
+
+
                 ? updateMessage
+
+
 
                 : sendMessage
 
+
+
             }
+
+
+
+
 
 
 
             disabled={
 
+
+
               !isReady
+
+
 
             }
 
 
 
+
+
+
+
             style={{
 
+
+
               flex:
+
+
 
                 1,
 
 
 
+
+
+
+
               height:
+
+
 
                 "52px",
 
 
 
+
+
+
+
               border:
+
+
 
                 "none",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "15px",
 
 
 
+
+
+
+
               background:
+
+
 
                 isReady
 
+
+
                   ? "linear-gradient(135deg,#4f46e5,#7c3aed)"
+
+
 
                   : "#e2e8f0",
 
 
 
+
+
+
+
               color:
+
+
 
                 isReady
 
+
+
                   ? "#fff"
+
+
 
                   : "#94a3b8",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "800",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "14px",
 
 
 
+
+
+
+
               cursor:
+
+
 
                 isReady
 
+
+
                   ? "pointer"
+
+
 
                   : "not-allowed",
 
 
 
+
+
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               justifyContent:
 
+
+
                 "center",
+
+
+
+
 
 
 
               alignItems:
 
+
+
                 "center",
+
+
+
+
 
 
 
               gap:
 
+
+
                 "9px",
+
+
+
+
 
 
 
               boxShadow:
 
+
+
                 isReady
+
+
 
                   ? "0 10px 25px rgba(79,70,229,.22)"
 
+
+
                   : "none",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             {editingMessage
 
+
+
               ? <FaSave />
+
+
 
               : <FaPaperPlane />}
 
 
 
+
+
+
+
            {editingMessage
+
+
 
   ? "Enregistrer les modifications"
 
+
+
   : target === "new"
 
+
+
     ? "Envoyer aux nouveaux clients"
+
+
 
     : "Envoyer à tous les clients"}
 
 
 
+
+
+
+
             <FaArrowRight
+
+
 
               style={{
 
+
+
                 fontSize:
+
+
 
                   "12px",
 
+
+
               }}
 
+
+
             />
+
+
+
+
 
 
 
@@ -3191,7 +6368,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -3201,11 +6386,25 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
       {/* =====================================================
+
+
 
           PREVIEW
 
+
+
       ===================================================== */}
+
+
+
+
 
 
 
@@ -3213,141 +6412,283 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             marginTop:
+
+
 
               "16px",
 
 
 
+
+
+
+
             background:
+
+
 
               "#fff",
 
 
 
+
+
+
+
             border:
+
+
 
               "1px solid #e8ebf2",
 
 
 
+
+
+
+
             borderRadius:
+
+
 
               "24px",
 
 
 
+
+
+
+
             padding:
+
+
 
               "20px",
 
 
 
+
+
+
+
             boxShadow:
+
+
 
               "0 8px 25px rgba(15,23,42,.04)",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display:
+
+
 
                 "flex",
 
 
 
+
+
+
+
               alignItems:
+
+
 
                 "center",
 
 
 
+
+
+
+
               gap:
+
+
 
                 "8px",
 
 
 
+
+
+
+
               marginBottom:
+
+
 
                 "14px",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <FaClock
+
+
 
               style={{
 
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "13px",
 
+
+
               }}
+
+
 
             />
 
 
 
+
+
+
+
             <span
+
+
 
               style={{
 
+
+
                 fontSize:
+
+
 
                   "11px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "800",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 textTransform:
+
+
 
                   "uppercase",
 
 
 
+
+
+
+
                 letterSpacing:
+
+
 
                   ".7px",
 
+
+
               }}
+
+
 
             >
 
+
+
               Aperçu
 
+
+
             </span>
+
+
+
+
 
 
 
@@ -3355,129 +6696,259 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               border:
+
+
 
                 "1px solid #edf0f5",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "18px",
 
 
 
+
+
+
+
               padding:
+
+
 
                 "16px",
 
 
 
+
+
+
+
               background:
+
+
 
                 "#fafbff",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 display:
+
+
 
                   "flex",
 
 
 
+
+
+
+
                 alignItems:
+
+
 
                   "center",
 
 
 
+
+
+
+
                 gap:
+
+
 
                   "9px",
 
 
 
+
+
+
+
                 marginBottom:
+
+
 
                   "10px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   width:
 
+
+
                     "34px",
+
+
+
+
 
 
 
                   height:
 
+
+
                     "34px",
+
+
+
+
 
 
 
                   borderRadius:
 
+
+
                     "11px",
+
+
+
+
 
 
 
                   background:
 
+
+
                     "linear-gradient(135deg,#4f46e5,#7c3aed)",
+
+
+
+
 
 
 
                   color:
 
+
+
                     "#fff",
+
+
+
+
 
 
 
                   display:
 
+
+
                     "flex",
+
+
+
+
 
 
 
                   justifyContent:
 
+
+
                     "center",
+
+
+
+
 
 
 
                   alignItems:
 
+
+
                     "center",
+
+
+
+
 
 
 
                   fontSize:
 
+
+
                     "13px",
+
+
 
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -3485,7 +6956,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -3493,51 +6972,103 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     fontSize:
+
+
 
                       "13px",
 
 
 
+
+
+
+
                     fontWeight:
+
+
 
                       "800",
 
+
+
                   }}
+
+
 
                 >
 
+
+
                   KONAN SHOPPING
 
+
+
                 </div>
+
+
+
+
 
 
 
                 <div
 
+
+
                   style={{
 
+
+
                     fontSize:
+
+
 
                       "10px",
 
 
 
+
+
+
+
                     color:
+
+
 
                       "#94a3b8",
 
+
+
                   }}
+
+
 
                 >
 
+
+
                   Communication client
 
+
+
                 </div>
+
+
+
+
 
 
 
@@ -3545,93 +7076,187 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
             <h3
 
+
+
               style={{
 
+
+
                 margin:
+
+
 
                   "0 0 7px",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "15px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "800",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#111827",
 
+
+
               }}
+
+
 
             >
 
+
+
               {title ||
 
+
+
                 "Titre du message"}
+
+
 
             </h3>
 
 
 
+
+
+
+
             <p
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   0,
 
 
 
+
+
+
+
                 color:
+
+
 
                   message
 
+
+
                     ? "#475569"
+
+
 
                     : "#cbd5e1",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "13px",
 
 
 
+
+
+
+
                 lineHeight:
+
+
 
                   "1.65",
 
 
 
+
+
+
+
                 whiteSpace:
+
+
 
                   "pre-wrap",
 
+
+
               }}
+
+
 
             >
 
+
+
               {message ||
+
+
 
                 "Votre message apparaîtra ici..."}
 
+
+
             </p>
+
+
+
+
 
 
 
@@ -3639,7 +7264,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -3647,63 +7280,127 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
       {/* =====================================================
 
+
+
           HISTORY
+
+
 
       ===================================================== */}
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           marginTop:
+
+
 
             "18px",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             alignItems:
+
+
 
               "center",
 
 
 
+
+
+
+
             justifyContent:
+
+
 
               "space-between",
 
 
 
+
+
+
+
             marginBottom:
+
+
 
               "12px",
 
 
 
+
+
+
+
             gap:
+
+
 
               "10px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -3711,119 +7408,241 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <h3
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   0,
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "18px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "850",
 
+
+
               }}
+
+
 
             >
 
+
+
               Messages envoyés
+
+
 
             </h3>
 
 
 
+
+
+
+
             <p
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   "4px 0 0",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "12px",
 
+
+
               }}
+
+
 
             >
 
+
+
               Historique de vos communications
+
+
 
             </p>
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               background:
+
+
 
                 "#eef2ff",
 
 
 
+
+
+
+
               color:
+
+
 
                 "#4f46e5",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "10px",
 
 
 
+
+
+
+
               padding:
+
+
 
                 "7px 10px",
 
 
 
+
+
+
+
               fontSize:
+
+
 
                 "11px",
 
 
 
+
+
+
+
               fontWeight:
+
+
 
                 "800",
 
+
+
             }}
+
+
 
           >
 
+
+
             {messages.length}
+
+
 
           </div>
 
 
 
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -3833,119 +7652,239 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         {messages.length === 0 && (
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
 
+
+
               background:
+
+
 
                 "#fff",
 
 
 
+
+
+
+
               border:
+
+
 
                 "1px solid #e8ebf2",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "22px",
 
 
 
+
+
+
+
               padding:
+
+
 
                 "35px 20px",
 
 
 
+
+
+
+
               textAlign:
+
+
 
                 "center",
 
 
 
+
+
+
+
               boxShadow:
+
+
 
                 "0 8px 25px rgba(15,23,42,.04)",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "60px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "60px",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "18px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#eef2ff",
+
+
+
+
 
 
 
                 color:
 
+
+
                   "#4f46e5",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 margin:
 
+
+
                   "0 auto 12px",
+
+
+
+
 
 
 
                 fontSize:
 
+
+
                   "22px",
+
+
 
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -3953,61 +7892,123 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
             <h3
 
+
+
               style={{
 
+
+
                 margin:
+
+
 
                   "0 0 6px",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "15px",
 
+
+
               }}
+
+
 
             >
 
+
+
               Aucun message envoyé
+
+
 
             </h3>
 
 
 
+
+
+
+
             <p
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   0,
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#94a3b8",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "12px",
 
+
+
               }}
+
+
 
             >
 
+
+
               Vos communications apparaîtront ici.
 
+
+
             </p>
+
+
+
+
 
 
 
@@ -4015,7 +8016,17 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4025,69 +8036,139 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         {messages.map(
+
+
 
           (msg, index) => (
 
 
 
+
+
+
+
             <div
+
+
 
               key={
 
+
+
                 msg._id ||
+
+
 
                 msg.id ||
 
+
+
                 index
+
+
 
               }
 
 
 
+
+
+
+
               style={{
 
+
+
                 background:
+
+
 
                   "#fff",
 
 
 
+
+
+
+
                 border:
+
+
 
                   "1px solid #e8ebf2",
 
 
 
+
+
+
+
                 borderRadius:
+
+
 
                   "20px",
 
 
 
+
+
+
+
                 padding:
+
+
 
                   "16px",
 
 
 
+
+
+
+
                 marginBottom:
+
+
 
                   "10px",
 
 
 
+
+
+
+
                 boxShadow:
+
+
 
                   "0 6px 20px rgba(15,23,42,.035)",
 
 
 
+
+
+
+
                 transition:
+
+
 
                   "all .2s ease",
 
+
+
               }}
+
+
+
+
 
 
 
@@ -4095,19 +8176,39 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 e.currentTarget.style.transform =
+
+
 
                   "translateY(-1px)";
 
 
 
+
+
+
+
                 e.currentTarget.style.boxShadow =
+
+
 
                   "0 10px 25px rgba(15,23,42,.07)";
 
 
 
+
+
+
+
               }}
+
+
+
+
 
 
 
@@ -4115,21 +8216,43 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 e.currentTarget.style.transform =
+
+
 
                   "translateY(0)";
 
 
 
+
+
+
+
                 e.currentTarget.style.boxShadow =
+
+
 
                   "0 6px 20px rgba(15,23,42,.035)";
 
 
 
+
+
+
+
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -4137,129 +8260,259 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   display:
+
+
 
                     "flex",
 
 
 
+
+
+
+
                   alignItems:
+
+
 
                     "flex-start",
 
 
 
+
+
+
+
                   justifyContent:
+
+
 
                     "space-between",
 
 
 
+
+
+
+
                   gap:
+
+
 
                     "12px",
 
+
+
                 }}
+
+
 
               >
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     display:
+
+
 
                       "flex",
 
 
 
+
+
+
+
                     alignItems:
+
+
 
                       "center",
 
 
 
+
+
+
+
                     gap:
+
+
 
                       "10px",
 
 
 
+
+
+
+
                     minWidth:
+
+
 
                       0,
 
+
+
                   }}
+
+
 
                 >
 
 
 
+
+
+
+
                   <div
+
+
 
                     style={{
 
+
+
                       width:
 
+
+
                         "40px",
+
+
+
+
 
 
 
                       height:
 
+
+
                         "40px",
+
+
+
+
 
 
 
                       flexShrink:
 
+
+
                         0,
+
+
+
+
 
 
 
                       borderRadius:
 
+
+
                         "12px",
+
+
+
+
 
 
 
                       background:
 
+
+
                         "#eef2ff",
+
+
+
+
 
 
 
                       color:
 
+
+
                         "#4f46e5",
+
+
+
+
 
 
 
                       display:
 
+
+
                         "flex",
+
+
+
+
 
 
 
                       alignItems:
 
+
+
                         "center",
+
+
+
+
 
 
 
                       justifyContent:
 
+
+
                         "center",
+
+
 
                     }}
 
+
+
                   >
+
+
+
+
 
 
 
@@ -4267,99 +8520,199 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   </div>
+
+
+
+
 
 
 
                   <div
 
+
+
                     style={{
+
+
 
                       minWidth:
 
+
+
                         0,
 
+
+
                     }}
+
+
 
                   >
 
 
 
+
+
+
+
                     <div
+
+
 
                       style={{
 
+
+
                         fontSize:
+
+
 
                           "14px",
 
 
 
+
+
+
+
                         fontWeight:
+
+
 
                           "800",
 
 
 
+
+
+
+
                         color:
+
+
 
                           "#111827",
 
 
 
+
+
+
+
                         overflow:
+
+
 
                           "hidden",
 
 
 
+
+
+
+
                         textOverflow:
+
+
 
                           "ellipsis",
 
 
 
+
+
+
+
                         whiteSpace:
+
+
 
                           "nowrap",
 
+
+
                       }}
+
+
 
                     >
 
+
+
                       {msg.title}
 
+
+
                     </div>
+
+
+
+
 
 
 
                     <div
 
+
+
                       style={{
 
+
+
                         marginTop:
+
+
 
                           "3px",
 
 
 
+
+
+
+
                         fontSize:
+
+
 
                           "10px",
 
 
 
+
+
+
+
                         color:
+
+
 
                           "#94a3b8",
 
+
+
                       }}
+
+
 
                     >
 
+
+
                       Communication client
 
+
+
                     </div>
+
+
+
+
 
 
 
@@ -4367,7 +8720,17 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 </div>
+
+
+
+
+
+
 
 
 
@@ -4377,71 +8740,143 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 <span
+
+
 
                   style={{
 
+
+
                     flexShrink:
+
+
 
                       0,
 
 
 
+
+
+
+
                     display:
+
+
 
                       "inline-flex",
 
 
 
+
+
+
+
                     alignItems:
+
+
 
                       "center",
 
 
 
+
+
+
+
                     gap:
+
+
 
                       "5px",
 
 
 
+
+
+
+
                     background:
+
+
 
                       "#f0fdf4",
 
 
 
+
+
+
+
                     color:
+
+
 
                       "#16a34a",
 
 
 
+
+
+
+
                     padding:
+
+
 
                       "5px 8px",
 
 
 
+
+
+
+
                     borderRadius:
+
+
 
                       "8px",
 
 
 
+
+
+
+
                     fontSize:
+
+
 
                       "10px",
 
 
 
+
+
+
+
                     fontWeight:
+
+
 
                       "800",
 
+
+
                   }}
 
+
+
                 >
+
+
+
+
 
 
 
@@ -4449,7 +8884,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   Envoyé
+
+
+
+
 
 
 
@@ -4457,7 +8900,17 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               </div>
+
+
+
+
+
+
 
 
 
@@ -4467,77 +8920,157 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   marginTop:
 
+
+
                     "13px",
+
+
+
+
 
 
 
                   paddingTop:
 
+
+
                     "13px",
+
+
+
+
 
 
 
                   borderTop:
 
+
+
                     "1px solid #f1f5f9",
 
+
+
                 }}
+
+
 
               >
 
 
 
+
+
+
+
                 <p
+
+
 
                   style={{
 
+
+
                     margin:
+
+
 
                       0,
 
 
 
+
+
+
+
                     color:
+
+
 
                       "#475569",
 
 
 
+
+
+
+
                     fontSize:
+
+
 
                       "13px",
 
 
 
+
+
+
+
                     lineHeight:
+
+
 
                       "1.65",
 
 
 
+
+
+
+
                     whiteSpace:
+
+
 
                       "pre-wrap",
 
+
+
                   }}
+
+
 
                 >
 
+
+
                   {msg.content ||
 
+
+
                     msg.message}
+
+
 
                 </p>
 
 
 
+
+
+
+
               </div>
+
+
+
+
+
+
 
 
 
@@ -4547,97 +9080,195 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   marginTop:
+
+
 
                     "14px",
 
 
 
+
+
+
+
                   paddingTop:
+
+
 
                     "12px",
 
 
 
+
+
+
+
                   borderTop:
+
+
 
                     "1px solid #f1f5f9",
 
 
 
+
+
+
+
                   display:
+
+
 
                     "flex",
 
 
 
+
+
+
+
                   justifyContent:
+
+
 
                     "space-between",
 
 
 
+
+
+
+
                   alignItems:
+
+
 
                     "center",
 
 
 
+
+
+
+
                   gap:
+
+
 
                     "10px",
 
 
 
+
+
+
+
                   flexWrap:
+
+
 
                     "wrap",
 
+
+
                 }}
+
+
 
               >
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     display:
+
+
 
                       "flex",
 
 
 
+
+
+
+
                     alignItems:
+
+
 
                       "center",
 
 
 
+
+
+
+
                     gap:
+
+
 
                       "6px",
 
 
 
+
+
+
+
                     color:
+
+
 
                       "#94a3b8",
 
 
 
+
+
+
+
                     fontSize:
+
+
 
                       "10px",
 
+
+
                   }}
 
+
+
                 >
+
+
+
+
 
 
 
@@ -4645,55 +9276,113 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   {msg.createdAt
+
+
 
                     ? new Date(
 
+
+
                         msg.createdAt
+
+
 
                       ).toLocaleString(
 
+
+
                         "fr-FR",
+
+
 
                         {
 
+
+
                           day:
 
+
+
                             "2-digit",
+
+
+
+
 
 
 
                           month:
 
+
+
                             "short",
+
+
+
+
 
 
 
                           year:
 
+
+
                             "numeric",
+
+
+
+
 
 
 
                           hour:
 
+
+
                             "2-digit",
+
+
+
+
 
 
 
                           minute:
 
+
+
                             "2-digit",
+
+
 
                         }
 
+
+
                       )
+
+
 
                     : "Date inconnue"}
 
 
 
+
+
+
+
                 </div>
+
+
+
+
+
+
 
 
 
@@ -4703,23 +9392,47 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 <div
+
+
 
                   style={{
 
+
+
                     display:
+
+
 
                       "flex",
 
 
 
+
+
+
+
                     gap:
+
+
 
                       "7px",
 
+
+
                   }}
 
+
+
                 >
+
+
+
+
 
 
 
@@ -4727,99 +9440,199 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   <button
+
+
 
                     type="button"
 
+
+
                     onClick={() =>
 
+
+
                       startEdit(msg)
+
+
 
                     }
 
 
 
+
+
+
+
                     style={{
 
+
+
                       height:
+
+
 
                         "34px",
 
 
 
+
+
+
+
                       padding:
+
+
 
                         "0 11px",
 
 
 
+
+
+
+
                       border:
+
+
 
                         "1px solid #e0e7ff",
 
 
 
+
+
+
+
                       borderRadius:
+
+
 
                         "10px",
 
 
 
+
+
+
+
                       background:
+
+
 
                         "#f8faff",
 
 
 
+
+
+
+
                       color:
+
+
 
                         "#4f46e5",
 
 
 
+
+
+
+
                       cursor:
+
+
 
                         "pointer",
 
 
 
+
+
+
+
                       display:
+
+
 
                         "flex",
 
 
 
+
+
+
+
                       alignItems:
 
+
+
                         "center",
+
+
+
+
 
 
 
                       justifyContent:
 
+
+
                         "center",
+
+
+
+
 
 
 
                       gap:
 
+
+
                         "6px",
+
+
+
+
 
 
 
                       fontSize:
 
+
+
                         "11px",
+
+
+
+
 
 
 
                       fontWeight:
 
+
+
                         "800",
+
+
 
                     }}
 
+
+
                   >
+
+
+
+
 
 
 
@@ -4827,11 +9640,25 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                     Modifier
 
 
 
+
+
+
+
                   </button>
+
+
+
+
+
+
 
 
 
@@ -4841,85 +9668,171 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   <button
+
+
 
                     type="button"
 
+
+
                     onClick={() =>
+
+
 
                       setDeletingMessage(
 
+
+
                         msg
 
+
+
                       )
+
+
 
                     }
 
 
 
+
+
+
+
                     style={{
+
+
 
                       width:
 
+
+
                         "34px",
+
+
+
+
 
 
 
                       height:
 
+
+
                         "34px",
+
+
+
+
 
 
 
                       border:
 
+
+
                         "1px solid #fee2e2",
+
+
+
+
 
 
 
                       borderRadius:
 
+
+
                         "10px",
+
+
+
+
 
 
 
                       background:
 
+
+
                         "#fffafa",
+
+
+
+
 
 
 
                       color:
 
+
+
                         "#dc2626",
+
+
+
+
 
 
 
                       cursor:
 
+
+
                         "pointer",
+
+
+
+
 
 
 
                       display:
 
+
+
                         "flex",
+
+
+
+
 
 
 
                       alignItems:
 
+
+
                         "center",
+
+
+
+
 
 
 
                       justifyContent:
 
+
+
                         "center",
+
+
 
                     }}
 
+
+
                   >
+
+
+
+
 
 
 
@@ -4927,7 +9840,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                   </button>
+
+
+
+
 
 
 
@@ -4935,7 +9856,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -4943,9 +9872,19 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
           )
 
+
+
         )}
+
+
+
+
 
 
 
@@ -4955,11 +9894,25 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
       {/* =====================================================
+
+
 
           DELETE CONFIRMATION MODAL
 
+
+
       ===================================================== */}
+
+
+
+
 
 
 
@@ -4967,109 +9920,219 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             position:
+
+
 
               "fixed",
 
 
 
+
+
+
+
             inset:
+
+
 
               0,
 
 
 
+
+
+
+
             background:
+
+
 
               "rgba(15,23,42,.60)",
 
 
 
+
+
+
+
             backdropFilter:
+
+
 
               "blur(6px)",
 
 
 
+
+
+
+
             display:
+
+
 
               "flex",
 
 
 
+
+
+
+
             alignItems:
 
+
+
               "center",
+
+
+
+
 
 
 
             justifyContent:
 
+
+
               "center",
+
+
+
+
 
 
 
             padding:
 
+
+
               "20px",
+
+
+
+
 
 
 
             zIndex:
 
+
+
               99999,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               width:
+
+
 
                 "100%",
 
 
 
+
+
+
+
               maxWidth:
+
+
 
                 "420px",
 
 
 
+
+
+
+
               background:
+
+
 
                 "#fff",
 
 
 
+
+
+
+
               borderRadius:
+
+
 
                 "24px",
 
 
 
+
+
+
+
               padding:
+
+
 
                 "22px",
 
 
 
+
+
+
+
               boxShadow:
+
+
 
                 "0 25px 70px rgba(0,0,0,.25)",
 
+
+
             }}
 
+
+
           >
+
+
+
+
 
 
 
@@ -5077,75 +10140,151 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width:
 
+
+
                   "52px",
+
+
+
+
 
 
 
                 height:
 
+
+
                   "52px",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "16px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#fef2f2",
+
+
+
+
 
 
 
                 color:
 
+
+
                   "#dc2626",
+
+
+
+
 
 
 
                 display:
 
+
+
                   "flex",
+
+
+
+
 
 
 
                 alignItems:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 justifyContent:
 
+
+
                   "center",
+
+
+
+
 
 
 
                 marginBottom:
 
+
+
                   "15px",
+
+
+
+
 
 
 
                 fontSize:
 
+
+
                   "20px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <FaExclamationTriangle />
+
+
+
+
 
 
 
@@ -5155,77 +10294,159 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
             <h2
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   "0 0 7px",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "19px",
 
 
 
+
+
+
+
                 fontWeight:
+
+
 
                   "850",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#111827",
 
+
+
               }}
+
+
 
             >
 
+
+
               Supprimer ce message ?
+
+
 
             </h2>
 
 
 
+
+
+
+
             <p
+
+
 
               style={{
 
+
+
                 margin:
+
+
 
                   "0",
 
 
 
+
+
+
+
                 color:
+
+
 
                   "#64748b",
 
 
 
+
+
+
+
                 fontSize:
+
+
 
                   "13px",
 
 
 
+
+
+
+
                 lineHeight:
+
+
 
                   "1.6",
 
+
+
               }}
+
+
 
             >
 
+
+
               Cette action supprimera définitivement
+
+
 
               ce message de votre historique.
 
+
+
             </p>
+
+
+
+
+
+
 
 
 
@@ -5235,131 +10456,265 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 marginTop:
+
+
 
                   "15px",
 
 
 
+
+
+
+
                 padding:
 
+
+
                   "12px",
+
+
+
+
 
 
 
                 background:
 
+
+
                   "#f8fafc",
+
+
+
+
 
 
 
                 border:
 
+
+
                   "1px solid #edf0f5",
+
+
+
+
 
 
 
                 borderRadius:
 
+
+
                   "12px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <strong
+
+
 
                 style={{
 
+
+
                   display:
+
+
 
                     "block",
 
 
 
+
+
+
+
                   fontSize:
+
+
 
                     "13px",
 
 
 
+
+
+
+
                   color:
+
+
 
                     "#111827",
 
 
 
+
+
+
+
                   marginBottom:
+
+
 
                     "4px",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 {deletingMessage.title}
+
+
 
               </strong>
 
 
 
+
+
+
+
               <span
+
+
 
                 style={{
 
+
+
                   display:
+
+
 
                     "block",
 
 
 
+
+
+
+
                   color:
+
+
 
                     "#64748b",
 
 
 
+
+
+
+
                   fontSize:
+
+
 
                     "11px",
 
 
 
+
+
+
+
                   overflow:
+
+
 
                     "hidden",
 
 
 
+
+
+
+
                   textOverflow:
+
+
 
                     "ellipsis",
 
 
 
+
+
+
+
                   whiteSpace:
+
+
 
                     "nowrap",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 {deletingMessage.content ||
 
+
+
                   deletingMessage.message}
+
+
 
               </span>
 
 
 
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5369,101 +10724,201 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 display:
+
+
 
                   "flex",
 
 
 
+
+
+
+
                 gap:
+
+
 
                   "10px",
 
 
 
+
+
+
+
                 marginTop:
+
+
 
                   "18px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <button
+
+
 
                 type="button"
 
+
+
                 onClick={() =>
+
+
 
                   setDeletingMessage(
 
+
+
                     null
 
+
+
                   )
+
+
 
                 }
 
 
 
+
+
+
+
                 style={{
 
+
+
                   flex:
+
+
 
                     1,
 
 
 
+
+
+
+
                   height:
+
+
 
                     "46px",
 
 
 
+
+
+
+
                   border:
+
+
 
                     "none",
 
 
 
+
+
+
+
                   borderRadius:
+
+
 
                     "13px",
 
 
 
+
+
+
+
                   background:
+
+
 
                     "#f1f5f9",
 
 
 
+
+
+
+
                   color:
+
+
 
                     "#475569",
 
 
 
+
+
+
+
                   fontWeight:
+
+
 
                     "800",
 
 
 
+
+
+
+
                   cursor:
+
+
 
                     "pointer",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 Annuler
+
+
 
               </button>
 
@@ -5471,93 +10926,189 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
+
+
               <button
+
+
 
                 type="button"
 
+
+
                 onClick={
 
+
+
                   deleteMessage
+
+
 
                 }
 
 
 
+
+
+
+
                 style={{
 
+
+
                   flex:
+
+
 
                     1,
 
 
 
+
+
+
+
                   height:
+
+
 
                     "46px",
 
 
 
+
+
+
+
                   border:
+
+
 
                     "none",
 
 
 
+
+
+
+
                   borderRadius:
+
+
 
                     "13px",
 
 
 
+
+
+
+
                   background:
+
+
 
                     "#dc2626",
 
 
 
+
+
+
+
                   color:
+
+
 
                     "#fff",
 
 
 
+
+
+
+
                   fontWeight:
+
+
 
                     "800",
 
 
 
+
+
+
+
                   cursor:
+
+
 
                     "pointer",
 
 
 
+
+
+
+
                   display:
+
+
 
                     "flex",
 
 
 
+
+
+
+
                   alignItems:
 
+
+
                     "center",
+
+
+
+
 
 
 
                   justifyContent:
 
+
+
                     "center",
+
+
+
+
 
 
 
                   gap:
 
+
+
                     "7px",
+
+
 
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -5565,7 +11116,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
                 Supprimer
+
+
+
+
 
 
 
@@ -5573,7 +11132,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -5581,7 +11148,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -5589,7 +11164,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -5597,7 +11180,15 @@ const deleteMessage = async () => {
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 

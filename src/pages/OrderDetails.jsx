@@ -2,31 +2,63 @@ import { useEffect, useState } from "react";
 
 
 
+
+
+
+
 import {
+
+
 
   FaBoxOpen,
 
+
+
   FaMoneyBillWave,
+
+
 
   FaShoppingBag,
 
+
+
   FaHashtag,
+
+
 
   FaTruck,
 
+
+
   FaCheckCircle,
+
+
 
   FaMapMarkerAlt,
 
+
+
   FaBox,
 
+
+
   FaEye,
+
+
 
 } from "react-icons/fa";
 
 
 
+
+
+
+
 import axios from "axios";
+
+
+
+
 
 
 
@@ -35,73 +67,123 @@ import { useParams } from "react-router-dom";
 
 
 
-const API_BASE_URL = "https://konanshopping.com";
+
+
+
+
+
+const API_BASE_URL = "https\://konanshopping.com";
+
 const API_TIMEOUT = 15000;
+
 const MAX_ID_LENGTH = 24;
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" ? token.trim() : "";
-  } catch {
-    return "";
-  }
-};
+
+
+// ======================================================
+ // 🔐 AUTHENTIFICATION UTILISATEUR PAR COOKIE HTTPONLY
+ // ======================================================
+ // Le JWT utilisateur n'est plus lu depuis localStorage.
+ // Le navigateur envoie automatiquement le cookie HttpOnly.
+ // La logique métier de la page reste inchangée.
+ // ======================================================
+
+axios.defaults.withCredentials = true;
+
 
 const isValidObjectId = (value) => {
+
   if (typeof value !== "string") return false;
+
   const safeId = value.trim();
+
   return safeId.length === MAX_ID_LENGTH && /^[a-fA-F0-9]{24}$/.test(safeId);
+
 };
+
+
 
 const getSafeServerMessage = (error) => {
+
   const message = error?.response?.data?.message;
+
   return typeof message === "string" && message.trim()
+
     ? message.trim().slice(0, 300)
+
     : "";
+
 };
 
+
+
 const normalizeOrder = (data) => {
+
   const candidate = data?.order || data?.data || data;
+
   if (!candidate || typeof candidate !== "object") return null;
+
   if (!isValidObjectId(String(candidate._id || ""))) return null;
+
   return candidate;
+
 };
+
+
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: { Accept: "application/json" },
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
-    if (!token) {
-      return Promise.reject(new Error("Session utilisateur absente."));
-    }
+    if (!config) return config;
+
+    config.withCredentials = true;
     config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Accept = "application/json";
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 api.interceptors.response.use(
+
   (response) => response,
+
   (error) => {
+
     if (error?.response?.status === 401 || error?.response?.status === 403) {
+
       error.userMessage = "Accès refusé ou session expirée.";
+
     } else if (error?.code === "ECONNABORTED") {
+
       error.userMessage = "Le serveur met trop de temps à répondre.";
+
     } else if (!error?.response) {
+
       error.userMessage = "Impossible de contacter le serveur.";
+
     }
+
     return Promise.reject(error);
+
   }
+
 );
 
+
+
 export default function OrderDetails() {
+
+
+
+
 
 
 
@@ -109,55 +191,111 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   const [order, setOrder] =
+
+
 
     useState(null);
 
+
+
   useEffect(() => {
+
     if (!isValidObjectId(id)) {
+
       setOrder(null);
+
       return;
+
     }
+
+
 
     let mounted = true;
 
+
+
     api
+
       .get(`/order/${encodeURIComponent(id.trim())}`)
+
       .then((res) => {
+
         if (!mounted) return;
+
+
 
         const data = normalizeOrder(res?.data);
 
+
+
         if (!data) {
+
           setOrder(null);
+
           return;
+
         }
 
+
+
         if (import.meta.env?.DEV) {
+
           console.debug("Order details loaded:", data._id);
+
         }
+
+
 
         setOrder(data);
+
       })
+
       .catch((err) => {
+
         if (!mounted) return;
 
+
+
         if (import.meta.env?.DEV) {
+
           console.warn(
+
             "Impossible de charger la commande.",
+
             err?.userMessage ||
+
               getSafeServerMessage(err) ||
+
               "Erreur serveur"
+
           );
+
         }
 
+
+
         setOrder(null);
+
       });
 
+
+
     return () => {
+
       mounted = false;
+
     };
+
   }, [id]);
+
+
+
+
 
 
 
@@ -165,15 +303,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   return (
+
+
+
+
 
 
 
     <div
 
+
+
       style={{
 
+
+
         background: "#F5F7FB",
+
+
+
+
 
 
 
@@ -181,7 +335,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -189,23 +351,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
         padding: "16px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           background: "#FFFFFF",
+
+
+
+
 
 
 
@@ -213,7 +399,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           maxWidth: "340px",
+
+
+
+
 
 
 
@@ -221,7 +415,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           borderRadius: "22px",
+
+
+
+
 
 
 
@@ -229,13 +431,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           boxShadow:
+
+
 
             "0 10px 30px rgba(15,23,42,0.06)",
 
 
 
+
+
+
+
           display: "flex",
+
+
+
+
 
 
 
@@ -243,23 +459,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           alignItems: "center",
+
+
+
+
 
 
 
           textAlign: "center",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             width: "65px",
+
+
+
+
 
 
 
@@ -267,13 +507,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             borderRadius: "18px",
+
+
+
+
 
 
 
             background:
 
+
+
               "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+
+
+
+
 
 
 
@@ -281,7 +535,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             justifyContent: "center",
+
+
+
+
 
 
 
@@ -289,27 +551,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             marginBottom: "14px",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <FaBoxOpen
 
+
+
             style={{
+
+
 
               fontSize: "28px",
 
 
 
+
+
+
+
               color: "#7C3AED",
+
+
 
             }}
 
+
+
           />
+
+
+
+
 
 
 
@@ -317,11 +607,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         <h2
+
+
 
           style={{
 
+
+
             margin: 0,
+
+
+
+
 
 
 
@@ -329,27 +631,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             fontSize: "18px",
+
+
+
+
 
 
 
             fontWeight: "900",
 
+
+
           }}
+
+
 
         >
 
+
+
           Chargement...
+
+
 
         </h2>
 
 
 
+
+
+
+
         <p
+
+
 
           style={{
 
+
+
             marginTop: "8px",
+
+
+
+
 
 
 
@@ -357,7 +687,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             color: "#64748B",
+
+
+
+
 
 
 
@@ -365,15 +703,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             lineHeight: "22px",
+
+
 
           }}
 
+
+
         >
+
+
 
           Récupération des détails de votre commande
 
+
+
         </p>
+
+
+
+
 
 
 
@@ -381,7 +735,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -389,13 +751,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
   const products =
 
+
+
     order.items || order.products || [];
+
+
+
+
 
 
 
@@ -403,19 +779,39 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         background: "#f5f7fb",
+
+
 
         minHeight: "100vh",
 
+
+
         padding: "15px",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -423,11 +819,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     background: "#FFFFFF",
+
+
+
+
 
 
 
@@ -435,7 +843,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     margin: "0 auto",
+
+
+
+
 
 
 
@@ -443,13 +859,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     padding:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "16px"
 
+
+
         : "22px",
+
+
+
+
 
 
 
@@ -457,13 +887,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     boxShadow:
+
+
 
       "0 2px 12px rgba(15,23,42,0.05)",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -471,41 +915,83 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     display: "flex",
+
+
 
     justifyContent: "space-between",
 
+
+
     alignItems:
 
+
+
       window.innerWidth < 768
+
+
 
         ? "flex-start"
 
+
+
         : "center",
+
+
 
     flexDirection:
 
+
+
       window.innerWidth < 768
+
+
 
         ? "column"
 
+
+
         : "row",
+
+
 
     gap: "12px",
 
+
+
     paddingBottom: "14px",
+
+
 
     marginBottom: "16px",
 
+
+
     borderBottom: "1px solid #E5E7EB",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -513,47 +999,95 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       display: "flex",
+
+
 
       alignItems: "center",
 
+
+
       gap: "10px",
+
+
 
       width: "100%",
 
+
+
       minWidth: 0,
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         width:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "44px"
 
+
+
             : "54px",
+
+
+
+
 
 
 
         height:
 
+
+
           window.innerWidth < 768
+
+
 
             ? "44px"
 
+
+
             : "54px",
+
+
+
+
 
 
 
@@ -561,9 +1095,19 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         background:
 
+
+
           "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+
+
+
+
 
 
 
@@ -571,7 +1115,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         justifyContent: "center",
+
+
+
+
 
 
 
@@ -579,33 +1131,67 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaBoxOpen
+
+
 
         style={{
 
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "18px"
+
+
 
               : "24px",
 
 
 
+
+
+
+
           color: "#7C3AED",
+
+
 
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -613,25 +1199,51 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         flex: 1,
+
+
 
         minWidth: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <h1
+
+
 
         style={{
 
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -639,13 +1251,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "17px"
 
+
+
               : "24px",
+
+
+
+
 
 
 
@@ -653,23 +1279,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           lineHeight: 1.2,
+
+
 
         }}
 
+
+
       >
 
+
+
         Détails commande
+
+
 
       </h1>
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           display: "flex",
+
+
+
+
 
 
 
@@ -677,7 +1327,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           gap: "5px",
+
+
+
+
 
 
 
@@ -685,7 +1343,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           color: "#64748B",
+
+
+
+
 
 
 
@@ -693,43 +1359,87 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           overflow: "hidden",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <FaHashtag
+
+
 
           style={{
 
+
+
             fontSize: "10px",
 
+
+
           }}
+
+
 
         />
 
 
 
+
+
+
+
         <span
+
+
 
           style={{
 
+
+
             overflow: "hidden",
+
+
 
             textOverflow: "ellipsis",
 
+
+
             whiteSpace: "nowrap",
+
+
 
           }}
 
+
+
         >
+
+
 
           {order._id}
 
+
+
         </span>
+
+
+
+
 
 
 
@@ -737,11 +1447,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -749,35 +1471,71 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         order.status === "Livrée"
 
+
+
           ? "#DCFCE7"
+
+
 
           : order.status === "En livraison"
 
+
+
           ? "#DBEAFE"
+
+
 
           : "#FEF3C7",
 
 
 
+
+
+
+
       color:
+
+
 
         order.status === "Livrée"
 
+
+
           ? "#15803D"
+
+
 
           : order.status === "En livraison"
 
+
+
           ? "#2563EB"
 
+
+
           : "#92400E",
+
+
+
+
 
 
 
@@ -785,7 +1543,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       borderRadius: "999px",
+
+
+
+
 
 
 
@@ -793,7 +1559,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       fontSize: "11px",
+
+
+
+
 
 
 
@@ -801,7 +1575,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -809,47 +1591,95 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       border:
+
+
 
         order.status === "Livrée"
 
+
+
           ? "1px solid #BBF7D0"
+
+
 
           : order.status === "En livraison"
 
+
+
           ? "1px solid #BFDBFE"
+
+
 
           : "1px solid #FCD34D",
 
 
 
+
+
+
+
       alignSelf:
+
+
 
         window.innerWidth < 768
 
+
+
           ? "flex-start"
+
+
 
           : "center",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     {
+
+
 
       order.status === "Livrée"
 
+
+
         ? <FaCheckCircle />
+
+
 
         : order.status === "En livraison"
 
+
+
         ? <FaTruck />
+
+
 
         : <FaBoxOpen />
 
+
+
     }
+
+
+
+
 
 
 
@@ -857,11 +1687,25 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
 
 
 
@@ -871,23 +1715,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
 {products.map((item, index) => (
+
+
+
+
 
 
 
   <div
 
+
+
     key={index}
 
+
+
     style={{
+
+
 
       background: "#FFFFFF",
 
 
 
+
+
+
+
       border:
 
+
+
         "1px solid #E5E7EB",
+
+
+
+
 
 
 
@@ -895,7 +1763,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       padding: "12px",
+
+
+
+
 
 
 
@@ -903,7 +1779,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -911,7 +1795,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -919,13 +1811,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 2px 8px rgba(15,23,42,0.04)",
 
+
+
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -933,15 +1839,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         display: "flex",
 
 
 
+
+
+
+
         alignItems: "center",
+
+
+
+
 
 
 
@@ -949,105 +1871,211 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         flex: 1,
+
+
+
+
 
 
 
         minWidth: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <img
+
+
 
         src={
 
+
+
           (
+
+
 
             item.image ||
 
+
+
             item.product?.image ||
 
+
+
             item.productImage
+
+
 
           )?.includes("localhost:5000")
 
 
 
+
+
+
+
             ? (
+
+
 
                 item.image ||
 
+
+
                 item.product?.image ||
+
+
 
                 item.productImage
 
+
+
               ).replace(
 
-                "http://localhost:5000",
 
-                "https://konanshopping.com/api/"
+
+                "http\://localhost:5000",
+
+
+
+                "https\://konanshopping.com/api/"
+
+
 
               )
+
+
+
+
 
 
 
             : (
 
+
+
                 item.image ||
+
+
 
                 item.product?.image ||
 
+
+
                 item.productImage ||
+
+
 
                 "/logo.jpg"
 
+
+
               )
 
+
+
         }
+
+
+
+
 
 
 
         alt={
 
+
+
           item.name ||
 
+
+
           item.product?.name
+
+
 
         }
 
 
 
+
+
+
+
         onError={(e) => {
 
+
+
           e.target.src = "/logo.jpg";
+
+
 
         }}
 
 
 
+
+
+
+
         style={{
+
+
 
           width:
 
+
+
             window.innerWidth < 768
+
+
 
               ? "65px"
 
+
+
               : "75px",
+
+
+
+
 
 
 
           height:
 
+
+
             window.innerWidth < 768
+
+
 
               ? "65px"
 
+
+
               : "75px",
+
+
+
+
 
 
 
@@ -1055,45 +2083,91 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           borderRadius: "14px",
+
+
+
+
 
 
 
           border:
 
+
+
             "1px solid #E5E7EB",
+
+
+
+
 
 
 
           flexShrink: 0,
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
       <div
 
+
+
         style={{
+
+
 
           flex: 1,
 
 
 
+
+
+
+
           minWidth: 0,
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display: "inline-flex",
+
+
+
+
 
 
 
@@ -1101,7 +2175,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             gap: "6px",
+
+
+
+
 
 
 
@@ -1109,7 +2191,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             color: "#7C3AED",
+
+
+
+
 
 
 
@@ -1117,7 +2207,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             borderRadius: "999px",
+
+
+
+
 
 
 
@@ -1125,15 +2223,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             fontWeight: "700",
+
+
+
+
 
 
 
             marginBottom: "6px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -1141,7 +2255,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           Produit
+
+
+
+
 
 
 
@@ -1149,11 +2271,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         <h3
+
+
 
           style={{
 
+
+
             margin: 0,
+
+
+
+
 
 
 
@@ -1161,13 +2295,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             fontSize:
+
+
 
               window.innerWidth < 768
 
+
+
                 ? "14px"
 
+
+
                 : "16px",
+
+
+
+
 
 
 
@@ -1175,7 +2323,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             overflow: "hidden",
+
+
+
+
 
 
 
@@ -1183,29 +2339,59 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             whiteSpace: "nowrap",
+
+
 
           }}
 
+
+
         >
+
+
 
           {
 
+
+
             item.name ||
+
+
 
             item.product?.name
 
+
+
           }
+
+
 
         </h3>
 
 
 
+
+
+
+
         <div
+
+
 
           style={{
 
+
+
             display: "flex",
+
+
+
+
 
 
 
@@ -1213,7 +2399,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             gap: "6px",
+
+
+
+
 
 
 
@@ -1221,15 +2415,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
             color: "#64748B",
+
+
+
+
 
 
 
             fontSize: "12px",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -1237,11 +2447,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           Quantité :
+
+
 
           {" "}
 
+
+
           {item.quantity || 1}
+
+
+
+
 
 
 
@@ -1249,11 +2471,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       </div>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1261,27 +2495,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     <div
 
+
+
       style={{
+
+
 
         textAlign: "right",
 
 
 
+
+
+
+
         flexShrink: 0,
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           fontSize: "11px",
+
+
+
+
 
 
 
@@ -1289,23 +2551,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           fontWeight: "600",
+
+
 
         }}
 
+
+
       >
 
+
+
         Prix
+
+
 
       </div>
 
 
 
+
+
+
+
       <div
+
+
 
         style={{
 
+
+
           color: "#4F46E5",
+
+
+
+
 
 
 
@@ -1313,27 +2599,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
           fontSize:
+
+
 
             window.innerWidth < 768
 
+
+
               ? "15px"
+
+
 
               : "18px",
 
+
+
         }}
+
+
 
       >
 
+
+
         {
+
+
 
           item.price ||
 
+
+
           item.product?.price
+
+
 
         } FCFA
 
+
+
       </div>
+
+
+
+
 
 
 
@@ -1341,7 +2655,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1349,15 +2671,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         {/* FOOTER */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
 
+
+
     marginTop: "18px",
+
+
+
+
 
 
 
@@ -1365,7 +2703,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     border: "1px solid #E2E8F0",
+
+
+
+
 
 
 
@@ -1373,7 +2719,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     padding: "16px",
+
+
+
+
 
 
 
@@ -1381,35 +2735,71 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     justifyContent: "space-between",
+
+
+
+
 
 
 
     alignItems:
 
+
+
       window.innerWidth < 768
 
+
+
         ? "stretch"
+
+
 
         : "center",
 
 
 
+
+
+
+
     flexDirection:
+
+
 
       window.innerWidth < 768
 
+
+
         ? "column"
+
+
 
         : "row",
 
 
 
+
+
+
+
     gap: "14px",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1417,23 +2807,47 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       flex: 1,
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -1441,7 +2855,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         gap: "8px",
+
+
+
+
 
 
 
@@ -1449,27 +2871,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         fontSize: "12px",
+
+
+
+
 
 
 
         fontWeight: "700",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <FaMoneyBillWave
+
+
 
         style={{
 
+
+
           color: "#4F46E5",
+
+
 
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -1477,15 +2927,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
     <h2
 
+
+
       style={{
 
+
+
         margin: "8px 0 0 0",
+
+
+
+
 
 
 
@@ -1493,13 +2959,27 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         fontSize:
+
+
 
           window.innerWidth < 768
 
+
+
             ? "24px"
 
+
+
             : "30px",
+
+
+
+
 
 
 
@@ -1507,15 +2987,31 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
         lineHeight: 1,
+
+
 
       }}
 
+
+
     >
+
+
 
       {order.total} FCFA
 
+
+
     </h2>
+
+
+
+
 
 
 
@@ -1523,25 +3019,51 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
   {/* BUTTON */}
+
+
+
+
 
 
 
   <button
 
+
+
    onClick={() =>
+
+
 
   window.location.href =
 
+
+
   `/track-order/${order._id}`
+
+
 
 }
 
+
+
     style={{
+
+
 
       background:
 
+
+
         "linear-gradient(135deg,#4F46E5,#7C3AED)",
+
+
+
+
 
 
 
@@ -1549,17 +3071,35 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       border: "none",
+
+
+
+
 
 
 
       padding:
 
+
+
         window.innerWidth < 768
+
+
 
           ? "14px"
 
+
+
           : "14px 22px",
+
+
+
+
 
 
 
@@ -1567,7 +3107,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       fontWeight: "800",
+
+
+
+
 
 
 
@@ -1575,7 +3123,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       cursor: "pointer",
+
+
+
+
 
 
 
@@ -1583,7 +3139,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -1591,27 +3155,55 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
       gap: "8px",
+
+
+
+
 
 
 
       width:
 
+
+
         window.innerWidth < 768
 
+
+
           ? "100%"
+
+
 
           : "auto",
 
 
 
+
+
+
+
       boxShadow:
+
+
 
         "0 8px 20px rgba(79,70,229,0.18)",
 
+
+
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1619,7 +3211,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     Suivre la livraison
+
+
+
+
 
 
 
@@ -1627,7 +3227,15 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -1635,11 +3243,23 @@ export default function OrderDetails() {
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   );
+
+
+
+
 
 
 

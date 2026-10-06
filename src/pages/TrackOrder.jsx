@@ -102,30 +102,12 @@ const API = "https://konanshopping.com/api";
 const API_TIMEOUT = 15000;
 const MAX_ORDER_ID_LENGTH = 24;
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" ? token.trim() : "";
-  } catch {
-    return "";
-  }
-};
-
-const isValidObjectId = (value) => {
-  const id = String(value ?? "").trim();
-  return /^[a-fA-F0-9]{24}$/.test(id);
-};
-
-const safeServerMessage = (error) => {
-  const message = error?.response?.data?.message;
-  return typeof message === "string" && message.trim()
-    ? message.trim().slice(0, 300)
-    : "";
-};
+axios.defaults.withCredentials = true;
 
 const apiClient = axios.create({
   baseURL: API,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: {
     Accept: "application/json",
   },
@@ -133,16 +115,11 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    const token = getAuthToken();
+    if (!config) return config;
 
-    if (!token) {
-      return Promise.reject(
-        new Error("Session utilisateur absente.")
-      );
-    }
-
+    config.withCredentials = true;
     config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Accept = "application/json";
 
     return config;
   },
@@ -170,10 +147,6 @@ apiClient.interceptors.response.use(
   }
 );
 
-
-
-
-// ======================================================
 
 // HELPERS
 

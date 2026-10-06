@@ -2,11 +2,23 @@ import {
 
 
 
+
+
+
+
   useEffect,
 
 
 
+
+
+
+
   useState
+
+
+
+
 
 
 
@@ -18,35 +30,75 @@ import {
 
 
 
+
+
+
+
+
+
+
+
 import axios from "axios";
 
 
 
+
+
+
+
 // ============================================================
+
+
 
 // SÉCURITÉ ADMIN — AdminProducts
 
+
+
 // La logique métier et les endpoints sont conservés.
 
+
+
 // Le backend reste l'autorité finale pour les droits admin.
+
+
 
 // ============================================================
 
 
 
-const API_BASE_URL = "https://konanshopping.com";
+
+
+
+
+const API_BASE_URL = "https\://konanshopping.com";
+
+
 
 const API_TIMEOUT = 15000;
 
 
 
+
+
+
+
 const MAX_NAME_LENGTH = 150;
+
+
 
 const MAX_CATEGORY_LENGTH = 100;
 
+
+
 const MAX_SEARCH_LENGTH = 100;
 
+
+
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+
+
+
 
 
 
@@ -54,269 +106,288 @@ const ALLOWED_STATUSES = []; // Conservé sans changer la logique métier.
 
 
 
+
+
+
+
 const safeParse = (value, fallback = null) => {
 
+
+
   try {
+
+
 
     return value ? JSON.parse(value) : fallback;
 
+
+
   } catch {
+
+
 
     return fallback;
 
+
+
   }
+
+
 
 };
 
 
 
-const getAuthToken = () => {
-
-  try {
-
-    const token = localStorage.getItem("token");
-
-    return typeof token === "string" && token.trim()
-
-      ? token.trim()
-
-      : null;
-
-  } catch {
-
-    return null;
-
-  }
-
-};
 
 
+
+
+// Authentification administrateur par cookie HttpOnly
+// Le JWT n'est plus lu depuis localStorage.
+// Le navigateur envoie automatiquement le cookie de session.
 
 const getStoredAdmin = () => {
 
+
+
   try {
+
+
 
     return safeParse(localStorage.getItem("admin"), null);
 
+
+
   } catch {
+
+
 
     return null;
 
+
+
   }
 
+
+
 };
+
+
+
+
 
 
 
 const isValidObjectId = (id) =>
 
+
+
   typeof id === "string" &&
+
+
 
   /^[a-f\d]{24}$/i.test(id);
 
 
 
+
+
+
+
 const normalizeProductsResponse = (data) =>
+
+
 
   Array.isArray(data) ? data : [];
 
 
 
+
+
+
+
 const normalizeText = (value, maxLength) =>
+
+
 
   typeof value === "string"
 
+
+
     ? value.trim().slice(0, maxLength)
+
+
 
     : "";
 
 
 
+
+
+
+
 const normalizePrice = (value) => {
+
+
 
   const number = Number(value);
 
+
+
   return Number.isFinite(number) && number >= 0
+
+
 
     ? number
 
+
+
     : null;
 
+
+
 };
+
+
+
+
 
 
 
 const isValidImageFile = (file) => {
 
+
+
   if (!file) return false;
+
+
+
+
 
 
 
   const allowedTypes = [
 
+
+
     "image/jpeg",
+
+
 
     "image/png",
 
+
+
     "image/webp",
 
+
+
     "image/gif",
+
+
 
   ];
 
 
 
+
+
+
+
   return (
+
+
 
     allowedTypes.includes(file.type) &&
 
+
+
     file.size > 0 &&
+
+
 
     file.size <= MAX_IMAGE_SIZE
 
+
+
   );
 
+
+
 };
 
 
+
+
+
+
+
+axios.defaults.withCredentials = true;
 
 const api = axios.create({
-
   baseURL: API_BASE_URL,
-
   timeout: API_TIMEOUT,
-
+  withCredentials: true,
   headers: {
-
     Accept: "application/json",
-
   },
-
 });
 
-
-
 api.interceptors.request.use(
-
   (config) => {
-
-    const token = getAuthToken();
-
-
-
-    if (token) {
-
-      config.headers = config.headers || {};
-
-      config.headers.Authorization = `Bearer ${token}`;
-
-    }
-
-
-
+    if (!config) return config;
+    config.withCredentials = true;
+    config.headers = config.headers || {};
+    config.headers.Accept = "application/json";
     return config;
-
   },
-
   (error) => Promise.reject(error)
-
 );
-
-
 
 api.interceptors.response.use(
-
   (response) => response,
-
   (error) => {
-
     const status = error?.response?.status;
-
-
-
     if (status === 401 || status === 403) {
-
       try {
-
-        localStorage.removeItem("token");
-
         localStorage.removeItem("admin");
-
       } catch {
-
         // Ne bloque pas l'application.
-
       }
-
-
-
       if (
-
         typeof window !== "undefined" &&
-
         window.location.pathname !== "/admin-login"
-
       ) {
-
         window.location.replace("/admin-login");
-
       }
-
     }
-
-
-
     return Promise.reject(error);
-
   }
-
 );
 
-
-
 const requireAdminSession = () => {
-
-  const token = getAuthToken();
-
   const admin = getStoredAdmin();
-
-
-
-  if (!token || !admin) {
-
+  if (!admin) {
     if (
-
       typeof window !== "undefined" &&
-
       window.location.pathname !== "/admin-login"
-
     ) {
-
       window.location.replace("/admin-login");
-
     }
-
-
-
     return false;
-
   }
-
-
-
   return true;
-
 };
 
-
-
-
-
-
-
-
-
 import { toast } from "react-toastify";
+
+
+
+
+
+
+
+
 
 
 
@@ -328,7 +399,15 @@ import {
 
 
 
+
+
+
+
   FaPlus,
+
+
+
+
 
 
 
@@ -336,7 +415,15 @@ import {
 
 
 
+
+
+
+
   FaEdit,
+
+
+
+
 
 
 
@@ -344,7 +431,15 @@ import {
 
 
 
+
+
+
+
   FaSearch,
+
+
+
+
 
 
 
@@ -352,11 +447,27 @@ import {
 
 
 
+
+
+
+
   FaImage,
 
 
 
+
+
+
+
 } from "react-icons/fa";
+
+
+
+
+
+
+
+
 
 
 
@@ -372,6 +483,14 @@ import "./AdminProducts.css";
 
 
 
+
+
+
+
+
+
+
+
 function AdminProducts() {
 
 
@@ -380,7 +499,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -388,7 +519,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -400,7 +543,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState([]);
+
+
+
+
+
+
+
+
 
 
 
@@ -412,7 +567,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState("");
+
+
+
+
+
+
+
+
 
 
 
@@ -424,7 +591,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState("");
+
+
+
+
+
+
+
+
 
 
 
@@ -436,7 +615,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState("");
+
+
+
+
+
+
+
+
 
 
 
@@ -448,7 +639,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState(null);
+
+
+
+
+
+
+
+
 
 
 
@@ -460,7 +663,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState("");
+
+
+
+
+
+
+
+
 
 
 
@@ -472,7 +687,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState(null);
+
+
+
+
+
+
+
+
 
 
 
@@ -484,6 +711,10 @@ function AdminProducts() {
 
 
 
+
+
+
+
     useState(false);
 
 
@@ -492,7 +723,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -500,7 +743,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -516,7 +771,23 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
     fetchProducts();
+
+
+
+
+
+
+
+
 
 
 
@@ -532,11 +803,31 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
   const fetchProducts =
 
 
 
+
+
+
+
     async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -552,15 +843,39 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
         const res = await api.get(
 
 
 
-  "https://konanshopping.com/api/products"
+
+
+
+
+  "https\://konanshopping.com/api/products"
+
+
+
+
 
 
 
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -576,7 +891,23 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
       } catch (err) {
+
+
+
+
+
+
+
+
 
 
 
@@ -592,7 +923,23 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
       }
+
+
+
+
+
+
+
+
 
 
 
@@ -608,7 +955,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -616,7 +975,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -628,7 +999,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
     async () => {
+
+
+
+
+
+
+
+
 
 
 
@@ -644,7 +1027,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
         if (
+
+
+
+
 
 
 
@@ -652,7 +1047,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
           !price ||
+
+
+
+
 
 
 
@@ -660,7 +1063,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
           !image
+
+
+
+
 
 
 
@@ -672,7 +1083,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
           return toast.warning(
+
+
+
+
 
 
 
@@ -680,7 +1103,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
   {
+
+
+
+
 
 
 
@@ -688,7 +1119,15 @@ function AdminProducts() {
 
 
 
+
+
+
+
     autoClose: 2500,
+
+
+
+
 
 
 
@@ -696,7 +1135,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -712,7 +1163,23 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
         setLoading(true);
+
+
+
+
+
+
+
+
 
 
 
@@ -728,7 +1195,23 @@ function AdminProducts() {
 
 
 
+
+
+
+
+
+
+
+
         // SAVE DATABASE
+
+
+
+
+
+
+
+
 
 
 
@@ -740,7 +1223,19 @@ function AdminProducts() {
 
 
 
+
+
+
+
   new FormData();
+
+
+
+
+
+
+
+
 
 
 
@@ -756,7 +1251,23 @@ formData.append("name", name);
 
 
 
+
+
+
+
+
+
+
+
 formData.append("price", price);
+
+
+
+
+
+
+
+
 
 
 
@@ -772,7 +1283,23 @@ formData.append("category", category);
 
 
 
+
+
+
+
+
+
+
+
 formData.append("image", image);
+
+
+
+
+
+
+
+
 
 
 
@@ -784,7 +1311,15 @@ await api.post(
 
 
 
-  "https://konanshopping.com/api/add-product",
+
+
+
+
+  "https\://konanshopping.com/api/add-product",
+
+
+
+
 
 
 
@@ -792,7 +1327,15 @@ await api.post(
 
 
 
+
+
+
+
   {
+
+
+
+
 
 
 
@@ -800,7 +1343,15 @@ await api.post(
 
 
 
+
+
+
+
       "Content-Type": "multipart/form-data",
+
+
+
+
 
 
 
@@ -808,11 +1359,27 @@ await api.post(
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -828,7 +1395,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setName("");
+
+
+
+
+
+
+
+
 
 
 
@@ -844,7 +1427,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setCategory("");
+
+
+
+
+
+
+
+
 
 
 
@@ -860,7 +1459,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         fetchProducts();
+
+
+
+
+
+
+
+
 
 
 
@@ -872,7 +1487,15 @@ await api.post(
 
 
 
+
+
+
+
   "Produit ajouté dans la boutique ✅",
+
+
+
+
 
 
 
@@ -880,7 +1503,15 @@ await api.post(
 
 
 
+
+
+
+
     position: "top-right",
+
+
+
+
 
 
 
@@ -888,11 +1519,27 @@ await api.post(
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -908,7 +1555,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
+
+
+
+
 
 
 
@@ -920,7 +1583,15 @@ await api.post(
 
 
 
+
+
+
+
   "Erreur lors de l'ajout du produit ❌",
+
+
+
+
 
 
 
@@ -928,7 +1599,15 @@ await api.post(
 
 
 
+
+
+
+
     position: "top-right",
+
+
+
+
 
 
 
@@ -936,11 +1615,27 @@ await api.post(
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -956,7 +1651,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setLoading(false);
+
+
+
+
+
+
+
+
 
 
 
@@ -972,6 +1683,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
     };
 
 
@@ -980,7 +1699,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -988,7 +1719,19 @@ await api.post(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -1000,7 +1743,19 @@ await api.post(
 
 
 
+
+
+
+
     async (id) => {
+
+
+
+
+
+
+
+
 
 
 
@@ -1012,11 +1767,23 @@ await api.post(
 
 
 
+
+
+
+
         window.confirm(
 
 
 
+
+
+
+
           "Supprimer ce produit ?"
+
+
+
+
 
 
 
@@ -1028,11 +1795,31 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
       if (!confirmDelete)
 
 
 
+
+
+
+
         return;
+
+
+
+
+
+
+
+
 
 
 
@@ -1048,15 +1835,39 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         await api.delete(
 
 
 
-  `https://konanshopping.com/api/delete-product/${id}`
+
+
+
+
+  `https\://konanshopping.com/api/delete-product/${id}`
+
+
+
+
 
 
 
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -1072,7 +1883,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         toast.success(
+
+
+
+
 
 
 
@@ -1080,7 +1903,15 @@ await api.post(
 
 
 
+
+
+
+
   {
+
+
+
+
 
 
 
@@ -1088,7 +1919,15 @@ await api.post(
 
 
 
+
+
+
+
     autoClose: 2500,
+
+
+
+
 
 
 
@@ -1096,7 +1935,19 @@ await api.post(
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -1112,7 +1963,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
+
+
+
+
 
 
 
@@ -1128,6 +1995,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
     };
 
 
@@ -1136,7 +2011,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1144,7 +2031,19 @@ await api.post(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -1156,6 +2055,10 @@ await api.post(
 
 
 
+
+
+
+
     async () => {
 
 
@@ -1164,7 +2067,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
       try {
+
+
+
+
+
+
+
+
 
 
 
@@ -1180,11 +2099,27 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         await api.put(
 
 
 
-  `https://konanshopping.com/api/update-product/${editId}`,
+
+
+
+
+  `https\://konanshopping.com/api/update-product/${editId}`,
+
+
+
+
 
 
 
@@ -1192,7 +2127,15 @@ await api.post(
 
 
 
+
+
+
+
     name,
+
+
+
+
 
 
 
@@ -1200,7 +2143,15 @@ await api.post(
 
 
 
+
+
+
+
     category,
+
+
+
+
 
 
 
@@ -1208,7 +2159,19 @@ await api.post(
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -1224,7 +2187,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setName("");
+
+
+
+
+
+
+
+
 
 
 
@@ -1240,7 +2219,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setCategory("");
+
+
+
+
+
+
+
+
 
 
 
@@ -1256,7 +2251,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         fetchProducts();
+
+
+
+
+
+
+
+
 
 
 
@@ -1268,7 +2279,15 @@ await api.post(
 
 
 
+
+
+
+
   "Produit modifié avec succès ✏️",
+
+
+
+
 
 
 
@@ -1276,7 +2295,15 @@ await api.post(
 
 
 
+
+
+
+
     position: "top-right",
+
+
+
+
 
 
 
@@ -1284,11 +2311,27 @@ await api.post(
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
 );
+
+
+
+
+
+
+
+
 
 
 
@@ -1304,7 +2347,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         console.error("Erreur AdminProducts :", err?.message || "Erreur inconnue");
+
+
+
+
+
+
+
+
 
 
 
@@ -1320,7 +2379,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         setLoading(false);
+
+
+
+
+
+
+
+
 
 
 
@@ -1336,6 +2411,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
     };
 
 
@@ -1344,7 +2427,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1352,7 +2447,19 @@ await api.post(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -1364,7 +2471,19 @@ await api.post(
 
 
 
+
+
+
+
     products.filter((product) =>
+
+
+
+
+
+
+
+
 
 
 
@@ -1376,7 +2495,15 @@ await api.post(
 
 
 
+
+
+
+
         ?.toLowerCase()
+
+
+
+
 
 
 
@@ -1384,11 +2511,27 @@ await api.post(
 
 
 
+
+
+
+
           search.toLowerCase()
 
 
 
+
+
+
+
         )
+
+
+
+
+
+
+
+
 
 
 
@@ -1404,7 +2547,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1412,7 +2567,19 @@ await api.post(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
+
+
+
+
 
 
 
@@ -1428,6 +2595,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
     <div className="adminProducts">
 
 
@@ -1436,7 +2611,23 @@ await api.post(
 
 
 
-      {/**\\\*** HEADER **\\\***/}
+
+
+
+
+
+
+
+
+      {/**\\\\\\*** HEADER **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -1452,7 +2643,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         <div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1468,7 +2675,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             Gestion Produits
+
+
+
+
+
+
+
+
 
 
 
@@ -1484,7 +2707,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           <p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1496,11 +2735,27 @@ await api.post(
 
 
 
+
+
+
+
             tous vos produits
 
 
 
+
+
+
+
             ecommerce premium
+
+
+
+
+
+
+
+
 
 
 
@@ -1516,7 +2771,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1532,7 +2803,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           <FaSearch />
+
+
+
+
+
+
+
+
 
 
 
@@ -1544,7 +2831,15 @@ await api.post(
 
 
 
+
+
+
+
             type="text"
+
+
+
+
 
 
 
@@ -1552,7 +2847,15 @@ await api.post(
 
 
 
+
+
+
+
             value={search}
+
+
+
+
 
 
 
@@ -1560,7 +2863,15 @@ await api.post(
 
 
 
+
+
+
+
               setSearch(
+
+
+
+
 
 
 
@@ -1568,7 +2879,15 @@ await api.post(
 
 
 
+
+
+
+
               )
+
+
+
+
 
 
 
@@ -1576,7 +2895,19 @@ await api.post(
 
 
 
+
+
+
+
           />
+
+
+
+
+
+
+
+
 
 
 
@@ -1592,6 +2923,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
       </div>
 
 
@@ -1600,7 +2939,23 @@ await api.post(
 
 
 
-      {/**\\\*** STATS **\\\***/}
+
+
+
+
+
+
+
+
+      {/**\\\\\\*** STATS **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -1616,7 +2971,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         <div className="statCard">
+
+
+
+
+
+
+
+
 
 
 
@@ -1632,11 +3003,27 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <p>
 
 
 
+
+
+
+
               Produits
+
+
+
+
 
 
 
@@ -1648,11 +3035,27 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <h2>
 
 
 
+
+
+
+
               {products.length}
+
+
+
+
 
 
 
@@ -1664,7 +3067,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1680,7 +3099,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1696,7 +3131,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           <div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1708,11 +3159,27 @@ await api.post(
 
 
 
+
+
+
+
               Catégories
 
 
 
+
+
+
+
             </p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1728,7 +3195,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
               {
+
+
+
+
 
 
 
@@ -1736,7 +3215,15 @@ await api.post(
 
 
 
+
+
+
+
                   ...new Set(
+
+
+
+
 
 
 
@@ -1744,7 +3231,15 @@ await api.post(
 
 
 
+
+
+
+
                       (p) =>
+
+
+
+
 
 
 
@@ -1752,7 +3247,15 @@ await api.post(
 
 
 
+
+
+
+
                     )
+
+
+
+
 
 
 
@@ -1760,11 +3263,27 @@ await api.post(
 
 
 
+
+
+
+
                 ].length
 
 
 
+
+
+
+
               }
+
+
+
+
+
+
+
+
 
 
 
@@ -1780,7 +3299,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1796,7 +3331,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1812,7 +3363,23 @@ await api.post(
 
 
 
-      {/**\\\*** FORMULAIRE **\\\***/}
+
+
+
+
+
+
+
+
+      {/**\\\\\\*** FORMULAIRE **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -1828,7 +3395,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         <div className="formHeader">
+
+
+
+
+
+
+
+
 
 
 
@@ -1844,7 +3427,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <h2>
+
+
+
+
+
+
+
+
 
 
 
@@ -1856,11 +3455,27 @@ await api.post(
 
 
 
+
+
+
+
                 ? "Modifier Produit"
 
 
 
+
+
+
+
                 : "Ajouter Produit"}
+
+
+
+
+
+
+
+
 
 
 
@@ -1876,7 +3491,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <p>
+
+
+
+
+
+
+
+
 
 
 
@@ -1888,11 +3519,27 @@ await api.post(
 
 
 
+
+
+
+
               vos nouveaux produits
 
 
 
+
+
+
+
               premium dans la boutique
+
+
+
+
+
+
+
+
 
 
 
@@ -1908,7 +3555,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -1924,7 +3587,23 @@ await api.post(
 
 
 
-        {/**\\\*** GRID **\\\***/}
+
+
+
+
+
+
+
+
+        {/**\\\\\\*** GRID **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -1940,7 +3619,23 @@ await api.post(
 
 
 
-          {/**\\\*** NOM **\\\***/}
+
+
+
+
+
+
+
+
+          {/**\\\\\\*** NOM **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -1956,7 +3651,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <label>
+
+
+
+
 
 
 
@@ -1964,6 +3671,10 @@ await api.post(
 
 
 
+
+
+
+
             </label>
 
 
@@ -1972,7 +3683,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <input
+
+
+
+
 
 
 
@@ -1980,7 +3703,15 @@ await api.post(
 
 
 
+
+
+
+
               placeholder="Ex: Jordan 4"
+
+
+
+
 
 
 
@@ -1988,7 +3719,15 @@ await api.post(
 
 
 
+
+
+
+
               onChange={(e) =>
+
+
+
+
 
 
 
@@ -1996,7 +3735,15 @@ await api.post(
 
 
 
+
+
+
+
                   e.target.value
+
+
+
+
 
 
 
@@ -2004,11 +3751,27 @@ await api.post(
 
 
 
+
+
+
+
               }
 
 
 
+
+
+
+
             />
+
+
+
+
+
+
+
+
 
 
 
@@ -2024,7 +3787,23 @@ await api.post(
 
 
 
-          {/**\\\*** PRIX **\\\***/}
+
+
+
+
+
+
+
+
+          {/**\\\\\\*** PRIX **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2040,7 +3819,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <label>
+
+
+
+
 
 
 
@@ -2048,7 +3839,19 @@ await api.post(
 
 
 
+
+
+
+
             </label>
+
+
+
+
+
+
+
+
 
 
 
@@ -2060,7 +3863,15 @@ await api.post(
 
 
 
+
+
+
+
               type="number"
+
+
+
+
 
 
 
@@ -2068,7 +3879,15 @@ await api.post(
 
 
 
+
+
+
+
               value={price}
+
+
+
+
 
 
 
@@ -2076,7 +3895,15 @@ await api.post(
 
 
 
+
+
+
+
                 setPrice(
+
+
+
+
 
 
 
@@ -2084,7 +3911,15 @@ await api.post(
 
 
 
+
+
+
+
                 )
+
+
+
+
 
 
 
@@ -2092,7 +3927,19 @@ await api.post(
 
 
 
+
+
+
+
             />
+
+
+
+
+
+
+
+
 
 
 
@@ -2108,7 +3955,23 @@ await api.post(
 
 
 
-          {/**\\\*** CATEGORIE **\\\***/}
+
+
+
+
+
+
+
+
+          {/**\\\\\\*** CATEGORIE **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2124,7 +3987,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <label>
+
+
+
+
 
 
 
@@ -2132,7 +4007,19 @@ await api.post(
 
 
 
+
+
+
+
             </label>
+
+
+
+
+
+
+
+
 
 
 
@@ -2144,7 +4031,15 @@ await api.post(
 
 
 
+
+
+
+
               value={category}
+
+
+
+
 
 
 
@@ -2152,7 +4047,15 @@ await api.post(
 
 
 
+
+
+
+
                 setCategory(
+
+
+
+
 
 
 
@@ -2160,11 +4063,23 @@ await api.post(
 
 
 
+
+
+
+
                 )
 
 
 
+
+
+
+
               }
+
+
+
+
 
 
 
@@ -2176,11 +4091,27 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   <option value="">
 
 
 
+
+
+
+
     Choisir catégorie
+
+
+
+
 
 
 
@@ -2192,7 +4123,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
   <option>T-shirts</option>
+
+
+
+
 
 
 
@@ -2200,7 +4143,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Blouses</option>
+
+
+
+
 
 
 
@@ -2208,7 +4159,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Débardeurs</option>
+
+
+
+
 
 
 
@@ -2216,7 +4175,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Gilets</option>
+
+
+
+
 
 
 
@@ -2224,7 +4191,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Hoodies</option>
+
+
+
+
 
 
 
@@ -2232,7 +4207,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Blousons</option>
+
+
+
+
 
 
 
@@ -2240,7 +4223,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Costumes</option>
+
+
+
+
 
 
 
@@ -2248,7 +4239,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Robes</option>
+
+
+
+
 
 
 
@@ -2256,7 +4255,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Pantalons</option>
+
+
+
+
 
 
 
@@ -2264,7 +4271,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Leggings</option>
+
+
+
+
 
 
 
@@ -2272,7 +4287,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Combinaisons</option>
+
+
+
+
 
 
 
@@ -2280,7 +4303,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Sous-vêtements</option>
+
+
+
+
 
 
 
@@ -2288,7 +4319,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Chaussettes</option>
+
+
+
+
 
 
 
@@ -2296,7 +4335,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Vêtements de sport</option>
+
+
+
+
 
 
 
@@ -2304,7 +4351,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Mode homme</option>
+
+
+
+
 
 
 
@@ -2312,7 +4367,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Mode enfant</option>
+
+
+
+
 
 
 
@@ -2320,7 +4383,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Chaussures</option>
+
+
+
+
 
 
 
@@ -2328,7 +4399,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Chaussures de ville</option>
+
+
+
+
 
 
 
@@ -2336,7 +4415,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Bottines</option>
+
+
+
+
 
 
 
@@ -2344,7 +4431,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Mocassins</option>
+
+
+
+
 
 
 
@@ -2352,7 +4447,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Ballerines</option>
+
+
+
+
 
 
 
@@ -2360,7 +4463,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Sacs à main</option>
+
+
+
+
 
 
 
@@ -2368,7 +4479,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Sacs de voyage</option>
+
+
+
+
 
 
 
@@ -2376,7 +4495,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Portefeuilles</option>
+
+
+
+
 
 
 
@@ -2384,7 +4511,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Montres</option>
+
+
+
+
 
 
 
@@ -2392,7 +4527,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Lunettes</option>
+
+
+
+
 
 
 
@@ -2400,7 +4543,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Chapeaux</option>
+
+
+
+
 
 
 
@@ -2408,7 +4559,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Foulards</option>
+
+
+
+
 
 
 
@@ -2416,7 +4575,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Accessoires</option>
+
+
+
+
 
 
 
@@ -2424,7 +4591,15 @@ await api.post(
 
 
 
+
+
+
+
   <option>Luxe</option>
+
+
+
+
 
 
 
@@ -2432,11 +4607,27 @@ await api.post(
 
 
 
+
+
+
+
   <option>Promotions</option>
 
 
 
+
+
+
+
 </select>
+
+
+
+
+
+
+
+
 
 
 
@@ -2452,7 +4643,23 @@ await api.post(
 
 
 
-          {/**\\\*** IMAGE **\\\***/}
+
+
+
+
+
+
+
+
+          {/**\\\\\\*** IMAGE **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2468,7 +4675,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <label>
+
+
+
+
 
 
 
@@ -2476,7 +4695,19 @@ await api.post(
 
 
 
+
+
+
+
             </label>
+
+
+
+
+
+
+
+
 
 
 
@@ -2492,7 +4723,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
               <FaImage />
+
+
+
+
+
+
+
+
 
 
 
@@ -2504,7 +4751,15 @@ await api.post(
 
 
 
+
+
+
+
                 type="file"
+
+
+
+
 
 
 
@@ -2512,7 +4767,15 @@ await api.post(
 
 
 
+
+
+
+
                   setImage(
+
+
+
+
 
 
 
@@ -2520,11 +4783,23 @@ await api.post(
 
 
 
+
+
+
+
                   )
 
 
 
+
+
+
+
                 }
+
+
+
+
 
 
 
@@ -2536,7 +4811,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -2552,6 +4843,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         </div>
 
 
@@ -2560,7 +4859,23 @@ await api.post(
 
 
 
-        {/**\\\*** BUTTON **\\\***/}
+
+
+
+
+
+
+
+
+        {/**\\\\\\*** BUTTON **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2572,7 +4887,15 @@ await api.post(
 
 
 
+
+
+
+
           className="addBtn"
+
+
+
+
 
 
 
@@ -2580,7 +4903,15 @@ await api.post(
 
 
 
+
+
+
+
             editId
+
+
+
+
 
 
 
@@ -2588,7 +4919,15 @@ await api.post(
 
 
 
+
+
+
+
               : addProduct
+
+
+
+
 
 
 
@@ -2596,7 +4935,19 @@ await api.post(
 
 
 
+
+
+
+
         >
+
+
+
+
+
+
+
+
 
 
 
@@ -2612,7 +4963,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             "Chargement..."
+
+
+
+
+
+
+
+
 
 
 
@@ -2628,7 +4995,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <>
+
+
+
+
 
 
 
@@ -2636,7 +5015,15 @@ await api.post(
 
 
 
+
+
+
+
                 ? <FaEdit />
+
+
+
+
 
 
 
@@ -2648,7 +5035,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
               {editId
+
+
+
+
 
 
 
@@ -2656,11 +5055,27 @@ await api.post(
 
 
 
+
+
+
+
                 : "Ajouter à la boutique"}
 
 
 
+
+
+
+
             </>
+
+
+
+
+
+
+
+
 
 
 
@@ -2676,7 +5091,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         </button>
+
+
+
+
+
+
+
+
 
 
 
@@ -2692,7 +5123,23 @@ await api.post(
 
 
 
-      {/**\\\*** PRODUITS **\\\***/}
+
+
+
+
+
+
+
+
+      {/**\\\\\\*** PRODUITS **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2708,7 +5155,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
         {filteredProducts.map(
+
+
+
+
 
 
 
@@ -2716,11 +5175,23 @@ await api.post(
 
 
 
+
+
+
+
             product,
 
 
 
+
+
+
+
             index
+
+
+
+
 
 
 
@@ -2732,7 +5203,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
             <div
+
+
+
+
 
 
 
@@ -2740,7 +5223,15 @@ await api.post(
 
 
 
+
+
+
+
               className="productCard"
+
+
+
+
 
 
 
@@ -2752,7 +5243,23 @@ await api.post(
 
 
 
-              {/**\\\*** IMAGE **\\\***/}
+
+
+
+
+
+
+
+
+              {/**\\\\\\*** IMAGE **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2768,7 +5275,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                 <img
+
+
+
+
 
 
 
@@ -2776,7 +5295,15 @@ await api.post(
 
 
 
+
+
+
+
     product.image.startsWith("http")
+
+
+
+
 
 
 
@@ -2784,7 +5311,15 @@ await api.post(
 
 
 
-      : `https://konanshopping.com/api/${product.image}`
+
+
+
+
+      : `https\://konanshopping.com/api/${product.image}`
+
+
+
+
 
 
 
@@ -2792,11 +5327,27 @@ await api.post(
 
 
 
+
+
+
+
    alt=""
 
 
 
+
+
+
+
 />
+
+
+
+
+
+
+
+
 
 
 
@@ -2812,7 +5363,23 @@ await api.post(
 
 
 
-              {/**\\\*** INFO **\\\***/}
+
+
+
+
+
+
+
+
+              {/**\\\\\\*** INFO **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2828,7 +5395,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                 <h3>
+
+
+
+
+
+
+
+
 
 
 
@@ -2840,11 +5423,27 @@ await api.post(
 
 
 
+
+
+
+
                     product.name
 
 
 
+
+
+
+
                   }
+
+
+
+
+
+
+
+
 
 
 
@@ -2860,7 +5459,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                 <h4>
+
+
+
+
+
+
+
+
 
 
 
@@ -2872,11 +5487,27 @@ await api.post(
 
 
 
+
+
+
+
                     product.price
 
 
 
+
+
+
+
                   } FCFA
+
+
+
+
+
+
+
+
 
 
 
@@ -2892,7 +5523,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                 <span>
+
+
+
+
+
+
+
+
 
 
 
@@ -2904,11 +5551,27 @@ await api.post(
 
 
 
+
+
+
+
                     product.category
 
 
 
+
+
+
+
                   }
+
+
+
+
+
+
+
+
 
 
 
@@ -2924,6 +5587,14 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
               </div>
 
 
@@ -2932,7 +5603,23 @@ await api.post(
 
 
 
-              {/**\\\*** BUTTONS **\\\***/}
+
+
+
+
+
+
+
+
+              {/**\\\\\\*** BUTTONS **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2948,7 +5635,23 @@ await api.post(
 
 
 
-                {/**\\\*** EDIT **\\\***/}
+
+
+
+
+
+
+
+
+                {/**\\\\\\*** EDIT **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -2960,7 +5663,19 @@ await api.post(
 
 
 
+
+
+
+
                   className="editBtn"
+
+
+
+
+
+
+
+
 
 
 
@@ -2976,7 +5691,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                     setEditId(
+
+
+
+
 
 
 
@@ -2984,7 +5711,19 @@ await api.post(
 
 
 
+
+
+
+
                     );
+
+
+
+
+
+
+
+
 
 
 
@@ -2996,11 +5735,27 @@ await api.post(
 
 
 
+
+
+
+
                       product.name
 
 
 
+
+
+
+
                     );
+
+
+
+
+
+
+
+
 
 
 
@@ -3012,11 +5767,27 @@ await api.post(
 
 
 
+
+
+
+
                       product.price
 
 
 
+
+
+
+
                     );
+
+
+
+
+
+
+
+
 
 
 
@@ -3028,7 +5799,15 @@ await api.post(
 
 
 
+
+
+
+
                       product.category
+
+
+
+
 
 
 
@@ -3040,7 +5819,19 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                     window.scrollTo({
+
+
+
+
 
 
 
@@ -3048,7 +5839,15 @@ await api.post(
 
 
 
+
+
+
+
                       behavior:"smooth",
+
+
+
+
 
 
 
@@ -3060,11 +5859,31 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                   }}
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -3080,7 +5899,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                   Modifier
+
+
+
+
+
+
+
+
 
 
 
@@ -3096,7 +5931,23 @@ await api.post(
 
 
 
-                {/**\\\*** DELETE **\\\***/}
+
+
+
+
+
+
+
+
+                {/**\\\\\\*** DELETE **\\\\\\***/}
+
+
+
+
+
+
+
+
 
 
 
@@ -3108,7 +5959,19 @@ await api.post(
 
 
 
+
+
+
+
                   className="deleteBtn"
+
+
+
+
+
+
+
+
 
 
 
@@ -3120,7 +5983,15 @@ await api.post(
 
 
 
+
+
+
+
                     deleteProduct(
+
+
+
+
 
 
 
@@ -3128,7 +5999,15 @@ await api.post(
 
 
 
+
+
+
+
                     )
+
+
+
+
 
 
 
@@ -3136,7 +6015,19 @@ await api.post(
 
 
 
+
+
+
+
                 >
+
+
+
+
+
+
+
+
 
 
 
@@ -3152,7 +6043,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
                   Supprimer
+
+
+
+
+
+
+
+
 
 
 
@@ -3168,7 +6075,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
               </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3184,11 +6107,31 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
           )
 
 
 
+
+
+
+
         )}
+
+
+
+
+
+
+
+
 
 
 
@@ -3204,7 +6147,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -3220,7 +6179,23 @@ await api.post(
 
 
 
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
 
 
 

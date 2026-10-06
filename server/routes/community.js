@@ -86,34 +86,17 @@ const getUserId = (req) => {
 
 const getCommunityToken = (req) => {
 
-  const authHeader = String(
+  // Étape Cookie-only : le JWT Community est lu exclusivement
+  // depuis le cookie HttpOnly envoyé automatiquement par le navigateur.
+  const cookieToken = req.cookies?.ks_user_token;
 
-    req.headers.authorization || ""
-
-  );
-
-
-
-  if (authHeader.startsWith("Bearer ")) {
-
-    return authHeader.slice(7).trim();
-
+  if (typeof cookieToken !== "string") {
+    return null;
   }
 
+  const cleanToken = cookieToken.trim();
 
-
-  const legacyToken =
-
-    typeof req.headers.token === "string"
-
-      ? req.headers.token.trim()
-
-      : "";
-
-
-
-  return legacyToken || null;
-
+  return cleanToken || null;
 };
 
 

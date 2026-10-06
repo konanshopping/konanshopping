@@ -2,7 +2,15 @@ import axios from "axios";
 
 
 
+
+
+
+
 import {
+
+
+
+
 
 
 
@@ -10,7 +18,15 @@ import {
 
 
 
+
+
+
+
   useEffect,
+
+
+
+
 
 
 
@@ -18,7 +34,15 @@ import {
 
 
 
+
+
+
+
 import PhoneInput from "react-phone-number-input";
+
+
+
+
 
 
 
@@ -26,7 +50,15 @@ import "react-phone-number-input/style.css";
 
 
 
+
+
+
+
 import emailjs from "@emailjs/browser";
+
+
+
+
 
 
 
@@ -34,7 +66,15 @@ import Confetti from "react-confetti";
 
 
 
+
+
+
+
 import { useNavigate } from "react-router-dom";
+
+
+
+
 
 
 
@@ -42,7 +82,15 @@ import { toast } from "react-toastify";
 
 
 
+
+
+
+
 import {
+
+
+
+
 
 
 
@@ -50,7 +98,15 @@ import {
 
 
 
+
+
+
+
   FaUser,
+
+
+
+
 
 
 
@@ -58,7 +114,15 @@ import {
 
 
 
+
+
+
+
   FaEnvelope,
+
+
+
+
 
 
 
@@ -66,7 +130,15 @@ import {
 
 
 
+
+
+
+
   FaCity,
+
+
+
+
 
 
 
@@ -74,7 +146,15 @@ import {
 
 
 
+
+
+
+
   FaTruck,
+
+
+
+
 
 
 
@@ -82,7 +162,15 @@ import {
 
 
 
+
+
+
+
   FaCheckCircle,
+
+
+
+
 
 
 
@@ -90,7 +178,15 @@ import {
 
 
 
+
+
+
+
   FaTag
+
+
+
+
 
 
 
@@ -98,7 +194,15 @@ import {
 
 
 
+
+
+
+
 import {
+
+
+
+
 
 
 
@@ -106,7 +210,15 @@ import {
 
 
 
+
+
+
+
   FaRocket,
+
+
+
+
 
 
 
@@ -114,7 +226,15 @@ import {
 
 
 
+
+
+
+
 } from "react-icons/fa";
+
+
+
+
 
 
 
@@ -122,7 +242,15 @@ import {
 
 
 
+
+
+
+
   FaWallet,
+
+
+
+
 
 
 
@@ -130,11 +258,25 @@ import {
 
 
 
+
+
+
+
 } from "react-icons/fa";
 
 
 
+
+
+
+
+axios.defaults.withCredentials = true;
+
 function Checkout() {
+
+
+
+
 
 
 
@@ -142,11 +284,23 @@ const user = JSON.parse(
 
 
 
+
+
+
+
   localStorage.getItem("user")
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -154,7 +308,15 @@ const clientId =
 
 
 
+
+
+
+
   user?._id ||
+
+
+
+
 
 
 
@@ -162,7 +324,15 @@ const clientId =
 
 
 
+
+
+
+
 const navigate = useNavigate();
+
+
+
+
 
 
 
@@ -170,7 +340,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
   window.innerWidth <= 768
+
+
+
+
 
 
 
@@ -178,7 +356,15 @@ const navigate = useNavigate();
 
 
 
+
+
+
+
 useEffect(() => {
+
+
+
+
 
 
 
@@ -186,11 +372,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     setMobile(window.innerWidth <= 768);
 
 
 
+
+
+
+
   };
+
+
+
+
 
 
 
@@ -198,7 +396,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     "resize",
+
+
+
+
 
 
 
@@ -206,7 +412,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   );
+
+
+
+
 
 
 
@@ -214,7 +428,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     window.removeEventListener(
+
+
+
+
 
 
 
@@ -222,7 +444,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       handleResize
+
+
+
+
 
 
 
@@ -230,7 +460,15 @@ useEffect(() => {
 
 
 
+
+
+
+
 }, []);
+
+
+
+
 
 
 
@@ -238,7 +476,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -246,7 +492,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
   // ========================
+
+
+
+
 
 
 
@@ -254,7 +508,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState([]);
+
+
+
+
 
 
 
@@ -262,11 +524,23 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setCustomerName] =
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -274,7 +548,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -282,11 +564,23 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setDistrict] =
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -294,7 +588,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -302,11 +604,23 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setAddress] =
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -314,7 +628,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState("");
+
+
+
+
 
 
 
@@ -322,11 +644,23 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setShowConfetti] =
 
 
 
+
+
+
+
     useState(false);
+
+
+
+
 
 
 
@@ -334,11 +668,23 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setLoading] =
 
 
 
+
+
+
+
     useState(false);
+
+
+
+
 
 
 
@@ -346,7 +692,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setSuccess] =
+
+
+
+
 
 
 
@@ -354,7 +708,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
   const [paymentMethod,
+
+
+
+
 
 
 
@@ -362,7 +724,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState(
+
+
+
+
 
 
 
@@ -370,7 +740,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
@@ -378,7 +756,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     setCoupon] =
+
+
+
+
 
 
 
@@ -386,7 +772,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
   const [discount,
+
+
+
+
 
 
 
@@ -394,7 +788,15 @@ const [location, setLocation] = useState(null);
 
 
 
+
+
+
+
     useState(0);
+
+
+
+
 
 
 
@@ -402,7 +804,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -410,7 +820,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -418,11 +836,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     JSON.parse(
 
 
 
+
+
+
+
       localStorage.getItem(
+
+
+
+
 
 
 
@@ -430,7 +860,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       )
+
+
+
+
 
 
 
@@ -438,7 +876,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   if (
+
+
+
+
 
 
 
@@ -446,11 +892,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     checkoutCart.length > 0
 
 
 
+
+
+
+
   ) {
+
+
+
+
 
 
 
@@ -458,7 +916,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     return;
+
+
+
+
 
 
 
@@ -466,7 +932,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -474,7 +948,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -482,11 +964,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     JSON.parse(
 
 
 
+
+
+
+
       localStorage.getItem(
+
+
+
+
 
 
 
@@ -494,11 +988,23 @@ useEffect(() => {
 
 
 
+
+
+
+
       )
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
@@ -506,7 +1012,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     checkoutProduct &&
+
+
+
+
 
 
 
@@ -514,7 +1028,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       `cart_${clientId}`
+
+
+
+
 
 
 
@@ -522,7 +1044,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   ) {
+
+
+
+
 
 
 
@@ -530,7 +1060,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       checkoutProduct
+
+
+
+
 
 
 
@@ -538,7 +1076,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     return;
+
+
+
+
 
 
 
@@ -546,7 +1092,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -554,7 +1108,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -562,7 +1124,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     `cart_${clientId}`;
+
+
+
+
 
 
 
@@ -570,11 +1140,23 @@ useEffect(() => {
 
 
 
+
+
+
+
     JSON.parse(
 
 
 
+
+
+
+
       localStorage.getItem(
+
+
+
+
 
 
 
@@ -582,7 +1164,15 @@ useEffect(() => {
 
 
 
+
+
+
+
       )
+
+
+
+
 
 
 
@@ -590,7 +1180,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   setCart(savedCart);
+
+
+
+
 
 
 
@@ -598,7 +1196,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -606,7 +1212,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -614,7 +1228,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   (acc, item) =>
+
+
+
+
 
 
 
@@ -622,7 +1244,15 @@ useEffect(() => {
 
 
 
+
+
+
+
     (Number(item.price) || 0) *
+
+
+
+
 
 
 
@@ -630,7 +1260,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   0
+
+
+
+
 
 
 
@@ -638,7 +1276,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -646,7 +1292,15 @@ useEffect(() => {
 
 
 
+
+
+
+
 // =========================
+
+
+
+
 
 
 
@@ -654,11 +1308,23 @@ const shipping =
 
 
 
+
+
+
+
   total >= 50000
 
 
 
+
+
+
+
     ? 0
+
+
+
+
 
 
 
@@ -666,7 +1332,15 @@ const shipping =
 
 
 
+
+
+
+
     ? 0
+
+
+
+
 
 
 
@@ -674,7 +1348,15 @@ const shipping =
 
 
 
+
+
+
+
     ? 2000
+
+
+
+
 
 
 
@@ -682,7 +1364,15 @@ const shipping =
 
 
 
+
+
+
+
     ? 1500
+
+
+
+
 
 
 
@@ -690,7 +1380,15 @@ const shipping =
 
 
 
+
+
+
+
     ? 2500
+
+
+
+
 
 
 
@@ -698,7 +1396,15 @@ const shipping =
 
 
 
+
+
+
+
   const finalTotal =
+
+
+
+
 
 
 
@@ -706,7 +1412,15 @@ const shipping =
 
 
 
+
+
+
+
   shipping -
+
+
+
+
 
 
 
@@ -714,7 +1428,15 @@ const shipping =
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -722,7 +1444,15 @@ const shipping =
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -730,7 +1460,15 @@ const shipping =
 
 
 
+
+
+
+
   const updated =
+
+
+
+
 
 
 
@@ -738,7 +1476,15 @@ const shipping =
 
 
 
+
+
+
+
       (item) =>
+
+
+
+
 
 
 
@@ -746,7 +1492,15 @@ const shipping =
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
@@ -754,7 +1508,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -762,7 +1524,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -770,7 +1540,15 @@ const shipping =
 
 
 
+
+
+
+
     JSON.parse(
+
+
+
+
 
 
 
@@ -778,7 +1556,15 @@ const shipping =
 
 
 
+
+
+
+
         "user"
+
+
+
+
 
 
 
@@ -786,7 +1572,15 @@ const shipping =
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
@@ -794,7 +1588,15 @@ const shipping =
 
 
 
+
+
+
+
     user?._id ||
+
+
+
+
 
 
 
@@ -802,7 +1604,15 @@ const shipping =
 
 
 
+
+
+
+
       "guestId"
+
+
+
+
 
 
 
@@ -810,7 +1620,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -818,7 +1636,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -826,11 +1652,23 @@ const shipping =
 
 
 
+
+
+
+
     `cart_${clientId}`;
 
 
 
+
+
+
+
   localStorage.setItem(
+
+
+
+
 
 
 
@@ -838,7 +1676,15 @@ const shipping =
 
 
 
+
+
+
+
     JSON.stringify(updated)
+
+
+
+
 
 
 
@@ -846,7 +1692,15 @@ const shipping =
 
 
 
+
+
+
+
   localStorage.setItem(
+
+
+
+
 
 
 
@@ -854,7 +1708,15 @@ const shipping =
 
 
 
+
+
+
+
   JSON.stringify(updated)
+
+
+
+
 
 
 
@@ -862,7 +1724,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -870,7 +1740,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -878,7 +1756,15 @@ const shipping =
 
 
 
+
+
+
+
     "cartCount",
+
+
+
+
 
 
 
@@ -886,11 +1772,23 @@ const shipping =
 
 
 
+
+
+
+
   );
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -898,7 +1796,15 @@ const shipping =
 
 
 
+
+
+
+
   // =====================
+
+
+
+
 
 
 
@@ -906,7 +1812,15 @@ const shipping =
 
 
 
+
+
+
+
     new Event("cartUpdated")
+
+
+
+
 
 
 
@@ -914,11 +1828,23 @@ const shipping =
 
 
 
+
+
+
+
 };
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -926,7 +1852,15 @@ const shipping =
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -934,7 +1868,15 @@ const shipping =
 
 
 
+
+
+
+
     id,
+
+
+
+
 
 
 
@@ -942,7 +1884,15 @@ const shipping =
 
 
 
+
+
+
+
   ) => {
+
+
+
+
 
 
 
@@ -950,7 +1900,15 @@ const shipping =
 
 
 
+
+
+
+
       cart.map((item) => {
+
+
+
+
 
 
 
@@ -958,7 +1916,15 @@ const shipping =
 
 
 
+
+
+
+
           item._id === id
+
+
+
+
 
 
 
@@ -966,7 +1932,15 @@ const shipping =
 
 
 
+
+
+
+
           return {
+
+
+
+
 
 
 
@@ -974,7 +1948,15 @@ const shipping =
 
 
 
+
+
+
+
             quantity:
+
+
+
+
 
 
 
@@ -982,7 +1964,15 @@ const shipping =
 
 
 
+
+
+
+
     ? Number(item.quantity || 1) + 1
+
+
+
+
 
 
 
@@ -990,7 +1980,15 @@ const shipping =
 
 
 
+
+
+
+
         1,
+
+
+
+
 
 
 
@@ -998,7 +1996,15 @@ const shipping =
 
 
 
+
+
+
+
       )
+
+
+
+
 
 
 
@@ -1006,7 +2012,15 @@ const shipping =
 
 
 
+
+
+
+
         }
+
+
+
+
 
 
 
@@ -1014,7 +2028,15 @@ const shipping =
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
@@ -1022,7 +2044,15 @@ const shipping =
 
 
 
+
+
+
+
 localStorage.setItem(
+
+
+
+
 
 
 
@@ -1030,11 +2060,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
   JSON.stringify(updated)
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -1042,7 +2084,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   `checkoutCart_${clientId}`,
+
+
+
+
 
 
 
@@ -1050,7 +2100,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -1058,7 +2116,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1066,7 +2132,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1074,23 +2148,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
   try {
 
 
 
-    const token = localStorage.getItem("token");
 
 
 
-    const couponHeaders = token
+
+    const couponHeaders = {};
 
 
 
-      ? { Authorization: `Bearer ${token}` }
 
-
-
-      : {};
 
 
 
@@ -1098,11 +2172,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
       "https://konanshopping.com/api/apply-coupon",
 
 
 
+
+
+
+
       {
+
+
+
+
 
 
 
@@ -1110,7 +2196,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
         total,
+
+
+
+
 
 
 
@@ -1118,23 +2212,34 @@ localStorage.setItem(
 
 
 
+
+
+
+
       },
 
 
 
+
+
+
+
       {
-
-
-
+        withCredentials: true,
         headers: couponHeaders,
-
-
-
       }
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
@@ -1142,7 +2247,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
     setCoupon(res.data.coupon.code);
+
+
+
+
 
 
 
@@ -1150,7 +2263,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   } catch (err) {
+
+
+
+
 
 
 
@@ -1158,7 +2279,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
       err.response?.data?.message || "Coupon invalide"
+
+
+
+
 
 
 
@@ -1166,7 +2295,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -1174,7 +2311,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1182,7 +2327,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1190,11 +2343,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
     // VALIDATION
 
 
 
+
+
+
+
     if (
+
+
+
+
 
 
 
@@ -1202,7 +2367,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
       !phone ||
+
+
+
+
 
 
 
@@ -1210,7 +2383,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
       !address ||
+
+
+
+
 
 
 
@@ -1218,7 +2399,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
       !district ||
+
+
+
+
 
 
 
@@ -1226,7 +2415,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
     ) {
+
+
+
+
 
 
 
@@ -1234,11 +2431,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
         "Veuillez remplir toutes les informations obligatoires ⚠️"
 
 
 
+
+
+
+
       );
+
+
+
+
 
 
 
@@ -1246,7 +2455,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1254,11 +2471,23 @@ localStorage.setItem(
 
 
 
+
+
+
+
       setLoading(true);
 
 
 
+
+
+
+
       // =====================
+
+
+
+
 
 
 
@@ -1266,35 +2495,31 @@ localStorage.setItem(
 
 
 
+
+
+
+
       // =====================
 
 
 
-      const token = localStorage.getItem("token");
 
 
 
-      const orderHeaders = token
+
+      const orderHeaders = {};
 
 
 
-        ? {
 
-
-
-            Authorization: `Bearer ${token}`,
-
-
-
-          }
-
-
-
-        : {};
 
 
 
 // =====================
+
+
+
+
 
 
 
@@ -1302,7 +2527,15 @@ localStorage.setItem(
 
 
 
+
+
+
+
 // =====================
+
+
+
+
 
 
 
@@ -1310,7 +2543,15 @@ if (
 
 
 
+
+
+
+
   paymentMethod === "Orange Money" ||
+
+
+
+
 
 
 
@@ -1318,7 +2559,15 @@ if (
 
 
 
+
+
+
+
 ) {
+
+
+
+
 
 
 
@@ -1326,7 +2575,15 @@ if (
 
 
 
+
+
+
+
   const res = await axios.post(
+
+
+
+
 
 
 
@@ -1334,7 +2591,15 @@ if (
 
 
 
+
+
+
+
   {
+
+
+
+
 
 
 
@@ -1342,7 +2607,15 @@ if (
 
 
 
+
+
+
+
     phone: phoneNumber,
+
+
+
+
 
 
 
@@ -1350,7 +2623,15 @@ if (
 
 
 
+
+
+
+
     email,
+
+
+
+
 
 
 
@@ -1358,7 +2639,15 @@ if (
 
 
 
+
+
+
+
     city,
+
+
+
+
 
 
 
@@ -1366,7 +2655,15 @@ if (
 
 
 
+
+
+
+
     paymentMethod,
+
+
+
+
 
 
 
@@ -1374,7 +2671,15 @@ if (
 
 
 
+
+
+
+
     total: finalTotal,
+
+
+
+
 
 
 
@@ -1382,8 +2687,17 @@ if (
 
 
 
+
+
+
+
     userId: user?._id || null,
+
       couponCode: coupon || null
+
+
+
+
 
 
 
@@ -1391,15 +2705,18 @@ if (
 
 
 
+
+
+
+
 , {
+        withCredentials: true,
+        headers: orderHeaders,
+      }
 
 
 
-      headers: orderHeaders,
 
-
-
-    }
 
 
 
@@ -1407,7 +2724,15 @@ if (
 
 
 
+
+
+
+
   if (res.data.payment_url) {
+
+
+
+
 
 
 
@@ -1415,7 +2740,15 @@ if (
 
 
 
+
+
+
+
       res.data.payment_url;
+
+
+
+
 
 
 
@@ -1423,11 +2756,23 @@ if (
 
 
 
+
+
+
+
   }
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
@@ -1435,7 +2780,15 @@ if (
 
 
 
+
+
+
+
 await axios.post(
+
+
+
+
 
 
 
@@ -1443,7 +2796,15 @@ await axios.post(
 
 
 
+
+
+
+
   {
+
+
+
+
 
 
 
@@ -1451,7 +2812,15 @@ await axios.post(
 
 
 
+
+
+
+
       user?._id || null,
+
+
+
+
 
 
 
@@ -1459,7 +2828,15 @@ await axios.post(
 
 
 
+
+
+
+
     customerName,
+
+
+
+
 
 
 
@@ -1467,7 +2844,15 @@ await axios.post(
 
 
 
+
+
+
+
     email,
+
+
+
+
 
 
 
@@ -1475,7 +2860,15 @@ await axios.post(
 
 
 
+
+
+
+
     city,
+
+
+
+
 
 
 
@@ -1483,7 +2876,15 @@ await axios.post(
 
 
 
+
+
+
+
     lat: location?.lat,
+
+
+
+
 
 
 
@@ -1491,7 +2892,15 @@ await axios.post(
 
 
 
+
+
+
+
     paymentMethod,
+
+
+
+
 
 
 
@@ -1499,7 +2908,15 @@ await axios.post(
 
 
 
+
+
+
+
     total: finalTotal,
+
+
+
+
 
 
 
@@ -1507,7 +2924,15 @@ await axios.post(
 
 
 
+
+
+
+
     status: "En attente",
+
+
+
+
 
 
 
@@ -1515,19 +2940,26 @@ await axios.post(
 
 
 
+
+
+
+
   {
+        withCredentials: true,
+        headers: orderHeaders,
+      }
 
 
 
-    headers: orderHeaders,
 
-
-
-  }
 
 
 
 );
+
+
+
+
 
 
 
@@ -1535,7 +2967,15 @@ await axios.post(
 
 
 
+
+
+
+
       await emailjs.send(
+
+
+
+
 
 
 
@@ -1543,7 +2983,15 @@ await axios.post(
 
 
 
+
+
+
+
         "template_tq69cv9",
+
+
+
+
 
 
 
@@ -1551,7 +2999,15 @@ await axios.post(
 
 
 
+
+
+
+
           name: customerName,
+
+
+
+
 
 
 
@@ -1559,7 +3015,15 @@ await axios.post(
 
 
 
+
+
+
+
           order_id: Date.now(),
+
+
+
+
 
 
 
@@ -1567,7 +3031,15 @@ await axios.post(
 
 
 
+
+
+
+
           products: cart
+
+
+
+
 
 
 
@@ -1575,7 +3047,15 @@ await axios.post(
 
 
 
+
+
+
+
               (item) =>
+
+
+
+
 
 
 
@@ -1583,7 +3063,15 @@ await axios.post(
 
 
 
+
+
+
+
             )
+
+
+
+
 
 
 
@@ -1591,7 +3079,15 @@ await axios.post(
 
 
 
+
+
+
+
           subtotal: total,
+
+
+
+
 
 
 
@@ -1599,7 +3095,15 @@ await axios.post(
 
 
 
+
+
+
+
           total: finalTotal,
+
+
+
+
 
 
 
@@ -1607,7 +3111,15 @@ await axios.post(
 
 
 
+
+
+
+
         "IwYaZmIgiiz6YIWck"
+
+
+
+
 
 
 
@@ -1615,7 +3127,15 @@ await axios.post(
 
 
 
+
+
+
+
       // SUCCESS
+
+
+
+
 
 
 
@@ -1623,11 +3143,23 @@ await axios.post(
 
 
 
+
+
+
+
       setSuccess(true);
 
 
 
+
+
+
+
       setTimeout(() => {
+
+
+
+
 
 
 
@@ -1635,7 +3167,15 @@ await axios.post(
 
 
 
+
+
+
+
       }, 10000);
+
+
+
+
 
 
 
@@ -1643,7 +3183,15 @@ await axios.post(
 
 
 
+
+
+
+
   "cart"
+
+
+
+
 
 
 
@@ -1651,7 +3199,15 @@ await axios.post(
 
 
 
+
+
+
+
 localStorage.removeItem(
+
+
+
+
 
 
 
@@ -1659,11 +3215,23 @@ localStorage.removeItem(
 
 
 
+
+
+
+
 );
 
 
 
+
+
+
+
 localStorage.removeItem(
+
+
+
+
 
 
 
@@ -1671,7 +3239,15 @@ localStorage.removeItem(
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -1679,11 +3255,23 @@ localStorage.removeItem(
 
 
 
+
+
+
+
   `cart_${clientId}`
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -1691,7 +3279,15 @@ setCart([]);
 
 
 
+
+
+
+
 localStorage.removeItem(`checkoutCart_${clientId}`);
+
+
+
+
 
 
 
@@ -1699,7 +3295,15 @@ localStorage.removeItem(`checkoutCart_${clientId}`);
 
 
 
+
+
+
+
   navigate("/success");
+
+
+
+
 
 
 
@@ -1707,7 +3311,15 @@ localStorage.removeItem(`checkoutCart_${clientId}`);
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1715,11 +3327,23 @@ localStorage.removeItem(`checkoutCart_${clientId}`);
 
 
 
+
+
+
+
   toast.error("Erreur lors de la commande ❌");
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
@@ -1727,11 +3351,23 @@ localStorage.removeItem(`checkoutCart_${clientId}`);
 
 
 
+
+
+
+
       setLoading(false);
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -1739,7 +3375,15 @@ localStorage.removeItem(`checkoutCart_${clientId}`);
 
 
 
+
+
+
+
 const cardStyle = {
+
+
+
+
 
 
 
@@ -1747,7 +3391,15 @@ const cardStyle = {
 
 
 
+
+
+
+
   width: "100%",
+
+
+
+
 
 
 
@@ -1755,11 +3407,23 @@ const cardStyle = {
 
 
 
+
+
+
+
   overflow: "hidden",
 
 
 
+
+
+
+
   boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -1767,11 +3431,23 @@ const cardStyle = {
 
 
 
+
+
+
+
   borderRadius: mobile ? "20px" : "26px",
 
 
 
+
+
+
+
   boxShadow:
+
+
+
+
 
 
 
@@ -1779,7 +3455,15 @@ const cardStyle = {
 
 
 
+
+
+
+
   border:
+
+
+
+
 
 
 
@@ -1787,7 +3471,15 @@ const cardStyle = {
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
@@ -1795,7 +3487,15 @@ if (!Array.isArray(cart)) {
 
 
 
+
+
+
+
   return <h1>Erreur panier</h1>;
+
+
+
+
 
 
 
@@ -1803,7 +3503,15 @@ if (!Array.isArray(cart)) {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1811,7 +3519,15 @@ if (!Array.isArray(cart)) {
 
 
 
+
+
+
+
   // =========================
+
+
+
+
 
 
 
@@ -1819,7 +3535,15 @@ return (
 
 
 
+
+
+
+
   <>
+
+
+
+
 
 
 
@@ -1827,7 +3551,15 @@ return (
 
 
 
+
+
+
+
       <Confetti
+
+
+
+
 
 
 
@@ -1835,11 +3567,23 @@ return (
 
 
 
+
+
+
+
         recycle={false}
 
 
 
+
+
+
+
       />
+
+
+
+
 
 
 
@@ -1847,11 +3591,23 @@ return (
 
 
 
+
+
+
+
     <div
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -1859,7 +3615,15 @@ return (
 
 
 
+
+
+
+
         background:
+
+
+
+
 
 
 
@@ -1867,7 +3631,15 @@ return (
 
 
 
+
+
+
+
         padding: mobile ? "0" : "50px",
+
+
+
+
 
 
 
@@ -1875,7 +3647,15 @@ return (
 
 
 
+
+
+
+
         margin: mobile ? "0" : "0 auto",
+
+
+
+
 
 
 
@@ -1883,11 +3663,23 @@ return (
 
 
 
+
+
+
+
         width: "100%",
 
 
 
+
+
+
+
         boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -1895,11 +3687,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -1907,7 +3711,15 @@ return (
 
 
 
+
+
+
+
       <div
+
+
+
+
 
 
 
@@ -1915,11 +3727,23 @@ return (
 
 
 
+
+
+
+
           display: "flex",
 
 
 
+
+
+
+
           alignItems: "center",
+
+
+
+
 
 
 
@@ -1927,7 +3751,15 @@ return (
 
 
 
+
+
+
+
           flexWrap: "wrap",
+
+
+
+
 
 
 
@@ -1935,7 +3767,15 @@ return (
 
 
 
+
+
+
+
           padding: mobile ? "20px" : "0",
+
+
+
+
 
 
 
@@ -1943,7 +3783,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -1951,7 +3799,15 @@ return (
 
 
 
+
+
+
+
           style={{
+
+
+
+
 
 
 
@@ -1959,7 +3815,15 @@ return (
 
 
 
+
+
+
+
             lineHeight: "1",
+
+
+
+
 
 
 
@@ -1967,7 +3831,15 @@ return (
 
 
 
+
+
+
+
           }}
+
+
+
+
 
 
 
@@ -1975,11 +3847,23 @@ return (
 
 
 
+
+
+
+
         <h1
 
 
 
+
+
+
+
           style={{
+
+
+
+
 
 
 
@@ -1987,7 +3871,15 @@ return (
 
 
 
+
+
+
+
               mobile ? "28px" : "58px",
+
+
+
+
 
 
 
@@ -1995,7 +3887,15 @@ return (
 
 
 
+
+
+
+
             color: "#111827",
+
+
+
+
 
 
 
@@ -2003,7 +3903,15 @@ return (
 
 
 
+
+
+
+
             lineHeight: "1",
+
+
+
+
 
 
 
@@ -2011,7 +3919,15 @@ return (
 
 
 
+
+
+
+
             wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -2019,7 +3935,15 @@ return (
 
 
 
+
+
+
+
         >
+
+
+
+
 
 
 
@@ -2027,7 +3951,15 @@ return (
 
 
 
+
+
+
+
         </h1>
+
+
+
+
 
 
 
@@ -2035,11 +3967,23 @@ return (
 
 
 
+
+
+
+
       <div
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -2047,7 +3991,15 @@ return (
 
 
 
+
+
+
+
           gridTemplateColumns:
+
+
+
+
 
 
 
@@ -2055,7 +4007,15 @@ return (
 
 
 
+
+
+
+
               ? "1fr"
+
+
+
+
 
 
 
@@ -2063,7 +4023,15 @@ return (
 
 
 
+
+
+
+
           gap: mobile ? "0" : "30px",
+
+
+
+
 
 
 
@@ -2071,11 +4039,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -2083,7 +4063,15 @@ return (
 
 
 
+
+
+
+
         <div
+
+
+
+
 
 
 
@@ -2091,7 +4079,15 @@ return (
 
 
 
+
+
+
+
         >
+
+
+
+
 
 
 
@@ -2099,7 +4095,15 @@ return (
 
 
 
+
+
+
+
             style={{
+
+
+
+
 
 
 
@@ -2107,7 +4111,15 @@ return (
 
 
 
+
+
+
+
               alignItems: "center",
+
+
+
+
 
 
 
@@ -2115,7 +4127,15 @@ return (
 
 
 
+
+
+
+
               marginBottom: "25px",
+
+
+
+
 
 
 
@@ -2123,7 +4143,15 @@ return (
 
 
 
+
+
+
+
             }}
+
+
+
+
 
 
 
@@ -2131,7 +4159,15 @@ return (
 
 
 
+
+
+
+
             <FaUser
+
+
+
+
 
 
 
@@ -2139,7 +4175,15 @@ return (
 
 
 
+
+
+
+
                 color: "#5b6cff",
+
+
+
+
 
 
 
@@ -2147,7 +4191,15 @@ return (
 
 
 
+
+
+
+
             />
+
+
+
+
 
 
 
@@ -2155,7 +4207,15 @@ return (
 
 
 
+
+
+
+
           </h2>
+
+
+
+
 
 
 
@@ -2163,7 +4223,15 @@ return (
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -2171,7 +4239,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -2179,7 +4255,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2187,7 +4271,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2195,7 +4287,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -2203,7 +4303,15 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
+
+
+
+
 
 
 
@@ -2211,7 +4319,15 @@ return (
 
 
 
+
+
+
+
       zIndex: 1,
+
+
+
+
 
 
 
@@ -2219,7 +4335,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -2227,7 +4351,15 @@ return (
 
 
 
+
+
+
+
     type="text"
+
+
+
+
 
 
 
@@ -2235,7 +4367,15 @@ return (
 
 
 
+
+
+
+
     required
+
+
+
+
 
 
 
@@ -2243,7 +4383,15 @@ return (
 
 
 
+
+
+
+
     onChange={(e) =>
+
+
+
+
 
 
 
@@ -2251,7 +4399,15 @@ return (
 
 
 
+
+
+
+
         e.target.value
+
+
+
+
 
 
 
@@ -2259,7 +4415,15 @@ return (
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -2267,7 +4431,15 @@ return (
 
 
 
+
+
+
+
       ...inputStyle,
+
+
+
+
 
 
 
@@ -2275,7 +4447,15 @@ return (
 
 
 
+
+
+
+
       width: "100%",
+
+
+
+
 
 
 
@@ -2283,7 +4463,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2291,7 +4479,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2299,7 +4495,15 @@ return (
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -2307,7 +4511,15 @@ return (
 
 
 
+
+
+
+
     marginBottom: "20px",
+
+
+
+
 
 
 
@@ -2315,11 +4527,23 @@ return (
 
 
 
+
+
+
+
   }}
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2327,7 +4551,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2335,7 +4567,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -2343,11 +4583,23 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
 
 
 
+
+
+
+
       fontSize: "15px",
+
+
+
+
 
 
 
@@ -2355,7 +4607,15 @@ return (
 
 
 
+
+
+
+
       pointerEvents: "none",
+
+
+
+
 
 
 
@@ -2363,7 +4623,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -2371,7 +4639,15 @@ return (
 
 
 
+
+
+
+
     international
+
+
+
+
 
 
 
@@ -2379,7 +4655,15 @@ return (
 
 
 
+
+
+
+
     value={phone}
+
+
+
+
 
 
 
@@ -2387,7 +4671,15 @@ return (
 
 
 
+
+
+
+
     placeholder="Numéro de téléphone"
+
+
+
+
 
 
 
@@ -2395,7 +4687,15 @@ return (
 
 
 
+
+
+
+
       ...inputStyle,
+
+
+
+
 
 
 
@@ -2403,7 +4703,15 @@ return (
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -2411,7 +4719,15 @@ return (
 
 
 
+
+
+
+
       width: "100%",
+
+
+
+
 
 
 
@@ -2419,7 +4735,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2427,7 +4751,15 @@ return (
 
 
 
+
+
+
+
       style: {
+
+
+
+
 
 
 
@@ -2435,11 +4767,23 @@ return (
 
 
 
+
+
+
+
         outline: "none",
 
 
 
+
+
+
+
         width: "100%",
+
+
+
+
 
 
 
@@ -2447,11 +4791,23 @@ return (
 
 
 
+
+
+
+
         fontSize: mobile ? "15px" : "16px",
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
@@ -2459,7 +4815,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2467,7 +4831,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2475,7 +4847,15 @@ return (
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -2483,7 +4863,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -2491,7 +4879,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2499,7 +4895,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2507,7 +4911,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -2515,7 +4927,15 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
+
+
+
+
 
 
 
@@ -2523,7 +4943,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2531,7 +4959,15 @@ return (
 
 
 
+
+
+
+
   <input
+
+
+
+
 
 
 
@@ -2539,11 +4975,23 @@ return (
 
 
 
+
+
+
+
     placeholder="Votre email"
 
 
 
+
+
+
+
     required
+
+
+
+
 
 
 
@@ -2551,7 +4999,15 @@ return (
 
 
 
+
+
+
+
     onChange={(e) =>
+
+
+
+
 
 
 
@@ -2559,7 +5015,15 @@ return (
 
 
 
+
+
+
+
         e.target.value
+
+
+
+
 
 
 
@@ -2567,7 +5031,15 @@ return (
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -2575,7 +5047,15 @@ return (
 
 
 
+
+
+
+
       ...inputStyle,
+
+
+
+
 
 
 
@@ -2583,7 +5063,15 @@ return (
 
 
 
+
+
+
+
       width: "100%",
+
+
+
+
 
 
 
@@ -2591,7 +5079,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2599,7 +5095,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -2607,7 +5111,15 @@ return (
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -2615,7 +5127,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -2623,7 +5143,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2631,7 +5159,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2639,7 +5175,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -2647,7 +5191,15 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
+
+
+
+
 
 
 
@@ -2655,7 +5207,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -2663,11 +5223,23 @@ return (
 
 
 
+
+
+
+
   <input
 
 
 
+
+
+
+
     type="text"
+
+
+
+
 
 
 
@@ -2675,7 +5247,15 @@ return (
 
 
 
+
+
+
+
     required
+
+
+
+
 
 
 
@@ -2683,7 +5263,15 @@ return (
 
 
 
+
+
+
+
     onChange={(e) =>
+
+
+
+
 
 
 
@@ -2691,7 +5279,15 @@ return (
 
 
 
+
+
+
+
         e.target.value
+
+
+
+
 
 
 
@@ -2699,11 +5295,23 @@ return (
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2711,7 +5319,15 @@ return (
 
 
 
+
+
+
+
       paddingLeft: "45px",
+
+
+
+
 
 
 
@@ -2719,7 +5335,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -2727,7 +5351,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -2735,7 +5367,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -2743,7 +5383,15 @@ return (
 
 
 
+
+
+
+
     position: "relative",
+
+
+
+
 
 
 
@@ -2751,7 +5399,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -2759,7 +5415,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2767,7 +5431,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -2775,7 +5447,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -2783,7 +5463,15 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
+
+
+
+
 
 
 
@@ -2791,7 +5479,15 @@ return (
 
 
 
+
+
+
+
       zIndex: 1,
+
+
+
+
 
 
 
@@ -2799,7 +5495,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -2807,7 +5511,15 @@ return (
 
 
 
+
+
+
+
     required
+
+
+
+
 
 
 
@@ -2815,7 +5527,15 @@ return (
 
 
 
+
+
+
+
     onChange={(e) =>
+
+
+
+
 
 
 
@@ -2823,7 +5543,15 @@ return (
 
 
 
+
+
+
+
         e.target.value
+
+
+
+
 
 
 
@@ -2831,7 +5559,15 @@ return (
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -2839,7 +5575,15 @@ return (
 
 
 
+
+
+
+
       ...inputStyle,
+
+
+
+
 
 
 
@@ -2847,7 +5591,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -2855,7 +5607,15 @@ return (
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -2863,7 +5623,15 @@ return (
 
 
 
+
+
+
+
       border:
+
+
+
+
 
 
 
@@ -2871,7 +5639,15 @@ return (
 
 
 
+
+
+
+
       borderRadius: "16px",
+
+
+
+
 
 
 
@@ -2879,7 +5655,15 @@ return (
 
 
 
+
+
+
+
         "0 4px 10px rgba(0,0,0,0.03)",
+
+
+
+
 
 
 
@@ -2887,7 +5671,15 @@ return (
 
 
 
+
+
+
+
       cursor: "pointer",
+
+
+
+
 
 
 
@@ -2895,11 +5687,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -2907,11 +5711,23 @@ return (
 
 
 
+
+
+
+
       Choisir une ville
 
 
 
+
+
+
+
     </option>
+
+
+
+
 
 
 
@@ -2919,11 +5735,23 @@ return (
 
 
 
+
+
+
+
       Douala
 
 
 
+
+
+
+
     </option>
+
+
+
+
 
 
 
@@ -2931,11 +5759,23 @@ return (
 
 
 
+
+
+
+
       Yaoundé
 
 
 
+
+
+
+
     </option>
+
+
+
+
 
 
 
@@ -2943,11 +5783,23 @@ return (
 
 
 
+
+
+
+
       Bafoussam
 
 
 
+
+
+
+
     </option>
+
+
+
+
 
 
 
@@ -2955,7 +5807,15 @@ return (
 
 
 
+
+
+
+
       Autres villes
+
+
+
+
 
 
 
@@ -2963,7 +5823,15 @@ return (
 
 
 
+
+
+
+
   </select>
+
+
+
+
 
 
 
@@ -2971,7 +5839,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -2979,7 +5855,15 @@ return (
 
 
 
+
+
+
+
     position: "relative",
+
+
+
+
 
 
 
@@ -2987,11 +5871,23 @@ return (
 
 
 
+
+
+
+
   }}
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -2999,7 +5895,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -3007,7 +5911,15 @@ return (
 
 
 
+
+
+
+
       top: "18px",
+
+
+
+
 
 
 
@@ -3015,7 +5927,15 @@ return (
 
 
 
+
+
+
+
       color: "#6b7280",
+
+
+
+
 
 
 
@@ -3023,7 +5943,15 @@ return (
 
 
 
+
+
+
+
       zIndex: 1,
+
+
+
+
 
 
 
@@ -3031,7 +5959,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -3039,7 +5975,15 @@ return (
 
 
 
+
+
+
+
     type="text"
+
+
+
+
 
 
 
@@ -3047,7 +5991,15 @@ return (
 
 
 
+
+
+
+
     required
+
+
+
+
 
 
 
@@ -3055,7 +6007,15 @@ return (
 
 
 
+
+
+
+
     onChange={(e) =>
+
+
+
+
 
 
 
@@ -3063,7 +6023,15 @@ return (
 
 
 
+
+
+
+
         e.target.value
+
+
+
+
 
 
 
@@ -3071,7 +6039,15 @@ return (
 
 
 
+
+
+
+
     }
+
+
+
+
 
 
 
@@ -3079,7 +6055,15 @@ return (
 
 
 
+
+
+
+
       ...inputStyle,
+
+
+
+
 
 
 
@@ -3087,7 +6071,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -3095,7 +6087,15 @@ return (
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -3103,7 +6103,15 @@ return (
 
 
 
+
+
+
+
       border:
+
+
+
+
 
 
 
@@ -3111,7 +6119,15 @@ return (
 
 
 
+
+
+
+
       borderRadius: "16px",
+
+
+
+
 
 
 
@@ -3119,7 +6135,15 @@ return (
 
 
 
+
+
+
+
         "0 4px 10px rgba(0,0,0,0.03)",
+
+
+
+
 
 
 
@@ -3127,7 +6151,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3135,7 +6167,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3143,7 +6183,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -3151,7 +6199,15 @@ return (
 
 
 
+
+
+
+
     position: "relative",
+
+
+
+
 
 
 
@@ -3159,7 +6215,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -3167,7 +6231,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -3175,11 +6247,23 @@ return (
 
 
 
+
+
+
+
     style={{
 
 
 
+
+
+
+
       position: "absolute",
+
+
+
+
 
 
 
@@ -3187,7 +6271,15 @@ return (
 
 
 
+
+
+
+
       left: "15px",
+
+
+
+
 
 
 
@@ -3195,7 +6287,15 @@ return (
 
 
 
+
+
+
+
       fontSize: "15px",
+
+
+
+
 
 
 
@@ -3203,11 +6303,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -3215,7 +6327,15 @@ return (
 
 
 
+
+
+
+
     value={paymentMethod}
+
+
+
+
 
 
 
@@ -3223,7 +6343,15 @@ return (
 
 
 
+
+
+
+
       setPaymentMethod(
+
+
+
+
 
 
 
@@ -3231,7 +6359,15 @@ return (
 
 
 
+
+
+
+
       )
+
+
+
+
 
 
 
@@ -3239,7 +6375,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -3247,11 +6391,23 @@ return (
 
 
 
+
+
+
+
       width: "100%",
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -3259,7 +6415,15 @@ return (
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -3267,7 +6431,15 @@ return (
 
 
 
+
+
+
+
       border:
+
+
+
+
 
 
 
@@ -3275,11 +6447,23 @@ return (
 
 
 
+
+
+
+
       borderRadius: "16px",
 
 
 
+
+
+
+
       boxShadow:
+
+
+
+
 
 
 
@@ -3287,7 +6471,15 @@ return (
 
 
 
+
+
+
+
       appearance: "none",
+
+
+
+
 
 
 
@@ -3295,7 +6487,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3303,7 +6503,15 @@ return (
 
 
 
+
+
+
+
     <option>
+
+
+
+
 
 
 
@@ -3311,11 +6519,23 @@ return (
 
 
 
+
+
+
+
     </option>
 
 
 
+
+
+
+
     <option>
+
+
+
+
 
 
 
@@ -3323,7 +6543,15 @@ return (
 
 
 
+
+
+
+
     </option>
+
+
+
+
 
 
 
@@ -3331,7 +6559,15 @@ return (
 
 
 
+
+
+
+
       MTN Mobile Money
+
+
+
+
 
 
 
@@ -3339,11 +6575,23 @@ return (
 
 
 
+
+
+
+
   </select>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3351,7 +6599,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -3359,7 +6615,15 @@ return (
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -3367,7 +6631,15 @@ return (
 
 
 
+
+
+
+
     gap: "12px",
+
+
+
+
 
 
 
@@ -3375,7 +6647,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -3383,7 +6663,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -3391,7 +6679,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -3399,7 +6695,15 @@ return (
 
 
 
+
+
+
+
       flex: 1,
+
+
+
+
 
 
 
@@ -3407,7 +6711,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -3415,7 +6727,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -3423,11 +6743,23 @@ return (
 
 
 
+
+
+
+
       style={{
 
 
 
+
+
+
+
         position: "absolute",
+
+
+
+
 
 
 
@@ -3435,7 +6767,15 @@ return (
 
 
 
+
+
+
+
         left: "15px",
+
+
+
+
 
 
 
@@ -3443,7 +6783,15 @@ return (
 
 
 
+
+
+
+
         fontSize: "15px",
+
+
+
+
 
 
 
@@ -3451,11 +6799,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     />
+
+
+
+
 
 
 
@@ -3463,7 +6823,15 @@ return (
 
 
 
+
+
+
+
       type="text"
+
+
+
+
 
 
 
@@ -3471,7 +6839,15 @@ return (
 
 
 
+
+
+
+
       value={coupon}
+
+
+
+
 
 
 
@@ -3479,7 +6855,15 @@ return (
 
 
 
+
+
+
+
         setCoupon(
+
+
+
+
 
 
 
@@ -3487,7 +6871,15 @@ return (
 
 
 
+
+
+
+
         )
+
+
+
+
 
 
 
@@ -3495,7 +6887,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -3503,7 +6903,15 @@ return (
 
 
 
+
+
+
+
         boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -3511,7 +6919,15 @@ return (
 
 
 
+
+
+
+
         borderRadius: "16px",
+
+
+
+
 
 
 
@@ -3519,7 +6935,15 @@ return (
 
 
 
+
+
+
+
         background:
+
+
+
+
 
 
 
@@ -3527,7 +6951,15 @@ return (
 
 
 
+
+
+
+
         boxShadow:
+
+
+
+
 
 
 
@@ -3535,7 +6967,15 @@ return (
 
 
 
+
+
+
+
         outline: "none",
+
+
+
+
 
 
 
@@ -3543,7 +6983,15 @@ return (
 
 
 
+
+
+
+
         color: "#111827",
+
+
+
+
 
 
 
@@ -3551,7 +6999,15 @@ return (
 
 
 
+
+
+
+
         caretColor: "#4B2E83",
+
+
+
+
 
 
 
@@ -3559,7 +7015,15 @@ return (
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -3567,7 +7031,15 @@ return (
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3575,11 +7047,23 @@ return (
 
 
 
+
+
+
+
     onClick={applyCoupon}
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -3587,7 +7071,15 @@ return (
 
 
 
+
+
+
+
       border: "none",
+
+
+
+
 
 
 
@@ -3595,7 +7087,15 @@ return (
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -3603,7 +7103,15 @@ return (
 
 
 
+
+
+
+
       color: "white",
+
+
+
+
 
 
 
@@ -3611,7 +7119,15 @@ return (
 
 
 
+
+
+
+
       fontWeight: "800",
+
+
+
+
 
 
 
@@ -3619,7 +7135,15 @@ return (
 
 
 
+
+
+
+
       boxShadow:
+
+
+
+
 
 
 
@@ -3627,7 +7151,15 @@ return (
 
 
 
+
+
+
+
       transition: "0.3s",
+
+
+
+
 
 
 
@@ -3635,11 +7167,23 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3647,7 +7191,15 @@ return (
 
 
 
+
+
+
+
       e.currentTarget.style.transform =
+
+
+
+
 
 
 
@@ -3655,7 +7207,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -3663,7 +7223,15 @@ return (
 
 
 
+
+
+
+
       e.currentTarget.style.transform =
+
+
+
+
 
 
 
@@ -3671,11 +7239,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -3683,11 +7263,23 @@ return (
 
 
 
+
+
+
+
   </button>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -3695,11 +7287,23 @@ return (
 
 
 
+
+
+
+
 {/* RIGHT */}
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -3707,7 +7311,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -3715,7 +7327,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -3723,7 +7343,15 @@ return (
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -3731,11 +7359,23 @@ return (
 
 
 
+
+
+
+
       marginBottom: "25px",
 
 
 
+
+
+
+
       color: "#111827",
+
+
+
+
 
 
 
@@ -3743,7 +7383,15 @@ return (
 
 
 
+
+
+
+
       fontWeight: "800",
+
+
+
+
 
 
 
@@ -3751,11 +7399,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -3763,7 +7423,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -3771,7 +7439,15 @@ return (
 
 
 
+
+
+
+
         fontSize: mobile ? "24px" : "28px",
+
+
+
+
 
 
 
@@ -3779,11 +7455,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     />
+
+
+
+
 
 
 
@@ -3791,7 +7479,15 @@ return (
 
 
 
+
+
+
+
   </h2>
+
+
+
+
 
 
 
@@ -3799,11 +7495,23 @@ return (
 
 
 
+
+
+
+
     <div
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -3811,7 +7519,15 @@ return (
 
 
 
+
+
+
+
         padding: mobile ? "30px 20px" : "40px 25px",
+
+
+
+
 
 
 
@@ -3819,7 +7535,15 @@ return (
 
 
 
+
+
+
+
         background:
+
+
+
+
 
 
 
@@ -3827,7 +7551,15 @@ return (
 
 
 
+
+
+
+
         border: "1px solid #e5e7eb",
+
+
+
+
 
 
 
@@ -3835,7 +7567,15 @@ return (
 
 
 
+
+
+
+
         boxShadow:
+
+
+
+
 
 
 
@@ -3843,7 +7583,15 @@ return (
 
 
 
+
+
+
+
         width: "100%",
+
+
+
+
 
 
 
@@ -3851,11 +7599,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -3863,7 +7623,15 @@ return (
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -3871,7 +7639,15 @@ return (
 
 
 
+
+
+
+
           color: "#cbd5e1",
+
+
+
+
 
 
 
@@ -3879,7 +7655,15 @@ return (
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -3887,7 +7671,15 @@ return (
 
 
 
+
+
+
+
       <h2
+
+
+
+
 
 
 
@@ -3895,11 +7687,23 @@ return (
 
 
 
+
+
+
+
           margin: 0,
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -3907,7 +7711,15 @@ return (
 
 
 
+
+
+
+
           fontWeight: "800",
+
+
+
+
 
 
 
@@ -3915,11 +7727,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -3927,7 +7751,15 @@ return (
 
 
 
+
+
+
+
       </h2>
+
+
+
+
 
 
 
@@ -3935,7 +7767,15 @@ return (
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -3943,7 +7783,15 @@ return (
 
 
 
+
+
+
+
           color: "#6b7280",
+
+
+
+
 
 
 
@@ -3951,7 +7799,15 @@ return (
 
 
 
+
+
+
+
           lineHeight: "1.6",
+
+
+
+
 
 
 
@@ -3959,7 +7815,15 @@ return (
 
 
 
+
+
+
+
           wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -3967,11 +7831,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -3979,11 +7855,23 @@ return (
 
 
 
+
+
+
+
         Découvrez nos meilleures offres et ajoutez vos articles préférés.
 
 
 
+
+
+
+
       </p>
+
+
+
+
 
 
 
@@ -3991,11 +7879,23 @@ return (
 
 
 
+
+
+
+
         onClick={() => navigate("/")}
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -4003,7 +7903,15 @@ return (
 
 
 
+
+
+
+
           padding: "14px 25px",
+
+
+
+
 
 
 
@@ -4011,7 +7919,15 @@ return (
 
 
 
+
+
+
+
           borderRadius: "14px",
+
+
+
+
 
 
 
@@ -4019,7 +7935,15 @@ return (
 
 
 
+
+
+
+
             "linear-gradient(135deg,#5b6cff,#7c4dff)",
+
+
+
+
 
 
 
@@ -4027,7 +7951,15 @@ return (
 
 
 
+
+
+
+
           fontWeight: "700",
+
+
+
+
 
 
 
@@ -4035,7 +7967,15 @@ return (
 
 
 
+
+
+
+
           width: mobile ? "100%" : "auto",
+
+
+
+
 
 
 
@@ -4043,11 +7983,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4055,11 +8007,23 @@ return (
 
 
 
+
+
+
+
       </button>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -4067,7 +8031,15 @@ return (
 
 
 
+
+
+
+
   <>
+
+
+
+
 
 
 
@@ -4075,7 +8047,15 @@ return (
 
 
 
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -4083,7 +8063,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -4091,7 +8079,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -4099,7 +8095,15 @@ return (
 
 
 
+
+
+
+
       maxWidth: "100%",
+
+
+
+
 
 
 
@@ -4107,7 +8111,15 @@ return (
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -4115,7 +8127,15 @@ return (
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -4123,7 +8143,15 @@ return (
 
 
 
+
+
+
+
       marginTop: "18px",
+
+
+
+
 
 
 
@@ -4131,7 +8159,15 @@ return (
 
 
 
+
+
+
+
       padding: mobile ? "12px" : "18px",
+
+
+
+
 
 
 
@@ -4139,7 +8175,15 @@ return (
 
 
 
+
+
+
+
       boxShadow: "0 8px 20px rgba(0,0,0,0.04)",
+
+
+
+
 
 
 
@@ -4147,11 +8191,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -4159,7 +8215,15 @@ return (
 
 
 
+
+
+
+
     <img
+
+
+
+
 
 
 
@@ -4167,11 +8231,23 @@ return (
 
 
 
+
+
+
+
       alt=""
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -4179,11 +8255,23 @@ return (
 
 
 
+
+
+
+
         height: mobile ? "85px" : "90px",
 
 
 
+
+
+
+
         flexShrink: 0,
+
+
+
+
 
 
 
@@ -4191,7 +8279,15 @@ return (
 
 
 
+
+
+
+
         borderRadius: "15px",
+
+
+
+
 
 
 
@@ -4199,7 +8295,15 @@ return (
 
 
 
+
+
+
+
         padding: "4px",
+
+
+
+
 
 
 
@@ -4207,7 +8311,15 @@ return (
 
 
 
+
+
+
+
     />
+
+
+
+
 
 
 
@@ -4215,7 +8327,15 @@ return (
 
 
 
+
+
+
+
     <div
+
+
+
+
 
 
 
@@ -4223,11 +8343,23 @@ return (
 
 
 
+
+
+
+
         flex: 1,
 
 
 
+
+
+
+
         minWidth: 0,
+
+
+
+
 
 
 
@@ -4235,7 +8367,15 @@ return (
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -4243,7 +8383,15 @@ return (
 
 
 
+
+
+
+
       <h3
+
+
+
+
 
 
 
@@ -4251,7 +8399,15 @@ return (
 
 
 
+
+
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -4259,7 +8415,15 @@ return (
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -4267,7 +8431,15 @@ return (
 
 
 
+
+
+
+
           wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -4275,7 +8447,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4283,7 +8463,15 @@ return (
 
 
 
+
+
+
+
       </h3>
+
+
+
+
 
 
 
@@ -4291,11 +8479,23 @@ return (
 
 
 
+
+
+
+
         style={{
 
 
 
+
+
+
+
           color: "#6b7280",
+
+
+
+
 
 
 
@@ -4303,7 +8503,15 @@ return (
 
 
 
+
+
+
+
           fontSize: "15px",
+
+
+
+
 
 
 
@@ -4311,7 +8519,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4319,7 +8535,15 @@ return (
 
 
 
+
+
+
+
       </p>
+
+
+
+
 
 
 
@@ -4327,11 +8551,23 @@ return (
 
 
 
+
+
+
+
       <div
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -4339,7 +8575,15 @@ return (
 
 
 
+
+
+
+
           padding: "5px 10px",
+
+
+
+
 
 
 
@@ -4347,7 +8591,15 @@ return (
 
 
 
+
+
+
+
           display: "inline-block",
+
+
+
+
 
 
 
@@ -4355,7 +8607,15 @@ return (
 
 
 
+
+
+
+
           fontWeight: "700",
+
+
+
+
 
 
 
@@ -4363,11 +8623,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4375,7 +8647,15 @@ return (
 
 
 
+
+
+
+
       </div>
+
+
+
+
 
 
 
@@ -4383,11 +8663,23 @@ return (
 
 
 
+
+
+
+
       <div
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -4395,7 +8687,15 @@ return (
 
 
 
+
+
+
+
           alignItems: "center",
+
+
+
+
 
 
 
@@ -4403,7 +8703,15 @@ return (
 
 
 
+
+
+
+
           marginTop: "12px",
+
+
+
+
 
 
 
@@ -4411,7 +8719,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4419,7 +8735,15 @@ return (
 
 
 
+
+
+
+
           onClick={() =>
+
+
+
+
 
 
 
@@ -4427,7 +8751,15 @@ return (
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -4435,7 +8767,15 @@ return (
 
 
 
+
+
+
+
             width: "34px",
+
+
+
+
 
 
 
@@ -4443,11 +8783,23 @@ return (
 
 
 
+
+
+
+
             borderRadius: "50%",
 
 
 
+
+
+
+
             border: "none",
+
+
+
+
 
 
 
@@ -4455,7 +8807,15 @@ return (
 
 
 
+
+
+
+
             color: "#5b6cff",
+
+
+
+
 
 
 
@@ -4463,7 +8823,15 @@ return (
 
 
 
+
+
+
+
             fontWeight: "bold",
+
+
+
+
 
 
 
@@ -4471,11 +8839,23 @@ return (
 
 
 
+
+
+
+
           }}
 
 
 
+
+
+
+
         >
+
+
+
+
 
 
 
@@ -4483,7 +8863,15 @@ return (
 
 
 
+
+
+
+
         </button>
+
+
+
+
 
 
 
@@ -4491,7 +8879,15 @@ return (
 
 
 
+
+
+
+
           style={{
+
+
+
+
 
 
 
@@ -4499,7 +8895,15 @@ return (
 
 
 
+
+
+
+
             fontSize: "16px",
+
+
+
+
 
 
 
@@ -4507,7 +8911,15 @@ return (
 
 
 
+
+
+
+
         >
+
+
+
+
 
 
 
@@ -4515,7 +8927,15 @@ return (
 
 
 
+
+
+
+
         </span>
+
+
+
+
 
 
 
@@ -4523,7 +8943,15 @@ return (
 
 
 
+
+
+
+
           onClick={() =>
+
+
+
+
 
 
 
@@ -4531,7 +8959,15 @@ return (
 
 
 
+
+
+
+
           }
+
+
+
+
 
 
 
@@ -4539,7 +8975,15 @@ return (
 
 
 
+
+
+
+
             width: "34px",
+
+
+
+
 
 
 
@@ -4547,7 +8991,15 @@ return (
 
 
 
+
+
+
+
             borderRadius: "50%",
+
+
+
+
 
 
 
@@ -4555,7 +9007,15 @@ return (
 
 
 
+
+
+
+
             background:
+
+
+
+
 
 
 
@@ -4563,7 +9023,15 @@ return (
 
 
 
+
+
+
+
             color: "white",
+
+
+
+
 
 
 
@@ -4571,7 +9039,15 @@ return (
 
 
 
+
+
+
+
             fontWeight: "bold",
+
+
+
+
 
 
 
@@ -4579,7 +9055,15 @@ return (
 
 
 
+
+
+
+
           }}
+
+
+
+
 
 
 
@@ -4587,7 +9071,15 @@ return (
 
 
 
+
+
+
+
           +
+
+
+
+
 
 
 
@@ -4595,11 +9087,23 @@ return (
 
 
 
+
+
+
+
       </div>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -4607,7 +9111,15 @@ return (
 
 
 
+
+
+
+
     <button
+
+
+
+
 
 
 
@@ -4615,7 +9127,15 @@ return (
 
 
 
+
+
+
+
         removeItem(item._id)
+
+
+
+
 
 
 
@@ -4623,7 +9143,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -4631,7 +9159,15 @@ return (
 
 
 
+
+
+
+
         top: mobile ? "10px" : "18px",
+
+
+
+
 
 
 
@@ -4639,11 +9175,23 @@ return (
 
 
 
+
+
+
+
         border: "none",
 
 
 
+
+
+
+
         background:
+
+
+
+
 
 
 
@@ -4651,7 +9199,15 @@ return (
 
 
 
+
+
+
+
         color: "white",
+
+
+
+
 
 
 
@@ -4659,7 +9215,15 @@ return (
 
 
 
+
+
+
+
         height: mobile ? "34px" : "38px",
+
+
+
+
 
 
 
@@ -4667,7 +9231,15 @@ return (
 
 
 
+
+
+
+
         cursor: "pointer",
+
+
+
+
 
 
 
@@ -4675,7 +9247,15 @@ return (
 
 
 
+
+
+
+
         fontSize: mobile ? "15px" : "16px",
+
+
+
+
 
 
 
@@ -4683,7 +9263,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -4691,11 +9279,23 @@ return (
 
 
 
+
+
+
+
     </button>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -4703,7 +9303,15 @@ return (
 
 
 
+
+
+
+
 {/* TOTAL */}
+
+
+
+
 
 
 
@@ -4711,7 +9319,15 @@ return (
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -4719,7 +9335,15 @@ return (
 
 
 
+
+
+
+
     background:
+
+
+
+
 
 
 
@@ -4727,7 +9351,15 @@ return (
 
 
 
+
+
+
+
     padding: mobile ? "22px" : "30px",
+
+
+
+
 
 
 
@@ -4735,7 +9367,15 @@ return (
 
 
 
+
+
+
+
     boxShadow:
+
+
+
+
 
 
 
@@ -4743,7 +9383,15 @@ return (
 
 
 
+
+
+
+
     border:
+
+
+
+
 
 
 
@@ -4751,7 +9399,15 @@ return (
 
 
 
+
+
+
+
     backdropFilter: "blur(12px)",
+
+
+
+
 
 
 
@@ -4759,7 +9415,15 @@ return (
 
 
 
+
+
+
+
     overflow: "hidden",
+
+
+
+
 
 
 
@@ -4767,7 +9431,15 @@ return (
 
 
 
+
+
+
+
     boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -4775,7 +9447,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -4783,11 +9463,23 @@ return (
 
 
 
+
+
+
+
   <div
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -4795,7 +9487,15 @@ return (
 
 
 
+
+
+
+
       top: "-60px",
+
+
+
+
 
 
 
@@ -4803,7 +9503,15 @@ return (
 
 
 
+
+
+
+
       width: mobile ? "140px" : "180px",
+
+
+
+
 
 
 
@@ -4811,11 +9519,23 @@ return (
 
 
 
+
+
+
+
       borderRadius: "50%",
 
 
 
+
+
+
+
       background:
+
+
+
+
 
 
 
@@ -4823,7 +9543,15 @@ return (
 
 
 
+
+
+
+
       filter: "blur(10px)",
+
+
+
+
 
 
 
@@ -4831,7 +9559,15 @@ return (
 
 
 
+
+
+
+
   />
+
+
+
+
 
 
 
@@ -4839,7 +9575,15 @@ return (
 
 
 
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -4847,7 +9591,15 @@ return (
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -4855,11 +9607,23 @@ return (
 
 
 
+
+
+
+
       justifyContent: "space-between",
 
 
 
+
+
+
+
       gap: "15px",
+
+
+
+
 
 
 
@@ -4867,7 +9631,15 @@ return (
 
 
 
+
+
+
+
       flexWrap: mobile ? "wrap" : "nowrap",
+
+
+
+
 
 
 
@@ -4875,7 +9647,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -4883,7 +9663,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -4891,7 +9679,15 @@ return (
 
 
 
+
+
+
+
         minWidth: 0,
+
+
+
+
 
 
 
@@ -4899,7 +9695,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -4907,11 +9711,23 @@ return (
 
 
 
+
+
+
+
         style={{
 
 
 
+
+
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -4919,7 +9735,15 @@ return (
 
 
 
+
+
+
+
           fontSize: mobile ? "12px" : "13px",
+
+
+
+
 
 
 
@@ -4927,11 +9751,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4939,7 +9775,15 @@ return (
 
 
 
+
+
+
+
       </p>
+
+
+
+
 
 
 
@@ -4947,11 +9791,23 @@ return (
 
 
 
+
+
+
+
         style={{
 
 
 
+
+
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -4959,7 +9815,15 @@ return (
 
 
 
+
+
+
+
           color: "#111827",
+
+
+
+
 
 
 
@@ -4967,7 +9831,15 @@ return (
 
 
 
+
+
+
+
           fontWeight: "900",
+
+
+
+
 
 
 
@@ -4975,11 +9847,23 @@ return (
 
 
 
+
+
+
+
         }}
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -4987,7 +9871,15 @@ return (
 
 
 
+
+
+
+
       </h2>
+
+
+
+
 
 
 
@@ -4995,11 +9887,23 @@ return (
 
 
 
+
+
+
+
     <div
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5007,7 +9911,15 @@ return (
 
 
 
+
+
+
+
           "linear-gradient(135deg,#5b6cff,#7c4dff)",
+
+
+
+
 
 
 
@@ -5015,7 +9927,15 @@ return (
 
 
 
+
+
+
+
         height: mobile ? "55px" : "65px",
+
+
+
+
 
 
 
@@ -5023,7 +9943,15 @@ return (
 
 
 
+
+
+
+
         display: "flex",
+
+
+
+
 
 
 
@@ -5031,11 +9959,23 @@ return (
 
 
 
+
+
+
+
         justifyContent: "center",
 
 
 
+
+
+
+
         flexShrink: 0,
+
+
+
+
 
 
 
@@ -5043,7 +9983,15 @@ return (
 
 
 
+
+
+
+
           "0 10px 25px rgba(91,108,255,0.25)",
+
+
+
+
 
 
 
@@ -5051,7 +9999,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5059,7 +10015,15 @@ return (
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -5067,11 +10031,23 @@ return (
 
 
 
+
+
+
+
           fontSize: mobile ? "24px" : "28px",
 
 
 
+
+
+
+
         }}
+
+
+
+
 
 
 
@@ -5079,11 +10055,23 @@ return (
 
 
 
+
+
+
+
     </div>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -5091,7 +10079,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -5099,7 +10095,15 @@ return (
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -5107,7 +10111,15 @@ return (
 
 
 
+
+
+
+
     gap: "15px",
+
+
+
+
 
 
 
@@ -5115,7 +10127,15 @@ return (
 
 
 
+
+
+
+
     alignItems: mobile ? "flex-start" : "center",
+
+
+
+
 
 
 
@@ -5123,7 +10143,15 @@ return (
 
 
 
+
+
+
+
     borderBottom: "1px solid #dbeafe",
+
+
+
+
 
 
 
@@ -5131,7 +10159,15 @@ return (
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -5139,7 +10175,15 @@ return (
 
 
 
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -5147,7 +10191,15 @@ return (
 
 
 
+
+
+
+
       minWidth: 0,
+
+
+
+
 
 
 
@@ -5155,7 +10207,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5163,7 +10223,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5171,7 +10239,15 @@ return (
 
 
 
+
+
+
+
         color: "#374151",
+
+
+
+
 
 
 
@@ -5179,7 +10255,15 @@ return (
 
 
 
+
+
+
+
         fontWeight: "700",
+
+
+
+
 
 
 
@@ -5187,11 +10271,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5199,7 +10295,15 @@ return (
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
@@ -5207,7 +10311,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5215,7 +10327,15 @@ return (
 
 
 
+
+
+
+
         marginTop: "3px",
+
+
+
+
 
 
 
@@ -5223,7 +10343,15 @@ return (
 
 
 
+
+
+
+
         color: "#9ca3af",
+
+
+
+
 
 
 
@@ -5231,7 +10359,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5239,7 +10375,15 @@ return (
 
 
 
+
+
+
+
     </p>
+
+
+
+
 
 
 
@@ -5247,7 +10391,15 @@ return (
 
 
 
+
+
+
+
   <h3
+
+
+
+
 
 
 
@@ -5255,7 +10407,15 @@ return (
 
 
 
+
+
+
+
       margin: 0,
+
+
+
+
 
 
 
@@ -5263,7 +10423,15 @@ return (
 
 
 
+
+
+
+
       fontWeight: "900",
+
+
+
+
 
 
 
@@ -5271,11 +10439,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5283,11 +10463,23 @@ return (
 
 
 
+
+
+
+
   </h3>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -5295,7 +10487,15 @@ return (
 
 
 
+
+
+
+
 <div
+
+
+
+
 
 
 
@@ -5303,7 +10503,15 @@ return (
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -5311,7 +10519,15 @@ return (
 
 
 
+
+
+
+
     gap: "15px",
+
+
+
+
 
 
 
@@ -5319,7 +10535,15 @@ return (
 
 
 
+
+
+
+
     alignItems: mobile ? "flex-start" : "center",
+
+
+
+
 
 
 
@@ -5327,7 +10551,15 @@ return (
 
 
 
+
+
+
+
     borderBottom: "1px solid #dbeafe",
+
+
+
+
 
 
 
@@ -5335,7 +10567,15 @@ return (
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -5343,7 +10583,15 @@ return (
 
 
 
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -5351,7 +10599,15 @@ return (
 
 
 
+
+
+
+
       minWidth: 0,
+
+
+
+
 
 
 
@@ -5359,7 +10615,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5367,11 +10631,23 @@ return (
 
 
 
+
+
+
+
       style={{
 
 
 
+
+
+
+
         margin: 0,
+
+
+
+
 
 
 
@@ -5379,7 +10655,15 @@ return (
 
 
 
+
+
+
+
         fontSize: "16px",
+
+
+
+
 
 
 
@@ -5387,7 +10671,15 @@ return (
 
 
 
+
+
+
+
         wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -5395,7 +10687,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5403,7 +10703,15 @@ return (
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
@@ -5411,11 +10719,23 @@ return (
 
 
 
+
+
+
+
       style={{
 
 
 
+
+
+
+
         margin: 0,
+
+
+
+
 
 
 
@@ -5423,7 +10743,15 @@ return (
 
 
 
+
+
+
+
         fontSize: "12px",
+
+
+
+
 
 
 
@@ -5431,11 +10759,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5443,11 +10783,23 @@ return (
 
 
 
+
+
+
+
     </p>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -5455,7 +10807,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -5463,7 +10823,15 @@ return (
 
 
 
+
+
+
+
       fontWeight: "900",
+
+
+
+
 
 
 
@@ -5471,7 +10839,15 @@ return (
 
 
 
+
+
+
+
         shipping === 0
+
+
+
+
 
 
 
@@ -5479,7 +10855,15 @@ return (
 
 
 
+
+
+
+
           : "#111827",
+
+
+
+
 
 
 
@@ -5487,11 +10871,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5499,7 +10895,15 @@ return (
 
 
 
+
+
+
+
         ? "Gratuite 🎉"
+
+
+
+
 
 
 
@@ -5507,11 +10911,23 @@ return (
 
 
 
+
+
+
+
   </h3>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -5519,7 +10935,15 @@ return (
 
 
 
+
+
+
+
 {discount > 0 && (
+
+
+
+
 
 
 
@@ -5527,11 +10951,23 @@ return (
 
 
 
+
+
+
+
     style={{
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -5539,7 +10975,15 @@ return (
 
 
 
+
+
+
+
       gap: "15px",
+
+
+
+
 
 
 
@@ -5547,7 +10991,15 @@ return (
 
 
 
+
+
+
+
       alignItems: mobile ? "flex-start" : "center",
+
+
+
+
 
 
 
@@ -5555,7 +11007,15 @@ return (
 
 
 
+
+
+
+
       borderBottom: "1px solid #dbeafe",
+
+
+
+
 
 
 
@@ -5563,11 +11023,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5575,7 +11047,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5583,11 +11063,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5595,11 +11087,23 @@ return (
 
 
 
+
+
+
+
         style={{
 
 
 
+
+
+
+
           margin: 0,
+
+
+
+
 
 
 
@@ -5607,7 +11111,15 @@ return (
 
 
 
+
+
+
+
           fontSize: "16px",
+
+
+
+
 
 
 
@@ -5615,7 +11127,15 @@ return (
 
 
 
+
+
+
+
           wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -5623,7 +11143,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -5631,7 +11159,15 @@ return (
 
 
 
+
+
+
+
       </h3>
+
+
+
+
 
 
 
@@ -5639,7 +11175,15 @@ return (
 
 
 
+
+
+
+
         style={{
+
+
+
+
 
 
 
@@ -5647,7 +11191,15 @@ return (
 
 
 
+
+
+
+
           marginTop: "3px",
+
+
+
+
 
 
 
@@ -5655,7 +11207,15 @@ return (
 
 
 
+
+
+
+
           color: "#86efac",
+
+
+
+
 
 
 
@@ -5663,7 +11223,15 @@ return (
 
 
 
+
+
+
+
       >
+
+
+
+
 
 
 
@@ -5671,7 +11239,15 @@ return (
 
 
 
+
+
+
+
       </p>
+
+
+
+
 
 
 
@@ -5679,7 +11255,15 @@ return (
 
 
 
+
+
+
+
     <h3
+
+
+
+
 
 
 
@@ -5687,7 +11271,15 @@ return (
 
 
 
+
+
+
+
         margin: 0,
+
+
+
+
 
 
 
@@ -5695,7 +11287,15 @@ return (
 
 
 
+
+
+
+
         fontWeight: "900",
+
+
+
+
 
 
 
@@ -5703,11 +11303,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5715,7 +11327,15 @@ return (
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
@@ -5723,7 +11343,15 @@ return (
 
 
 
+
+
+
+
 )}
+
+
+
+
 
 
 
@@ -5731,11 +11359,23 @@ return (
 
 
 
+
+
+
+
 <div
 
 
 
+
+
+
+
   style={{
+
+
+
+
 
 
 
@@ -5743,7 +11383,15 @@ return (
 
 
 
+
+
+
+
     padding: mobile ? "16px" : "22px",
+
+
+
+
 
 
 
@@ -5751,7 +11399,15 @@ return (
 
 
 
+
+
+
+
     background:
+
+
+
+
 
 
 
@@ -5759,7 +11415,15 @@ return (
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -5767,7 +11431,15 @@ return (
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -5775,7 +11447,15 @@ return (
 
 
 
+
+
+
+
     width: "100%",
+
+
+
+
 
 
 
@@ -5783,7 +11463,15 @@ return (
 
 
 
+
+
+
+
     boxShadow:
+
+
+
+
 
 
 
@@ -5791,11 +11479,23 @@ return (
 
 
 
+
+
+
+
   }}
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -5803,11 +11503,23 @@ return (
 
 
 
+
+
+
+
   <div
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -5815,7 +11527,15 @@ return (
 
 
 
+
+
+
+
       minWidth: 0,
+
+
+
+
 
 
 
@@ -5823,7 +11543,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5831,11 +11559,23 @@ return (
 
 
 
+
+
+
+
       style={{
 
 
 
+
+
+
+
         margin: 0,
+
+
+
+
 
 
 
@@ -5843,7 +11583,15 @@ return (
 
 
 
+
+
+
+
         fontSize: "13px",
+
+
+
+
 
 
 
@@ -5851,11 +11599,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5863,7 +11623,15 @@ return (
 
 
 
+
+
+
+
     </p>
+
+
+
+
 
 
 
@@ -5871,7 +11639,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5879,7 +11655,15 @@ return (
 
 
 
+
+
+
+
         color: "white",
+
+
+
+
 
 
 
@@ -5887,7 +11671,15 @@ return (
 
 
 
+
+
+
+
         fontWeight: "900",
+
+
+
+
 
 
 
@@ -5895,11 +11687,23 @@ return (
 
 
 
+
+
+
+
       }}
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -5907,11 +11711,23 @@ return (
 
 
 
+
+
+
+
     </h2>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -5919,11 +11735,23 @@ return (
 
 
 
+
+
+
+
   <div
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -5931,7 +11759,15 @@ return (
 
 
 
+
+
+
+
       height: mobile ? "52px" : "62px",
+
+
+
+
 
 
 
@@ -5939,11 +11775,23 @@ return (
 
 
 
+
+
+
+
       background: "rgba(255,255,255,0.18)",
 
 
 
+
+
+
+
       display: "flex",
+
+
+
+
 
 
 
@@ -5951,7 +11799,15 @@ return (
 
 
 
+
+
+
+
       justifyContent: "center",
+
+
+
+
 
 
 
@@ -5959,11 +11815,23 @@ return (
 
 
 
+
+
+
+
     }}
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -5971,7 +11839,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -5979,7 +11855,15 @@ return (
 
 
 
+
+
+
+
         fontSize: mobile ? "24px" : "30px",
+
+
+
+
 
 
 
@@ -5987,7 +11871,15 @@ return (
 
 
 
+
+
+
+
     />
+
+
+
+
 
 
 
@@ -5995,11 +11887,23 @@ return (
 
 
 
+
+
+
+
 </div>
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -6007,7 +11911,15 @@ return (
 
 
 
+
+
+
+
 {success && (
+
+
+
+
 
 
 
@@ -6015,7 +11927,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -6023,7 +11943,15 @@ return (
 
 
 
+
+
+
+
         "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+
+
+
+
 
 
 
@@ -6031,7 +11959,15 @@ return (
 
 
 
+
+
+
+
       padding: mobile ? "18px" : "20px",
+
+
+
+
 
 
 
@@ -6039,7 +11975,15 @@ return (
 
 
 
+
+
+
+
       marginTop: "25px",
+
+
+
+
 
 
 
@@ -6047,7 +11991,15 @@ return (
 
 
 
+
+
+
+
       alignItems: mobile ? "flex-start" : "center",
+
+
+
+
 
 
 
@@ -6055,7 +12007,15 @@ return (
 
 
 
+
+
+
+
       fontWeight: "700",
+
+
+
+
 
 
 
@@ -6063,7 +12023,15 @@ return (
 
 
 
+
+
+
+
         "0 8px 20px rgba(34,197,94,0.15)",
+
+
+
+
 
 
 
@@ -6071,7 +12039,15 @@ return (
 
 
 
+
+
+
+
       boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -6079,7 +12055,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -6087,7 +12071,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -6095,11 +12087,23 @@ return (
 
 
 
+
+
+
+
         flexShrink: 0,
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -6107,7 +12111,15 @@ return (
 
 
 
+
+
+
+
     <span
+
+
+
+
 
 
 
@@ -6115,7 +12127,15 @@ return (
 
 
 
+
+
+
+
         wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -6123,7 +12143,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -6131,7 +12159,15 @@ return (
 
 
 
+
+
+
+
     </span>
+
+
+
+
 
 
 
@@ -6139,7 +12175,15 @@ return (
 
 
 
+
+
+
+
 )}
+
+
+
+
 
 
 
@@ -6147,11 +12191,23 @@ return (
 
 
 
+
+
+
+
   style={{
 
 
 
+
+
+
+
     background:
+
+
+
+
 
 
 
@@ -6159,11 +12215,23 @@ return (
 
 
 
+
+
+
+
     padding: mobile ? "16px" : "18px",
 
 
 
+
+
+
+
     borderRadius: "18px",
+
+
+
+
 
 
 
@@ -6171,7 +12239,15 @@ return (
 
 
 
+
+
+
+
     display: "flex",
+
+
+
+
 
 
 
@@ -6179,7 +12255,15 @@ return (
 
 
 
+
+
+
+
     gap: "15px",
+
+
+
+
 
 
 
@@ -6187,7 +12271,15 @@ return (
 
 
 
+
+
+
+
     boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -6195,7 +12287,15 @@ return (
 
 
 
+
+
+
+
 >
+
+
+
+
 
 
 
@@ -6203,7 +12303,15 @@ return (
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -6211,7 +12319,15 @@ return (
 
 
 
+
+
+
+
       color: "#5b6cff",
+
+
+
+
 
 
 
@@ -6219,7 +12335,15 @@ return (
 
 
 
+
+
+
+
     }}
+
+
+
+
 
 
 
@@ -6227,7 +12351,15 @@ return (
 
 
 
+
+
+
+
   <div
+
+
+
+
 
 
 
@@ -6235,7 +12367,15 @@ return (
 
 
 
+
+
+
+
       minWidth: 0,
+
+
+
+
 
 
 
@@ -6243,7 +12383,15 @@ return (
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -6251,7 +12399,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -6259,7 +12415,15 @@ return (
 
 
 
+
+
+
+
         wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -6267,7 +12431,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -6275,7 +12447,15 @@ return (
 
 
 
+
+
+
+
     </h4>
+
+
+
+
 
 
 
@@ -6283,7 +12463,15 @@ return (
 
 
 
+
+
+
+
       style={{
+
+
+
+
 
 
 
@@ -6291,7 +12479,15 @@ return (
 
 
 
+
+
+
+
         color: "#6b7280",
+
+
+
+
 
 
 
@@ -6299,7 +12495,15 @@ return (
 
 
 
+
+
+
+
         wordBreak: "break-word",
+
+
+
+
 
 
 
@@ -6307,7 +12511,15 @@ return (
 
 
 
+
+
+
+
     >
+
+
+
+
 
 
 
@@ -6315,7 +12527,15 @@ return (
 
 
 
+
+
+
+
     </p>
+
+
+
+
 
 
 
@@ -6323,7 +12543,15 @@ return (
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
@@ -6331,7 +12559,15 @@ return (
 
 
 
+
+
+
+
 <button
+
+
+
+
 
 
 
@@ -6339,7 +12575,15 @@ return (
 
 
 
+
+
+
+
   disabled={
+
+
+
+
 
 
 
@@ -6347,7 +12591,15 @@ return (
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -6355,7 +12607,15 @@ return (
 
 
 
+
+
+
+
     marginTop: "30px",
+
+
+
+
 
 
 
@@ -6363,7 +12623,15 @@ return (
 
 
 
+
+
+
+
     padding: mobile ? "16px" : "17px",
+
+
+
+
 
 
 
@@ -6371,7 +12639,15 @@ return (
 
 
 
+
+
+
+
       loading || cart.length === 0
+
+
+
+
 
 
 
@@ -6379,7 +12655,15 @@ return (
 
 
 
+
+
+
+
         : "linear-gradient(135deg,#6d28d9,#4f46e5)",
+
+
+
+
 
 
 
@@ -6387,7 +12671,15 @@ return (
 
 
 
+
+
+
+
     border: "none",
+
+
+
+
 
 
 
@@ -6395,7 +12687,15 @@ return (
 
 
 
+
+
+
+
     fontSize: mobile ? "15px" : "16px",
+
+
+
+
 
 
 
@@ -6403,11 +12703,23 @@ return (
 
 
 
+
+
+
+
     cursor:
 
 
 
+
+
+
+
       loading || cart.length === 0
+
+
+
+
 
 
 
@@ -6415,7 +12727,15 @@ return (
 
 
 
+
+
+
+
         : "pointer",
+
+
+
+
 
 
 
@@ -6423,7 +12743,15 @@ return (
 
 
 
+
+
+
+
     alignItems: "center",
+
+
+
+
 
 
 
@@ -6431,7 +12759,15 @@ return (
 
 
 
+
+
+
+
     gap: "12px",
+
+
+
+
 
 
 
@@ -6439,7 +12775,15 @@ return (
 
 
 
+
+
+
+
     boxSizing: "border-box",
+
+
+
+
 
 
 
@@ -6447,11 +12791,23 @@ return (
 
 
 
+
+
+
+
       loading || cart.length === 0
 
 
 
+
+
+
+
         ? "none"
+
+
+
+
 
 
 
@@ -6459,7 +12815,15 @@ return (
 
 
 
+
+
+
+
     transition: "0.3s",
+
+
+
+
 
 
 
@@ -6467,7 +12831,15 @@ return (
 
 
 
+
+
+
+
     opacity:
+
+
+
+
 
 
 
@@ -6475,7 +12847,15 @@ return (
 
 
 
+
+
+
+
         ? 0.7
+
+
+
+
 
 
 
@@ -6483,7 +12863,15 @@ return (
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -6491,7 +12879,15 @@ return (
 
 
 
+
+
+
+
     if (
+
+
+
+
 
 
 
@@ -6499,7 +12895,15 @@ return (
 
 
 
+
+
+
+
       cart.length > 0
+
+
+
+
 
 
 
@@ -6507,7 +12911,15 @@ return (
 
 
 
+
+
+
+
       e.currentTarget.style.transform =
+
+
+
+
 
 
 
@@ -6515,7 +12927,15 @@ return (
 
 
 
+
+
+
+
       e.currentTarget.style.boxShadow =
+
+
+
+
 
 
 
@@ -6523,11 +12943,23 @@ return (
 
 
 
+
+
+
+
     }
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -6535,7 +12967,15 @@ return (
 
 
 
+
+
+
+
     e.currentTarget.style.transform =
+
+
+
+
 
 
 
@@ -6543,7 +12983,15 @@ return (
 
 
 
+
+
+
+
     e.currentTarget.style.boxShadow =
+
+
+
+
 
 
 
@@ -6551,7 +12999,15 @@ return (
 
 
 
+
+
+
+
         ? "none"
+
+
+
+
 
 
 
@@ -6559,7 +13015,15 @@ return (
 
 
 
+
+
+
+
   }}
+
+
+
+
 
 
 
@@ -6567,11 +13031,23 @@ return (
 
 
 
+
+
+
+
   {loading ? (
 
 
 
+
+
+
+
     <>
+
+
+
+
 
 
 
@@ -6579,11 +13055,23 @@ return (
 
 
 
+
+
+
+
       Envoi...
 
 
 
+
+
+
+
     </>
+
+
+
+
 
 
 
@@ -6591,7 +13079,15 @@ return (
 
 
 
+
+
+
+
     <>
+
+
+
+
 
 
 
@@ -6599,11 +13095,23 @@ return (
 
 
 
+
+
+
+
       Panier vide
 
 
 
+
+
+
+
     </>
+
+
+
+
 
 
 
@@ -6611,7 +13119,15 @@ return (
 
 
 
+
+
+
+
     <>
+
+
+
+
 
 
 
@@ -6619,7 +13135,15 @@ return (
 
 
 
+
+
+
+
       Commander maintenant
+
+
+
+
 
 
 
@@ -6627,7 +13151,15 @@ return (
 
 
 
+
+
+
+
     </>
+
+
+
+
 
 
 
@@ -6635,11 +13167,23 @@ return (
 
 
 
+
+
+
+
 </button>
 
 
 
+
+
+
+
 </>
+
+
+
+
 
 
 
@@ -6647,15 +13191,31 @@ return (
 
 
 
-</div>
 
-
-
-</div>
 
 
 
 </div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
 
 
 
@@ -6663,7 +13223,15 @@ return (
 
 
 
+
+
+
+
 );
+
+
+
+
 
 
 
@@ -6671,7 +13239,15 @@ return (
 
 
 
+
+
+
+
 // =========================
+
+
+
+
 
 
 
@@ -6679,7 +13255,15 @@ return (
 
 
 
+
+
+
+
 // =========================
+
+
+
+
 
 
 
@@ -6687,7 +13271,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   width: "100%",
+
+
+
+
 
 
 
@@ -6695,7 +13287,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   overflow: "hidden",
+
+
+
+
 
 
 
@@ -6703,7 +13303,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   marginTop: "14px",
+
+
+
+
 
 
 
@@ -6711,7 +13319,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   border: "1px solid #e5e7eb",
+
+
+
+
 
 
 
@@ -6719,7 +13335,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   minHeight: "56px",
+
+
+
+
 
 
 
@@ -6727,7 +13351,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   background: "#fff",
+
+
+
+
 
 
 
@@ -6735,7 +13367,15 @@ const inputStyle = {
 
 
 
+
+
+
+
   color: "#111827",
+
+
+
+
 
 
 
@@ -6743,7 +13383,15 @@ const inputStyle = {
 
 
 
+
+
+
+
     "0 2px 8px rgba(0,0,0,0.03)",
+
+
+
+
 
 
 
@@ -6751,11 +13399,23 @@ const inputStyle = {
 
 
 
+
+
+
+
   WebkitAppearance: "none",
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 

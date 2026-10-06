@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 
+
+
 import axios from "axios";
+
+
+
+
 
 
 
@@ -8,7 +14,15 @@ import {
 
 
 
+
+
+
+
   FaTicketAlt,
+
+
+
+
 
 
 
@@ -16,7 +30,15 @@ import {
 
 
 
+
+
+
+
   FaTrash,
+
+
+
+
 
 
 
@@ -24,7 +46,15 @@ import {
 
 
 
+
+
+
+
   FaSearch,
+
+
+
+
 
 
 
@@ -32,7 +62,15 @@ import {
 
 
 
+
+
+
+
   FaChartLine,
+
+
+
+
 
 
 
@@ -40,7 +78,15 @@ import {
 
 
 
+
+
+
+
   FaCoins,
+
+
+
+
 
 
 
@@ -48,7 +94,15 @@ import {
 
 
 
+
+
+
+
   FaCalendarAlt,
+
+
+
+
 
 
 
@@ -56,7 +110,15 @@ import {
 
 
 
+
+
+
+
   FaMoneyBillWave,
+
+
+
+
 
 
 
@@ -64,7 +126,15 @@ import {
 
 
 
+
+
+
+
   FaTimesCircle,
+
+
+
+
 
 
 
@@ -72,7 +142,15 @@ import {
 
 
 
+
+
+
+
   FaHistory,
+
+
+
+
 
 
 
@@ -80,7 +158,15 @@ import {
 
 
 
+
+
+
+
   FaChartBar,
+
+
+
+
 
 
 
@@ -88,112 +174,197 @@ import {
 
 
 
+
+
+
+
   FaGift,
+
+
+
+
 
 
 
 } from "react-icons/fa";
 
+
+
 // ======================================================
+
 // 🔐 SECURITY LAYER — ADMIN COUPONS
+
 // ======================================================
+
+
 
 const API_BASE_URL = "https://konanshopping.com";
+
 const API_TIMEOUT = 15000;
+
 const MAX_SEARCH_LENGTH = 100;
+
 const MAX_CODE_LENGTH = 50;
 
+
+
 const safeParse = (value, fallback = null) => {
+
   try {
+
     return value ? JSON.parse(value) : fallback;
+
   } catch {
+
     return fallback;
+
   }
+
 };
 
-const getAuthToken = () => {
-  try {
-    const token = localStorage.getItem("token");
-    return typeof token === "string" && token.trim() ? token.trim() : "";
-  } catch {
-    return "";
-  }
-};
+
+
+// Authentification administrateur par cookie HttpOnly
+// Le JWT n'est plus lu depuis localStorage.
+// Le navigateur envoie automatiquement le cookie de session.
+
+axios.defaults.withCredentials = true;
 
 const getStoredAdmin = () => {
+
   try {
+
     const admin = safeParse(localStorage.getItem("admin"), null);
+
     return admin && typeof admin === "object" ? admin : null;
+
   } catch {
+
     return null;
+
   }
+
 };
+
+
 
 const isValidObjectId = (value) =>
+
   typeof value === "string" && /^[a-f\d]{24}$/i.test(value);
 
+
+
 const normalizeNumber = (value) => {
+
   const n = Number(value);
+
   return Number.isFinite(n) && n >= 0 ? n : 0;
+
 };
+
+
 
 const buildCouponPayload = (form) => ({
+
   ...form,
+
   code:
+
     typeof form.code === "string"
+
       ? form.code.trim().toUpperCase().slice(0, MAX_CODE_LENGTH)
+
       : "",
+
   discountValue: normalizeNumber(form.discountValue),
+
   minPurchase: normalizeNumber(form.minPurchase),
+
   maxUses: normalizeNumber(form.maxUses),
+
 });
 
+
+
 const normalizeCouponsResponse = (data) => {
+
   if (Array.isArray(data)) return data;
+
   if (data && Array.isArray(data.coupons)) return data.coupons;
+
   if (data && Array.isArray(data.data)) return data.data;
+
   return null;
+
 };
+
+
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
+  withCredentials: true,
   headers: { Accept: "application/json" },
 });
 
 api.interceptors.request.use((config) => {
-  const token = getAuthToken();
+  if (!config) return config;
 
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
 
   return config;
 });
 
 api.interceptors.response.use(
+
   (response) => response,
+
   (error) => {
+
     if (error?.response?.status === 401 || error?.response?.status === 403) {
+
       try {
+
         localStorage.removeItem("admin");
+
         localStorage.removeItem("token");
+
       } catch {
+
         // Ignore storage errors.
+
       }
+
     }
+
     return Promise.reject(error);
+
   }
+
 );
 
+
+
 const redirectIfUnauthorized = (error) => {
+
   if (error?.response?.status === 401 || error?.response?.status === 403) {
+
     window.location.href = "/admin-login";
+
     return true;
+
   }
+
   return false;
+
 };
+
+
+
+
+
 
 
 
@@ -202,11 +373,23 @@ function AdminCoupons() {
 
 
 
+
+
+
+
   // ==========================
+
+
 
   // DATA
 
+
+
   // ==========================
+
+
+
+
 
 
 
@@ -214,47 +397,95 @@ function AdminCoupons() {
 
 
 
+
+
+
+
   const [loading, setLoading] =
+
+
 
     useState(false);
 
 
 
+
+
+
+
   const [search, setSearch] =
+
+
 
     useState("");
 
 
 
+
+
+
+
   const [filter, setFilter] =
+
+
 
     useState("all");
 
 
 
+
+
+
+
   const [sort, setSort] =
+
+
 
     useState("newest");
 
 
 
+
+
+
+
   const [editingCoupon, setEditingCoupon] =
+
+
 
     useState(null);
 
 
 
+
+
+
+
   // ==========================
+
+
 
   // FORM
 
+
+
   // ==========================
+
+
+
+
 
 
 
   const [form, setForm] =
 
+
+
     useState({
+
+
+
+
 
 
 
@@ -262,7 +493,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
       discountType: "percent",
+
+
+
+
 
 
 
@@ -270,7 +509,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
       minPurchase: "",
+
+
+
+
 
 
 
@@ -278,7 +525,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
       active: true,
+
+
+
+
 
 
 
@@ -286,47 +541,95 @@ function AdminCoupons() {
 
 
 
+
+
+
+
   // ==========================
+
+
 
   // STATS
 
+
+
   // ==========================
+
+
+
+
 
 
 
   const totalCoupons =
 
+
+
     coupons.length;
+
+
+
+
 
 
 
   const activeCoupons =
 
+
+
     coupons.filter(
+
+
 
       c => c.active
 
+
+
     ).length;
+
+
+
+
 
 
 
   const inactiveCoupons =
 
+
+
     coupons.filter(
 
+
+
       c => !c.active
+
+
 
     ).length;
 
 
 
+
+
+
+
   const totalUses =
+
+
 
     coupons.reduce(
 
 
 
+
+
+
+
       (sum, c) =>
+
+
+
+
 
 
 
@@ -334,7 +637,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
       0
+
+
+
+
 
 
 
@@ -342,9 +653,19 @@ function AdminCoupons() {
 
 
 
+
+
+
+
   const totalSavings =
 
+
+
     coupons.reduce(
+
+
+
+
 
 
 
@@ -352,9 +673,19 @@ function AdminCoupons() {
 
 
 
+
+
+
+
         sum +
 
+
+
         (c.totalSavings || 0),
+
+
+
+
 
 
 
@@ -362,19 +693,39 @@ function AdminCoupons() {
 
 
 
+
+
+
+
     );
+
+
+
+
 
 
 
   const topCoupon =
 
+
+
     useMemo(() => {
+
+
+
+
 
 
 
       if (!coupons.length)
 
+
+
         return null;
+
+
+
+
 
 
 
@@ -382,7 +733,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
         .sort(
+
+
+
+
 
 
 
@@ -390,7 +749,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
             (b.usedCount || 0) -
+
+
+
+
 
 
 
@@ -398,7 +765,15 @@ function AdminCoupons() {
 
 
 
+
+
+
+
         )[0];
+
+
+
+
 
 
 
@@ -406,11 +781,23 @@ function AdminCoupons() {
 
 
 
+
+
+
+
     // ==========================
+
+
 
 // LOAD COUPONS
 
+
+
 // ==========================
+
+
+
+
 
 
 
@@ -418,7 +805,15 @@ useEffect(() => {
 
 
 
+
+
+
+
   loadCoupons();
+
+
+
+
 
 
 
@@ -426,192 +821,381 @@ useEffect(() => {
 
 
 
-const loadCoupons = async () => {
-  try {
-    const admin = getStoredAdmin();
-    const token = getAuthToken();
 
-    if (!admin || !token) {
+
+
+
+const loadCoupons = async () => {
+
+  try {
+
+    const admin = getStoredAdmin();
+
+
+
+
+    if (!admin) {
+
       window.location.href = "/admin-login";
+
       return;
+
     }
+
+
 
     setLoading(true);
 
+
+
     const res = await api.get("/api/coupons");
+
     const data = normalizeCouponsResponse(res.data);
 
+
+
     if (!data) {
+
       console.error("Réponse coupons invalide.");
+
       setCoupons([]);
+
       return;
+
     }
 
+
+
     setCoupons(data);
+
   } catch (err) {
+
     if (redirectIfUnauthorized(err)) return;
+
     console.error("Erreur API.", err);
+
   } finally {
+
     setLoading(false);
+
   }
+
 };
 
 
 
+
+
+
+
 // ==========================
+
+
 
 // AJOUTER
 
+
+
 // ==========================
+
+
+
+
 
 
 
 const addCoupon = async () => {
-  const admin = getStoredAdmin();
-  const token = getAuthToken();
 
-  if (!admin || !token) {
+  const admin = getStoredAdmin();
+
+
+
+
+  if (!admin) {
+
     window.location.href = "/admin-login";
+
     return;
+
   }
+
+
 
   const payload = buildCouponPayload(form);
 
+
+
   if (!payload.code) {
+
     alert("Le code du coupon est obligatoire.");
+
     return;
+
   }
+
+
 
   try {
+
     await api.post(
+
       "/api/coupons",
+
       payload
+
     );
 
+
+
     setForm({
+
       code: "",
+
       discountType: "percent",
+
       discountValue: "",
+
       minPurchase: "",
+
       maxUses: "",
+
       active: true,
+
     });
 
+
+
     loadCoupons();
+
   } catch (err) {
+
     if (redirectIfUnauthorized(err)) return;
+
     console.error("Erreur API.", err);
+
     alert("Impossible d'ajouter le coupon.");
+
   }
+
 };
 
 
 
+
+
+
+
 // ==========================
+
+
 
 // MODIFIER
 
+
+
 // ==========================
+
+
+
+
 
 
 
 const updateCoupon = async () => {
+
   if (!editingCoupon) return;
 
-  const admin = getStoredAdmin();
-  const token = getAuthToken();
 
-  if (!admin || !token) {
+
+  const admin = getStoredAdmin();
+
+
+
+
+  if (!admin) {
+
     window.location.href = "/admin-login";
+
     return;
+
   }
+
+
 
   if (!isValidObjectId(String(editingCoupon._id))) {
+
     alert("Identifiant du coupon invalide.");
+
     return;
+
   }
+
+
 
   const payload = buildCouponPayload(form);
 
+
+
   if (!payload.code) {
+
     alert("Le code du coupon est obligatoire.");
+
     return;
+
   }
 
+
+
   try {
+
     await api.put(
+
       `/api/coupons/${editingCoupon._id}`,
+
       payload
+
     );
+
+
 
     setEditingCoupon(null);
 
+
+
     setForm({
+
       code: "",
+
       discountType: "percent",
+
       discountValue: "",
+
       minPurchase: "",
+
       maxUses: "",
+
       active: true,
+
     });
 
+
+
     loadCoupons();
+
   } catch (err) {
+
     if (redirectIfUnauthorized(err)) return;
+
     console.error("Erreur API.", err);
+
   }
+
 };
 
 
 
+
+
+
+
 // ==========================
+
+
 
 // SUPPRIMER
 
+
+
 // ==========================
+
+
+
+
 
 
 
 const deleteCoupon = async (id) => {
+
   if (
+
     !window.confirm(
+
       "Supprimer ce coupon ?"
+
     )
+
   )
+
     return;
+
+
 
   const admin = getStoredAdmin();
-  const token = getAuthToken();
 
-  if (!admin || !token) {
+
+
+
+  if (!admin) {
+
     window.location.href = "/admin-login";
+
     return;
+
   }
+
+
 
   if (!isValidObjectId(String(id))) {
+
     alert("Identifiant du coupon invalide.");
+
     return;
+
   }
+
+
 
   try {
+
     await api.delete(
+
       `/api/coupons/${id}`
+
     );
 
+
+
     loadCoupons();
+
   } catch (err) {
+
     if (redirectIfUnauthorized(err)) return;
+
     console.error("Erreur API.", err);
+
   }
+
 };
 
 
 
+
+
+
+
 // ==========================
+
+
 
 // EDITION
 
+
+
 // ==========================
+
+
+
+
 
 
 
@@ -619,7 +1203,15 @@ const startEdit = (coupon) => {
 
 
 
+
+
+
+
   setEditingCoupon(coupon);
+
+
+
+
 
 
 
@@ -627,37 +1219,75 @@ const startEdit = (coupon) => {
 
 
 
+
+
+
+
     code: coupon.code,
+
+
+
+
 
 
 
     discountType:
 
+
+
       coupon.discountType,
+
+
+
+
 
 
 
     discountValue:
 
+
+
       coupon.discountValue,
+
+
+
+
 
 
 
     minPurchase:
 
+
+
       coupon.minPurchase,
+
+
+
+
 
 
 
     maxUses:
 
+
+
       coupon.maxUses,
+
+
+
+
 
 
 
     active:
 
+
+
       coupon.active,
+
+
+
+
 
 
 
@@ -665,15 +1295,31 @@ const startEdit = (coupon) => {
 
 
 
+
+
+
+
 };
 
 
 
+
+
+
+
 // ==========================
+
+
 
 // FILTRE + RECHERCHE
 
+
+
 // ==========================
+
+
+
+
 
 
 
@@ -681,7 +1327,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
   let data = [...coupons];
+
+
+
+
 
 
 
@@ -689,7 +1343,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data = data.filter((coupon) =>
+
+
+
+
 
 
 
@@ -697,7 +1359,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
         .toLowerCase()
+
+
+
+
 
 
 
@@ -705,7 +1375,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
           search.toLowerCase()
+
+
+
+
 
 
 
@@ -713,11 +1391,23 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -725,7 +1415,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data = data.filter(
+
+
+
+
 
 
 
@@ -733,11 +1431,23 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -745,7 +1455,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data = data.filter(
+
+
+
+
 
 
 
@@ -753,11 +1471,23 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -765,11 +1495,23 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data.sort(
 
 
 
+
+
+
+
       (a, b) =>
+
+
+
+
 
 
 
@@ -777,7 +1519,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
         (a.usedCount || 0)
+
+
+
+
 
 
 
@@ -785,7 +1535,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -793,7 +1551,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data.sort(
+
+
+
+
 
 
 
@@ -801,7 +1567,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
         b.discountValue -
+
+
+
+
 
 
 
@@ -809,11 +1583,23 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -821,7 +1607,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
     data.reverse();
+
+
+
+
 
 
 
@@ -829,7 +1623,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
   return data;
+
+
+
+
 
 
 
@@ -837,7 +1639,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
   coupons,
+
+
+
+
 
 
 
@@ -845,7 +1655,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
   filter,
+
+
+
+
 
 
 
@@ -853,7 +1671,15 @@ const filteredCoupons = useMemo(() => {
 
 
 
+
+
+
+
 ]);
+
+
+
+
 
 
 
@@ -861,49 +1687,99 @@ return (
 
 
 
+
+
+
+
 <div
+
+
 
   style={{
 
+
+
     minHeight: "100vh",
+
+
 
     background: "#F1F5F9",
 
+
+
     padding: "24px",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
 {/* ==========================
 
+
+
 HEADER
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     display: "flex",
 
+
+
     justifyContent: "space-between",
+
+
 
     alignItems: "center",
 
+
+
     flexWrap: "wrap",
+
+
 
     gap: "20px",
 
+
+
     marginBottom: "30px",
+
+
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -911,27 +1787,55 @@ HEADER
 
 
 
+
+
+
+
     <h1
+
+
 
       style={{
 
+
+
         margin: 0,
+
+
 
         fontSize: "34px",
 
+
+
         fontWeight: "900",
+
+
 
         color: "#0F172A",
 
+
+
         display: "flex",
+
+
 
         alignItems: "center",
 
+
+
         gap: "12px",
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -939,7 +1843,15 @@ HEADER
 
 
 
+
+
+
+
       Gestion des coupons
+
+
+
+
 
 
 
@@ -947,25 +1859,51 @@ HEADER
 
 
 
+
+
+
+
     <p
+
+
 
       style={{
 
+
+
         marginTop: "10px",
+
+
 
         color: "#64748B",
 
+
+
         fontSize: "15px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       Gérez les coupons promotionnels de
 
+
+
       Konan Shopping Cameroun.
+
+
+
+
 
 
 
@@ -973,7 +1911,15 @@ HEADER
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -981,19 +1927,39 @@ HEADER
 
 
 
+
+
+
+
     onClick={
+
+
 
       editingCoupon
 
+
+
         ? updateCoupon
 
+
+
         : addCoupon
+
+
 
     }
 
 
 
+
+
+
+
     style={{
+
+
+
+
 
 
 
@@ -1001,13 +1967,27 @@ HEADER
 
 
 
+
+
+
+
       background:
+
+
 
         "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
 
 
+
+
+
+
       color: "#fff",
+
+
+
+
 
 
 
@@ -1015,7 +1995,15 @@ HEADER
 
 
 
+
+
+
+
       borderRadius: "14px",
+
+
+
+
 
 
 
@@ -1023,7 +2011,15 @@ HEADER
 
 
 
+
+
+
+
       cursor: "pointer",
+
+
+
+
 
 
 
@@ -1031,7 +2027,15 @@ HEADER
 
 
 
+
+
+
+
       alignItems: "center",
+
+
+
+
 
 
 
@@ -1039,9 +2043,19 @@ HEADER
 
 
 
+
+
+
+
       boxShadow:
 
+
+
         "0 10px 25px rgba(37,99,235,.25)",
+
+
+
+
 
 
 
@@ -1049,7 +2063,15 @@ HEADER
 
 
 
+
+
+
+
   >
+
+
+
+
 
 
 
@@ -1057,11 +2079,23 @@ HEADER
 
 
 
+
+
+
+
     {editingCoupon
+
+
 
       ? "Modifier le coupon"
 
+
+
       : "Créer un coupon"}
+
+
+
+
 
 
 
@@ -1069,35 +2103,71 @@ HEADER
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
 {/* ==========================
 
+
+
 STATISTIQUES
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     display: "grid",
 
+
+
     gridTemplateColumns:
+
+
 
       "repeat(auto-fit,minmax(230px,1fr))",
 
+
+
     gap: "18px",
+
+
 
     marginBottom: "28px",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -1105,13 +2175,27 @@ STATISTIQUES
 
 
 
+
+
+
+
     <FaTicketAlt
+
+
 
       size={30}
 
+
+
       color="#2563EB"
 
+
+
     />
+
+
+
+
 
 
 
@@ -1119,11 +2203,23 @@ STATISTIQUES
 
 
 
+
+
+
+
     <span>
+
+
 
       Coupons enregistrés
 
+
+
     </span>
+
+
+
+
 
 
 
@@ -1131,17 +2227,35 @@ STATISTIQUES
 
 
 
+
+
+
+
   <div className="admin-card">
+
+
+
+
 
 
 
     <FaCheckCircle
 
+
+
       size={30}
+
+
 
       color="#22C55E"
 
+
+
     />
+
+
+
+
 
 
 
@@ -1149,11 +2263,23 @@ STATISTIQUES
 
 
 
+
+
+
+
     <span>
+
+
 
       Coupons actifs
 
+
+
     </span>
+
+
+
+
 
 
 
@@ -1161,17 +2287,35 @@ STATISTIQUES
 
 
 
+
+
+
+
   <div className="admin-card">
+
+
+
+
 
 
 
     <FaUsers
 
+
+
       size={30}
+
+
 
       color="#7C3AED"
 
+
+
     />
+
+
+
+
 
 
 
@@ -1179,15 +2323,31 @@ STATISTIQUES
 
 
 
+
+
+
+
     <span>
 
+
+
       Utilisations
+
+
 
     </span>
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -1195,13 +2355,27 @@ STATISTIQUES
 
 
 
+
+
+
+
     <FaCoins
+
+
 
       size={30}
 
+
+
       color="#F59E0B"
 
+
+
     />
+
+
+
+
 
 
 
@@ -1209,11 +2383,23 @@ STATISTIQUES
 
 
 
+
+
+
+
       {Number(
+
+
 
         totalSavings
 
+
+
       ).toLocaleString()} FCFA
+
+
+
+
 
 
 
@@ -1221,11 +2407,23 @@ STATISTIQUES
 
 
 
+
+
+
+
     <span>
+
+
 
       Total économisé
 
+
+
     </span>
+
+
+
+
 
 
 
@@ -1233,21 +2431,43 @@ STATISTIQUES
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
 {/* ==========================
 
+
+
 BARRE OUTILS
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
+
+
 
 
 
@@ -1255,7 +2475,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
     gap: "15px",
+
+
+
+
 
 
 
@@ -1263,19 +2491,39 @@ BARRE OUTILS
 
 
 
+
+
+
+
     marginBottom: "30px",
+
+
+
+
 
 
 
   }}
 
+
+
 >
+
+
+
+
 
 
 
   <div
 
+
+
     style={{
+
+
+
+
 
 
 
@@ -1283,7 +2531,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
       minWidth: "280px",
+
+
+
+
 
 
 
@@ -1291,11 +2547,23 @@ BARRE OUTILS
 
 
 
+
+
+
+
       alignItems: "center",
 
 
 
+
+
+
+
       background: "#fff",
+
+
+
+
 
 
 
@@ -1303,19 +2571,39 @@ BARRE OUTILS
 
 
 
+
+
+
+
       padding: "0 15px",
+
+
+
+
 
 
 
       boxShadow:
 
+
+
         "0 6px 20px rgba(15,23,42,.05)",
+
+
+
+
 
 
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1323,7 +2611,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
     <input
+
+
+
+
 
 
 
@@ -1331,15 +2627,31 @@ BARRE OUTILS
 
 
 
+
+
+
+
       value={search}
+
+
+
+
 
 
 
       onChange={(e)=>
 
+
+
         setSearch(e.target.value.slice(0, MAX_SEARCH_LENGTH))
 
+
+
       }
+
+
+
+
 
 
 
@@ -1347,7 +2659,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
         border: "none",
+
+
+
+
 
 
 
@@ -1355,7 +2675,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
         width: "100%",
+
+
+
+
 
 
 
@@ -1363,7 +2691,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
         fontSize: "15px",
+
+
+
+
 
 
 
@@ -1371,7 +2707,15 @@ BARRE OUTILS
 
 
 
+
+
+
+
       }}
+
+
+
+
 
 
 
@@ -1379,11 +2723,23 @@ BARRE OUTILS
 
 
 
+
+
+
+
   </div>
 
 
 
+
+
+
+
   <select
+
+
+
+
 
 
 
@@ -1391,11 +2747,23 @@ BARRE OUTILS
 
 
 
+
+
+
+
     onChange={(e)=>
+
+
 
       setFilter(e.target.value)
 
+
+
     }
+
+
+
+
 
 
 
@@ -1403,31 +2771,63 @@ BARRE OUTILS
 
 
 
+
+
+
+
     <option value="all">
+
+
 
       Tous
 
+
+
     </option>
+
+
+
+
 
 
 
     <option value="active">
 
+
+
       Actifs
 
+
+
     </option>
+
+
+
+
 
 
 
     <option value="inactive">
 
+
+
       Désactivés
+
+
 
     </option>
 
 
 
+
+
+
+
   </select>
+
+
+
+
 
 
 
@@ -1435,15 +2835,31 @@ BARRE OUTILS
 
 
 
+
+
+
+
     value={sort}
+
+
+
+
 
 
 
     onChange={(e)=>
 
+
+
       setSort(e.target.value)
 
+
+
     }
+
+
+
+
 
 
 
@@ -1451,27 +2867,55 @@ BARRE OUTILS
 
 
 
+
+
+
+
     <option value="newest">
+
+
 
       Plus récents
 
+
+
     </option>
+
+
+
+
 
 
 
     <option value="uses">
 
+
+
       Plus utilisés
 
+
+
     </option>
+
+
+
+
 
 
 
     <option value="discount">
 
+
+
       Plus grosse réduction
 
+
+
     </option>
+
+
+
+
 
 
 
@@ -1479,7 +2923,17 @@ BARRE OUTILS
 
 
 
+
+
+
+
 </div>
+
+
+
+
+
+
 
 
 
@@ -1487,57 +2941,113 @@ BARRE OUTILS
 
 {/* ==========================
 
+
+
 FORMULAIRE PREMIUM
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     background: "#FFFFFF",
 
+
+
     borderRadius: "22px",
+
+
 
     padding: "28px",
 
+
+
     boxShadow: "0 10px 30px rgba(15,23,42,.06)",
+
+
 
     marginBottom: "35px",
 
+
+
   }}
+
+
 
 >
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       display: "flex",
+
+
 
       alignItems: "center",
 
+
+
       gap: "12px",
+
+
 
       marginBottom: "25px",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaGift
+
+
 
       color="#2563EB"
 
+
+
       size={28}
 
+
+
     />
+
+
+
+
 
 
 
@@ -1545,29 +3055,59 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           margin: 0,
+
+
 
           color: "#0F172A",
 
+
+
           fontSize: "24px",
+
+
 
           fontWeight: "800",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         {editingCoupon
+
+
 
           ? "Modifier un coupon"
 
+
+
           : "Créer un nouveau coupon"}
+
+
+
+
 
 
 
@@ -1575,21 +3115,43 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
       <p
+
+
 
         style={{
 
+
+
           margin: "6px 0 0",
+
+
 
           color: "#64748B",
 
+
+
         }}
+
+
 
       >
 
+
+
         Configurez votre offre promotionnelle.
 
+
+
       </p>
+
+
+
+
 
 
 
@@ -1597,25 +3159,51 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
   <div
 
+
+
     style={{
+
+
 
       display: "grid",
 
+
+
       gridTemplateColumns:
+
+
 
         "repeat(auto-fit,minmax(250px,1fr))",
 
+
+
       gap: "20px",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -1623,67 +3211,135 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Code du coupon
+
+
 
       </label>
 
 
 
+
+
+
+
       <input
+
+
 
         value={form.code}
 
+
+
         onChange={(e)=>
+
+
 
           setForm({
 
+
+
             ...form,
+
+
 
             code: e.target.value.toUpperCase(),
 
+
+
           })
+
+
 
         }
 
+
+
         placeholder="Ex : WELCOME20"
+
+
 
         style={{
 
+
+
           width: "100%",
+
+
 
           padding: "14px",
 
+
+
           marginTop: "8px",
+
+
 
           borderRadius: "12px",
 
+
+
           border: "1px solid #CBD5E1",
+
+
 
           outline: "none",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1691,75 +3347,151 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Type de réduction
+
+
 
       </label>
 
 
 
+
+
+
+
       <select
+
+
 
         value={form.discountType}
 
+
+
         onChange={(e)=>
+
+
 
           setForm({
 
+
+
             ...form,
+
+
 
             discountType: e.target.value,
 
+
+
           })
+
+
 
         }
 
+
+
         style={{
+
+
 
           width: "100%",
 
+
+
           padding: "14px",
+
+
 
           marginTop: "8px",
 
+
+
           borderRadius: "12px",
+
+
 
           border: "1px solid #CBD5E1",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <option value="percent">
+
+
 
           Pourcentage (%)
 
+
+
         </option>
+
+
+
+
 
 
 
         <option value="fixed">
 
+
+
           Montant fixe (FCFA)
 
+
+
         </option>
+
+
+
+
 
 
 
@@ -1767,7 +3499,15 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1775,67 +3515,135 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Valeur de la réduction
+
+
 
       </label>
 
 
 
+
+
+
+
       <input
+
+
 
         type="number"
 
+
+
         value={form.discountValue}
+
+
 
         onChange={(e)=>
 
+
+
           setForm({
+
+
 
             ...form,
 
+
+
             discountValue: e.target.value,
+
+
 
           })
 
+
+
         }
+
+
 
         placeholder="10 ou 5000"
 
+
+
         style={{
+
+
 
           width: "100%",
 
+
+
           padding: "14px",
+
+
 
           marginTop: "8px",
 
+
+
           borderRadius: "12px",
+
+
 
           border: "1px solid #CBD5E1",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1843,67 +3651,135 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Achat minimum
+
+
 
       </label>
 
 
 
+
+
+
+
       <input
+
+
 
         type="number"
 
+
+
         value={form.minPurchase}
+
+
 
         onChange={(e)=>
 
+
+
           setForm({
+
+
 
             ...form,
 
+
+
             minPurchase: e.target.value,
+
+
 
           })
 
+
+
         }
+
+
 
         placeholder="20000"
 
+
+
         style={{
+
+
 
           width: "100%",
 
+
+
           padding: "14px",
+
+
 
           marginTop: "8px",
 
+
+
           borderRadius: "12px",
+
+
 
           border: "1px solid #CBD5E1",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1911,67 +3787,135 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Nombre maximal d'utilisations
+
+
 
       </label>
 
 
 
+
+
+
+
       <input
+
+
 
         type="number"
 
+
+
         value={form.maxUses}
+
+
 
         onChange={(e)=>
 
+
+
           setForm({
+
+
 
             ...form,
 
+
+
             maxUses: e.target.value,
+
+
 
           })
 
+
+
         }
+
+
 
         placeholder="9999"
 
+
+
         style={{
+
+
 
           width: "100%",
 
+
+
           padding: "14px",
+
+
 
           marginTop: "8px",
 
+
+
           borderRadius: "12px",
+
+
 
           border: "1px solid #CBD5E1",
 
+
+
         }}
+
+
 
       />
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -1979,77 +3923,155 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     <div>
+
+
+
+
 
 
 
       <label
 
+
+
         style={{
+
+
 
           fontWeight: "700",
 
+
+
           color: "#334155",
+
+
 
         }}
 
+
+
       >
 
+
+
         Statut
+
+
 
       </label>
 
 
 
+
+
+
+
       <select
+
+
 
         value={form.active}
 
+
+
         onChange={(e)=>
+
+
 
           setForm({
 
+
+
             ...form,
+
+
 
             active:
 
+
+
               e.target.value === "true",
+
+
 
           })
 
+
+
         }
+
+
 
         style={{
 
+
+
           width: "100%",
+
+
 
           padding: "14px",
 
+
+
           marginTop: "8px",
+
+
 
           borderRadius: "12px",
 
+
+
           border: "1px solid #CBD5E1",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         <option value={true}>
+
+
 
           Actif
 
+
+
         </option>
+
+
+
+
 
 
 
         <option value={false}>
 
+
+
           Désactivé
 
+
+
         </option>
+
+
+
+
 
 
 
@@ -2057,7 +4079,15 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2065,65 +4095,131 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       display: "flex",
+
+
 
       justifyContent: "flex-end",
 
+
+
       marginTop: "28px",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <button
+
+
 
       onClick={
 
+
+
         editingCoupon
+
+
 
           ? updateCoupon
 
+
+
           : addCoupon
+
+
 
       }
 
+
+
       style={{
+
+
 
         border: "none",
 
+
+
         background:
+
+
 
           "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
+
+
         color: "#fff",
+
+
 
         padding: "15px 30px",
 
+
+
         borderRadius: "14px",
+
+
 
         fontWeight: "800",
 
+
+
         cursor: "pointer",
+
+
 
         fontSize: "15px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       {editingCoupon
+
+
 
         ? "Enregistrer les modifications"
 
+
+
         : "Créer le coupon"}
+
+
+
+
 
 
 
@@ -2131,7 +4227,15 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -2139,51 +4243,103 @@ FORMULAIRE PREMIUM
 
 
 
+
+
+
+
 {/* ==========================
+
+
 
 TABLEAU PREMIUM
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     background: "#fff",
 
+
+
     borderRadius: "24px",
+
+
 
     padding: "25px",
 
+
+
     marginTop: "25px",
+
+
 
     boxShadow:
 
+
+
       "0 15px 40px rgba(15,23,42,.06)",
+
+
 
     overflowX: "auto",
 
+
+
   }}
+
+
 
 >
 
 
 
+
+
+
+
   <table
+
+
 
     style={{
 
+
+
       width: "100%",
+
+
 
       borderCollapse: "collapse",
 
+
+
       minWidth: "1200px",
+
+
 
     }}
 
+
+
   >
+
+
+
+
 
 
 
@@ -2191,15 +4347,31 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
       <tr
+
+
 
         style={{
 
+
+
           background: "#F8FAFC",
+
+
 
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -2207,7 +4379,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
         <th style={thStyle}>Réduction</th>
+
+
+
+
 
 
 
@@ -2215,7 +4395,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
         <th style={thStyle}>Utilisations</th>
+
+
+
+
 
 
 
@@ -2223,7 +4411,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
         <th style={thStyle}>Disponibilité</th>
+
+
+
+
 
 
 
@@ -2231,7 +4427,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
         <th style={thStyle}>Actions</th>
+
+
+
+
 
 
 
@@ -2239,7 +4443,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
     </thead>
+
+
+
+
 
 
 
@@ -2247,23 +4459,47 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
       {filteredCoupons.map((coupon) => (
+
+
+
+
 
 
 
         <tr
 
+
+
           key={coupon._id}
+
+
 
           style={{
 
+
+
             borderBottom:
+
+
 
               "1px solid #E2E8F0",
 
+
+
           }}
 
+
+
         >
+
+
+
+
 
 
 
@@ -2271,47 +4507,95 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 display: "flex",
+
+
 
                 alignItems: "center",
 
+
+
                 gap: "12px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <div
+
+
 
                 style={{
 
+
+
                   width: 48,
+
+
 
                   height: 48,
 
+
+
                   borderRadius: 15,
+
+
 
                   background:
 
+
+
                     "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+
 
                   display: "flex",
 
+
+
                   justifyContent: "center",
+
+
 
                   alignItems: "center",
 
+
+
                   color: "#fff",
+
+
 
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2319,7 +4603,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </div>
+
+
+
+
 
 
 
@@ -2327,39 +4619,79 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
                 <div
 
+
+
                   style={{
+
+
 
                     fontWeight: "800",
 
+
+
                     color: "#0F172A",
+
+
 
                   }}
 
+
+
                 >
+
+
 
                   {coupon.code}
 
+
+
                 </div>
+
+
+
+
 
 
 
                 <div
 
+
+
                   style={{
+
+
 
                     color: "#64748B",
 
+
+
                     fontSize: 13,
+
+
 
                   }}
 
+
+
                 >
+
+
 
                   {coupon.discountType}
 
+
+
                 </div>
+
+
+
+
 
 
 
@@ -2367,7 +4699,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -2375,7 +4715,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           <td style={tdStyle}>
+
+
+
+
 
 
 
@@ -2383,7 +4731,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               ? `${coupon.discountValue}%`
+
+
+
+
 
 
 
@@ -2391,7 +4747,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           </td>
+
+
+
+
 
 
 
@@ -2399,17 +4763,35 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             <span
+
+
 
               style={{
 
+
+
                 fontWeight: "700",
+
+
 
                 color: "#2563EB",
 
+
+
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -2417,7 +4799,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             </span>
+
+
+
+
 
 
 
@@ -2425,7 +4815,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           <td style={tdStyle}>
+
+
+
+
 
 
 
@@ -2433,7 +4831,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             /
+
+
+
+
 
 
 
@@ -2441,7 +4847,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           </td>
+
+
+
+
 
 
 
@@ -2449,23 +4863,47 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             <span
+
+
 
               style={{
 
+
+
                 color: "#16A34A",
+
+
 
                 fontWeight: "800",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               {(coupon.totalSavings || 0)
 
+
+
                 .toLocaleString()} FCFA
+
+
+
+
 
 
 
@@ -2473,11 +4911,23 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           </td>
 
 
 
+
+
+
+
           <td style={tdStyle}>
+
+
+
+
 
 
 
@@ -2485,23 +4935,47 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               <span
+
+
 
                 style={{
 
+
+
                   background: "#DCFCE7",
+
+
 
                   color: "#16A34A",
 
+
+
                   padding: "8px 15px",
+
+
 
                   borderRadius: 999,
 
+
+
                   fontWeight: "700",
+
+
 
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2509,7 +4983,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
                 {" "}
+
+
+
+
 
 
 
@@ -2517,7 +4999,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -2525,23 +5015,47 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               <span
+
+
 
                 style={{
 
+
+
                   background: "#FEE2E2",
+
+
 
                   color: "#DC2626",
 
+
+
                   padding: "8px 15px",
+
+
 
                   borderRadius: 999,
 
+
+
                   fontWeight: "700",
+
+
 
                 }}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2549,7 +5063,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
                 {" "}
+
+
+
+
 
 
 
@@ -2557,7 +5079,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </span>
+
+
+
+
 
 
 
@@ -2565,11 +5095,23 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           </td>
 
 
 
+
+
+
+
           <td style={tdStyle}>
+
+
+
+
 
 
 
@@ -2577,11 +5119,23 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               ? new Date(
+
+
 
                   coupon.createdAt
 
+
+
                 ).toLocaleDateString()
+
+
+
+
 
 
 
@@ -2589,7 +5143,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
           </td>
+
+
+
+
 
 
 
@@ -2597,25 +5159,51 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 display: "flex",
+
+
 
                 gap: "10px",
 
+
+
               }}
+
+
 
             >
 
 
 
+
+
+
+
               <button
+
+
 
                 style={actionBlue}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2623,21 +5211,43 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </button>
+
+
+
+
 
 
 
               <button
 
+
+
                 onClick={() =>
+
+
 
                   startEdit(coupon)
 
+
+
                 }
+
+
 
                 style={actionOrange}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2645,21 +5255,43 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </button>
+
+
+
+
 
 
 
               <button
 
+
+
                 onClick={() =>
+
+
 
                   deleteCoupon(coupon._id)
 
+
+
                 }
+
+
 
                 style={actionRed}
 
+
+
               >
+
+
+
+
 
 
 
@@ -2667,11 +5299,23 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
               </button>
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -2679,11 +5323,23 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
         </tr>
 
 
 
+
+
+
+
       ))}
+
+
+
+
 
 
 
@@ -2691,7 +5347,15 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
   </table>
+
+
+
+
 
 
 
@@ -2699,31 +5363,63 @@ TABLEAU PREMIUM
 
 
 
+
+
+
+
 {/* ==========================
+
+
 
 ANALYTICS PREMIUM
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     display: "grid",
 
+
+
     gridTemplateColumns:
+
+
 
       "2fr 1fr",
 
+
+
     gap: "22px",
+
+
 
     marginBottom: "25px",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -2731,69 +5427,139 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#fff",
+
+
 
       borderRadius: "22px",
 
+
+
       padding: "22px",
+
+
 
       boxShadow:
 
+
+
         "0 10px 30px rgba(15,23,42,.06)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         display: "flex",
+
+
 
         justifyContent: "space-between",
 
+
+
         alignItems: "center",
+
+
 
         marginBottom: "20px",
 
+
+
       }}
+
+
 
     >
 
 
 
+
+
+
+
       <h3
+
+
 
         style={{
 
+
+
           margin: 0,
+
+
 
           fontWeight: "800",
 
+
+
           color: "#0F172A",
+
+
 
         }}
 
+
+
       >
+
+
 
         <FaChartLine
 
+
+
           style={{
+
+
 
             marginRight: 8,
 
+
+
             color: "#2563EB",
+
+
 
           }}
 
+
+
         />
+
+
+
+
 
 
 
@@ -2801,11 +5567,23 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
       </h3>
 
 
 
+
+
+
+
     </div>
+
+
+
+
 
 
 
@@ -2813,21 +5591,43 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
       const percent =
+
+
 
         coupon.maxUses
 
+
+
           ? (
+
+
 
               (coupon.usedCount || 0) /
 
+
+
               coupon.maxUses
+
+
 
             ) *
 
+
+
             100
 
+
+
           : 0;
+
+
+
+
 
 
 
@@ -2835,55 +5635,111 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
         <div
+
+
 
           key={coupon._id}
 
+
+
           style={{
+
+
 
             marginBottom: 18,
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display: "flex",
+
+
 
               justifyContent:
 
+
+
                 "space-between",
+
+
 
               marginBottom: 6,
 
+
+
               fontWeight: "700",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <span>
+
+
 
               {coupon.code}
 
+
+
             </span>
+
+
+
+
 
 
 
             <span>
 
+
+
               {coupon.usedCount || 0}/
+
+
 
               {coupon.maxUses}
 
+
+
             </span>
+
+
+
+
 
 
 
@@ -2891,39 +5747,79 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               height: 10,
+
+
 
               background: "#E2E8F0",
 
+
+
               borderRadius: 999,
+
+
 
             }}
 
+
+
           >
+
+
+
+
 
 
 
             <div
 
+
+
               style={{
+
+
 
                 width: `${percent}%`,
 
+
+
                 height: "100%",
+
+
 
                 borderRadius: 999,
 
+
+
                 background:
+
+
 
                   "linear-gradient(90deg,#2563EB,#38BDF8)",
 
+
+
               }}
 
+
+
             />
+
+
+
+
 
 
 
@@ -2931,7 +5827,15 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -2939,11 +5843,23 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
     })}
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -2951,123 +5867,247 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background:
+
+
 
         "linear-gradient(135deg,#2563EB,#1D4ED8)",
 
+
+
       color: "#fff",
+
+
 
       borderRadius: "22px",
 
+
+
       padding: "24px",
+
+
 
       boxShadow:
 
+
+
         "0 20px 40px rgba(37,99,235,.25)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <FaCrown
+
+
 
       style={{
 
+
+
         fontSize: 40,
+
+
 
         marginBottom: 20,
 
+
+
       }}
+
+
 
     />
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         fontSize: 14,
+
+
 
         opacity: .85,
 
+
+
       }}
+
+
 
     >
 
+
+
       Coupon le plus utilisé
 
+
+
     </div>
+
+
+
+
 
 
 
     <h2
 
+
+
       style={{
+
+
 
         margin: "12px 0",
 
+
+
         fontSize: 30,
+
+
 
       }}
 
+
+
     >
+
+
 
       {topCoupon
 
+
+
         ? topCoupon.code
 
+
+
         : "--"}
+
+
 
     </h2>
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         fontSize: 17,
+
+
 
         fontWeight: "700",
 
+
+
       }}
+
+
 
     >
 
+
+
       {topCoupon?.usedCount || 0}
+
+
 
       {" "}
 
+
+
       utilisations
+
+
 
     </div>
 
 
 
+
+
+
+
     <div
+
+
 
       style={{
 
+
+
         marginTop: 25,
+
+
 
         background:
 
+
+
           "rgba(255,255,255,.15)",
+
+
 
         borderRadius: 18,
 
+
+
         padding: 18,
+
+
 
       }}
 
+
+
     >
+
+
+
+
 
 
 
@@ -3075,7 +6115,15 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
         💰 Économies
+
+
+
+
 
 
 
@@ -3083,23 +6131,47 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
       <h2
+
+
 
         style={{
 
+
+
           margin: "10px 0",
 
+
+
         }}
+
+
 
       >
 
 
 
+
+
+
+
         {(
+
+
 
           topCoupon?.totalSavings || 0
 
+
+
         ).toLocaleString()}
+
+
+
+
 
 
 
@@ -3107,7 +6179,15 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
       </h2>
+
+
+
+
 
 
 
@@ -3115,7 +6195,15 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3123,31 +6211,63 @@ ANALYTICS PREMIUM
 
 
 
+
+
+
+
 {/* ==========================
+
+
 
 TOP 5 + HISTORIQUE
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 <div
 
+
+
   style={{
+
+
 
     display: "grid",
 
+
+
     gridTemplateColumns: "1fr 1fr",
+
+
 
     gap: "22px",
 
+
+
     marginTop: "25px",
+
+
 
     marginBottom: "25px",
 
+
+
   }}
 
+
+
 >
+
+
+
+
 
 
 
@@ -3155,51 +6275,103 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#fff",
+
+
 
       borderRadius: "22px",
 
+
+
       padding: "22px",
+
+
 
       boxShadow: "0 10px 30px rgba(15,23,42,.06)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         margin: 0,
+
+
 
         marginBottom: "20px",
 
+
+
         fontWeight: "800",
+
+
 
         color: "#0F172A",
 
+
+
       }}
+
+
 
     >
 
+
+
       <FaCrown
+
+
 
         style={{
 
+
+
           color: "#F59E0B",
+
+
 
           marginRight: "10px",
 
+
+
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -3207,95 +6379,191 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
     {[...coupons]
 
+
+
       .sort(
+
+
 
         (a, b) =>
 
+
+
           (b.usedCount || 0) -
+
+
 
           (a.usedCount || 0)
 
+
+
       )
 
+
+
       .slice(0, 5)
+
+
 
       .map((coupon, index) => (
 
 
 
+
+
+
+
         <div
+
+
 
           key={coupon._id}
 
+
+
           style={{
+
+
 
             display: "flex",
 
+
+
             justifyContent: "space-between",
+
+
 
             alignItems: "center",
 
+
+
             padding: "14px 0",
+
+
 
             borderBottom:
 
+
+
               "1px solid #F1F5F9",
 
+
+
           }}
+
+
 
         >
 
 
 
+
+
+
+
           <div
+
+
 
             style={{
 
+
+
               display: "flex",
+
+
 
               alignItems: "center",
 
+
+
               gap: "14px",
 
+
+
             }}
+
+
 
           >
 
 
 
+
+
+
+
             <div
+
+
 
               style={{
 
+
+
                 width: 38,
+
+
 
                 height: 38,
 
+
+
                 borderRadius: "50%",
+
+
 
                 background:
 
+
+
                   "linear-gradient(135deg,#2563EB,#1D4ED8)",
+
+
 
                 color: "#fff",
 
+
+
                 display: "flex",
+
+
 
                 justifyContent: "center",
 
+
+
                 alignItems: "center",
+
+
 
                 fontWeight: "800",
 
+
+
               }}
 
+
+
             >
+
+
+
+
 
 
 
@@ -3303,7 +6571,15 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
             </div>
+
+
+
+
 
 
 
@@ -3311,41 +6587,83 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
               <div
 
+
+
                 style={{
+
+
 
                   fontWeight: "800",
 
+
+
                 }}
+
+
 
               >
 
+
+
                 {coupon.code}
 
+
+
               </div>
+
+
+
+
 
 
 
               <div
 
+
+
                 style={{
+
+
 
                   color: "#64748B",
 
+
+
                   fontSize: "13px",
+
+
 
                 }}
 
+
+
               >
+
+
 
                 {(coupon.usedCount || 0)}
 
+
+
                 {" "}
+
+
 
                 utilisations
 
+
+
               </div>
+
+
+
+
 
 
 
@@ -3353,21 +6671,43 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
           </div>
+
+
+
+
 
 
 
           <FaChartBar
 
+
+
             color="#2563EB"
 
+
+
             size={22}
+
+
 
           />
 
 
 
+
+
+
+
         </div>
+
+
+
+
 
 
 
@@ -3375,7 +6715,15 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
   </div>
+
+
+
+
 
 
 
@@ -3383,49 +6731,99 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
   <div
+
+
 
     style={{
 
+
+
       background: "#fff",
+
+
 
       borderRadius: "22px",
 
+
+
       padding: "22px",
+
+
 
       boxShadow: "0 10px 30px rgba(15,23,42,.06)",
 
+
+
     }}
+
+
 
   >
 
 
 
+
+
+
+
     <h3
+
+
 
       style={{
 
+
+
         margin: 0,
+
+
 
         marginBottom: "20px",
 
+
+
         fontWeight: "800",
+
+
 
       }}
 
+
+
     >
+
+
 
       <FaHistory
 
+
+
         style={{
+
+
 
           color: "#2563EB",
 
+
+
           marginRight: "10px",
+
+
 
         }}
 
+
+
       />
+
+
+
+
 
 
 
@@ -3433,7 +6831,15 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
     </h3>
+
+
+
+
 
 
 
@@ -3441,27 +6847,55 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
       <div
+
+
 
         key={coupon._id}
 
+
+
         style={{
+
+
 
           display: "flex",
 
+
+
           justifyContent: "space-between",
+
+
 
           alignItems: "center",
 
+
+
           padding: "14px 0",
+
+
 
           borderBottom:
 
+
+
             "1px solid #F1F5F9",
+
+
 
         }}
 
+
+
       >
+
+
+
+
 
 
 
@@ -3469,47 +6903,95 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
           <div
 
+
+
             style={{
+
+
 
               fontWeight: "700",
 
+
+
             }}
+
+
 
           >
 
+
+
             {coupon.code}
 
+
+
           </div>
+
+
+
+
 
 
 
           <div
 
+
+
             style={{
+
+
 
               color: "#64748B",
 
+
+
               fontSize: "13px",
+
+
 
             }}
 
+
+
           >
+
+
 
             Créé le{" "}
 
+
+
             {coupon.createdAt
+
+
 
               ? new Date(
 
+
+
                   coupon.createdAt
+
+
 
                 ).toLocaleDateString()
 
+
+
               : "--"}
 
+
+
           </div>
+
+
+
+
 
 
 
@@ -3517,11 +6999,23 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
         <FaCalendarAlt
+
+
 
           color="#2563EB"
 
+
+
         />
+
+
+
+
 
 
 
@@ -3529,7 +7023,15 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
     ))}
+
+
+
+
 
 
 
@@ -3537,19 +7039,39 @@ TOP 5 + HISTORIQUE
 
 
 
+
+
+
+
 </div>
+
+
+
+
 
 
 
 {/* ==========================
 
+
+
 FIN PAGE
 
-\========================== */}
+
+
+\\========================== */}
+
+
+
+
 
 
 
 </div>
+
+
+
+
 
 
 
@@ -3557,7 +7079,15 @@ FIN PAGE
 
 
 
+
+
+
+
 }
+
+
+
+
 
 
 
@@ -3565,7 +7095,15 @@ const thStyle = {
 
 
 
+
+
+
+
   textAlign: "left",
+
+
+
+
 
 
 
@@ -3573,7 +7111,15 @@ const thStyle = {
 
 
 
+
+
+
+
   fontSize: "13px",
+
+
+
+
 
 
 
@@ -3581,7 +7127,15 @@ const thStyle = {
 
 
 
+
+
+
+
   fontWeight: "800",
+
+
+
+
 
 
 
@@ -3589,7 +7143,15 @@ const thStyle = {
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
@@ -3597,7 +7159,15 @@ const tdStyle = {
 
 
 
+
+
+
+
   padding: "18px 16px",
+
+
+
+
 
 
 
@@ -3605,7 +7175,15 @@ const tdStyle = {
 
 
 
+
+
+
+
   fontSize: "14px",
+
+
+
+
 
 
 
@@ -3613,7 +7191,15 @@ const tdStyle = {
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
@@ -3621,7 +7207,15 @@ const actionBlue = {
 
 
 
+
+
+
+
   width: "42px",
+
+
+
+
 
 
 
@@ -3629,11 +7223,23 @@ const actionBlue = {
 
 
 
+
+
+
+
   border: "none",
 
 
 
+
+
+
+
   borderRadius: "12px",
+
+
+
+
 
 
 
@@ -3641,7 +7247,15 @@ const actionBlue = {
 
 
 
+
+
+
+
   color: "#2563EB",
+
+
+
+
 
 
 
@@ -3649,7 +7263,15 @@ const actionBlue = {
 
 
 
+
+
+
+
   display: "flex",
+
+
+
+
 
 
 
@@ -3657,7 +7279,15 @@ const actionBlue = {
 
 
 
+
+
+
+
   alignItems: "center",
+
+
+
+
 
 
 
@@ -3665,11 +7295,23 @@ const actionBlue = {
 
 
 
+
+
+
+
   transition: ".25s",
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
@@ -3677,7 +7319,15 @@ const actionOrange = {
 
 
 
+
+
+
+
   width: "42px",
+
+
+
+
 
 
 
@@ -3685,11 +7335,23 @@ const actionOrange = {
 
 
 
+
+
+
+
   border: "none",
 
 
 
+
+
+
+
   borderRadius: "12px",
+
+
+
+
 
 
 
@@ -3697,7 +7359,15 @@ const actionOrange = {
 
 
 
+
+
+
+
   color: "#EA580C",
+
+
+
+
 
 
 
@@ -3705,7 +7375,15 @@ const actionOrange = {
 
 
 
+
+
+
+
   display: "flex",
+
+
+
+
 
 
 
@@ -3713,7 +7391,15 @@ const actionOrange = {
 
 
 
+
+
+
+
   alignItems: "center",
+
+
+
+
 
 
 
@@ -3721,11 +7407,23 @@ const actionOrange = {
 
 
 
+
+
+
+
   transition: ".25s",
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
@@ -3733,7 +7431,15 @@ const actionRed = {
 
 
 
+
+
+
+
   width: "42px",
+
+
+
+
 
 
 
@@ -3741,7 +7447,15 @@ const actionRed = {
 
 
 
+
+
+
+
   border: "none",
+
+
+
+
 
 
 
@@ -3749,7 +7463,15 @@ const actionRed = {
 
 
 
+
+
+
+
   background: "#FEF2F2",
+
+
+
+
 
 
 
@@ -3757,7 +7479,15 @@ const actionRed = {
 
 
 
+
+
+
+
   cursor: "pointer",
+
+
+
+
 
 
 
@@ -3765,7 +7495,15 @@ const actionRed = {
 
 
 
+
+
+
+
   justifyContent: "center",
+
+
+
+
 
 
 
@@ -3773,7 +7511,15 @@ const actionRed = {
 
 
 
+
+
+
+
   fontSize: "16px",
+
+
+
+
 
 
 
@@ -3781,7 +7527,15 @@ const actionRed = {
 
 
 
+
+
+
+
 };
+
+
+
+
 
 
 
