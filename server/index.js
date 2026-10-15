@@ -1309,6 +1309,13 @@ async function getAuthenticatedSession(req, res) {
 
 // Cette route reste publique : elle sert uniquement à vérifier la session.
 app.get("/auth/session", async (req, res) => {
+  // Une session dépend des cookies envoyés par le navigateur : ne pas la mettre en cache.
+  res.set({
+    "Cache-Control": "no-store, no-cache, must-revalidate, private, max-age=0",
+    Pragma: "no-cache",
+    Expires: "0",
+  });
+
   try {
     const session = await getAuthenticatedSession(req, res);
     return res.json(session);

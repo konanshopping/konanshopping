@@ -217,9 +217,17 @@ function AuthSessionProvider({ children }) {
 
   const refreshSession = async () => {
     try {
+      // La session est dynamique et ne doit jamais être servie depuis le cache.
+      // Le paramètre unique évite une réponse conditionnelle 304 sans corps JSON.
       const response = await axios.get(
-        "https://konanshopping.com/api/auth/session",
-        { withCredentials: true }
+        `https://konanshopping.com/api/auth/session?_=${Date.now()}`,
+        {
+          withCredentials: true,
+          headers: {
+            "Cache-Control": "no-cache",
+            Pragma: "no-cache",
+          },
+        }
       );
 
       const data = response.data || {};

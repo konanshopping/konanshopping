@@ -74,6 +74,11 @@ const API_BASE_URL = "https://konanshopping.com";
 const API_TIMEOUT = 15000;
 
 const MAX_PRODUCT_ID_LENGTH = 24;
+
+// Validation locale d'un ObjectId MongoDB (24 caractères hexadécimaux).
+// Évite de dépendre d'une fonction non importée dans le frontend.
+const isValidObjectId = (value) =>
+  typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value);
 const MAX_REVIEW_NAME_LENGTH = 100;
 const MAX_REVIEW_COMMENT_LENGTH = 2000;
 const MAX_REPLY_LENGTH = 1000;
