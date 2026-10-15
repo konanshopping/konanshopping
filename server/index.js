@@ -3825,7 +3825,7 @@ app.post(
       const user =
         await User.findOne({
           email,
-        });
+        }).select("+password");
 
       if (!user) {
 
@@ -6197,7 +6197,7 @@ app.put(
 app.post("/driver-login", rateLimit({ name: "driver-login", windowMs: 15 * 60 * 1000, max: 10 }), async (req, res) => {
 
   try {
-    const driver = await Driver.findOne({ email: req.body.email });
+    const driver = await Driver.findOne({ email: req.body.email }).select("+password");
 
     if (!driver) {
       return res.status(401).json({ message: "Identifiants invalides" });

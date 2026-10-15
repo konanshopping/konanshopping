@@ -45,11 +45,8 @@ const normalizeEmail = (value) =>
   String(value ?? "").trim().toLowerCase();
 
 const isValidEmail = (value) =>
-
   value.length > 0 &&
-
   value.length <= MAX_EMAIL_LENGTH &&
-
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 const isValidLoginResponse = (data) =>
@@ -270,7 +267,7 @@ return (
 
     >
 
-      {/\* BACKGROUND LIGHTS \*/}
+      {/* BACKGROUND LIGHTS */}
 
       <div
 
@@ -328,7 +325,7 @@ return (
 
       />
 
-      {/\* CARD \*/}
+      {/* CARD */}
 
       <div
 
@@ -366,7 +363,7 @@ return (
 
       >
 
-        {/\* LOGO \*/}
+        {/* LOGO */}
 
 <div
 
@@ -428,7 +425,7 @@ return (
 
 </div>
 
-       {/\* TITLE \*/}
+       {/* TITLE */}
 
 <div
 
@@ -520,7 +517,7 @@ return (
 
 </div>
 
-        {/\* EMAIL \*/}
+        {/* EMAIL */}
 
 <div
 
@@ -642,7 +639,7 @@ return (
 
 </div>
 
-{/\* PASSWORD \*/}
+{/* PASSWORD */}
 
 <div
 
@@ -800,7 +797,7 @@ return (
 
 </div>
 
-{/\* MOT DE PASSE OUBLIÉ \*/}
+{/* MOT DE PASSE OUBLIÉ */}
 
 <div
 
@@ -872,7 +869,7 @@ return (
 
 </div>
 
-        {/\* LOGIN BUTTON \*/}
+        {/* LOGIN BUTTON */}
 
 <button
 
@@ -948,7 +945,7 @@ return (
 
 </button>
 
-        {/\* CREATE ACCOUNT \*/}
+        {/* CREATE ACCOUNT */}
 
         <button
 
@@ -1110,7 +1107,7 @@ return (
 
 </button>
 
-       {/\* FOOTER PREMIUM \*/}
+       {/* FOOTER PREMIUM */}
 
 <div
 
@@ -1168,7 +1165,7 @@ return (
 
 </div>
 
-      {/\* PROFESSIONAL NOTIFICATIONS \*/}
+      {/* PROFESSIONAL NOTIFICATIONS */}
 
       <ToastContainer
 

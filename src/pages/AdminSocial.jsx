@@ -1874,7 +1874,7 @@ function AdminSocial() {
 
       )
 
-      .filter((tag) => /^#[**\p**{L}**\p**{N}_-]+$/u.test(tag));
+      .filter((tag) => /^#[\p{L}\p{N}_-]+$/u.test(tag));
 
 
 

@@ -241,22 +241,14 @@ function Register() {
 
 
     if (
-
-      safeEmail.length > 254 ||
-
-      !/^[^\s@]+@[^\s@]+**\\.**[^\s@]+$/.test(
-
-        safeEmail
-
-      )
-
-    ) {
-
-      toast.error("Adresse e-mail invalide");
-
-      return;
-
-    }
+  safeEmail.length > 254 ||
+  !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    safeEmail
+  )
+) {
+  toast.error("Adresse e-mail invalide");
+  return;
+}
 
 
 
