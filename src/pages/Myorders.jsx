@@ -108,6 +108,10 @@ import {
 
 import PendingOrders from "./PendingOrders";
 
+// URL publique du backend. Peut être remplacée par VITE_API_BASE_URL dans .env.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://konanshopping.com").replace(/\/$/, "");
+const API_TIMEOUT = 15000;
+
 
 
 
@@ -252,7 +256,9 @@ function MyOrders() {
       (error) => {
         const status = error?.response?.status;
 
-        if (status === 401 || status === 403) {
+        // 401 : l'authentification est absente ou invalide.
+        // On conserve ici le comportement existant de reconnexion.
+        if (status === 401) {
           try {
             localStorage.removeItem("user");
           } catch {
@@ -264,67 +270,87 @@ function MyOrders() {
           }
         }
 
+        // 403 : le serveur refuse cette ressource, mais cela ne signifie
+        // pas nécessairement que la session du client a expiré.
+        // On ne supprime donc pas ses données de session et on ne le redirige pas.
+        if (status === 403 && import.meta.env?.DEV) {
+          console.warn(
+            "Accès refusé :",
+            error?.response?.data?.message || "Autorisation insuffisante."
+          );
+        }
+
         return Promise.reject(error);
       }
     );
 
-    const userId = String(user._id).trim();
+    // LOAD SESSION AND ORDERS
+    // La session serveur/cookie est la source prioritaire. localStorage
+    // n'est utilisé qu'en secours pour compatibilité avec l'ancien frontend.
+    const loadOrders = async () => {
+      try {
+        let sessionUser = null;
 
+        try {
+          const sessionResponse = await api.get("/api/auth/session");
+          const sessionData = sessionResponse?.data;
 
-
-    // LOAD ORDERS
-
-    api
-
-      .get(`/my-orders/${encodeURIComponent(userId)}`)
-
-      .then((res) => {
-
-        if (!mounted) return;
-
-
-
-        const data = Array.isArray(res.data)
-
-          ? res.data
-
-          : Array.isArray(res.data?.orders)
-
-            ? res.data.orders
-
-            : [];
-
-
-
-        setOrders(data);
-
-      })
-
-      .catch((err) => {
-
-        if (!mounted) return;
-
-
-
-        if (import.meta.env?.DEV) {
-
-          console.warn(
-
-            "Chargement des commandes impossible :",
-
-            err?.response?.status || err?.message || "Erreur réseau"
-
-          );
-
+          if (sessionData?.authenticated && sessionData?.type === "user") {
+            sessionUser = sessionData.user || null;
+          }
+        } catch (sessionError) {
+          if (import.meta.env?.DEV) {
+            console.warn(
+              "Vérification de session impossible :",
+              sessionError?.response?.status || sessionError?.message
+            );
+          }
         }
 
+        if (!mounted) return;
 
+        const storedUser = getStoredUser();
+        const userId = String(
+          sessionUser?._id ||
+          sessionUser?.id ||
+          storedUser?._id ||
+          storedUser?.id ||
+          ""
+        ).trim();
+
+        if (!userId) {
+          if (mounted) navigate("/login", { replace: true });
+          return;
+        }
+
+        const response = await api.get(
+          `/api/my-orders/${encodeURIComponent(userId)}`
+        );
+
+        if (!mounted) return;
+
+        const data = Array.isArray(response.data)
+          ? response.data
+          : Array.isArray(response.data?.orders)
+            ? response.data.orders
+            : [];
+
+        setOrders(data);
+      } catch (err) {
+        if (!mounted) return;
+
+        if (import.meta.env?.DEV) {
+          console.warn(
+            "Chargement des commandes impossible :",
+            err?.response?.status || err?.message || "Erreur réseau"
+          );
+        }
 
         setOrders([]);
+      }
+    };
 
-      });
-
-
+    loadOrders();
 
     // LOAD PRODUCTS
 

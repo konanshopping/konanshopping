@@ -1089,8 +1089,7 @@ function securityGate(req, res, next) {
     "/orders/status/",
     "/coupons/create-default",
     "/coupons",
-    "/users",
-    "/api/users",
+   
     "/visitors",
     "/api/visitors",
     "/api/fix-images",
@@ -1098,6 +1097,20 @@ function securityGate(req, res, next) {
     "/drivers",
     "/api/social/upload-video",
   ];
+
+// 🔐 Les listes d'utilisateurs restent réservées à l'administration.
+// Les routes individuelles sont contrôlées séparément par requireSelfOrAdmin.
+if (
+  (pathName === "/users" || pathName === "/api/users") &&
+  !["GET", "HEAD"].includes(method)
+) {
+  return requireAdmin(req, res, next);
+}
+
+if (pathName === "/users" || pathName === "/api/users") {
+  return requireAdmin(req, res, next);
+}
+
   if (adminPrefixes.some((prefix) => pathName === prefix || pathName.startsWith(prefix))) {
     return requireAdmin(req, res, next);
   }
