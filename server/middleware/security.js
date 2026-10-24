@@ -709,18 +709,16 @@ function requireSelfOrAdmin(paramName = "id") {
 
 
 
+      // Le securityGate peut précéder le routage Express : il transmet alors l’ID extrait du chemin.
       const requestedUserId = String(
-
-        req.params[paramName] ||
-
+        req.securityRequestedUserId ||
+        req.params?.[paramName] ||
         req.body?.[paramName] ||
-
-        req.params.userId ||
-
+        req.query?.[paramName] ||
+        req.params?.userId ||
         req.body?.userId ||
-
+        req.query?.userId ||
         ""
-
       );
 
 

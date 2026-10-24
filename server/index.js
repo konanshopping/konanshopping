@@ -982,9 +982,33 @@ app.use(
 // 🔐 SECURITY GATE — protège les routes sensibles sans
 // modifier leur logique métier interne.
 // ======================================================
+
 function securityGate(req, res, next) {
-  const pathName = req.path;
+  const rawPathName = req.path;
+  const pathName = rawPathName.startsWith("/api/")
+    ? rawPathName.slice(4)
+    : rawPathName;
   const method = req.method;
+
+  // L'identifiant de la route n'est pas encore disponible
+  // dans req.params à ce stade du middleware global.
+  // On extrait uniquement l'identifiant des routes personnelles connues.
+  const personalResourceMatch = pathName.match(
+    /^\/(?:profile|favorites|cart|my-orders|users)\/([^/]+)$/
+  );
+
+  if (personalResourceMatch) {
+    try {
+      req.securityRequestedUserId = decodeURIComponent(
+        personalResourceMatch[1]
+      );
+    } catch (_) {
+      return res.status(400).json({
+        message: "Identifiant de ressource invalide.",
+      });
+    }
+  }
+
 
   // Routes publiques nécessaires au fonctionnement de la boutique.
   const publicExact = new Set([
