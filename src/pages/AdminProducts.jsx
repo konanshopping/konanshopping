@@ -70,7 +70,7 @@ import axios from "axios";
 
 
 
-const API_BASE_URL = "https\://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com";
 
 
 
@@ -859,7 +859,7 @@ function AdminProducts() {
 
 
 
-  "https\://konanshopping.com/api/products"
+  "https://konanshopping.com/api/products"
 
 
 
@@ -1315,7 +1315,7 @@ await api.post(
 
 
 
-  "https\://konanshopping.com/api/add-product",
+  "https://konanshopping.com/api/add-product",
 
 
 
@@ -1851,7 +1851,7 @@ await api.post(
 
 
 
-  `https\://konanshopping.com/api/delete-product/${id}`
+  `https://konanshopping.com/api/delete-product/${id}`
 
 
 
@@ -2115,7 +2115,7 @@ await api.post(
 
 
 
-  `https\://konanshopping.com/api/update-product/${editId}`,
+  `https://konanshopping.com/api/update-product/${editId}`,
 
 
 
@@ -5315,7 +5315,7 @@ await api.post(
 
 
 
-      : `https\://konanshopping.com/api/${product.image}`
+      : `https://konanshopping.com/api/${product.image}`
 
 
 

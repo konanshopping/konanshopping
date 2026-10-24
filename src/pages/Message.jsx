@@ -58,13 +58,15 @@ import MessageCard from "../components/MessageCard";
 
 
 
-const API_BASE_URL = "https\://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com";
 
 const API_TIMEOUT = 15000;
 
 const MAX_MESSAGES = 500;
 
 const OBJECT_ID_REGEX = /^[a-fA-F0-9]{24}$/;
+
+const isValidObjectId = (value) => OBJECT_ID_REGEX.test(String(value || "").trim());
 
 
 
@@ -258,7 +260,40 @@ function Message() {
 
 
 
-  const user = getStoredUser() || {};
+  const [user, setUser] = useState({});
+  const [sessionLoaded, setSessionLoaded] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    api.get("/auth/session")
+      .then((res) => {
+        if (!active) return;
+
+        const sessionUser =
+          res.data?.authenticated && res.data?.type === "user"
+            ? res.data.user
+            : null;
+
+        setUser(sessionUser || {});
+      })
+      .catch((error) => {
+        if (!active) return;
+
+        console.warn(
+          "Impossible de vérifier la session utilisateur:",
+          getSafeError(error, "Session indisponible.")
+        );
+        setUser({});
+      })
+      .finally(() => {
+        if (active) setSessionLoaded(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
 
 
@@ -287,22 +322,19 @@ function Message() {
 
 
   useEffect(() => {
+    if (!sessionLoaded) return;
 
+    const userId = String(user?._id || "").trim();
 
+    if (!isValidObjectId(userId)) {
+      setMessages([]);
+      setLoading(false);
+      return;
+    }
 
-
-
-
-
+    setLoading(true);
     fetchMessages();
-
-
-
-
-
-
-
-  }, []);
+  }, [sessionLoaded, user]);
 
 
 

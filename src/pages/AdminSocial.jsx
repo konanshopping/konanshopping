@@ -134,7 +134,7 @@ function AdminSocial() {
 
 
 
-    "https\://konanshopping.com";
+    "https://konanshopping.com";
 
 
 

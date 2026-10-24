@@ -58,7 +58,7 @@ import {
 
 
 
-const API_BASE_URL = "https\://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com";
 
 const API_TIMEOUT = 15000;
 

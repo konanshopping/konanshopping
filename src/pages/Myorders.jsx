@@ -109,7 +109,9 @@ import {
 import PendingOrders from "./PendingOrders";
 
 // URL publique du backend. Peut être remplacée par VITE_API_BASE_URL dans .env.
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || "https://konanshopping.com").replace(/\/$/, "");
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL || "https://konanshopping.com"
+).replace(/\/+$/, "");
 const API_TIMEOUT = 15000;
 
 
@@ -5176,7 +5178,7 @@ function MyOrders() {
 
 
 
-                    "https\://konanshopping.com/api/"
+                    "https://konanshopping.com/api/"
 
 
 

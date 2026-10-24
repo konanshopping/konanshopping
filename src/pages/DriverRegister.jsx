@@ -76,7 +76,7 @@ import {
 
 const API =
 
-  "https\://konanshopping.com";
+  "https://konanshopping.com";
 
 
 

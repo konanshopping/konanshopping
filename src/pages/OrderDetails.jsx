@@ -72,7 +72,7 @@ import { useParams } from "react-router-dom";
 
 
 
-const API_BASE_URL = "https\://konanshopping.com";
+const API_BASE_URL = "https://konanshopping.com";
 
 const API_TIMEOUT = 15000;
 
@@ -1955,7 +1955,7 @@ export default function OrderDetails() {
 
 
 
-                "https\://konanshopping.com/api/"
+                "https://konanshopping.com/api/"
 
 
 

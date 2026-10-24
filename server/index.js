@@ -1103,6 +1103,16 @@ function securityGate(req, res, next) {
     return requireAdmin(req, res, next);
   }
 
+  // ======================================================
+// 🎟️ COUPONS — CONSULTATION RÉSERVÉE AUX CLIENTS CONNECTÉS
+// La consultation est autorisée aux clients authentifiés.
+// Les modifications restent réservées à l'administration.
+// ======================================================
+
+if (pathName === "/coupons" && method === "GET") {
+  return requireUser(req, res, next);
+}
+
   // Administration.
   const adminPrefixes = [
     "/admin",
