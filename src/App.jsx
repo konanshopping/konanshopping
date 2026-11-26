@@ -1512,6 +1512,36 @@ if (
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior-x: contain;
+      min-width: 0;
+      max-width: 100%;
+      touch-action: pan-x pan-y;
+    }
+
+    .konan-products-horizontal-row > a {
+      min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+      .konan-products-horizontal-row {
+        gap: 10px !important;
+        padding-left: 1px;
+        padding-right: 1px;
+        scroll-snap-type: x mandatory;
+      }
+
+      .konan-products-horizontal-row > a {
+        scroll-snap-stop: always;
+      }
+
+      .konan-seasonal-product-card {
+        border-radius: 13px !important;
+      }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      .konan-products-horizontal-row {
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     .konan-products-horizontal-row::-webkit-scrollbar,
@@ -3570,7 +3600,7 @@ if (
 
         margin: 0,
 
-        fontSize: "22px",
+        fontSize: viewportWidth < 600 ? "18px" : "22px",
 
         fontWeight: "800",
 
@@ -3973,15 +4003,18 @@ style={{
 textDecoration: "none",
 color: "var(--season-text, #111827)",
 display: "block",
+
+// Deux cartes visibles côte à côte sur mobile, y compris sur iPhone.
 flex: viewportWidth < 600
-  ? "0 0 78vw"
+  ? "0 0 calc((100% - 10px) / 2)"
   : viewportWidth < 1024
     ? "0 0 min(42vw, 320px)"
     : "0 0 clamp(230px, 22vw, 340px)",
-minWidth: viewportWidth < 600 ? "210px" : "230px",
-maxWidth: viewportWidth < 600 ? "340px" : "340px",
+minWidth: viewportWidth < 600 ? "0" : "230px",
+maxWidth: viewportWidth < 600 ? "none" : "340px",
 boxSizing: "border-box",
 scrollSnapAlign: "start",
+WebkitTapHighlightColor: "transparent",
 }}
 >
 
@@ -4044,10 +4077,12 @@ width:"100%",
 
 height:
 viewportWidth < 380
-? "155px"
-: viewportWidth < 768
-  ? "180px"
-  : "230px",
+? "132px"
+: viewportWidth < 600
+  ? "148px"
+  : viewportWidth < 768
+    ? "170px"
+    : "230px",
 
 background:"var(--season-surface-soft, #F9FAFB)",
 
@@ -4365,7 +4400,9 @@ item._id === product._id
 
   <div
     style={{
-      padding: "14px", // réduit
+      padding: viewportWidth < 600 ? "10px" : "14px",
+      minWidth: 0,
+      boxSizing: "border-box",
     }}
   >
 
@@ -4384,9 +4421,11 @@ item._id === product._id
         margin: 0,
 
         fontSize:
-          viewportWidth < 768
-            ? "15px"
-            : "18px", // réduit
+          viewportWidth < 600
+            ? "13px"
+            : viewportWidth < 768
+              ? "15px"
+              : "18px",
 
         color: "var(--season-text, #111827)",
 
@@ -4537,9 +4576,11 @@ avis )
         color: "var(--season-primary, #4B2E83)",
 
         fontSize:
-          viewportWidth < 768
-            ? "18px"
-            : "24px", // réduit
+          viewportWidth < 600
+            ? "16px"
+            : viewportWidth < 768
+              ? "19px"
+              : "24px",
 
         marginBottom: "14px",
 

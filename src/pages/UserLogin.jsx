@@ -2335,6 +2335,198 @@ function UserLogin() {
         }
 
 
+        /* =====================================================
+           CORRECTION MOBILE FINALE — LARGEUR ET DÉFILEMENT
+           Présentation uniquement : logique de connexion intacte.
+           ===================================================== */
+        .ks-login-page {
+          position: fixed !important;
+          inset: 0 !important;
+          width: auto !important;
+          max-width: none !important;
+          min-width: 0 !important;
+          height: 100vh !important;
+          height: 100svh !important;
+          height: 100dvh !important;
+          margin: 0 !important;
+          box-sizing: border-box !important;
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .ks-login-page *,
+        .ks-login-page *::before,
+        .ks-login-page *::after {
+          box-sizing: border-box;
+        }
+
+        .ks-login-shell,
+        .ks-login-layout,
+        .ks-login-form-panel,
+        .ks-login-form,
+        .ks-login-field,
+        .ks-login-input {
+          min-width: 0 !important;
+          max-width: 100%;
+        }
+
+        .ks-login-shell {
+          width: min(100%, 1160px);
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .ks-login-form-panel {
+          overflow: hidden;
+        }
+
+        .ks-login-input input {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .ks-intro {
+          position: fixed;
+          inset: 0;
+          width: auto !important;
+          min-width: 0;
+          max-width: none;
+          box-sizing: border-box;
+          overflow: hidden;
+        }
+
+        @media (max-width: 700px) {
+          .ks-login-page {
+            display: flex !important;
+            align-items: flex-start !important;
+            justify-content: center !important;
+            padding:
+              max(10px, env(safe-area-inset-top))
+              max(10px, env(safe-area-inset-right))
+              max(14px, env(safe-area-inset-bottom))
+              max(10px, env(safe-area-inset-left)) !important;
+          }
+
+          .ks-login-page > .ks-login-shell {
+            flex: 0 0 auto;
+            display: block;
+            width: 100% !important;
+            max-width: 500px !important;
+            min-width: 0 !important;
+            margin: auto !important;
+          }
+
+          .ks-login-layout {
+            display: block !important;
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+
+          .ks-login-brand-panel {
+            display: none !important;
+          }
+
+          .ks-login-form-panel {
+            display: flex;
+            flex-direction: column;
+            width: 100% !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            padding:
+              clamp(20px, 4vh, 30px)
+              clamp(15px, 4.5vw, 24px)
+              max(18px, env(safe-area-inset-bottom)) !important;
+            overflow: visible;
+          }
+
+          .ks-login-header,
+          .ks-login-footer,
+          .ks-login-security,
+          .ks-login-form,
+          .ks-login-field {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+          }
+
+          .ks-login-header h1,
+          .ks-login-header p,
+          .ks-login-security small,
+          .ks-login-footer span {
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            word-break: normal;
+          }
+
+          .ks-login-input {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+          }
+
+          .ks-login-input input {
+            flex: 1 1 0;
+            width: 0;
+            min-width: 0;
+          }
+
+          .ks-login-submit,
+          .ks-login-create,
+          .ks-login-home {
+            width: 100%;
+            max-width: 100%;
+          }
+
+          .ks-login-forgot {
+            display: flex;
+            flex-wrap: wrap;
+            min-width: 0;
+            max-width: 100%;
+            gap: 4px 8px;
+          }
+
+          .ks-login-forgot span,
+          .ks-login-forgot button {
+            min-width: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .ks-login-page {
+            padding-right: max(7px, env(safe-area-inset-right)) !important;
+            padding-left: max(7px, env(safe-area-inset-left)) !important;
+          }
+
+          .ks-login-form-panel {
+            padding-right: 13px !important;
+            padding-left: 13px !important;
+          }
+
+          .ks-login-input {
+            padding-right: 10px;
+            padding-left: 10px;
+          }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+          .ks-login-page {
+            height: 100vh !important;
+            height: -webkit-fill-available !important;
+            height: 100dvh !important;
+          }
+
+          .ks-login-input input {
+            font-size: 16px !important;
+            -webkit-appearance: none;
+            appearance: none;
+          }
+        }
+
+
       `}</style>
     </main>
   );
