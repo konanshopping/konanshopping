@@ -994,7 +994,7 @@ function securityGate(req, res, next) {
   // dans req.params à ce stade du middleware global.
   // On extrait uniquement l'identifiant des routes personnelles connues.
   const personalResourceMatch = pathName.match(
-    /^\/(?:profile|favorites|cart|my-orders|users)\/([^/]+)$/
+    /^\/(?:profile|favorites|cart|my-orders|users)\/([^/]+)(?:\/[^/]+)?$/
   );
 
   if (personalResourceMatch) {
@@ -1208,9 +1208,12 @@ if (pathName === "/users" || pathName === "/api/users") {
     return requireUserOrAdmin(req, res, next);
   }
 
-  // Les avis peuvent être publiés par un visiteur (logique existante).
-  // La route recalcule toutefois l'identité client côté serveur lorsqu'un JWT est présent.
-  if (method === "POST" && /^\/product\/[^/]+\/review$/.test(pathName)) {
+  // Publication d'avis et réactions : les visiteurs sont autorisés,
+  // mais leur identité est établie côté serveur (cookie signé), jamais via body.clientId.
+  if (
+    (method === "POST" && /^\/product\/[^/]+\/review$/.test(pathName)) ||
+    (method === "PUT" && /^\/product\/[^/]+\/review\/[^/]+\/(?:like|dislike)$/.test(pathName))
+  ) {
     return next();
   }
 
@@ -3545,6 +3548,7 @@ console.log(
 
 app.put("/order-delivered/:id", async (req, res) => {
 
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ message: "Identifiant invalide." });
   const order =
     await Order.findByIdAndUpdate(
 
@@ -3558,6 +3562,7 @@ app.put("/order-delivered/:id", async (req, res) => {
 
     );
 
+  if (!order) return res.status(404).json({ message: "Commande introuvable." });
   res.json(order);
 
 });
@@ -3664,13 +3669,14 @@ app.put("/orders/:id", async (req, res) => {
   try {
 
     const { status } = req.body;
+    const allowedStatuses = new Set(["En attente", "Confirmée", "Préparation", "En livraison", "Livrée", "Annulée"]);
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(400).json({ error: "Identifiant de commande invalide." });
+    if (typeof status !== "string" || !allowedStatuses.has(status)) return res.status(400).json({ error: "Statut de commande invalide." });
 
-    const updatedOrder =
-      await Order.findByIdAndUpdate(
-        req.params.id,
-        { status },
-        { new: true }
-      );
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id, { status }, { new: true, runValidators: true }
+    );
+    if (!updatedOrder) return res.status(404).json({ error: "Commande introuvable." });
 
     const message = `
 🚚 MISE À JOUR COMMANDE
@@ -3997,573 +4003,200 @@ const aiChatRateLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  message: { error: "Konan AI reçoit beaucoup de demandes. Réessayez dans quelques instants." },
+});
+
+// Assistant shopping public : aucune connexion n'est exigée pour conseiller.
+// Les actions panier/favoris sont exécutées côté navigateur avec les routes
+// sécurisées existantes (compte) ou le stockage visiteur (invité).
+const normalizeAiText = (value, max = 2000) =>
+  typeof value === "string"
+    ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().slice(0, max)
+    : "";
+
+const aiStopWords = new Set([
+  "avec", "pour", "dans", "des", "une", "les", "sur", "chez", "mon", "ma", "mes",
+  "moi", "vous", "votre", "voudrais", "veux", "cherche", "recherche", "donne", "montre",
+  "bonjour", "salut", "merci", "est", "sont", "qui", "que", "quoi", "comment", "combien",
+  "moins", "plus", "cher", "chere", "prix", "acheter", "acheter", "produit", "produits",
+  "article", "articles", "s il", "plait", "svp", "stp", "commande", "commander"
+]);
+
+// Comprend les budgets exprimés comme « 15mil », « 15 mille », « 15k »
+// ou « 15 000 FCFA » sans changer le fonctionnement de recherche existant.
+const extractAiPriceTarget = (normalizedMessage) => {
+  const compact = String(normalizedMessage || "").replace(/,/g, ".");
+  const abbreviated = compact.match(/\b(\d+(?:\.\d+)?)\s*(mil|mille|k)\b/);
+  if (abbreviated) return Math.round(Number(abbreviated[1]) * 1000);
+  const grouped = compact.match(/\b(\d{1,3}(?:\s\d{3})+)\s*(?:fcfa|francs?)?\b/);
+  if (grouped) return Number(grouped[1].replace(/\s/g, ""));
+  const currency = compact.match(/\b(\d{4,7})\s*(?:fcfa|francs?)\b/);
+  return currency ? Number(currency[1]) : null;
+};
+
+const aiProductCard = (product) => ({
+  _id: String(product?._id || ""),
+  name: String(product?.name || "Produit Konan Shopping").slice(0, 160),
+  price: Number(product?.price) || 0,
+  image: typeof product?.image === "string" ? product.image.slice(0, 1200) : "",
+  category: String(product?.category || "Autres").slice(0, 100),
+  description: String(product?.description || "").slice(0, 500),
+  reviewCount: Array.isArray(product?.reviews) ? product.reviews.length : 0,
+  reviews: [],
 });
 
 app.post("/ai-chat", aiChatRateLimiter, async (req, res) => {
-
   try {
+    const message = normalizeAiText(req.body?.message, 1000);
+    const rawHistory = req.body?.history;
 
-   const {
-  message,
-  history = []
-} = req.body;
-
-    if (typeof message !== "string" || message.length === 0 || message.length > 2000) {
-      return res.status(400).json({ error: "Message invalide." });
+    if (!message) {
+      return res.status(400).json({ error: "Écrivez votre demande pour continuer." });
+    }
+    if (typeof req.body?.message !== "string" || req.body.message.length > 1000) {
+      return res.status(400).json({ error: "Votre message est trop long." });
+    }
+    if (!Array.isArray(rawHistory) || rawHistory.length > 30) {
+      return res.status(400).json({ error: "Historique de conversation invalide." });
     }
 
-    if (!Array.isArray(history) || history.length > 40) {
-      return res.status(400).json({ error: "Historique invalide." });
+    // L'historique sert uniquement au contexte de conversation. Les identifiants
+    // reçus sont revalidés et les produits sont toujours relus dans MongoDB.
+    const history = rawHistory.slice(-30).map((item) => ({
+      role: item?.role === "user" ? "user" : item?.role === "ai" ? "ai" : "",
+      text: normalizeAiText(item?.text, 1200),
+      products: Array.isArray(item?.products)
+        ? item.products.slice(0, 12).map((p) => ({ _id: String(p?._id || "") }))
+        : [],
+    })).filter((item) => item.role);
+
+    const previousAi = [...history].reverse().find((item) => item.role === "ai" && item.products.length);
+    const previousProducts = previousAi?.products || [];
+    const previousUserMessages = history.filter((item) => item.role === "user");
+    const previousUserText = previousUserMessages.at(-1)?.text || "";
+
+    // Catalogue limité aux champs utiles : pas d'exposition de documents Mongo complets.
+    const catalogue = await Product.find({})
+      .select("_id name price image category description reviews")
+      .limit(1200)
+      .lean();
+
+    const words = message
+      .replace(/[^a-z0-9\s-]/g, " ")
+      .split(/\s+/)
+      .filter((word) => word.length > 2 && !aiStopWords.has(word));
+
+    const asksForSimilar = /\b(similaire|similaires|alternative|ressemble|comme celui|dans le meme style)\b/.test(message);
+    const asksCheaper = /\b(moins cher|moins chere|petit budget|pas trop cher|abordable)\b/.test(message);
+    const asksRecommendation = /\b(conseille|recommande|meilleur|meilleure|top|populaire|best|choisir)\b/.test(message);
+    const targetPrice = extractAiPriceTarget(message);
+    const asksCart = /\b(ajoute|ajouter|mets|mettre|place|placer)\b.*\b(panier|commande)\b|\b(dans|au) panier\b/.test(message);
+    const asksFavorite = /\b(ajoute|ajouter|mets|garde|enregistre|sauvegarde)\b.*\b(favori|favoris)\b|\bmettre en favori\b/.test(message);
+    const asksCartPage = /\b(ouvrir|voir|aller|affiche|montre).{0,25}\b(panier|commande)\b|\b(mon panier|voir le panier)\b/.test(message);
+    const asksFavoritesPage = /\b(ouvrir|voir|aller|affiche|montre).{0,25}\b(favoris|favori)\b|\bmes favoris\b/.test(message);
+    const saysFirst = /\b(premier|premiere|1er|1ere)\b/.test(message);
+    const saysSecond = /\b(deuxieme|2eme|second|seconde)\b/.test(message);
+
+    let selectedByContext = null;
+    if (saysFirst && previousProducts[0]?._id && mongoose.isValidObjectId(previousProducts[0]._id)) {
+      selectedByContext = catalogue.find((p) => String(p._id) === previousProducts[0]._id) || null;
+    } else if (saysSecond && previousProducts[1]?._id && mongoose.isValidObjectId(previousProducts[1]._id)) {
+      selectedByContext = catalogue.find((p) => String(p._id) === previousProducts[1]._id) || null;
     }
 
-    const safeHistory = history.map((item) => {
-      if (!item || typeof item !== "object") return {};
+    const contextualMessage = /\b(moins cher|moins chere|et celui|celui-la|celui ci|ajoute|ajouter|panier|favori|premier|premiere|deuxieme)\b/.test(message)
+      ? `${previousUserText} ${message}`
+      : message;
+    const contextualWords = normalizeAiText(contextualMessage)
+      .replace(/[^a-z0-9\s-]/g, " ")
+      .split(/\s+/)
+      .filter((word) => word.length > 2 && !aiStopWords.has(word));
 
-      return {
-        role: typeof item.role === "string" ? item.role.slice(0, 20) : "",
-        text: typeof item.text === "string" ? item.text.slice(0, 2000) : "",
-        products: Array.isArray(item.products) ? item.products.slice(0, 12) : [],
+    let ranked = catalogue.map((product) => {
+      const name = normalizeAiText(product.name, 200);
+      const category = normalizeAiText(product.category, 120);
+      const description = normalizeAiText(product.description, 600);
+      const searchable = `${name} ${category} ${description}`;
+      let score = 0;
+      for (const word of contextualWords) {
+        if (name.includes(word)) score += 5;
+        else if (category.includes(word)) score += 3;
+        else if (searchable.includes(word)) score += 1;
+      }
+      if (targetPrice && Number.isFinite(Number(product.price))) {
+        const difference = Math.abs(Number(product.price) - targetPrice);
+        if (difference === 0) score += 100;
+        else if (difference <= Math.max(500, targetPrice * 0.05)) score += 35;
+        else score -= Math.min(20, difference / Math.max(targetPrice, 1) * 10);
+      }
+      if (asksCheaper && Number.isFinite(Number(product.price))) score += Math.max(0, 4 - Number(product.price) / 100000);
+      if (asksRecommendation) score += Math.min(Array.isArray(product.reviews) ? product.reviews.length : 0, 100) * 0.08;
+      return { product, score };
+    }).filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score || Number(a.product.price || 0) - Number(b.product.price || 0));
+
+    if (asksForSimilar && selectedByContext) {
+      ranked = catalogue
+        .filter((p) => String(p._id) !== String(selectedByContext._id) && normalizeAiText(p.category) === normalizeAiText(selectedByContext.category))
+        .map((product) => ({ product, score: 10 }))
+        .concat(ranked)
+        .filter((item, index, arr) => arr.findIndex((other) => String(other.product._id) === String(item.product._id)) === index);
+    }
+
+    if (selectedByContext && (asksCart || asksFavorite)) {
+      ranked = [{ product: selectedByContext, score: 999 }, ...ranked.filter((item) => String(item.product._id) !== String(selectedByContext._id))];
+    }
+
+    const matchedProducts = ranked.slice(0, 12).map((item) => item.product);
+    const displayProducts = matchedProducts.length
+      ? matchedProducts
+      : [...catalogue].sort(() => Math.random() - 0.5).slice(0, 6);
+
+    let action = null;
+    let reply = "Je suis là pour vous aider à trouver le bon produit. Dites-moi ce que vous recherchez : une chaussure, un vêtement, un accessoire ou une marque.";
+
+    const chosenProduct = selectedByContext || matchedProducts[0] || null;
+    if ((asksCart || asksFavorite) && chosenProduct) {
+      action = {
+        type: asksFavorite ? "add_to_favorites" : "add_to_cart",
+        productId: String(chosenProduct._id),
+        product: aiProductCard(chosenProduct),
       };
-    });
-
-    const search =
-      message.toLowerCase();
-
-      const wantsRecommendation =
-
-search.includes("conseille")
-
-||
-
-search.includes("recommande")
-
-||
-
-search.includes("meilleur")
-
-||
-
-search.includes("top");
-
-      const lastUserMessage =
-
-safeHistory
-
-.filter(
-msg => msg.role === "user"
-)
-
-.slice(-1)[0]?.text || "";
-
-const previousSearch =
-
-safeHistory
-
-.filter(
-msg => msg.role === "user"
-)
-
-.slice(-2,-1)[0]?.text || "";
-
-const previousProducts =
-
-safeHistory
-
-.filter(
-msg =>
-msg.role === "ai"
-&&
-msg.products
-)
-
-.slice(-1)[0]?.products || [];
-
-const wantsSimilar =
-
-search.includes("similaire")
-
-||
-
-search.includes("ressemble")
-
-||
-
-search.includes("comme celui-ci")
-
-||
-
-search.includes("alternative");
-
-const referenceProduct =
-
-previousProducts[0] || null;
-
-let contextualSearch = search;
-
-if (
-
-search.includes("moins cher")
-
-||
-
-search.includes("le meilleur")
-
-||
-
-search.includes("recommande")
-
-) {
-
-contextualSearch =
-
-`${lastUserMessage} ${search}`;
-
-}
-
-if (
-
-search.includes("premier")
-
-||
-
-search.includes("deuxième")
-
-||
-
-search.includes("ajoute")
-
-||
-
-search.includes("panier")
-
-) {
-
-contextualSearch =
-
-`${previousSearch} ${search}`;
-
-}
-
-    const products =
-      await Product.find();
-
-    // =========================
-    // MOTS CLES
-    // =========================
-
-  const keywords =
-contextualSearch
-.toLowerCase()
-.replace(/[^\w\s]/g, "")
-.split(" ")
-.filter(word => word.length > 2);
-
-    // =========================
-    // MATCH PRODUITS
-    // =========================
-
-    let selectedProduct = null;
-
-if (
-
-search.includes("premier")
-
-&&
-
-previousProducts.length > 0
-
-) {
-
-selectedProduct =
-previousProducts[0];
-
-}
-
-if (
-
-search.includes("deuxième")
-
-&&
-
-previousProducts.length > 1
-
-) {
-
-selectedProduct =
-previousProducts[1];
-
-}
-
-   const matchedProducts =
-
-products
-
-.map((product) => {
-
-const productText =
-
-`
-${product.name}
-${product.category}
-${product.description || ""}
-`
-
-.toLowerCase();
-
-let score = 0;
-
-keywords.forEach((word) => {
-
-if (
-productText.includes(word)
-) {
-
-score++;
-
-}
-
-});
-
-return {
-
-...product._doc,
-
-score,
-
-};
-
-})
-
-.filter(
-(product) =>
-product.score > 0
-)
-
-.sort(
-(a, b) =>
-b.score - a.score
-);
-
-const rankedProducts =
-
-matchedProducts.map(product => ({
-
-...product,
-
-reviewCount:
-product.reviews?.length || 0,
-
-aiScore:
-
-(product.reviews?.length || 0) * 5
-
-+
-
-(product.score || 0)
-
-}));
-
-const bestProduct =
-
-rankedProducts
-
-.sort(
-(a,b) =>
-b.aiScore - a.aiScore
-)[0];
-
-    // =========================
-    // IA SMART RESPONSE
-    // =========================
-
-    let aiReply =
-      " Konan AI analyse votre demande...";
-
-      if (
-
-wantsRecommendation
-
-&&
-
-bestProduct
-
-) {
-
-aiReply =
-
-` Mon choix principal est :
-
-${bestProduct.name}
-
- ${Number(
-bestProduct.price
-).toLocaleString()} FCFA
-
- ${bestProduct.category}
-
- ${
-bestProduct.reviewCount
-} avis client(s)
-
-C'est actuellement le produit que je recommande le plus selon votre recherche.`;
-
-}
-
-else if (matchedProducts.length > 0){
-
-const firstProduct =
-matchedProducts[0];
-
-aiReply =
-
-` Bonjour,
-
-Je suis Konan AI, votre conseiller personnel chez Konan Shopping Cameroun.
-
-J'ai analysé votre demande et j'ai trouvé ${matchedProducts.length} produit(s) correspondant à ce que vous recherchez.
-
- Mon premier choix pour vous est :
-
-${firstProduct.name}
-
- Prix :
-${Number(firstProduct.price).toLocaleString()} FCFA
-
- Catégorie :
-${firstProduct.category}
-
- Je vous affiche maintenant les produits les plus pertinents afin que vous puissiez comparer et choisir celui qui vous convient le mieux.
-
-Si vous le souhaitez, je peux également :
-
- Ajouter un produit au panier
-
- Préparer votre commande
-
-Trouver une option moins chère
-
- Recommander les meilleures ventes
-
-Je reste à votre disposition.`;
-
-}
-
-else {
-
-aiReply =
-
-` Bonjour,
-
-Je suis Konan AI, votre conseiller personnel chez Konan Shopping Cameroun.
-
-Je n'ai malheureusement trouvé aucun produit correspondant exactement à votre demande.
-
- Je vous recommande d'essayer une recherche plus précise.
-
-Par exemple :
-
- iPhone
-
- Nike
-
- Montre
-
- Sac
-
- Costume
-
-Robe
-
-Je peux également vous proposer des alternatives similaires disponibles dans notre catalogue.`;
-
-}
-
-    // =========================
-    // PRODUITS
-    // =========================
-
-    let response = "";
-
-    if (
-      matchedProducts.length > 0
-    ) {
-
-      response =
-        matchedProducts
-
-          .slice(0, 6)
-
-          .map(
-            (product) =>
-
-              `
- ${product.name}
-
- ${product.price} FCFA
-
- ${product.category}
-`
-          )
-
-          .join("\n");
-
+      reply = asksFavorite
+        ? `J'ai trouvé ${chosenProduct.name} à ${Number(chosenProduct.price || 0).toLocaleString("fr-FR")} FCFA. Je l'ajoute à vos favoris ❤️`
+        : `J'ai trouvé ${chosenProduct.name} à ${Number(chosenProduct.price || 0).toLocaleString("fr-FR")} FCFA. Je l'ajoute à votre panier 🛒`;
+    } else if (asksCartPage) {
+      action = { type: "navigate", destination: "/checkout" };
+      reply = "Bien sûr. Je vous ouvre votre panier pour vérifier votre sélection.";
+    } else if (asksFavoritesPage) {
+      action = { type: "navigate", destination: "/favorites" };
+      reply = "Bien sûr. Je vous ouvre votre liste de favoris.";
+    } else if (matchedProducts.length) {
+      const first = matchedProducts[0];
+      reply = asksRecommendation
+        ? `Je vous conseille ${first.name} : ${Number(first.price || 0).toLocaleString("fr-FR")} FCFA. Regardez aussi les autres modèles que j'ai sélectionnés.`
+        : `Bien sûr 😊 J'ai trouvé ${matchedProducts.length} résultat(s). Voici les modèles qui correspondent le mieux à votre recherche.`;
+      if (targetPrice) reply += ` J'ai privilégié les articles proches de votre budget de ${targetPrice.toLocaleString("fr-FR")} FCFA.`;
+      if (asksCheaper) reply += " J'ai privilégié les options les plus abordables.";
+    } else if (!catalogue.length) {
+      reply = "Notre catalogue est momentanément indisponible. Réessayez dans quelques instants ou contactez notre équipe.";
+    } else {
+      reply = "Je n'ai pas trouvé de correspondance exacte. Je vous propose quelques articles disponibles. Vous pouvez aussi préciser la marque, la taille, la couleur ou votre budget.";
     }
 
-    else {
-
-      response =
-        " Aucun produit trouvé actuellement.";
-
-    }
-
-    // =========================
-    // IA AJOUT PANIER AUTO
-    // =========================
-
-    let addToCart = null;
-
-if (
-
-search.includes("ajoute")
-
-||
-
-search.includes("panier")
-
-||
-
-search.includes("acheter")
-
-) {
-
-if (
-
-selectedProduct
-
-) {
-
-addToCart =
-selectedProduct;
-
-aiReply =
-
-` Très bien.
-
-${selectedProduct.name}
-
-a été sélectionné.
-
-${Number(
-selectedProduct.price
-).toLocaleString()} FCFA
-
-${selectedProduct.category}
-
-Le produit est prêt à être ajouté au panier.`;
-
-}
-
-else if (
-
-matchedProducts.length > 0
-
-) {
-
-addToCart =
-matchedProducts[0];
-
-}
-
-}
-
-    // =========================
-    // IA RECOMMANDATION
-    // =========================
-
-    let recommendations = [];
-
-if (matchedProducts.length > 0) {
-
-  recommendations =
-    matchedProducts.slice(0, 12);
-
-}
-else {
-
-  recommendations =
-    products
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 6);
-
-}
-
-    // =========================
-    // RESPONSE FINAL
-    // =========================
-
-   const productCards = matchedProducts.map(product => ({
-
-  _id: product._id,
-
-  name: product.name,
-
-  price: product.price,
-
-  image: product.image,
-
-  category: product.category,
-
-  description:
-    product.description || "",
-
-  reviews:
-    product.reviews || [],
-
-  reviewCount:
-    product.reviews?.length || 0
-
-}));
-
-res.json({
-
-  reply:
-`${aiReply}
-
-${response}`,
-
-  addToCart,
-
-  recommendations,
-
-  products:
-productCards.map(product => ({
-  ...product,
-  reviews:
-    products.find(
-      p => p._id.toString() === product._id.toString()
-    )?.reviews || []
-})),
-
-  totalFound:
-    matchedProducts.length
-
-});
-
-  }
-
-  catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-
-      error:
-        "Erreur Konan AI",
-
+    const safeProducts = displayProducts.slice(0, 8).map(aiProductCard);
+    return res.json({
+      reply,
+      action,
+      products: safeProducts,
+      recommendations: safeProducts,
+      totalFound: matchedProducts.length,
+      assistant: { name: "Konan AI", mode: "catalogue-shopping-assistant" },
     });
-
+  } catch (error) {
+    console.error("KONAN AI ERROR:", error?.message || "unknown");
+    return res.status(500).json({ error: "Konan AI rencontre un problème. Veuillez réessayer." });
   }
-
 });
 
 app.get("/profile/:id", async (req, res) => {
@@ -4773,6 +4406,7 @@ app.get("/favorites/:userId", async (req, res) => {
   try {
 
     const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Identifiant utilisateur invalide." });
 
     const user =
       await User.findById(userId)
@@ -4814,8 +4448,11 @@ app.delete(
         productId
       } = req.params;
 
-      const user =
-        await User.findById(userId);
+      if (!mongoose.Types.ObjectId.isValid(userId) || !mongoose.Types.ObjectId.isValid(productId)) {
+        return res.status(400).json({ error: "Identifiant invalide." });
+      }
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ error: "Utilisateur introuvable." });
 
       user.favorites =
         user.favorites.filter(
@@ -4920,8 +4557,8 @@ app.get(
 
     try {
 
-      const userId =
-        req.params.userId;
+      const userId = req.params.userId;
+      if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).json({ error: "Identifiant utilisateur invalide." });
 
       const cart =
         await Cart.find({
@@ -5057,6 +4694,53 @@ app.get("/product/:id", async (req, res) => {
 
 });
 
+// ======================================================
+// IDENTITÉ INVITÉ SIGNÉE POUR AVIS ET RÉACTIONS
+// ======================================================
+const REVIEW_GUEST_COOKIE = "ks_review_guest";
+
+function getReviewGuestSecret() {
+  const secret = process.env.GUEST_REACTION_SECRET || process.env.JWT_SECRET;
+  if (!secret || String(secret).length < 32) return null;
+  return String(secret);
+}
+
+function signReviewGuestId(id, secret) {
+  return crypto.createHmac("sha256", secret).update(id).digest("hex");
+}
+
+function getOrCreateReviewGuestId(req, res) {
+  const secret = getReviewGuestSecret();
+  if (!secret) return null;
+  const raw = String(req.cookies?.[REVIEW_GUEST_COOKIE] || "");
+  const parts = raw.split(".");
+  if (parts.length === 2 && /^guest_[a-f0-9]{32}$/.test(parts[0])) {
+    const expected = signReviewGuestId(parts[0], secret);
+    const supplied = Buffer.from(parts[1], "hex");
+    const expectedBuffer = Buffer.from(expected, "hex");
+    if (supplied.length === expectedBuffer.length && crypto.timingSafeEqual(supplied, expectedBuffer)) return parts[0];
+  }
+  const id = `guest_${crypto.randomBytes(16).toString("hex")}`;
+  const signature = signReviewGuestId(id, secret);
+  res.cookie(REVIEW_GUEST_COOKIE, `${id}.${signature}`, {
+    httpOnly: true, secure: process.env.NODE_ENV === "production",
+    sameSite: "lax", path: "/", maxAge: 365 * 24 * 60 * 60 * 1000
+  });
+  return id;
+}
+
+function getReviewActorId(req, res) {
+  const token = req.cookies?.[AUTH_COOKIE_NAMES.user];
+  if (token) {
+    const payload = verifyAuthCookieToken(token, "user");
+    const id = String(payload?.sub || payload?.id || "");
+    if (!payload || !mongoose.Types.ObjectId.isValid(id)) return { error: "Session invalide." };
+    return { id };
+  }
+  const guestId = getOrCreateReviewGuestId(req, res);
+  return guestId ? { id: guestId } : { error: "Configuration sécurisée des avis indisponible." };
+}
+
 // =========================
 // AJOUTER AVIS PRODUIT
 // =========================
@@ -5091,21 +4775,16 @@ app.post(
 
       let hasPurchased = null;
 
-      const authenticatedClientId =
-        req.user?.sub && mongoose.Types.ObjectId.isValid(String(req.user.sub))
-          ? String(req.user.sub)
-          : null;
+      const reviewActor = getReviewActorId(req, res);
+      if (reviewActor.error) return res.status(503).json({ message: reviewActor.error });
+      const clientId = reviewActor.id;
 
-      const requestedClientId =
-        typeof req.body.clientId === "string"
-          ? req.body.clientId.trim().slice(0, 100)
-          : "";
-
-      // JWT prioritaire. Les visiteurs gardent leur identifiant guest pour préserver
-      // la possibilité de laisser un avis sans compte.
-      const clientId =
-        authenticatedClientId ||
-        (requestedClientId.startsWith("guest_") ? requestedClientId : `guest_${crypto.randomBytes(12).toString("hex")}`);
+      const rating = Number(req.body.rating);
+      const comment = String(req.body.comment || "").trim().slice(0, 2000);
+      const reviewerName = String(req.body.name || "Client").trim().slice(0, 100);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 5 || !comment) {
+        return res.status(400).json({ message: "Note ou commentaire invalide." });
+      }
 
 
       // ==================================================
@@ -5149,16 +4828,9 @@ app.post(
         clientId:
           clientId,
 
-        name:
-          req.body.name,
-
-        rating:
-          Number(
-            req.body.rating
-          ),
-
-        comment:
-          req.body.comment,
+        name: reviewerName,
+        rating,
+        comment,
 
         verifiedPurchase:
           !!hasPurchased,
@@ -8849,133 +8521,51 @@ app.use(
   messageRoutes
 );
 
-app.put(
-  "/product/:productId/review/:reviewId/like",
-  async (req, res) => {
+const reviewReactionLimiter = rateLimit({
+  name: "review-reaction", windowMs: 10 * 60 * 1000, max: 80,
+  standardHeaders: true, legacyHeaders: false,
+});
 
-    try {
-
-      const product =
-        await Product.findById(
-          req.params.productId
-        );
-
-      if (!product) {
-        return res.status(404).json({
-          message: "Produit introuvable",
-        });
-      }
-
-      const review =
-        product.reviews.id(
-          req.params.reviewId
-        );
-
-      if (!review) {
-        return res.status(404).json({
-          message: "Avis introuvable",
-        });
-      }
-
-      const clientId =
-        req.body.clientId;
-
-      if (
-        !review.likes.includes(
-          clientId
-        )
-      ) {
-
-        review.likes.push(
-          clientId
-        );
-
-        review.dislikes =
-          review.dislikes.filter(
-            (id) =>
-              id !== clientId
-          );
-
-      }
-
-      await product.save();
-
-      res.json({
-        likes:
-          review.likes.length,
-      });
-
-    } catch (err) {
-
-      console.log(err);
-
-      res.status(500).json({
-        message:
-          "Erreur serveur",
-      });
-
+async function handleReviewReaction(req, res, reaction) {
+  try {
+    const { productId, reviewId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(productId) || !mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ message: "Identifiant invalide." });
     }
-
-  }
-);
-
-app.put(
-  "/product/:productId/review/:reviewId/dislike",
-  async (req, res) => {
-
-    try {
-
-      const product =
-        await Product.findById(
-          req.params.productId
-        );
-
-      const review =
-        product.reviews.id(
-          req.params.reviewId
-        );
-
-      const clientId =
-        req.body.clientId;
-
-      if (
-        !review.dislikes.includes(
-          clientId
-        )
-      ) {
-
-        review.dislikes.push(
-          clientId
-        );
-
-        review.likes =
-          review.likes.filter(
-            (id) =>
-              id !== clientId
-          );
-
+    const actor = getReviewActorId(req, res);
+    if (actor.error) return res.status(503).json({ message: actor.error });
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Produit introuvable." });
+    const review = product.reviews.id(reviewId);
+    if (!review) return res.status(404).json({ message: "Avis introuvable." });
+    if (!Array.isArray(review.likes)) review.likes = [];
+    if (!Array.isArray(review.dislikes)) review.dislikes = [];
+    const actorId = actor.id;
+    const own = reaction === "like" ? review.likes : review.dislikes;
+    const opposite = reaction === "like" ? review.dislikes : review.likes;
+    const already = own.some((id) => String(id) === actorId);
+    if (already) {
+      if (reaction === "like") review.likes = review.likes.filter((id) => String(id) !== actorId);
+      else review.dislikes = review.dislikes.filter((id) => String(id) !== actorId);
+    } else {
+      if (reaction === "like") {
+        review.dislikes = review.dislikes.filter((id) => String(id) !== actorId);
+        if (!review.likes.some((id) => String(id) === actorId)) review.likes.push(actorId);
+      } else {
+        review.likes = review.likes.filter((id) => String(id) !== actorId);
+        if (!review.dislikes.some((id) => String(id) === actorId)) review.dislikes.push(actorId);
       }
-
-      await product.save();
-
-      res.json({
-        dislikes:
-          review.dislikes.length,
-      });
-
-    } catch (err) {
-
-      console.log(err);
-
-      res.status(500).json({
-        message:
-          "Erreur serveur",
-      });
-
     }
-
+    await product.save();
+    return res.json({ likes: review.likes.length, dislikes: review.dislikes.length, reaction: already ? null : reaction });
+  } catch (error) {
+    console.error("REVIEW REACTION ERROR:", error);
+    return res.status(500).json({ message: "Erreur serveur." });
   }
-);
+}
+
+app.put("/product/:productId/review/:reviewId/like", reviewReactionLimiter, (req, res) => handleReviewReaction(req, res, "like"));
+app.put("/product/:productId/review/:reviewId/dislike", reviewReactionLimiter, (req, res) => handleReviewReaction(req, res, "dislike"));
 
 app.post(
   "/product/:productId/review/:reviewId/reply",
@@ -9004,10 +8594,15 @@ app.post(
         });
       }
 
+      const replyClientId = String(req.user?.sub || req.admin?.sub || "");
+      const replyComment = String(req.body.comment || "").trim().slice(0, 1000);
+      if (!replyClientId || !replyComment) {
+        return res.status(400).json({ message: "Réponse invalide." });
+      }
       review.replies.push({
-        clientId: req.user?.sub || (typeof req.body.clientId === "string" ? req.body.clientId.trim().slice(0, 100) : "guest"),
-        name: req.body.name,
-        comment: req.body.comment,
+        clientId: replyClientId,
+        name: String(req.body.name || "Client").trim().slice(0, 100),
+        comment: replyComment,
       });
 
       await product.save();

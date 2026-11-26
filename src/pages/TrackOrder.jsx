@@ -102,6 +102,23 @@ const API = "https://konanshopping.com/api";
 const API_TIMEOUT = 15000;
 const MAX_ORDER_ID_LENGTH = 24;
 
+// Validation de l'identifiant MongoDB utilisé dans l'URL.
+const isValidObjectId = (value) =>
+  typeof value === "string" &&
+  value.length === MAX_ORDER_ID_LENGTH &&
+  /^[a-fA-F0-9]{24}$/.test(value);
+
+// Retourne uniquement un message serveur sûr et exploitable.
+const safeServerMessage = (error) => {
+  const message =
+    error?.response?.data?.message ??
+    error?.response?.data?.error;
+
+  return typeof message === "string" && message.trim()
+    ? message.trim().slice(0, 300)
+    : "";
+};
+
 axios.defaults.withCredentials = true;
 
 const apiClient = axios.create({
@@ -190,34 +207,20 @@ const getImageUrl = (value) => {
 
 
 
-  if (
-
-    url.startsWith("http://") ||
-
-    url.startsWith("https://") ||
-
-    url.startsWith("data:")
-
-  ) {
-
-    return url;
-
-  }
-
-
-
   if (url.startsWith("http://localhost:5000")) {
-
     return url.replace("http://localhost:5000", API);
-
   }
-
-
 
   if (url.startsWith("localhost:5000")) {
+    return `https://${url.replace("localhost:5000", "konanshopping.com/api")}`;
+  }
 
-    return `https://${url}`;
-
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://") ||
+    url.startsWith("data:")
+  ) {
+    return url;
   }
 
 
@@ -393,21 +396,29 @@ function RecenterMap({ position }) {
 
 
   useEffect(() => {
-
     if (!position || position.length !== 2) return;
 
-
-
     map.flyTo(
-
       position,
-
-      window.innerWidth < 768 ? 15 : 14,
-
+      window.matchMedia?.("(max-width: 767px)").matches ? 15 : 14,
       { duration: 1.2 }
-
     );
 
+    // Rafraîchit les dimensions Leaflet après les changements du viewport iOS.
+    const refreshMapSize = () => {
+      window.requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+    };
+
+    window.addEventListener("resize", refreshMapSize, { passive: true });
+    window.addEventListener("orientationchange", refreshMapSize, { passive: true });
+    window.visualViewport?.addEventListener("resize", refreshMapSize, { passive: true });
+    refreshMapSize();
+
+    return () => {
+      window.removeEventListener("resize", refreshMapSize);
+      window.removeEventListener("orientationchange", refreshMapSize);
+      window.visualViewport?.removeEventListener("resize", refreshMapSize);
+    };
   }, [map, position]);
 
 
@@ -563,25 +574,24 @@ export default function TrackOrder() {
 
 
   useEffect(() => {
-
     const handleResize = () => {
-
-      setIsMobile(window.innerWidth < 768);
-
+      setIsMobile(
+        window.matchMedia
+          ? window.matchMedia("(max-width: 767px)").matches
+          : window.innerWidth < 768
+      );
     };
 
-
-
-    window.addEventListener("resize", handleResize);
-
-
+    handleResize();
+    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("orientationchange", handleResize, { passive: true });
+    window.visualViewport?.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
-
       window.removeEventListener("resize", handleResize);
-
+      window.removeEventListener("orientationchange", handleResize);
+      window.visualViewport?.removeEventListener("resize", handleResize);
     };
-
   }, []);
 
 
@@ -1220,9 +1230,9 @@ export default function TrackOrder() {
 
         return {
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
-          bg: "#DBEAFE",
+          bg: "color-mix(in srgb, var(--season-primary, #2563eb) 15%, white)",
 
           icon: <FaTruck />,
 
@@ -1252,9 +1262,9 @@ export default function TrackOrder() {
 
         return {
 
-          color: "#7C3AED",
+          color: "var(--season-secondary, #3b82f6)",
 
-          bg: "#EDE9FE",
+          bg: "color-mix(in srgb, var(--season-secondary, #3b82f6) 12%, white)",
 
           icon: <FaCheckCircle />,
 
@@ -1330,7 +1340,7 @@ export default function TrackOrder() {
 
           .track-loading {
 
-            min-height:100vh;
+            min-height:100vh;\n            min-height:100svh;\n            min-height:100dvh;
 
             width:100%;
 
@@ -1340,7 +1350,7 @@ export default function TrackOrder() {
 
             justify-content:center;
 
-            background:linear-gradient(180deg,#eff6ff,#fff);
+            background:linear-gradient(180deg,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white),#fff);
 
             padding:20px;
 
@@ -1386,7 +1396,7 @@ export default function TrackOrder() {
 
             justify-content:center;
 
-            background:#2563EB;
+            background:var(--season-primary, #2563eb);
 
             color:#fff;
 
@@ -1426,9 +1436,9 @@ export default function TrackOrder() {
 
             height:34px;
 
-            border:3px solid #DBEAFE;
+            border:3px solid color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
 
-            border-top-color:#2563EB;
+            border-top-color:var(--season-primary, #2563eb);
 
             border-radius:50%;
 
@@ -1516,7 +1526,7 @@ export default function TrackOrder() {
 
           .track-error {
 
-            min-height:100vh;
+            min-height:100vh;\n            min-height:100svh;\n            min-height:100dvh;
 
             display:flex;
 
@@ -1608,7 +1618,7 @@ export default function TrackOrder() {
 
             border:none;
 
-            background:#2563EB;
+            background:var(--season-primary, #2563eb);
 
             color:#fff;
 
@@ -2060,7 +2070,7 @@ export default function TrackOrder() {
 
                         pathOptions={{
 
-                          color: "#60A5FA",
+                          color: "color-mix(in srgb, var(--season-secondary, #3b82f6) 72%, white)",
 
                           weight: isMobile ? 10 : 17,
 
@@ -2086,7 +2096,7 @@ export default function TrackOrder() {
 
                         pathOptions={{
 
-                          color: "#2563EB",
+                          color: "var(--season-primary, #2563eb)",
 
                           weight: isMobile ? 4 : 6,
 
@@ -2108,9 +2118,9 @@ export default function TrackOrder() {
 
                         pathOptions={{
 
-                          color: "#2563EB",
+                          color: "var(--season-primary, #2563eb)",
 
-                          fillColor: "#2563EB",
+                          fillColor: "var(--season-primary, #2563eb)",
 
                           fillOpacity: 0.1,
 
@@ -3038,9 +3048,9 @@ export default function TrackOrder() {
 
           width:100%;
 
-          min-height:100vh;
+          min-height:100vh;\n            min-height:100svh;\n            min-height:100dvh;
 
-          background:linear-gradient(180deg,#EFF6FF 0%,#F8FAFC 35%,#FFF 100%);
+          background:linear-gradient(180deg,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white) 0%,#F8FAFC 35%,#FFF 100%);
 
           padding:12px;
 
@@ -3106,9 +3116,9 @@ export default function TrackOrder() {
 
           border-radius:13px;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           display:flex;
 
@@ -3156,7 +3166,7 @@ export default function TrackOrder() {
 
           justify-content:center;
 
-          background:linear-gradient(135deg,#2563EB,#4F46E5);
+          background:linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6));
 
           color:#FFF;
 
@@ -3346,7 +3356,7 @@ export default function TrackOrder() {
 
           height:100%;
 
-          background:linear-gradient(90deg,#2563EB,#4F46E5);
+          background:linear-gradient(90deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6));
 
           border-radius:10px;
 
@@ -3390,7 +3400,7 @@ export default function TrackOrder() {
 
         .point.active {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -3472,7 +3482,7 @@ export default function TrackOrder() {
 
         .map-header strong svg {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -3600,7 +3610,7 @@ export default function TrackOrder() {
 
           padding:30px;
 
-          background:linear-gradient(145deg,#EFF6FF,#F8FAFC);
+          background:linear-gradient(145deg,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white),#F8FAFC);
 
           color:#64748B;
 
@@ -3610,7 +3620,7 @@ export default function TrackOrder() {
 
         .no-gps svg {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:35px;
 
@@ -3744,7 +3754,7 @@ export default function TrackOrder() {
 
         .driver-card-header h2 svg {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -3812,9 +3822,9 @@ export default function TrackOrder() {
 
           justify-content:center;
 
-          background:#DBEAFE;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:27px;
 
@@ -3876,7 +3886,7 @@ export default function TrackOrder() {
 
         .driver-info p svg {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           margin-right:4px;
 
@@ -3902,7 +3912,7 @@ export default function TrackOrder() {
 
           text-decoration:none;
 
-          background:#2563EB;
+          background:var(--season-primary, #2563eb);
 
           color:#FFF;
 
@@ -3928,9 +3938,9 @@ export default function TrackOrder() {
 
           margin-bottom:12px;
 
-          border-color:#DBEAFE;
+          border-color:color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
 
-          background:linear-gradient(135deg,#FFF,#F8FBFF);
+          background:linear-gradient(135deg,#FFF,color-mix(in srgb, var(--season-primary, #2563eb) 3%, white));
 
         }
 
@@ -3946,9 +3956,9 @@ export default function TrackOrder() {
 
           border-radius:15px;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           display:flex;
 
@@ -4002,7 +4012,7 @@ export default function TrackOrder() {
 
           gap:6px;
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:9px;
 
@@ -4020,7 +4030,7 @@ export default function TrackOrder() {
 
           border-radius:50%;
 
-          background:#2563EB;
+          background:var(--season-primary, #2563eb);
 
           animation:pulseDriver 1.2s infinite;
 
@@ -4090,9 +4100,9 @@ export default function TrackOrder() {
 
           justify-content:center;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -4154,7 +4164,7 @@ export default function TrackOrder() {
 
           border-radius:13px;
 
-          background:#FAFCFF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 2%, white);
 
         }
 
@@ -4172,9 +4182,9 @@ export default function TrackOrder() {
 
           overflow:hidden;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           display:flex;
 
@@ -4246,7 +4256,7 @@ export default function TrackOrder() {
 
         .product-price {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:10px;
 
@@ -4336,7 +4346,7 @@ export default function TrackOrder() {
 
         .grand-total strong {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:18px;
 
@@ -4360,7 +4370,7 @@ export default function TrackOrder() {
 
           flex-wrap:wrap;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
           border-radius:12px;
 
@@ -4374,7 +4384,7 @@ export default function TrackOrder() {
 
         .payment-info svg {
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -4382,7 +4392,7 @@ export default function TrackOrder() {
 
         .payment-info strong {
 
-          color:#1D4ED8;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -4498,7 +4508,7 @@ export default function TrackOrder() {
 
           justify-content:center;
 
-          background:linear-gradient(135deg,#2563EB,#4F46E5);
+          background:linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6));
 
           color:#FFF;
 
@@ -4634,7 +4644,7 @@ export default function TrackOrder() {
 
           background:#FFF;
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -4680,13 +4690,13 @@ export default function TrackOrder() {
 
           margin-bottom:10px;
 
-          background:#EFF6FF;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 
-          border:1px solid #DBEAFE;
+          border:1px solid color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
 
           border-radius:15px;
 
-          color:#1E40AF;
+          color:var(--season-primary, #2563eb);
 
         }
 
@@ -4768,9 +4778,9 @@ export default function TrackOrder() {
 
           justify-content:center;
 
-          background:#DBEAFE;
+          background:color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
 
-          color:#2563EB;
+          color:var(--season-primary, #2563eb);
 
           font-size:19px;
 
@@ -5110,6 +5120,261 @@ export default function TrackOrder() {
 
           }
 
+        }
+
+        /* =====================================================
+           KONAN SHOPPING — RESPONSIVE & iOS SAFARI FINAL LAYER
+           ===================================================== */
+        .track-order-page,
+        .track-order-page * { box-sizing: border-box; }
+
+        .track-order-page {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
+          padding-top: max(12px, env(safe-area-inset-top));
+          padding-right: max(12px, env(safe-area-inset-right));
+          padding-bottom: max(18px, env(safe-area-inset-bottom));
+          padding-left: max(12px, env(safe-area-inset-left));
+          overflow-x: clip;
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .track-order-page button,
+        .track-order-page a {
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .track-order-page img,
+        .track-order-page svg { max-width: 100%; }
+
+        .track-order-page section,
+        .track-order-page main,
+        .track-order-page header,
+        .track-order-page .track-content,
+        .track-order-page .track-header,
+        .track-order-page .status-card { min-width: 0; }
+
+        .track-order-page .map-container {
+          width: 100%;
+          height: clamp(280px, 52vh, 460px);
+          height: clamp(280px, 52svh, 460px);
+          min-height: 280px;
+          max-height: 620px;
+          overflow: hidden;
+          isolation: isolate;
+          -webkit-transform: translateZ(0);
+        }
+
+        .track-order-page .leaflet-container {
+          width: 100%;
+          height: 100%;
+          min-height: 100%;
+          font-family: inherit;
+          touch-action: pan-x pan-y;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .track-order-page .leaflet-control-zoom a {
+          min-width: 40px;
+          min-height: 40px;
+          line-height: 40px !important;
+          touch-action: manipulation;
+        }
+
+        .track-order-page .header-title,
+        .track-order-page .status-top > div:last-child,
+        .track-order-page .map-header > div:first-child,
+        .track-order-page .driver-info,
+        .track-order-page .no-driver-card > div:last-child,
+        .track-order-page .address-card > div:last-child,
+        .track-order-page .info-footer > div {
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+
+        .track-order-page .product-row { min-width: 0; }
+
+        .track-order-page .product-price,
+        .track-order-page .total-row strong,
+        .track-order-page .grand-total strong { overflow-wrap: anywhere; }
+
+        .track-order-page .gps-info {
+          min-width: 0;
+          flex-wrap: wrap;
+        }
+
+        .track-order-page .gps-info span {
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+
+        .track-order-page .qr-wrapper svg {
+          display: block;
+          width: min(100%, 230px);
+          height: auto;
+        }
+
+        .track-loading,
+        .track-error {
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
+          padding-top: max(20px, env(safe-area-inset-top));
+          padding-right: max(16px, env(safe-area-inset-right));
+          padding-bottom: max(20px, env(safe-area-inset-bottom));
+          padding-left: max(16px, env(safe-area-inset-left));
+          overflow-x: clip;
+        }
+
+        .track-loading *,
+        .track-error * { box-sizing: border-box; }
+
+        .loading-card,
+        .error-card {
+          min-width: 0;
+          max-width: 100%;
+          overflow-wrap: anywhere;
+        }
+
+        .track-error button {
+          min-height: 46px;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        @media (max-width: 380px) {
+          .track-order-page {
+            padding-right: max(7px, env(safe-area-inset-right));
+            padding-left: max(7px, env(safe-area-inset-left));
+          }
+          .track-order-page .track-header { gap: 7px; padding: 9px; }
+          .track-order-page .header-icon { width: 36px; height: 36px; }
+          .track-order-page .header-title strong { font-size: 12px; }
+          .track-order-page .header-status { width: 34px; height: 34px; }
+          .track-order-page .status-card { padding: 11px; }
+          .track-order-page .progress-points { gap: 2px; }
+          .track-order-page .point span {
+            max-width: 100%;
+            font-size: 7px;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+          }
+          .track-order-page .map-container {
+            height: 48vh;
+            height: 48svh;
+            min-height: 270px;
+          }
+          .track-order-page .product-row { gap: 6px; padding: 6px; }
+          .track-order-page .product-price { max-width: 82px; font-size: 9px; }
+          .track-order-page .total-row > div { align-items: flex-start; }
+        }
+
+        @media (max-width: 767px) {
+          .track-order-page .track-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+          }
+          .track-order-page .map-card,
+          .track-order-page .metrics-grid,
+          .track-order-page .driver-card,
+          .track-order-page .no-driver-card,
+          .track-order-page .order-card,
+          .track-order-page .address-card,
+          .track-order-page .qr-card,
+          .track-order-page .gps-info,
+          .track-order-page .info-footer {
+            width: 100%;
+            min-width: 0;
+          }
+          .track-order-page .map-container {
+            height: clamp(280px, 50vh, 430px);
+            height: clamp(280px, 50svh, 430px);
+            min-height: 280px;
+          }
+          .track-order-page .metrics-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .track-order-page .driver-main { min-width: 0; }
+          .track-order-page .call-driver { min-height: 48px; }
+          .track-order-page .qr-card { padding-right: 12px; padding-left: 12px; }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .track-order-page { padding: 16px; }
+          .track-order-page .track-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+          }
+          .track-order-page .map-container {
+            height: clamp(360px, 55vh, 520px);
+            min-height: 360px;
+          }
+          .track-order-page .metrics-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
+        }
+
+        @media (min-width: 1024px) {
+          .track-order-page { padding: 20px; }
+          .track-order-page .track-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(300px, 0.9fr);
+            align-items: start;
+            gap: 16px;
+          }
+          .track-order-page .map-card { grid-column: 1; grid-row: 1 / span 4; }
+          .track-order-page .metrics-grid,
+          .track-order-page .driver-card,
+          .track-order-page .no-driver-card,
+          .track-order-page .order-card,
+          .track-order-page .address-card,
+          .track-order-page .qr-card { grid-column: 2; }
+          .track-order-page .gps-info,
+          .track-order-page .info-footer { grid-column: 1 / -1; }
+          .track-order-page .map-container {
+            height: min(620px, 65vh);
+            min-height: 420px;
+          }
+        }
+
+        @media (max-width: 900px) and (orientation: landscape) {
+          .track-order-page .map-container {
+            height: 68vh;
+            height: 68svh;
+            min-height: 230px;
+            max-height: 390px;
+          }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+          .track-order-page .back-button,
+          .track-order-page .call-driver,
+          .track-error button { min-height: 46px; }
+          .track-order-page .leaflet-control-zoom a {
+            width: 42px !important;
+            height: 42px !important;
+            line-height: 42px !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .track-order-page *,
+          .track-loading *,
+          .track-error * {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
         }
 
       `}</style>

@@ -86,7 +86,7 @@ return (
 
     background:
 
-      "linear-gradient(135deg,#4B2E83,#2563EB)",
+      "linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 
 
     borderRadius:
@@ -121,7 +121,7 @@ return (
 
     boxShadow:
 
-      "0 8px 22px rgba(37,99,235,.15)",
+      "0 8px 22px color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent)",
 
   }}
 
@@ -536,7 +536,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 }}
 
@@ -684,7 +684,7 @@ height:"42px",
 
 borderRadius:"12px",
 
-background:"linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+background:"linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 7%, white),color-mix(in srgb, var(--season-primary, #2563eb) 15%, white))",
 
 display:"flex",
 
@@ -701,7 +701,7 @@ alignItems:"center",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 fontSize:"18px",
 
@@ -824,7 +824,7 @@ height:"42px",
 
 borderRadius:"12px",
 
-background:"linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+background:"linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 7%, white),color-mix(in srgb, var(--season-primary, #2563eb) 15%, white))",
 
 display:"flex",
 
@@ -841,7 +841,7 @@ alignItems:"center",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 fontSize:"18px",
 
@@ -974,7 +974,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
           fontSize: "20px",
 
@@ -1038,7 +1038,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color: "#2563EB",
+              color: "var(--season-primary, #2563eb)",
 
               marginTop: "3px",
 
@@ -1131,7 +1131,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
           fontSize: "20px",
 
@@ -1195,7 +1195,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color: "#2563EB",
+              color: "var(--season-primary, #2563eb)",
 
               marginTop: "3px",
 
@@ -1306,7 +1306,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
           fontSize: "20px",
 
@@ -1368,7 +1368,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color:"#2563EB",
+              color:"var(--season-primary, #2563eb)",
 
               marginTop:"3px",
 
@@ -1461,7 +1461,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color:"#2563EB",
+          color:"var(--season-primary, #2563eb)",
 
           fontSize:"20px",
 
@@ -1523,7 +1523,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color:"#2563EB",
+              color:"var(--season-primary, #2563eb)",
 
               marginTop:"3px",
 
@@ -1616,7 +1616,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color:"#2563EB",
+          color:"var(--season-primary, #2563eb)",
 
           fontSize:"20px",
 
@@ -1678,7 +1678,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color:"#2563EB",
+              color:"var(--season-primary, #2563eb)",
 
               marginTop:"3px",
 
@@ -1787,7 +1787,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
           fontSize: "20px",
 
@@ -1849,7 +1849,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
             style={{
 
-              color:"#2563EB",
+              color:"var(--season-primary, #2563eb)",
 
               marginTop:"3px",
 
@@ -1942,7 +1942,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color:"#2563EB",
+          color:"var(--season-primary, #2563eb)",
 
           fontSize:"20px",
 
@@ -2072,7 +2072,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
       style={{
 
-        color: "#2563EB",
+        color: "var(--season-primary, #2563eb)",
 
         fontSize: "20px",
 
@@ -2186,7 +2186,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
           style={{
 
-            color: "#2563EB",
+            color: "var(--season-primary, #2563eb)",
 
 
             marginTop: "3px",
@@ -2285,7 +2285,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
         style={{
 
-          color:"#2563EB",
+          color:"var(--season-primary, #2563eb)",
 
           fontSize:"20px",
 
@@ -2337,7 +2337,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
     style={{
 
-      background:"linear-gradient(135deg,#2563EB,#4B2E83)",
+      background:"linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6))",
 
       borderRadius:window.innerWidth<768?"18px":"24px",
 
@@ -2347,7 +2347,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
       textAlign:"center",
 
-      boxShadow:"0 10px 28px rgba(37,99,235,.18)",
+      boxShadow:"0 10px 28px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
     }}
 
@@ -2488,7 +2488,7 @@ Nous communiquons clairement les informations concernant nos produits, nos prix,
 
           background:"#FFFFFF",
 
-          color:"#2563EB",
+          color:"var(--season-primary, #2563eb)",
 
           fontWeight:"800",
 

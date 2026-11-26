@@ -483,7 +483,7 @@ function Orders() {
   return (
 
     <div
-
+      className="konan-orders-page"
       style={{
 
         minHeight: "100vh",
@@ -501,18 +501,263 @@ function Orders() {
       }}
 
     >
+      <style>{`
+        .konan-orders-page,
+        .konan-orders-page * {
+          box-sizing: border-box;
+        }
+
+        .konan-orders-page {
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          min-height: 100vh;
+          min-height: 100svh;
+          overflow-x: clip;
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+          padding-bottom: max(15px, env(safe-area-inset-bottom));
+        }
+
+        .konan-orders-page button {
+          font: inherit;
+          touch-action: manipulation;
+          -webkit-appearance: none;
+          appearance: none;
+        }
+
+        .konan-orders-page h1,
+        .konan-orders-page h2,
+        .konan-orders-page h3,
+        .konan-orders-page p,
+        .konan-orders-page span,
+        .konan-orders-page strong {
+          overflow-wrap: anywhere;
+          word-break: normal;
+        }
+
+        .konan-orders-header {
+          min-width: 0;
+          padding-top: max(20px, env(safe-area-inset-top)) !important;
+        }
+
+        .konan-order-card {
+          min-width: 0;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .konan-order-customer {
+          min-width: 0;
+          flex: 1 1 220px;
+        }
+
+        .konan-order-customer p {
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+
+        .konan-order-product {
+          min-width: 0;
+          gap: 12px;
+        }
+
+        .konan-order-product > span {
+          min-width: 0;
+          flex: 1 1 auto;
+        }
+
+        .konan-order-product > strong {
+          flex: 0 0 auto;
+          text-align: right;
+        }
+
+        .konan-order-actions {
+          min-width: 0;
+        }
+
+        .konan-order-action-button {
+          min-height: 46px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          white-space: normal;
+          text-align: center;
+          max-width: 100%;
+        }
+
+        @media (max-width: 767px) {
+          .konan-orders-page {
+            padding: 12px 12px max(18px, env(safe-area-inset-bottom)) !important;
+          }
+
+          .konan-orders-header {
+            padding: max(18px, env(safe-area-inset-top)) 16px 18px !important;
+            border-radius: 18px !important;
+            margin-bottom: 16px !important;
+          }
+
+          .konan-orders-header > div {
+            align-items: flex-start !important;
+            gap: 11px !important;
+          }
+
+          .konan-orders-header svg {
+            flex: 0 0 auto;
+          }
+
+          .konan-order-card {
+            padding: 15px !important;
+            margin-bottom: 14px !important;
+            border-radius: 18px !important;
+          }
+
+          .konan-order-client {
+            align-items: flex-start !important;
+            gap: 12px !important;
+          }
+
+          .konan-order-customer {
+            flex-basis: 100%;
+            width: 100%;
+          }
+
+          .konan-order-customer h2 {
+            font-size: 18px !important;
+            line-height: 1.35;
+          }
+
+          .konan-order-customer p {
+            align-items: flex-start !important;
+            font-size: 14px;
+            line-height: 1.5;
+          }
+
+          .konan-order-client > div:last-child {
+            align-self: flex-start;
+            max-width: 100%;
+            white-space: normal;
+          }
+
+          .konan-order-product {
+            align-items: flex-start !important;
+            padding: 11px !important;
+          }
+
+          .konan-order-product > strong {
+            max-width: 45%;
+            white-space: normal;
+          }
+
+          .konan-order-total {
+            align-items: flex-start !important;
+          }
+
+          .konan-order-total h2 {
+            font-size: clamp(20px, 6vw, 25px);
+          }
+
+          .konan-order-actions {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 9px !important;
+          }
+
+          .konan-order-action-button {
+            width: 100%;
+            min-width: 0;
+            min-height: 48px;
+            padding: 11px 9px !important;
+            border-radius: 12px !important;
+            font-size: 13px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .konan-orders-page {
+            padding-left: 9px !important;
+            padding-right: 9px !important;
+          }
+
+          .konan-order-card {
+            padding: 12px !important;
+          }
+
+          .konan-order-actions {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .konan-order-action-button {
+            min-height: 46px;
+          }
+
+          .konan-order-product {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 5px;
+          }
+
+          .konan-order-product > strong {
+            max-width: 100%;
+            text-align: left;
+          }
+        }
+
+        @media (max-width: 320px) {
+          .konan-orders-header h1 {
+            font-size: 19px !important;
+          }
+
+          .konan-orders-header svg {
+            font-size: 25px !important;
+          }
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+          .konan-orders-page {
+            padding-top: 10px !important;
+          }
+
+          .konan-orders-header {
+            padding-top: max(12px, env(safe-area-inset-top)) !important;
+          }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .konan-order-action-button {
+            transition: filter 150ms ease, transform 150ms ease;
+          }
+
+          .konan-order-action-button:hover {
+            filter: brightness(1.06);
+            transform: translateY(-1px);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .konan-orders-page *,
+          .konan-orders-page *::before,
+          .konan-orders-page *::after {
+            scroll-behavior: auto !important;
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+          }
+        }
+      `}</style>
 
       {/* HEADER */}
 
 
 
       <div
-
+        className="konan-orders-header"
         style={{
 
           background:
 
-            "linear-gradient(135deg,#2563EB,#1D4ED8)",
+            "linear-gradient(135deg,var(--season-primary, #2563eb),color-mix(in srgb, var(--season-primary, #2563eb) 78%, #000))",
 
 
 
@@ -534,7 +779,7 @@ function Orders() {
 
           boxShadow:
 
-            "0 10px 30px rgba(37,99,235,0.15)",
+            "0 10px 30px color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent)",
 
         }}
 
@@ -631,7 +876,7 @@ function Orders() {
       {orders.map((order) => (
 
         <div
-
+          className="konan-order-card"
           key={order._id}
 
           style={{
@@ -702,7 +947,7 @@ function Orders() {
 
           >
 
-            <div>
+            <div className="konan-order-customer">
 
               <h2
 
@@ -742,7 +987,7 @@ function Orders() {
 
                   style={{
 
-                    color: "#2563EB",
+                    color: "var(--season-primary, #2563eb)",
 
                   }}
 
@@ -862,7 +1107,7 @@ function Orders() {
 
                     : order.status === "En livraison"
 
-                    ? "#DBEAFE"
+                    ? "color-mix(in srgb, var(--season-primary, #2563eb) 16%, white)"
 
                     : "#FEF3C7",
 
@@ -876,7 +1121,7 @@ function Orders() {
 
                     : order.status === "En livraison"
 
-                    ? "#2563EB"
+                    ? "var(--season-primary, #2563eb)"
 
                     : "#92400E",
 
@@ -961,7 +1206,7 @@ function Orders() {
             order.products.map((item, index) => (
 
               <div
-
+                className="konan-order-product"
                 key={index}
 
                 style={{
@@ -1024,7 +1269,7 @@ function Orders() {
 
                   style={{
 
-                    color: "#2563EB",
+                    color: "var(--season-primary, #2563eb)",
 
                   }}
 
@@ -1045,7 +1290,7 @@ function Orders() {
 
 
           <div
-
+            className="konan-order-total"
             style={{
 
               marginTop: "20px",
@@ -1157,7 +1402,7 @@ function Orders() {
 
 
           <div
-
+            className="konan-order-actions"
             style={{
 
               marginTop: "18px",
@@ -1179,6 +1424,7 @@ function Orders() {
           >
 
             <button
+              className="konan-order-action-button"
 
               type="button"
 
@@ -1202,7 +1448,7 @@ function Orders() {
 
                 background:
 
-                  "linear-gradient(135deg,#2563EB,#1D4ED8)",
+                  "linear-gradient(135deg,var(--season-primary, #2563eb),color-mix(in srgb, var(--season-primary, #2563eb) 78%, #000))",
 
 
 
@@ -1247,6 +1493,7 @@ function Orders() {
 
 
             <button
+              className="konan-order-action-button"
 
               type="button"
 

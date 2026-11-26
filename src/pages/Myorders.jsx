@@ -1,229 +1,58 @@
 import {
-
-
-
   useEffect,
-
-
-
   useState,
-
-
-
 } from "react";
-
-
-
-
-
-
-
 import axios from "axios";
-
-
-
-
-
-
-
 import {
-
-
-
   useNavigate,
-
-
-
 } from "react-router-dom";
-
-
-
-
-
-
-
 import {
-
-
-
   FaBoxOpen,
-
-
-
   FaTruck,
-
-
-
   FaCheckCircle,
-
-
-
   FaTimesCircle,
-
-
-
   FaClipboardList,
-
-
-
   FaEye,
-
-
-
   FaChevronDown,
-
-
-
   FaHeadset,
-
-
-
   FaShieldAlt,
-
-
-
    FaClock
-
-
-
 } from "react-icons/fa";
-
-
-
-
-
-
-
 import {
-
-
-
   MdLocalShipping,
-
-
-
 } from "react-icons/md";
-
-
-
 import PendingOrders from "./PendingOrders";
-
 // URL publique du backend. Peut être remplacée par VITE_API_BASE_URL dans .env.
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || "https://konanshopping.com"
 ).replace(/\/+$/, "");
 const API_TIMEOUT = 15000;
-
-
-
-
-
-
-
 function MyOrders() {
-
-
-
-
-
-
-
   const [orders, setOrders] =
-
-
-
     useState([]);
-
-
-
-
-
-
-
   const [
-
-
-
     recommendedProducts,
-
-
-
     setRecommendedProducts,
-
-
-
   ] = useState([]);
-
-
-
-
-
-
-
   const [filter, setFilter] =
-
-
-
     useState("Tous");
-
-
-
-
-
-
-
   const navigate =
-
-
-
     useNavigate();
-
-
-
-
-
-
-
   useEffect(() => {
-
     let mounted = true;
-
-
-
     const getStoredUser = () => {
-
       try {
-
         const rawUser = localStorage.getItem("user");
-
         if (!rawUser) return null;
-
-
-
         const parsedUser = JSON.parse(rawUser);
-
-
-
         if (!parsedUser || typeof parsedUser !== "object") {
-
           return null;
-
         }
-
-
-
         return parsedUser;
-
       } catch {
-
         return null;
-
       }
-
     };
-
-
-
     // ======================================================
     // 🔐 AUTHENTIFICATION UTILISATEUR PAR COOKIE HTTPONLY
     // ======================================================
@@ -231,9 +60,7 @@ function MyOrders() {
     // Le navigateur envoie automatiquement le cookie HttpOnly.
     // La logique métier de la page reste inchangée.
     // ======================================================
-
     axios.defaults.withCredentials = true;
-
     const api = axios.create({
       baseURL: API_BASE_URL,
       timeout: API_TIMEOUT,
@@ -242,22 +69,17 @@ function MyOrders() {
         Accept: "application/json",
       },
     });
-
     api.interceptors.request.use((config) => {
       if (!config) return config;
-
       config.withCredentials = true;
       config.headers = config.headers || {};
       config.headers.Accept = "application/json";
-
       return config;
     });
-
     api.interceptors.response.use(
       (response) => response,
       (error) => {
         const status = error?.response?.status;
-
         // 401 : l'authentification est absente ou invalide.
         // On conserve ici le comportement existant de reconnexion.
         if (status === 401) {
@@ -266,12 +88,10 @@ function MyOrders() {
           } catch {
             // Ignore localStorage errors.
           }
-
           if (mounted) {
             navigate("/login", { replace: true });
           }
         }
-
         // 403 : le serveur refuse cette ressource, mais cela ne signifie
         // pas nécessairement que la session du client a expiré.
         // On ne supprime donc pas ses données de session et on ne le redirige pas.
@@ -281,22 +101,18 @@ function MyOrders() {
             error?.response?.data?.message || "Autorisation insuffisante."
           );
         }
-
         return Promise.reject(error);
       }
     );
-
     // LOAD SESSION AND ORDERS
     // La session serveur/cookie est la source prioritaire. localStorage
     // n'est utilisé qu'en secours pour compatibilité avec l'ancien frontend.
     const loadOrders = async () => {
       try {
         let sessionUser = null;
-
         try {
           const sessionResponse = await api.get("/api/auth/session");
           const sessionData = sessionResponse?.data;
-
           if (sessionData?.authenticated && sessionData?.type === "user") {
             sessionUser = sessionData.user || null;
           }
@@ -308,9 +124,7 @@ function MyOrders() {
             );
           }
         }
-
         if (!mounted) return;
-
         const storedUser = getStoredUser();
         const userId = String(
           sessionUser?._id ||
@@ -319,6691 +133,1256 @@ function MyOrders() {
           storedUser?.id ||
           ""
         ).trim();
-
         if (!userId) {
           if (mounted) navigate("/login", { replace: true });
           return;
         }
-
         const response = await api.get(
           `/api/my-orders/${encodeURIComponent(userId)}`
         );
-
         if (!mounted) return;
-
         const data = Array.isArray(response.data)
           ? response.data
           : Array.isArray(response.data?.orders)
             ? response.data.orders
             : [];
-
         setOrders(data);
       } catch (err) {
         if (!mounted) return;
-
         if (import.meta.env?.DEV) {
           console.warn(
             "Chargement des commandes impossible :",
             err?.response?.status || err?.message || "Erreur réseau"
           );
         }
-
         setOrders([]);
       }
     };
-
     loadOrders();
-
     // LOAD PRODUCTS
-
     api
-
       .get("/api/products")
-
       .then((res) => {
-
         if (!mounted) return;
-
-
-
         const products = Array.isArray(res.data)
-
           ? res.data
-
           : Array.isArray(res.data?.products)
-
             ? res.data.products
-
             : [];
-
-
-
         setRecommendedProducts(products.slice(0, 8));
-
       })
-
       .catch((err) => {
-
         if (!mounted) return;
-
-
-
         if (import.meta.env?.DEV) {
-
           console.warn(
-
             "Chargement des produits impossible :",
-
             err?.response?.status || err?.message || "Erreur réseau"
-
           );
-
         }
-
-
-
         setRecommendedProducts([]);
-
       });
-
-
-
     return () => {
-
       mounted = false;
-
     };
-
   }, [navigate]);
-
-
-
   // FILTERS
-
-
-
-
-
-
-
   const filteredOrders =
-
-
-
     filter === "Tous"
-
-
-
       ? orders
-
-
-
       : orders.filter(
-
-
-
           (order) =>
-
-
-
             order.status ===
-
-
-
             filter
-
-
-
         );
-
-
-
-
-
-
-
   // STATS
-
-
-
-
-
-
-
   const pendingOrders =
-
-
-
     orders.filter(
-
-
-
       (o) =>
-
-
-
         o.status ===
-
-
-
         "En attente"
-
-
-
     ).length;
-
-
-
-
-
-
-
   const shippedOrders =
-
-
-
     orders.filter(
-
-
-
       (o) =>
-
-
-
         o.status ===
-
-
-
         "En livraison"
-
-
-
     ).length;
-
-
-
-
-
-
-
   const deliveredOrders =
-
-
-
     orders.filter(
-
-
-
       (o) =>
-
-
-
         o.status ===
-
-
-
         "Livrée"
-
-
-
     ).length;
-
-
-
-
-
-
-
   const cancelledOrders =
-
-
-
     orders.filter(
-
-
-
       (o) =>
-
-
-
         o.status ===
-
-
-
         "Annulée"
-
-
-
     ).length;
-
-
-
-
-
-
-
   // STATUS STYLE
-
-
-
-
-
-
-
   const getStatusStyle =
-
-
-
     (status) => {
-
-
-
-
-
-
-
       switch (status) {
-
-
-
-
-
-
-
         case "Livrée":
-
-
-
           return {
-
-
-
             background:
-
-
-
               "#DCFCE7",
-
-
-
             color:
-
-
-
               "#16A34A",
-
-
-
           };
-
-
-
-
-
-
-
         case "En livraison":
-
-
-
           return {
-
-
-
             background:
-
-
-
-              "#DBEAFE",
-
-
-
+              "color-mix(in srgb, var(--season-primary, #2563eb) 14%, white)",
             color:
-
-
-
-              "#2563EB",
-
-
-
+              "var(--season-primary, #2563eb)",
           };
-
-
-
-
-
-
-
         case "Annulée":
-
-
-
           return {
-
-
-
             background:
-
-
-
               "#FEE2E2",
-
-
-
             color:
-
-
-
               "#DC2626",
-
-
-
           };
-
-
-
-
-
-
-
         default:
-
-
-
           return {
-
-
-
             background:
-
-
-
               "#FEF3C7",
-
-
-
             color:
-
-
-
               "#D97706",
-
-
-
           };
-
-
-
-
-
-
-
       }
-
-
-
-
-
-
-
     };
-
-
-
-
-
-
-
  return (
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background: "#F8FAFC",
-
-
-
-
-
-
-
       minHeight: "100vh",
-
-
-
-
-
-
-
       width: "100%",
-
-
-
-
-
-
-
       maxWidth: "100vw",
-
-
-
-
-
-
-
       overflowX: "hidden",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "20px",
-
-
-
-
-
-
-
       boxSizing: "border-box",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
      {/* HERO */}
-
-
-
-
-
-
-
 <div
-
-
-
   style={{
-
-
-
     background:
-
-
-
       "linear-gradient(135deg,#FFFFFF,#F8FAFC)",
-
-
-
-
-
-
-
     border:
-
-
-
       "1px solid #E5E7EB",
-
-
-
-
-
-
-
     borderRadius: "24px",
-
-
-
-
-
-
-
     padding:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "18px"
-
-
-
         : "30px",
-
-
-
-
-
-
-
     display: "flex",
-
-
-
-
-
-
-
     alignItems: "center",
-
-
-
-
-
-
-
     gap:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "14px"
-
-
-
         : "22px",
-
-
-
-
-
-
-
     marginBottom: "20px",
-
-
-
-
-
-
-
     boxShadow:
-
-
-
       "0 10px 30px rgba(0,0,0,0.05)",
-
-
-
   }}
-
-
-
 >
-
-
-
-
-
-
-
   {/* ICÔNE */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       width:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "65px"
-
-
-
           : "85px",
-
-
-
-
-
-
-
       height:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "65px"
-
-
-
           : "85px",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       background:
-
-
-
-        "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-
-
-
-
-
-
+        "linear-gradient(135deg,var(--season-primary, #2563eb),color-mix(in srgb, var(--season-primary, #2563eb) 78%, #000))",
       display: "flex",
-
-
-
-
-
-
-
       justifyContent: "center",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       flexShrink: 0,
-
-
-
-
-
-
-
       boxShadow:
-
-
-
-        "0 10px 25px rgba(37,99,235,0.20)",
-
-
-
+        "0 10px 25px color-mix(in srgb, var(--season-primary, #2563eb) 20%, transparent)",
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <FaBoxOpen
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "28px"
-
-
-
             : "38px",
-
-
-
-
-
-
-
         color: "#fff",
-
-
-
       }}
-
-
-
     />
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
   {/* TEXTE */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       flex: 1,
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <h1
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "30px"
-
-
-
             : "58px",
-
-
-
-
-
-
-
         fontWeight: "900",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
-
-
-
-
         lineHeight: 1.1,
-
-
-
       }}
-
-
-
     >
-
-
-
       Mes commandes
-
-
-
     </h1>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "14px"
-
-
-
             : "16px",
-
-
-
-
-
-
-
         marginTop: "8px",
-
-
-
-
-
-
-
         marginBottom: 0,
-
-
-
-
-
-
-
         lineHeight: "1.5",
-
-
-
       }}
-
-
-
     >
-
-
-
       Suivez vos achats, livraisons et
-
-
-
       commandes Konan Shopping en temps réel.
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {/* STATS */}
-
-
-
-
-
-
-
 <div
-
-
-
   style={{
-
-
-
     display: "grid",
-
-
-
-
-
-
-
     gridTemplateColumns:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "repeat(2,1fr)"
-
-
-
         : "repeat(5,1fr)",
-
-
-
-
-
-
-
     gap:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "10px"
-
-
-
         : "16px",
-
-
-
-
-
-
-
     marginTop: "10px",
-
-
-
   }}
-
-
-
 >
-
-
-
-
-
-
-
   {/* TOTAL */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
-
-
-
-
       border:
-
-
-
         "1px solid #EEF2F7",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "12px"
-
-
-
           : "18px",
-
-
-
-
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "14px",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       minHeight:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "85px"
-
-
-
           : "105px",
-
-
-
-
-
-
-
       boxShadow:
-
-
-
         "0 6px 18px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         width:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         height:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
-        background: "#EEF2FF",
-
-
-
-
-
-
-
+        background: "color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexShrink: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaClipboardList
-
-
-
         style={{
-
-
-
-          color: "#2563EB",
-
-
-
-
-
-
-
+          color: "var(--season-primary, #2563eb)",
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "18px"
-
-
-
               : "24px",
-
-
-
         }}
-
-
-
       />
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     <div>
-
-
-
-
-
-
-
       <h2
-
-
-
         style={{
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "24px"
-
-
-
               : "30px",
-
-
-
-
-
-
-
           fontWeight: "900",
-
-
-
-
-
-
-
           color: "#111827",
-
-
-
-
-
-
-
           margin: 0,
-
-
-
-
-
-
-
           lineHeight: 1,
-
-
-
         }}
-
-
-
       >
-
-
-
         {orders.length}
-
-
-
       </h2>
-
-
-
-
-
-
-
       <p
-
-
-
         style={{
-
-
-
           color: "#6B7280",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "12px"
-
-
-
               : "13px",
-
-
-
-
-
-
-
           marginTop: "6px",
-
-
-
-
-
-
-
           marginBottom: 0,
-
-
-
-
-
-
-
           fontWeight: "500",
-
-
-
         }}
-
-
-
       >
-
-
-
         Total commandes
-
-
-
       </p>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
   {/* PENDING */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
-
-
-
-
       border:
-
-
-
         "1px solid #EEF2F7",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "12px"
-
-
-
           : "18px",
-
-
-
-
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "14px",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       minHeight:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "85px"
-
-
-
           : "105px",
-
-
-
-
-
-
-
       boxShadow:
-
-
-
         "0 6px 18px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         width:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         height:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
         background: "#FEF3C7",
-
-
-
-
-
-
-
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexShrink: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaClock
-
-
-
         style={{
-
-
-
           color: "#D97706",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "18px"
-
-
-
               : "24px",
-
-
-
         }}
-
-
-
       />
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     <div>
-
-
-
-
-
-
-
       <h2
-
-
-
         style={{
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "24px"
-
-
-
               : "30px",
-
-
-
-
-
-
-
           fontWeight: "900",
-
-
-
-
-
-
-
           color: "#111827",
-
-
-
-
-
-
-
           margin: 0,
-
-
-
-
-
-
-
           lineHeight: 1,
-
-
-
         }}
-
-
-
       >
-
-
-
         {pendingOrders}
-
-
-
       </h2>
-
-
-
-
-
-
-
       <p
-
-
-
         style={{
-
-
-
           color: "#6B7280",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "12px"
-
-
-
               : "13px",
-
-
-
-
-
-
-
           marginTop: "6px",
-
-
-
-
-
-
-
           marginBottom: 0,
-
-
-
-
-
-
-
           fontWeight: "500",
-
-
-
         }}
-
-
-
       >
-
-
-
         En attente
-
-
-
       </p>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
   {/* SHIPPED */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
-
-
-
-
       border:
-
-
-
         "1px solid #EEF2F7",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "12px"
-
-
-
           : "18px",
-
-
-
-
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "14px",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       minHeight:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "85px"
-
-
-
           : "105px",
-
-
-
-
-
-
-
       boxShadow:
-
-
-
         "0 6px 18px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         width:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         height:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
-        background: "#DBEAFE",
-
-
-
-
-
-
-
+        background: "color-mix(in srgb, var(--season-primary, #2563eb) 14%, white)",
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexShrink: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaTruck
-
-
-
         style={{
-
-
-
-          color: "#2563EB",
-
-
-
-
-
-
-
+          color: "var(--season-primary, #2563eb)",
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "18px"
-
-
-
               : "24px",
-
-
-
         }}
-
-
-
       />
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     <div>
-
-
-
-
-
-
-
       <h2
-
-
-
         style={{
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "24px"
-
-
-
               : "30px",
-
-
-
-
-
-
-
           fontWeight: "900",
-
-
-
-
-
-
-
           color: "#111827",
-
-
-
-
-
-
-
           margin: 0,
-
-
-
-
-
-
-
           lineHeight: 1,
-
-
-
         }}
-
-
-
       >
-
-
-
         {shippedOrders}
-
-
-
       </h2>
-
-
-
-
-
-
-
       <p
-
-
-
         style={{
-
-
-
           color: "#6B7280",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "12px"
-
-
-
               : "13px",
-
-
-
-
-
-
-
           marginTop: "6px",
-
-
-
-
-
-
-
           marginBottom: 0,
-
-
-
-
-
-
-
           fontWeight: "500",
-
-
-
         }}
-
-
-
       >
-
-
-
         En livraison
-
-
-
       </p>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
   {/* DELIVERED */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
-
-
-
-
       border:
-
-
-
         "1px solid #EEF2F7",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "12px"
-
-
-
           : "18px",
-
-
-
-
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "14px",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       minHeight:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "85px"
-
-
-
           : "105px",
-
-
-
-
-
-
-
       boxShadow:
-
-
-
         "0 6px 18px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         width:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         height:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
         background: "#DCFCE7",
-
-
-
-
-
-
-
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexShrink: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaCheckCircle
-
-
-
         style={{
-
-
-
           color: "#16A34A",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "18px"
-
-
-
               : "24px",
-
-
-
         }}
-
-
-
       />
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     <div>
-
-
-
-
-
-
-
       <h2
-
-
-
         style={{
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "24px"
-
-
-
               : "30px",
-
-
-
-
-
-
-
           fontWeight: "900",
-
-
-
-
-
-
-
           color: "#111827",
-
-
-
-
-
-
-
           margin: 0,
-
-
-
-
-
-
-
           lineHeight: 1,
-
-
-
         }}
-
-
-
       >
-
-
-
         {deliveredOrders}
-
-
-
       </h2>
-
-
-
-
-
-
-
       <p
-
-
-
         style={{
-
-
-
           color: "#6B7280",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "12px"
-
-
-
               : "13px",
-
-
-
-
-
-
-
           marginTop: "6px",
-
-
-
-
-
-
-
           marginBottom: 0,
-
-
-
-
-
-
-
           fontWeight: "500",
-
-
-
         }}
-
-
-
       >
-
-
-
         Livrées
-
-
-
       </p>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
-
-
-
-
   {/* CANCELLED */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
-
-
-
-
       border:
-
-
-
         "1px solid #EEF2F7",
-
-
-
-
-
-
-
       borderRadius: "18px",
-
-
-
-
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "12px"
-
-
-
           : "18px",
-
-
-
-
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "10px"
-
-
-
           : "14px",
-
-
-
-
-
-
-
       alignItems: "center",
-
-
-
-
-
-
-
       minHeight:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "85px"
-
-
-
           : "105px",
-
-
-
-
-
-
-
       boxShadow:
-
-
-
         "0 6px 18px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         width:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         height:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "42px"
-
-
-
             : "52px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
         background: "#FEE2E2",
-
-
-
-
-
-
-
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexShrink: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaTimesCircle
-
-
-
         style={{
-
-
-
           color: "#DC2626",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "18px"
-
-
-
               : "24px",
-
-
-
         }}
-
-
-
       />
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     <div>
-
-
-
-
-
-
-
       <h2
-
-
-
         style={{
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "24px"
-
-
-
               : "30px",
-
-
-
-
-
-
-
           fontWeight: "900",
-
-
-
-
-
-
-
           color: "#111827",
-
-
-
-
-
-
-
           margin: 0,
-
-
-
-
-
-
-
           lineHeight: 1,
-
-
-
         }}
-
-
-
       >
-
-
-
         {cancelledOrders}
-
-
-
       </h2>
-
-
-
-
-
-
-
       <p
-
-
-
         style={{
-
-
-
           color: "#6B7280",
-
-
-
-
-
-
-
           fontSize:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "12px"
-
-
-
               : "13px",
-
-
-
-
-
-
-
           marginTop: "6px",
-
-
-
-
-
-
-
           marginBottom: 0,
-
-
-
-
-
-
-
           fontWeight: "500",
-
-
-
         }}
-
-
-
       >
-
-
-
         Annulées
-
-
-
       </p>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {/* FILTERS */}
-
-
-
-
-
-
-
 <div
-
-
-
   style={{
-
-
-
     marginTop: "12px",
-
-
-
-
-
-
-
     marginBottom:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "28px"
-
-
-
         : "35px",
-
-
-
-
-
-
-
     overflowX: "auto",
-
-
-
-
-
-
-
     scrollbarWidth: "none",
-
-
-
-
-
-
-
     msOverflowStyle: "none",
-
-
-
   }}
-
-
-
 >
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       display: "flex",
-
-
-
-
-
-
-
       gap: "10px",
-
-
-
-
-
-
-
       flexWrap: "nowrap",
-
-
-
-
-
-
-
       minWidth: "max-content",
-
-
-
-
-
-
-
       paddingBottom: "4px",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     {[
-
-
-
       {
-
-
-
         name: "Tous",
-
-
-
         count: orders.length,
-
-
-
       },
-
-
-
-
-
-
-
 {
-
-
-
   name: "En attente",
-
-
-
   count: pendingOrders,
-
-
-
 },
-
-
-
-
-
-
-
       {
-
-
-
         name: "En livraison",
-
-
-
         count: shippedOrders,
-
-
-
       },
-
-
-
-
-
-
-
       {
-
-
-
         name: "Livrée",
-
-
-
         count: deliveredOrders,
-
-
-
       },
-
-
-
-
-
-
-
       {
-
-
-
         name: "Annulée",
-
-
-
         count: cancelledOrders,
-
-
-
       },
-
-
-
-
-
-
-
     ].map((item) => (
-
-
-
-
-
-
-
       <button
-
-
-
         key={item.name}
-
-
-
-
-
-
-
         onClick={() =>
-
-
-
           setFilter(item.name)
-
-
-
         }
-
-
-
-
-
-
-
         style={{
-
-
-
           border:
-
-
-
             filter === item.name
-
-
-
               ? "none"
-
-
-
               : "1px solid #E5E7EB",
-
-
-
-
-
-
-
           padding:
-
-
-
             window.innerWidth < 768
-
-
-
               ? "10px 16px"
-
-
-
               : "14px 22px",
-
-
-
-
-
-
-
           borderRadius: "14px",
-
-
-
-
-
-
-
           fontWeight: "700",
-
-
-
-
-
-
-
           cursor: "pointer",
-
-
-
-
-
-
-
           background:
-
-
-
             filter === item.name
-
-
-
-              ? "#2563EB"
-
-
-
+              ? "var(--season-primary, #2563eb)"
               : "#FFFFFF",
-
-
-
-
-
-
-
           color:
-
-
-
             filter === item.name
-
-
-
               ? "white"
-
-
-
               : "#111827",
-
-
-
-
-
-
-
           boxShadow:
-
-
-
             filter === item.name
-
-
-
-              ? "0 8px 20px rgba(37,99,235,0.18)"
-
-
-
+              ? "0 8px 20px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)"
               : "0 4px 12px rgba(0,0,0,0.04)",
-
-
-
-
-
-
-
           whiteSpace: "nowrap",
-
-
-
-
-
-
-
           flexShrink: 0,
-
-
-
-
-
-
-
           transition: "all .25s ease",
-
-
-
         }}
-
-
-
       >
-
-
-
-
-
-
-
         <div
-
-
-
           style={{
-
-
-
             display: "flex",
-
-
-
-
-
-
-
             alignItems: "center",
-
-
-
-
-
-
-
             gap: "8px",
-
-
-
           }}
-
-
-
         >
-
-
-
-
-
-
-
           <span>
-
-
-
             {item.name}
-
-
-
           </span>
-
-
-
-
-
-
-
           <div
-
-
-
             style={{
-
-
-
               background:
-
-
-
                 filter === item.name
-
-
-
                   ? "rgba(255,255,255,0.2)"
-
-
-
                   : "#EEF2F7",
-
-
-
-
-
-
-
               color:
-
-
-
                 filter === item.name
-
-
-
                   ? "#FFFFFF"
-
-
-
                   : "#475569",
-
-
-
-
-
-
-
               padding: "3px 8px",
-
-
-
-
-
-
-
               borderRadius: "20px",
-
-
-
-
-
-
-
               fontSize: "12px",
-
-
-
-
-
-
-
               fontWeight: "800",
-
-
-
             }}
-
-
-
           >
-
-
-
             {item.count}
-
-
-
           </div>
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
       </button>
-
-
-
-
-
-
-
     ))}
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
      {/* TABLE */}
-
-
-
-
-
-
-
 <div
-
-
-
   style={{
-
-
-
     background: "#FFFFFF",
-
-
-
-
-
-
-
     borderRadius: "24px",
-
-
-
-
-
-
-
     overflow: "hidden",
-
-
-
-
-
-
-
     border: "1px solid #EEF2F7",
-
-
-
-
-
-
-
     boxShadow:
-
-
-
       "0 10px 30px rgba(0,0,0,0.04)",
-
-
-
   }}
-
-
-
 >
-
-
-
-
-
-
-
   {/* HEADER */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       padding:
-
-
-
         window.innerWidth < 768
-
-
-
           ? "18px"
-
-
-
           : "24px",
-
-
-
-
-
-
-
       borderBottom:
-
-
-
         "1px solid #F1F5F9",
-
-
-
-
-
-
-
       background:
-
-
-
         "linear-gradient(180deg,#FFFFFF,#FAFAFA)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <h2
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "20px"
-
-
-
             : "28px",
-
-
-
-
-
-
-
         fontWeight: "900",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Historique de vos commandes
-
-
-
     </h2>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize: "13px",
-
-
-
-
-
-
-
         marginTop: "6px",
-
-
-
-
-
-
-
         marginBottom: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Consultez toutes vos commandes et leur statut en temps réel.
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
   {filteredOrders.map((order, index) => (
-
-
-
-
-
-
-
   <div
-
-
-
     key={index}
-
-
-
     style={{
-
-
-
       background: "#FFFFFF",
-
-
-
       border: "1px solid #EEF2F7",
-
-
-
       borderRadius: "20px",
-
-
-
       padding: "16px",
-
-
-
       marginBottom: "16px",
-
-
-
       boxShadow: "0 4px 15px rgba(0,0,0,0.04)",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     {/* HEADER */}
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         display: "flex",
-
-
-
         justifyContent: "space-between",
-
-
-
         alignItems: "center",
-
-
-
         marginBottom: "16px",
-
-
-
         flexWrap: "wrap",
-
-
-
         gap: "10px",
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <div
-
-
-
         style={{
-
-
-
-          background: "#EEF2FF",
-
-
-
-          color: "#2563EB",
-
-
-
+          background: "color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
+          color: "var(--season-primary, #2563eb)",
           padding: "8px 14px",
-
-
-
           borderRadius: "999px",
-
-
-
           fontSize: "12px",
-
-
-
           fontWeight: "800",
-
-
-
         }}
-
-
-
       >
-
-
-
         Commande #{order._id.slice(-8)}
-
-
-
       </div>
-
-
-
-
-
-
-
       <div
-
-
-
         style={{
-
-
-
           ...getStatusStyle(order.status),
-
-
-
-
-
-
-
           padding: "8px 12px",
-
-
-
-
-
-
-
           borderRadius: "999px",
-
-
-
-
-
-
-
           fontSize: "12px",
-
-
-
-
-
-
-
           fontWeight: "700",
-
-
-
-
-
-
-
           display: "flex",
-
-
-
-
-
-
-
           alignItems: "center",
-
-
-
-
-
-
-
           gap: "6px",
-
-
-
         }}
-
-
-
       >
-
-
-
-
-
-
-
         {order.status === "Livrée" ? (
-
-
-
           <FaCheckCircle />
-
-
-
         ) : order.status === "En livraison" ? (
-
-
-
           <FaTruck />
-
-
-
         ) : (
-
-
-
           <FaTimesCircle />
-
-
-
         )}
-
-
-
-
-
-
-
         {order.status}
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     {/* PRODUITS */}
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         display: "flex",
-
-
-
         flexDirection: "column",
-
-
-
         gap: "12px",
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       {(order.items || []).map((item, i) => (
-
-
-
-
-
-
-
         <div
-
-
-
           key={i}
-
-
-
           style={{
-
-
-
             display: "flex",
-
-
-
             alignItems: "center",
-
-
-
             gap: "12px",
-
-
-
             padding: "12px",
-
-
-
             borderRadius: "14px",
-
-
-
             background: "#F8FAFC",
-
-
-
             border: "1px solid #EEF2F7",
-
-
-
           }}
-
-
-
         >
-
-
-
-
-
-
-
           <img
-
-
-
             src={
-
-
-
               item.image?.includes("localhost:5000")
-
-
-
                 ? item.image.replace(
-
-
-
-                    "http\://localhost:5000",
-
-
-
+                    "http://localhost:5000",
                     "https://konanshopping.com/api/"
-
-
-
                   )
-
-
-
                 : item.image || "/logo.jpg"
-
-
-
             }
-
-
-
-
-
-
-
             alt={item.name}
-
-
-
-
-
-
-
             onError={(e) => {
-
-
-
               e.target.src = "/logo.jpg";
-
-
-
             }}
-
-
-
-
-
-
-
             style={{
-
-
-
               width: "70px",
-
-
-
               height: "70px",
-
-
-
               borderRadius: "12px",
-
-
-
               objectFit: "cover",
-
-
-
               border: "1px solid #E5E7EB",
-
-
-
               flexShrink: 0,
-
-
-
             }}
-
-
-
           />
-
-
-
-
-
-
-
           <div
-
-
-
             style={{
-
-
-
               flex: 1,
-
-
-
             }}
-
-
-
           >
-
-
-
-
-
-
-
             <h3
-
-
-
               style={{
-
-
-
                 margin: 0,
-
-
-
                 color: "#111827",
-
-
-
                 fontSize: "14px",
-
-
-
                 fontWeight: "700",
-
-
-
               }}
-
-
-
             >
-
-
-
               {item.name}
-
-
-
             </h3>
-
-
-
-
-
-
-
             <p
-
-
-
               style={{
-
-
-
                 margin: "6px 0",
-
-
-
                 color: "#6B7280",
-
-
-
                 fontSize: "13px",
-
-
-
               }}
-
-
-
             >
-
-
-
               Quantité : {item.quantity}
-
-
-
             </p>
-
-
-
-
-
-
-
             <div
-
-
-
               style={{
-
-
-
-                color: "#2563EB",
-
-
-
+                color: "var(--season-primary, #2563eb)",
                 fontWeight: "800",
-
-
-
                 fontSize: "15px",
-
-
-
               }}
-
-
-
             >
-
-
-
               {item.price} FCFA
-
-
-
             </div>
-
-
-
-
-
-
-
           </div>
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
       ))}
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     {/* INFOS COMMANDE */}
-
-
-
-
-
-
-
     <div
-
-
-
       style={{
-
-
-
         marginTop: "16px",
-
-
-
-
-
-
-
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "space-between",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         flexWrap: "wrap",
-
-
-
-
-
-
-
         gap: "10px",
-
-
-
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <div>
-
-
-
-
-
-
-
         <p
-
-
-
           style={{
-
-
-
             margin: 0,
-
-
-
             color: "#94A3B8",
-
-
-
             fontSize: "12px",
-
-
-
           }}
-
-
-
         >
-
-
-
           Date
-
-
-
         </p>
-
-
-
-
-
-
-
         <strong>
-
-
-
           {new Date(
-
-
-
             order.createdAt
-
-
-
           ).toLocaleDateString(
-
-
-
             "fr-FR",
-
-
-
             {
-
-
-
               day: "numeric",
-
-
-
               month: "long",
-
-
-
               year: "numeric",
-
-
-
             }
-
-
-
           )}
-
-
-
         </strong>
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
       <div
-
-
-
         style={{
-
-
-
           textAlign: "right",
-
-
-
         }}
-
-
-
       >
-
-
-
-
-
-
-
         <p
-
-
-
           style={{
-
-
-
             margin: 0,
-
-
-
             color: "#94A3B8",
-
-
-
             fontSize: "12px",
-
-
-
           }}
-
-
-
         >
-
-
-
           Total
-
-
-
         </p>
-
-
-
-
-
-
-
         <h2
-
-
-
           style={{
-
-
-
             margin: 0,
-
-
-
-            color: "#2563EB",
-
-
-
+            color: "var(--season-primary, #2563eb)",
             fontWeight: "900",
-
-
-
             fontSize: "24px",
-
-
-
           }}
-
-
-
         >
-
-
-
           {order.total} FCFA
-
-
-
         </h2>
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
     {/* BOUTON */}
-
-
-
-
-
-
-
     <button
-
-
-
       onClick={() =>
-
-
-
         navigate(
-
-
-
           `/track-order/${order._id}`
-
-
-
         )
-
-
-
       }
-
-
-
-
-
-
-
       style={{
-
-
-
         width: "100%",
-
-
-
-
-
-
-
         marginTop: "18px",
-
-
-
-
-
-
-
         border: "none",
-
-
-
-
-
-
-
         background:
-
-
-
-          "linear-gradient(135deg,#2563EB,#1D4ED8)",
-
-
-
-
-
-
-
+          "linear-gradient(135deg,var(--season-primary, #2563eb),color-mix(in srgb, var(--season-primary, #2563eb) 78%, #000))",
         color: "#FFFFFF",
-
-
-
-
-
-
-
         padding: "13px",
-
-
-
-
-
-
-
         borderRadius: "14px",
-
-
-
-
-
-
-
         fontWeight: "700",
-
-
-
-
-
-
-
         cursor: "pointer",
-
-
-
-
-
-
-
         display: "flex",
-
-
-
-
-
-
-
         justifyContent: "center",
-
-
-
-
-
-
-
         alignItems: "center",
-
-
-
-
-
-
-
         gap: "8px",
-
-
-
-
-
-
-
         boxShadow:
-
-
-
-          "0 8px 20px rgba(37,99,235,0.20)",
-
-
-
+          "0 8px 20px color-mix(in srgb, var(--season-primary, #2563eb) 20%, transparent)",
       }}
-
-
-
     >
-
-
-
-
-
-
-
       <FaEye />
-
-
-
-
-
-
-
       Voir les détails
-
-
-
-
-
-
-
     </button>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
 ))}
-
-
-
-
-
-
-
       {/* FOOTER */}
-
-
-
-
-
-
-
 <div
-
-
-
   style={{
-
-
-
     marginTop: "24px",
-
-
-
-
-
-
-
     background: "#FFFFFF",
-
-
-
-
-
-
-
     border: "1px solid #EEF2F7",
-
-
-
-
-
-
-
     borderRadius: "20px",
-
-
-
-
-
-
-
     padding:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "16px"
-
-
-
         : "24px",
-
-
-
-
-
-
-
     display: "grid",
-
-
-
-
-
-
-
     gridTemplateColumns:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "repeat(2,1fr)"
-
-
-
         : "repeat(4,1fr)",
-
-
-
-
-
-
-
     gap:
-
-
-
       window.innerWidth < 768
-
-
-
         ? "14px"
-
-
-
         : "20px",
-
-
-
-
-
-
-
     boxShadow:
-
-
-
       "0 8px 25px rgba(0,0,0,0.04)",
-
-
-
   }}
-
-
-
 >
-
-
-
-
-
-
-
   {/* PAIEMENT */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       textAlign: "center",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <FaShieldAlt
-
-
-
       style={{
-
-
-
-        color: "#2563EB",
-
-
-
-
-
-
-
+        color: "var(--season-primary, #2563eb)",
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "22px"
-
-
-
             : "28px",
-
-
-
-
-
-
-
         marginBottom: "8px",
-
-
-
       }}
-
-
-
     />
-
-
-
-
-
-
-
     <h3
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "13px"
-
-
-
             : "15px",
-
-
-
-
-
-
-
         fontWeight: "700",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         marginBottom: "4px",
-
-
-
       }}
-
-
-
     >
-
-
-
       Paiement sécurisé
-
-
-
     </h3>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "11px"
-
-
-
             : "13px",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Transactions protégées
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
   {/* LIVRAISON */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       textAlign: "center",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <FaTruck
-
-
-
       style={{
-
-
-
-        color: "#2563EB",
-
-
-
-
-
-
-
+        color: "var(--season-primary, #2563eb)",
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "22px"
-
-
-
             : "28px",
-
-
-
-
-
-
-
         marginBottom: "8px",
-
-
-
       }}
-
-
-
     />
-
-
-
-
-
-
-
     <h3
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "13px"
-
-
-
             : "15px",
-
-
-
-
-
-
-
         fontWeight: "700",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         marginBottom: "4px",
-
-
-
       }}
-
-
-
     >
-
-
-
       Livraison rapide
-
-
-
     </h3>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "11px"
-
-
-
             : "13px",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Partout au Cameroun
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
   {/* SUPPORT */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       textAlign: "center",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <FaHeadset
-
-
-
       style={{
-
-
-
-        color: "#2563EB",
-
-
-
-
-
-
-
+        color: "var(--season-primary, #2563eb)",
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "22px"
-
-
-
             : "28px",
-
-
-
-
-
-
-
         marginBottom: "8px",
-
-
-
       }}
-
-
-
     />
-
-
-
-
-
-
-
     <h3
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "13px"
-
-
-
             : "15px",
-
-
-
-
-
-
-
         fontWeight: "700",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         marginBottom: "4px",
-
-
-
       }}
-
-
-
     >
-
-
-
       Support 24/7
-
-
-
     </h3>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "11px"
-
-
-
             : "13px",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Assistance premium
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
   {/* GARANTIE */}
-
-
-
-
-
-
-
   <div
-
-
-
     style={{
-
-
-
       textAlign: "center",
-
-
-
     }}
-
-
-
   >
-
-
-
-
-
-
-
     <FaCheckCircle
-
-
-
       style={{
-
-
-
         color: "#16A34A",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "22px"
-
-
-
             : "28px",
-
-
-
-
-
-
-
         marginBottom: "8px",
-
-
-
       }}
-
-
-
     />
-
-
-
-
-
-
-
     <h3
-
-
-
       style={{
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "13px"
-
-
-
             : "15px",
-
-
-
-
-
-
-
         fontWeight: "700",
-
-
-
-
-
-
-
         color: "#111827",
-
-
-
-
-
-
-
         marginBottom: "4px",
-
-
-
       }}
-
-
-
     >
-
-
-
       Satisfaction garantie
-
-
-
     </h3>
-
-
-
-
-
-
-
     <p
-
-
-
       style={{
-
-
-
         color: "#6B7280",
-
-
-
-
-
-
-
         fontSize:
-
-
-
           window.innerWidth < 768
-
-
-
             ? "11px"
-
-
-
             : "13px",
-
-
-
-
-
-
-
         margin: 0,
-
-
-
       }}
-
-
-
     >
-
-
-
       Qualité assurée
-
-
-
     </p>
-
-
-
-
-
-
-
   </div>
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
 </div>
-
-
-
-
-
-
-
 </div>
-
-
-
   );
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
 export default MyOrders;

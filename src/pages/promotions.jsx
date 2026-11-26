@@ -222,6 +222,27 @@ const normalizeProductsResponse = (data) => {
 
 function Promotions() {
 
+  // Largeur réactive : les styles se recalculent aussi après rotation sur iOS.
+  const [viewportWidth, setViewportWidth] = useState(
+    () => (typeof window !== "undefined" ? window.innerWidth : 1024)
+  );
+
+  useEffect(() => {
+    const updateViewport = () => setViewportWidth(window.innerWidth);
+
+    window.addEventListener("resize", updateViewport, { passive: true });
+    window.addEventListener("orientationchange", updateViewport, { passive: true });
+    window.visualViewport?.addEventListener("resize", updateViewport, { passive: true });
+
+    updateViewport();
+
+    return () => {
+      window.removeEventListener("resize", updateViewport);
+      window.removeEventListener("orientationchange", updateViewport);
+      window.visualViewport?.removeEventListener("resize", updateViewport);
+    };
+  }, []);
+
 
 
 
@@ -843,12 +864,8 @@ useEffect(() => {
 
 
 <div
-
-
-
+className="ks-promotions-page"
 style={{
-
-
 
 minHeight:"100vh",
 
@@ -858,7 +875,7 @@ width:"100%",
 
 
 
-background:"#F8FAFD",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 2%, white)",
 
 
 
@@ -870,7 +887,7 @@ padding:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -887,6 +904,103 @@ window.innerWidth<768
 
 
 >
+
+<style>{`
+  .ks-promotions-page {
+    box-sizing: border-box;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ks-promotions-page *,
+  .ks-promotions-page *::before,
+  .ks-promotions-page *::after {
+    box-sizing: border-box;
+  }
+
+  .ks-promotions-page img {
+    max-width: 100%;
+  }
+
+  .ks-promotions-page a,
+  .ks-promotions-page button {
+    touch-action: manipulation;
+  }
+
+  .ks-promotions-page a:focus-visible,
+  .ks-promotions-page button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--season-primary, #2563eb) 45%, transparent);
+    outline-offset: 3px;
+  }
+
+  .ks-promotions-page h1,
+  .ks-promotions-page h2,
+  .ks-promotions-page h3,
+  .ks-promotions-page p,
+  .ks-promotions-page span,
+  .ks-promotions-page b {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 767px) {
+    .ks-promotions-page {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .ks-promotions-page footer {
+      margin-bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+    .ks-promotions-page button,
+    .ks-promotions-page a {
+      -webkit-touch-callout: none;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .ks-promotions-page h1 {
+      font-size: clamp(27px, 8.5vw, 34px) !important;
+      line-height: 1.12 !important;
+    }
+    .ks-promotions-page h2 {
+      overflow-wrap: anywhere;
+    }
+    .ks-promotions-page {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 340px) {
+    .ks-promotions-page .ks-never-overflow {
+      min-width: 0;
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .ks-promotions-page {
+      min-height: 100svh;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ks-promotions-page *,
+    .ks-promotions-page *::before,
+    .ks-promotions-page *::after {
+      scroll-behavior: auto !important;
+      animation-duration: .01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
+  }
+`}</style>
+
 
 
 
@@ -938,7 +1052,7 @@ borderRadius:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -958,7 +1072,7 @@ padding:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -978,7 +1092,7 @@ boxShadow:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -986,7 +1100,7 @@ window.innerWidth<768
 
 
 
-:"0 10px 40px rgba(37,99,235,.08)",
+:"0 10px 40px color-mix(in srgb, var(--season-primary, #2563eb) 8%, transparent)",
 
 
 
@@ -1042,7 +1156,7 @@ borderRadius:"50%",
 
 
 
-background:"rgba(37,99,235,.05)",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 5%, transparent)",
 
 
 
@@ -1090,7 +1204,7 @@ borderRadius:"50%",
 
 
 
-background:"#7EA8FF",
+background:"color-mix(in srgb, var(--season-secondary, #3b82f6) 72%, white)",
 
 
 
@@ -1138,7 +1252,7 @@ borderRadius:"50%",
 
 
 
-background:"#A7C4FF",
+background:"color-mix(in srgb, var(--season-secondary, #3b82f6) 52%, white)",
 
 
 
@@ -1202,7 +1316,7 @@ fontSize:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1294,7 +1408,7 @@ flexDirection:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1310,7 +1424,7 @@ alignItems:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1330,7 +1444,7 @@ gap:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1382,7 +1496,7 @@ maxWidth:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1442,11 +1556,11 @@ borderRadius:"40px",
 
 
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1518,7 +1632,7 @@ fontSize:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1590,7 +1704,7 @@ style={{
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1650,7 +1764,7 @@ borderRadius:"20px",
 
 
 
-background:"#2563EB",
+background:"var(--season-primary, #2563eb)",
 
 
 
@@ -1690,7 +1804,7 @@ fontSize:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1710,7 +1824,7 @@ lineHeight:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -1774,7 +1888,7 @@ style={{
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1842,7 +1956,7 @@ Ne les manquez pas !
 
 
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
 
 
@@ -1862,7 +1976,7 @@ Ne les manquez pas !
 
 
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
 
 
@@ -2006,7 +2120,7 @@ Ne les manquez pas !
 
 
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
 
 
@@ -2034,7 +2148,7 @@ Ne les manquez pas !
 
 
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
 
 
@@ -2070,7 +2184,7 @@ Ne les manquez pas !
 
 
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
 
 
@@ -2110,7 +2224,7 @@ Ne les manquez pas !
 
 
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
 
 
@@ -2142,7 +2256,7 @@ Ne les manquez pas !
 
 
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
 
 
@@ -2162,7 +2276,7 @@ Ne les manquez pas !
 
 
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
 
 
@@ -2186,7 +2300,7 @@ Ne les manquez pas !
 
 
 
-          background: "#EEF4FF",
+          background: "color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 
 
@@ -2218,7 +2332,7 @@ Ne les manquez pas !
 
 
 
-          color: "#2563EB",
+          color: "var(--season-primary, #2563eb)",
 
 
 
@@ -2230,7 +2344,7 @@ Ne les manquez pas !
 
 
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
 
 
@@ -2294,7 +2408,7 @@ Ne les manquez pas !
 
 
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
 
 
@@ -2370,7 +2484,7 @@ Ne les manquez pas !
 
 
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
 
 
@@ -2386,7 +2500,7 @@ Ne les manquez pas !
 
 
 
-            color: "#2563EB",
+            color: "var(--season-primary, #2563eb)",
 
 
 
@@ -2462,7 +2576,7 @@ Ne les manquez pas !
 
 
 
-    top: window.innerWidth < 768 ? "-85px" : "-130px",
+    top: viewportWidth < 768 ? "-85px" : "-130px",
 
 
 
@@ -2470,7 +2584,7 @@ Ne les manquez pas !
 
 
 
-    right: window.innerWidth < 768 ? "-65px" : "-110px",
+    right: viewportWidth < 768 ? "-65px" : "-110px",
 
 
 
@@ -2478,7 +2592,7 @@ Ne les manquez pas !
 
 
 
-    width: window.innerWidth < 768 ? "220px" : "340px",
+    width: viewportWidth < 768 ? "220px" : "340px",
 
 
 
@@ -2486,7 +2600,7 @@ Ne les manquez pas !
 
 
 
-    height: window.innerWidth < 768 ? "220px" : "340px",
+    height: viewportWidth < 768 ? "220px" : "340px",
 
 
 
@@ -2642,15 +2756,15 @@ marginBottom:"24px",
 
 
 
-background:"linear-gradient(135deg,#0D5BFF,#2563EB)",
+background:"linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-primary, #2563eb))",
 
 
 
-borderRadius:window.innerWidth<768?"22px":"28px",
+borderRadius:viewportWidth<768?"22px":"28px",
 
 
 
-padding:window.innerWidth<768?"20px 14px":"34px",
+padding:viewportWidth<768?"20px 14px":"34px",
 
 
 
@@ -2662,7 +2776,7 @@ overflow:"hidden",
 
 
 
-boxShadow:"0 15px 35px rgba(37,99,235,.25)",
+boxShadow:"0 15px 35px color-mix(in srgb, var(--season-primary, #2563eb) 25%, transparent)",
 
 
 
@@ -2822,7 +2936,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"20px":"30px",
+fontSize:viewportWidth<768?"20px":"30px",
 
 
 
@@ -2846,11 +2960,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"42px":"48px",
+width:viewportWidth<768?"42px":"48px",
 
 
 
-height:window.innerWidth<768?"42px":"48px",
+height:viewportWidth<768?"42px":"48px",
 
 
 
@@ -2946,7 +3060,7 @@ alignItems:"center",
 
 
 
-gap:window.innerWidth<768?"6px":"18px",
+gap:viewportWidth<768?"6px":"18px",
 
 
 
@@ -3042,7 +3156,7 @@ alignItems:"center",
 
 
 
-gap:window.innerWidth<768?"6px":"12px",
+gap:viewportWidth<768?"6px":"12px",
 
 
 
@@ -3066,11 +3180,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"82px":"110px",
+width:viewportWidth<380?"68px":viewportWidth<768?"82px":"110px",
 
 
 
-height:window.innerWidth<768?"92px":"130px",
+height:viewportWidth<380?"78px":viewportWidth<768?"92px":"130px",
 
 
 
@@ -3122,7 +3236,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"38px":"64px",
+fontSize:viewportWidth<380?"32px":viewportWidth<768?"38px":"64px",
 
 
 
@@ -3130,7 +3244,7 @@ fontWeight:"900",
 
 
 
-color:"#0D5BFF",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -3178,7 +3292,7 @@ marginTop:"8px",
 
 
 
-fontSize:window.innerWidth<768?"11px":"14px",
+fontSize:viewportWidth<768?"11px":"14px",
 
 
 
@@ -3242,7 +3356,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"30px":"48px",
+fontSize:viewportWidth<768?"30px":"48px",
 
 
 
@@ -3342,7 +3456,7 @@ color:"#EAF2FF",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
@@ -3450,11 +3564,11 @@ background:"#FFFFFF",
 
 
 
-borderRadius:window.innerWidth<768?"18px":"24px",
+borderRadius:viewportWidth<768?"18px":"24px",
 
 
 
-padding:window.innerWidth<768?"14px":"20px",
+padding:viewportWidth<768?"14px":"20px",
 
 
 
@@ -3470,7 +3584,7 @@ justifyContent:"space-between",
 
 
 
-gap:window.innerWidth<768?"12px":"16px",
+gap:viewportWidth<768?"12px":"16px",
 
 
 
@@ -3526,7 +3640,7 @@ alignItems:"center",
 
 
 
-gap:window.innerWidth<768?"12px":"16px",
+gap:viewportWidth<768?"12px":"16px",
 
 
 
@@ -3566,15 +3680,15 @@ style={{
 
 
 
-width:window.innerWidth<768?"60px":"88px",
+width:viewportWidth<768?"60px":"88px",
 
 
 
-height:window.innerWidth<768?"60px":"88px",
+height:viewportWidth<768?"60px":"88px",
 
 
 
-borderRadius:window.innerWidth<768?"14px":"18px",
+borderRadius:viewportWidth<768?"14px":"18px",
 
 
 
@@ -3674,11 +3788,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"24px":"28px",
+width:viewportWidth<768?"24px":"28px",
 
 
 
-height:window.innerWidth<768?"24px":"28px",
+height:viewportWidth<768?"24px":"28px",
 
 
 
@@ -3686,7 +3800,7 @@ borderRadius:"50%",
 
 
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 
 
@@ -3722,11 +3836,11 @@ style={{
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
-fontSize:window.innerWidth<768?"12px":"14px",
+fontSize:viewportWidth<768?"12px":"14px",
 
 
 
@@ -3762,7 +3876,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"15px":"20px",
+fontSize:viewportWidth<768?"15px":"20px",
 
 
 
@@ -3818,7 +3932,7 @@ margin:0,
 
 
 
-fontSize:window.innerWidth<768?"13px":"17px",
+fontSize:viewportWidth<768?"13px":"17px",
 
 
 
@@ -3826,7 +3940,7 @@ fontWeight:"600",
 
 
 
-lineHeight:window.innerWidth<768?"20px":"30px",
+lineHeight:viewportWidth<768?"20px":"30px",
 
 
 
@@ -3890,11 +4004,11 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"14px":"19px",
+fontSize:viewportWidth<768?"14px":"19px",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -3966,7 +4080,7 @@ color:"#6B7280",
 
 
 
-fontSize:window.innerWidth<768?"11px":"14px",
+fontSize:viewportWidth<768?"11px":"14px",
 
 
 
@@ -4050,7 +4164,7 @@ alignItems:"center",
 
 
 
-paddingLeft:window.innerWidth<768?"4px":"10px",
+paddingLeft:viewportWidth<768?"4px":"10px",
 
 
 
@@ -4078,11 +4192,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"12px":"16px",
+width:viewportWidth<768?"12px":"16px",
 
 
 
-height:window.innerWidth<768?"12px":"16px",
+height:viewportWidth<768?"12px":"16px",
 
 
 
@@ -4262,11 +4376,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"34px":"40px",
+width:viewportWidth<768?"34px":"40px",
 
 
 
-height:window.innerWidth<768?"34px":"40px",
+height:viewportWidth<768?"34px":"40px",
 
 
 
@@ -4274,7 +4388,7 @@ borderRadius:"50%",
 
 
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 
 
@@ -4314,11 +4428,11 @@ style={{
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
-fontSize:window.innerWidth<768?"16px":"20px",
+fontSize:viewportWidth<768?"16px":"20px",
 
 
 
@@ -4354,7 +4468,7 @@ margin:0,
 
 
 
-fontSize:window.innerWidth<768?"20px":"32px",
+fontSize:viewportWidth<768?"20px":"32px",
 
 
 
@@ -4430,7 +4544,7 @@ gap:"6px",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -4438,7 +4552,7 @@ fontWeight:"800",
 
 
 
-fontSize:window.innerWidth<768?"13px":"16px",
+fontSize:viewportWidth<768?"13px":"16px",
 
 
 
@@ -4474,7 +4588,7 @@ transform:"rotate(180deg)",
 
 
 
-fontSize:window.innerWidth<768?"12px":"16px",
+fontSize:viewportWidth<768?"12px":"16px",
 
 
 
@@ -4530,7 +4644,7 @@ gridTemplateColumns:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -4542,7 +4656,7 @@ window.innerWidth<768
 
 
 
-gap:window.innerWidth<768?"12px":"18px",
+gap:viewportWidth<768?"12px":"18px",
 
 
 
@@ -4642,7 +4756,7 @@ background:"#FFFFFF",
 
 
 
-borderRadius:window.innerWidth<768?"16px":"24px",
+borderRadius:viewportWidth<768?"16px":"24px",
 
 
 
@@ -4730,7 +4844,7 @@ width:"100%",
 
 
 
-height:window.innerWidth<768?"145px":"280px",
+height:viewportWidth<768?"145px":"280px",
 
 
 
@@ -4778,7 +4892,7 @@ left:"10px",
 
 
 
-background:"#2563EB",
+background:"var(--season-primary, #2563eb)",
 
 
 
@@ -4786,7 +4900,7 @@ color:"#FFFFFF",
 
 
 
-padding:window.innerWidth<768?"5px 10px":"8px 14px",
+padding:viewportWidth<768?"5px 10px":"8px 14px",
 
 
 
@@ -4798,7 +4912,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"11px":"14px",
+fontSize:viewportWidth<768?"11px":"14px",
 
 
 
@@ -4858,11 +4972,11 @@ right:"10px",
 
 
 
-width:window.innerWidth<768?"34px":"46px",
+width:viewportWidth<768?"34px":"46px",
 
 
 
-height:window.innerWidth<768?"34px":"46px",
+height:viewportWidth<768?"34px":"46px",
 
 
 
@@ -4910,7 +5024,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"14px":"18px",
+fontSize:viewportWidth<768?"14px":"18px",
 
 
 
@@ -4962,7 +5076,7 @@ style={{
 
 
 
-padding:window.innerWidth<768?"12px":"18px",
+padding:viewportWidth<768?"12px":"18px",
 
 
 
@@ -4990,7 +5104,7 @@ margin:"0 0 10px",
 
 
 
-fontSize:window.innerWidth<768?"15px":"22px",
+fontSize:viewportWidth<768?"15px":"22px",
 
 
 
@@ -5086,7 +5200,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"18px":"28px",
+fontSize:viewportWidth<768?"18px":"28px",
 
 
 
@@ -5094,7 +5208,7 @@ fontWeight:"900",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -5134,7 +5248,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"12px":"18px",
+fontSize:viewportWidth<768?"12px":"18px",
 
 
 
@@ -5194,7 +5308,7 @@ width:"100%",
 
 
 
-height:window.innerWidth<768?"42px":"52px",
+height:viewportWidth<768?"42px":"52px",
 
 
 
@@ -5206,7 +5320,7 @@ borderRadius:"12px",
 
 
 
-background:"linear-gradient(135deg,#2563EB,#1D4ED8)",
+background:"linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-primary, #2563eb))",
 
 
 
@@ -5218,7 +5332,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"13px":"16px",
+fontSize:viewportWidth<768?"13px":"16px",
 
 
 
@@ -5454,11 +5568,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"36px":"42px",
+width:viewportWidth<768?"36px":"42px",
 
 
 
-height:window.innerWidth<768?"36px":"42px",
+height:viewportWidth<768?"36px":"42px",
 
 
 
@@ -5466,7 +5580,7 @@ borderRadius:"50%",
 
 
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 
 
@@ -5502,11 +5616,11 @@ style={{
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
-fontSize:window.innerWidth<768?"16px":"18px",
+fontSize:viewportWidth<768?"16px":"18px",
 
 
 
@@ -5542,7 +5656,7 @@ margin:0,
 
 
 
-fontSize:window.innerWidth<768?"22px":"34px",
+fontSize:viewportWidth<768?"22px":"34px",
 
 
 
@@ -5614,7 +5728,7 @@ gridTemplateColumns:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -5626,7 +5740,7 @@ window.innerWidth<768
 
 
 
-gap:window.innerWidth<768?"12px":"16px",
+gap:viewportWidth<768?"12px":"16px",
 
 
 
@@ -5662,7 +5776,7 @@ value:stats.users.toLocaleString(),
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -5718,7 +5832,7 @@ value:stats.downloads.toLocaleString(),
 
 
 
-color:"#7C3AED",
+color:"var(--season-secondary, #3b82f6)",
 
 
 
@@ -5782,11 +5896,11 @@ background:"#FFFFFF",
 
 
 
-borderRadius:window.innerWidth<768?"18px":"24px",
+borderRadius:viewportWidth<768?"18px":"24px",
 
 
 
-padding:window.innerWidth<768?"16px":"22px",
+padding:viewportWidth<768?"16px":"22px",
 
 
 
@@ -5822,11 +5936,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"46px":"60px",
+width:viewportWidth<768?"46px":"60px",
 
 
 
-height:window.innerWidth<768?"46px":"60px",
+height:viewportWidth<768?"46px":"60px",
 
 
 
@@ -5838,7 +5952,7 @@ borderRadius:"50%",
 
 
 
-background:`${item.color}15`,
+background:`color-mix(in srgb, ${item.color} 8%, white)`,
 
 
 
@@ -5854,7 +5968,7 @@ alignItems:"center",
 
 
 
-fontSize:window.innerWidth<768?"18px":"24px",
+fontSize:viewportWidth<768?"18px":"24px",
 
 
 
@@ -5902,7 +6016,7 @@ margin:0,
 
 
 
-fontSize:window.innerWidth<768?"20px":"28px",
+fontSize:viewportWidth<768?"20px":"28px",
 
 
 
@@ -5954,7 +6068,7 @@ marginTop:"6px",
 
 
 
-fontSize:window.innerWidth<768?"12px":"14px",
+fontSize:viewportWidth<768?"12px":"14px",
 
 
 
@@ -6074,7 +6188,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"22px":"34px",
+fontSize:viewportWidth<768?"22px":"34px",
 
 
 
@@ -6126,7 +6240,7 @@ gridTemplateColumns:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -6138,7 +6252,7 @@ window.innerWidth<768
 
 
 
-gap:window.innerWidth<768?"12px":"16px",
+gap:viewportWidth<768?"12px":"16px",
 
 
 
@@ -6170,7 +6284,7 @@ title:"Livraison rapide",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -6218,7 +6332,7 @@ title:"Paiement sécurisé",
 
 
 
-color:"#7C3AED",
+color:"var(--season-secondary, #3b82f6)",
 
 
 
@@ -6374,11 +6488,11 @@ background:"#FFFFFF",
 
 
 
-borderRadius:window.innerWidth<768?"18px":"24px",
+borderRadius:viewportWidth<768?"18px":"24px",
 
 
 
-padding:window.innerWidth<768?"16px":"22px",
+padding:viewportWidth<768?"16px":"22px",
 
 
 
@@ -6414,11 +6528,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"48px":"60px",
+width:viewportWidth<768?"48px":"60px",
 
 
 
-height:window.innerWidth<768?"48px":"60px",
+height:viewportWidth<768?"48px":"60px",
 
 
 
@@ -6430,7 +6544,7 @@ borderRadius:"50%",
 
 
 
-background:`${item.color}15`,
+background:`color-mix(in srgb, ${item.color} 8%, white)`,
 
 
 
@@ -6446,7 +6560,7 @@ alignItems:"center",
 
 
 
-fontSize:window.innerWidth<768?"18px":"24px",
+fontSize:viewportWidth<768?"18px":"24px",
 
 
 
@@ -6498,7 +6612,7 @@ fontWeight:"800",
 
 
 
-fontSize:window.innerWidth<768?"13px":"16px",
+fontSize:viewportWidth<768?"13px":"16px",
 
 
 
@@ -6586,15 +6700,15 @@ style={{
 
 
 
-background:"linear-gradient(135deg,#2563EB,#1E3A8A)",
+background:"linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6))",
 
 
 
-borderRadius:window.innerWidth<768?"20px":"30px",
+borderRadius:viewportWidth<768?"20px":"30px",
 
 
 
-padding:window.innerWidth<768?"22px 18px":"48px",
+padding:viewportWidth<768?"22px 18px":"48px",
 
 
 
@@ -6610,7 +6724,7 @@ marginBottom:"28px",
 
 
 
-boxShadow:"0 15px 35px rgba(37,99,235,.22)",
+boxShadow:"0 15px 35px color-mix(in srgb, var(--season-primary, #2563eb) 22%, transparent)",
 
 
 
@@ -6638,11 +6752,11 @@ style={{
 
 
 
-width:window.innerWidth<768?"60px":"80px",
+width:viewportWidth<768?"60px":"80px",
 
 
 
-height:window.innerWidth<768?"60px":"80px",
+height:viewportWidth<768?"60px":"80px",
 
 
 
@@ -6690,7 +6804,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"30px":"40px",
+fontSize:viewportWidth<768?"30px":"40px",
 
 
 
@@ -6734,7 +6848,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"24px":"42px",
+fontSize:viewportWidth<768?"24px":"42px",
 
 
 
@@ -6786,11 +6900,11 @@ maxWidth:"600px",
 
 
 
-lineHeight:window.innerWidth<768?"24px":"30px",
+lineHeight:viewportWidth<768?"24px":"30px",
 
 
 
-fontSize:window.innerWidth<768?"14px":"16px",
+fontSize:viewportWidth<768?"14px":"16px",
 
 
 
@@ -6862,7 +6976,7 @@ gap:"8px",
 
 
 
-padding:window.innerWidth<768?"13px 22px":"16px 30px",
+padding:viewportWidth<768?"13px 22px":"16px 30px",
 
 
 
@@ -6870,7 +6984,7 @@ background:"#FFFFFF",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -6882,7 +6996,7 @@ fontWeight:"900",
 
 
 
-fontSize:window.innerWidth<768?"14px":"16px",
+fontSize:viewportWidth<768?"14px":"16px",
 
 
 
@@ -6890,7 +7004,7 @@ borderRadius:"14px",
 
 
 
-width:window.innerWidth<768?"100%":"auto",
+width:viewportWidth<768?"100%":"auto",
 
 
 
@@ -6962,7 +7076,7 @@ marginTop:"30px",
 
 
 
-marginBottom:window.innerWidth<768?"90px":"20px",
+marginBottom:viewportWidth<768?"90px":"20px",
 
 
 
@@ -6970,11 +7084,11 @@ background:"#FFFFFF",
 
 
 
-borderRadius:window.innerWidth<768?"20px":"30px",
+borderRadius:viewportWidth<768?"20px":"30px",
 
 
 
-padding:window.innerWidth<768?"22px 16px":"40px",
+padding:viewportWidth<768?"22px 16px":"40px",
 
 
 
@@ -7054,15 +7168,15 @@ style={{
 
 
 
-width:window.innerWidth<768?"60px":"72px",
+width:viewportWidth<768?"60px":"72px",
 
 
 
-height:window.innerWidth<768?"60px":"72px",
+height:viewportWidth<768?"60px":"72px",
 
 
 
-borderRadius:window.innerWidth<768?"18px":"22px",
+borderRadius:viewportWidth<768?"18px":"22px",
 
 
 
@@ -7070,7 +7184,7 @@ objectFit:"cover",
 
 
 
-boxShadow:"0 8px 20px rgba(37,99,235,.15)",
+boxShadow:"0 8px 20px color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent)",
 
 
 
@@ -7106,7 +7220,7 @@ marginBottom:"8px",
 
 
 
-fontSize:window.innerWidth<768?"22px":"34px",
+fontSize:viewportWidth<768?"22px":"34px",
 
 
 
@@ -7170,11 +7284,11 @@ maxWidth:"520px",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
-lineHeight:window.innerWidth<768?"22px":"28px",
+lineHeight:viewportWidth<768?"22px":"28px",
 
 
 
@@ -7246,7 +7360,7 @@ gridTemplateColumns:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -7298,7 +7412,7 @@ fontWeight:"800",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -7318,7 +7432,7 @@ gap:"8px",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
@@ -7378,7 +7492,7 @@ fontWeight:"800",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -7398,7 +7512,7 @@ gap:"8px",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
@@ -7458,7 +7572,7 @@ fontWeight:"800",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -7478,7 +7592,7 @@ gap:"8px",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
@@ -7566,7 +7680,7 @@ gap:"8px",
 
 
 
-fontSize:window.innerWidth<768?"13px":"15px",
+fontSize:viewportWidth<768?"13px":"15px",
 
 
 
@@ -7634,11 +7748,11 @@ marginTop:"24px",
 
 
 
-padding:window.innerWidth<768?"16px":"18px",
+padding:viewportWidth<768?"16px":"18px",
 
 
 
-borderRadius:window.innerWidth<768?"16px":"18px",
+borderRadius:viewportWidth<768?"16px":"18px",
 
 
 
@@ -7654,7 +7768,7 @@ gridTemplateColumns:
 
 
 
-window.innerWidth<768
+viewportWidth<768
 
 
 
@@ -7714,11 +7828,11 @@ fontWeight:"800",
 
 
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
-fontSize:window.innerWidth<768?"14px":"16px",
+fontSize:viewportWidth<768?"14px":"16px",
 
 
 
@@ -7742,7 +7856,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"18px":"20px",
+fontSize:viewportWidth<768?"18px":"20px",
 
 
 
@@ -7806,7 +7920,7 @@ color:"#16A34A",
 
 
 
-fontSize:window.innerWidth<768?"14px":"16px",
+fontSize:viewportWidth<768?"14px":"16px",
 
 
 
@@ -7830,7 +7944,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"18px":"20px",
+fontSize:viewportWidth<768?"18px":"20px",
 
 
 
@@ -7894,7 +8008,7 @@ color:"#F59E0B",
 
 
 
-fontSize:window.innerWidth<768?"14px":"16px",
+fontSize:viewportWidth<768?"14px":"16px",
 
 
 
@@ -7918,7 +8032,7 @@ style={{
 
 
 
-fontSize:window.innerWidth<768?"18px":"20px",
+fontSize:viewportWidth<768?"18px":"20px",
 
 
 
@@ -8014,7 +8128,7 @@ margin:0,
 
 
 
-fontSize:window.innerWidth<768?"12px":"13px",
+fontSize:viewportWidth<768?"12px":"13px",
 
 
 
@@ -8022,7 +8136,7 @@ color:"#9CA3AF",
 
 
 
-lineHeight:window.innerWidth<768?"22px":"26px",
+lineHeight:viewportWidth<768?"22px":"26px",
 
 
 

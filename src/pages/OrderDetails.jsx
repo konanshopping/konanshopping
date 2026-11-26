@@ -201,102 +201,67 @@ export default function OrderDetails() {
 
     useState(null);
 
-
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-
-    if (!isValidObjectId(id)) {
-
-      setOrder(null);
-
-      return;
-
-    }
-
-
-
     let mounted = true;
 
+    const fetchOrder = async () => {
+      setLoading(true);
+      setLoadError(false);
 
+      if (!isValidObjectId(id)) {
+        if (mounted) {
+          setOrder(null);
+          setLoadError(true);
+          setLoading(false);
+        }
+        return;
+      }
 
-    api
-
-      .get(`/order/${encodeURIComponent(id.trim())}`)
-
-      .then((res) => {
-
+      try {
+        const res = await api.get(`/order/${encodeURIComponent(id.trim())}`);
         if (!mounted) return;
-
-
 
         const data = normalizeOrder(res?.data);
 
-
-
         if (!data) {
-
           setOrder(null);
-
+          setLoadError(true);
           return;
-
         }
-
-
 
         if (import.meta.env?.DEV) {
-
           console.debug("Order details loaded:", data._id);
-
         }
-
-
 
         setOrder(data);
-
-      })
-
-      .catch((err) => {
-
+      } catch (err) {
         if (!mounted) return;
 
-
-
         if (import.meta.env?.DEV) {
-
           console.warn(
-
             "Impossible de charger la commande.",
-
             err?.userMessage ||
-
               getSafeServerMessage(err) ||
-
               "Erreur serveur"
-
           );
-
         }
 
-
-
         setOrder(null);
-
-      });
-
-
-
-    return () => {
-
-      mounted = false;
-
+        setLoadError(true);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
 
+    fetchOrder();
+
+    return () => {
+      mounted = false;
+    };
   }, [id]);
-
-
-
-
-
 
 
  if (!order) {
@@ -315,14 +280,11 @@ export default function OrderDetails() {
 
 
 
-    <div
+    <div className="konan-order-details konan-order-details--state"
 
 
 
       style={{
-
-
-
         background: "#F5F7FB",
 
 
@@ -372,12 +334,45 @@ export default function OrderDetails() {
 
 
     >
-
-
-
-
-
-
+      <style>{`
+        .konan-order-details,
+        .konan-order-details * { box-sizing: border-box; }
+        .konan-order-details {
+          width: 100%;
+          min-height: 100vh;
+          min-height: 100svh;
+          overflow-x: clip;
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+          padding:
+            max(16px, env(safe-area-inset-top))
+            max(16px, env(safe-area-inset-right))
+            max(16px, env(safe-area-inset-bottom))
+            max(16px, env(safe-area-inset-left)) !important;
+        }
+        .konan-order-details img { max-width: 100%; }
+        .konan-order-details button {
+          min-height: 46px;
+          touch-action: manipulation;
+          -webkit-appearance: none;
+        }
+        .konan-order-details h1,
+        .konan-order-details h2,
+        .konan-order-details h3,
+        .konan-order-details p,
+        .konan-order-details span,
+        .konan-order-details strong { overflow-wrap: anywhere; }
+        @media (max-width: 600px) {
+          .konan-order-details--state > div { max-width: 100% !important; }
+        }
+        @media (max-width: 360px) {
+          .konan-order-details--state {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          }
+          .konan-order-details--state > div { padding: 18px !important; }
+        }
+      `}</style>
 
       <div
 
@@ -523,7 +518,7 @@ export default function OrderDetails() {
 
 
 
-              "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+              "linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 10%, white),color-mix(in srgb, var(--season-primary, #2563eb) 22%, white))",
 
 
 
@@ -587,7 +582,7 @@ export default function OrderDetails() {
 
 
 
-              color: "#7C3AED",
+              color: "var(--season-primary, #2563eb)",
 
 
 
@@ -655,7 +650,7 @@ export default function OrderDetails() {
 
 
 
-          Chargement...
+          {loading ? "Chargement..." : "Commande indisponible"}
 
 
 
@@ -719,7 +714,11 @@ export default function OrderDetails() {
 
 
 
-          Récupération des détails de votre commande
+          {loading
+            ? "Récupération des détails de votre commande"
+            : loadError
+              ? "Impossible d’afficher cette commande. Vérifiez le lien ou réessayez plus tard."
+              : "Récupération des détails de votre commande"}
 
 
 
@@ -783,14 +782,11 @@ export default function OrderDetails() {
 
 
 
-    <div
+    <div className="konan-order-details"
 
 
 
       style={{
-
-
-
         background: "#f5f7fb",
 
 
@@ -804,16 +800,78 @@ export default function OrderDetails() {
 
 
       }}
-
-
-
     >
-
-
-
-
-
-
+      <style>{`
+        .konan-order-details,
+        .konan-order-details * { box-sizing: border-box; }
+        .konan-order-details {
+          width: 100%;
+          min-height: 100vh;
+          min-height: 100svh;
+          overflow-x: clip;
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+          padding:
+            max(15px, env(safe-area-inset-top))
+            max(15px, env(safe-area-inset-right))
+            max(15px, env(safe-area-inset-bottom))
+            max(15px, env(safe-area-inset-left)) !important;
+        }
+        .konan-order-details > div { width: 100%; min-width: 0; }
+        .konan-order-details .konan-order-details__card {
+          width: 100%;
+          max-width: 850px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .konan-order-details img {
+          display: block;
+          max-width: 100%;
+          height: auto;
+          -webkit-user-drag: none;
+        }
+        .konan-order-details button {
+          min-height: 46px;
+          touch-action: manipulation;
+          -webkit-appearance: none;
+        }
+        .konan-order-details h1,
+        .konan-order-details h2,
+        .konan-order-details h3,
+        .konan-order-details p,
+        .konan-order-details span,
+        .konan-order-details strong { overflow-wrap: anywhere; }
+        @media (max-width: 600px) {
+          .konan-order-details {
+            padding-left: max(12px, env(safe-area-inset-left)) !important;
+            padding-right: max(12px, env(safe-area-inset-right)) !important;
+          }
+          .konan-order-details .konan-order-details__card { border-radius: 16px !important; }
+        }
+        @media (max-width: 380px) {
+          .konan-order-details {
+            padding-left: max(9px, env(safe-area-inset-left)) !important;
+            padding-right: max(9px, env(safe-area-inset-right)) !important;
+          }
+          .konan-order-details .konan-order-details__card { padding: 12px !important; }
+        }
+        @media (max-width: 340px) {
+          .konan-order-details .konan-order-details__card { padding: 10px !important; }
+          .konan-order-details button { width: 100% !important; }
+        }
+        @media (orientation: landscape) and (max-height: 500px) {
+          .konan-order-details { min-height: 100svh; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .konan-order-details *,
+          .konan-order-details *::before,
+          .konan-order-details *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+      `}</style>
 
      {/* MAIN CARD */}
 
@@ -823,7 +881,7 @@ export default function OrderDetails() {
 
 
 
-<div
+<div className="konan-order-details__card"
 
 
 
@@ -1103,7 +1161,7 @@ export default function OrderDetails() {
 
 
 
-          "linear-gradient(135deg,#EEF2FF,#DDD6FE)",
+          "linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 10%, white),color-mix(in srgb, var(--season-primary, #2563eb) 22%, white))",
 
 
 
@@ -1179,7 +1237,7 @@ export default function OrderDetails() {
 
 
 
-          color: "#7C3AED",
+          color: "var(--season-primary, #2563eb)",
 
 
 
@@ -2187,7 +2245,7 @@ export default function OrderDetails() {
 
 
 
-            background: "#F5F3FF",
+            background: "color-mix(in srgb, var(--season-primary, #2563eb) 7%, white)",
 
 
 
@@ -2195,7 +2253,7 @@ export default function OrderDetails() {
 
 
 
-            color: "#7C3AED",
+            color: "var(--season-primary, #2563eb)",
 
 
 
@@ -2587,7 +2645,7 @@ export default function OrderDetails() {
 
 
 
-          color: "#4F46E5",
+          color: "var(--season-primary, #2563eb)",
 
 
 
@@ -2907,7 +2965,7 @@ export default function OrderDetails() {
 
 
 
-          color: "#4F46E5",
+          color: "var(--season-primary, #2563eb)",
 
 
 
@@ -3059,7 +3117,7 @@ export default function OrderDetails() {
 
 
 
-        "linear-gradient(135deg,#4F46E5,#7C3AED)",
+        "linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6))",
 
 
 

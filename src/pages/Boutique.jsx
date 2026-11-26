@@ -94,8 +94,67 @@ const safeParse = (value, fallback = null) => {
   }
 };
 
-const readStoredUser = () =>
-  safeParse(localStorage.getItem("user"), {});
+const readStoredUser = () => {
+  try {
+    const user = safeParse(localStorage.getItem("user"), null);
+    return user && typeof user === "object" && isValidObjectId(String(user._id || "")) ? user : null;
+  } catch {
+    return null;
+  }
+};
+
+const getStableGuestId = () => {
+  try {
+    let id = localStorage.getItem("guestId");
+    if (!id || typeof id !== "string" || id.length > 120) {
+      id = `guest_${window.crypto?.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2)}`}`;
+      localStorage.setItem("guestId", id);
+    }
+    return id;
+  } catch {
+    return `guest_session_${Date.now()}`;
+  }
+};
+
+const getClientStorageId = () => readStoredUser()?._id || getStableGuestId();
+
+const readSafeArray = (key) => {
+  try {
+    const value = safeParse(localStorage.getItem(key), []);
+    return Array.isArray(value) ? value.filter((item) => item && typeof item === "object") : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeSafeJSON = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.warn(`Stockage local indisponible (${key})`, error);
+    return false;
+  }
+};
+
+const normalizeCart = (items) => {
+  const byId = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    if (!item || typeof item._id !== "string" || !item._id) continue;
+    const quantity = Math.max(1, Math.min(99, Math.floor(Number(item.quantity) || 1)));
+    const previous = byId.get(item._id);
+    byId.set(item._id, { ...(previous || {}), ...item, quantity: Math.min(99, quantity + (previous?.quantity || 0)) });
+  }
+  return [...byId.values()];
+};
+
+const normalizeFavorites = (items) => {
+  const byId = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    if (item && typeof item._id === "string" && item._id) byId.set(item._id, item);
+  }
+  return [...byId.values()];
+};
 
 // Authentification par cookie HttpOnly
 axios.defaults.withCredentials = true;
@@ -165,6 +224,20 @@ const selectedBrand =
 
 
   const [products, setProducts] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+  const [viewportWidth, setViewportWidth] = useState(
+    () => typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", updateViewportWidth, { passive: true });
+    window.addEventListener("orientationchange", updateViewportWidth, { passive: true });
+    return () => {
+      window.removeEventListener("resize", updateViewportWidth);
+      window.removeEventListener("orientationchange", updateViewportWidth);
+    };
+  }, []);
 
 
 
@@ -306,297 +379,61 @@ useEffect(() => {
 
 
 
-const [wishlist, setWishlist] =
+const [wishlist, setWishlist] = useState(() => readSafeArray(`favorites_${getClientStorageId()}`));
+const [cart, setCart] = useState(() => normalizeCart(readSafeArray(`cart_${getClientStorageId()}`)));
 
-  useState(() => {
-
-
-
-    const user =
-
-      readStoredUser();
-
-
-
-    const clientId =
-
-
-
-      user?._id ||
-
-
-
-      localStorage.getItem(
-
-        "guestId"
-
-      ) ||
-
-
-
-      (() => {
-
-
-
-        const newGuestId =
-
-
-
-          "guest_" +
-
-          Date.now();
-
-
-
-        localStorage.setItem(
-
-          "guestId",
-
-          newGuestId
-
-        );
-
-
-
-        return newGuestId;
-
-
-
-      })();
-
-
-
-    const favoritesKey =
-
-      `favorites_${clientId}`;
-
-
-
-    const savedWishlist =
-
-
-
-      localStorage.getItem(
-
-        favoritesKey
-
-      );
-
-
-
-    return savedWishlist
-
-      ? JSON.parse(savedWishlist)
-
-      : [];
-
-
-
-});
-
-
-
- const [cart, setCart] =
-
-  useState(() => {
-
-
-
-    const user =
-
-      readStoredUser();
-
-
-
-    const clientId =
-
-
-
-      user?._id ||
-
-
-
-      localStorage.getItem(
-
-        "guestId"
-
-      ) ||
-
-
-
-      (() => {
-
-
-
-        const newGuestId =
-
-
-
-          "guest_" +
-
-          Date.now();
-
-
-
-        localStorage.setItem(
-
-          "guestId",
-
-          newGuestId
-
-        );
-
-
-
-        return newGuestId;
-
-
-
-      })();
-
-
-
-    const cartKey =
-
-      `cart_${clientId}`;
-
-
-
-    const savedCart =
-
-
-
-      localStorage.getItem(
-
-        cartKey
-
-      );
-
-
-
-    return savedCart
-
-      ? JSON.parse(savedCart)
-
-      : [];
-
-
-
-  });
-
-
-
+  // Synchronisation avec l'accueil, la page favoris et les autres onglets.
   useEffect(() => {
-
-
-
-  const updateWishlist =
-
-    () => {
-
-
-
-      const user =
-
-
-
-        readStoredUser();
-
-
-
-      const clientId =
-
-
-
-        user?._id ||
-
-
-
-        localStorage.getItem(
-
-          "guestId"
-
-        );
-
-
-
-      const favoritesKey =
-
-        `favorites_${clientId}`;
-
-
-
-      const updatedWishlist =
-
-
-
-        JSON.parse(
-
-          localStorage.getItem(
-
-            favoritesKey
-
-          )
-
-        ) || [];
-
-
-
-      setWishlist(
-
-        [...updatedWishlist]
-
+    const refreshSharedData = () => {
+      const clientId = getClientStorageId();
+      const nextWishlist = normalizeFavorites(readSafeArray(`favorites_${clientId}`));
+      const nextCart = normalizeCart(readSafeArray(`cart_${clientId}`));
+      setWishlist((previous) =>
+        JSON.stringify(previous) === JSON.stringify(nextWishlist) ? previous : nextWishlist
       );
-
-
-
+      setCart((previous) =>
+        JSON.stringify(previous) === JSON.stringify(nextCart) ? previous : nextCart
+      );
     };
+    refreshSharedData();
+    window.addEventListener("favoritesUpdated", refreshSharedData);
+    window.addEventListener("cartUpdated", refreshSharedData);
+    window.addEventListener("storage", refreshSharedData);
+    return () => {
+      window.removeEventListener("favoritesUpdated", refreshSharedData);
+      window.removeEventListener("cartUpdated", refreshSharedData);
+      window.removeEventListener("storage", refreshSharedData);
+    };
+  }, []);
 
+  // Le compte connecté récupère aussi ses favoris conservés côté serveur.
+  useEffect(() => {
+    const user = readStoredUser();
+    if (!user?._id) return;
+    let cancelled = false;
+    apiClient.get(`/api/favorites/${user._id}`, getAuthConfig())
+      .then((response) => {
+        if (cancelled || !Array.isArray(response.data)) return;
+        const merged = normalizeFavorites([
+          ...normalizeFavorites(response.data),
+          ...readSafeArray(`favorites_${user._id}`)
+        ]);
+        writeSafeJSON(`favorites_${user._id}`, merged);
+        setWishlist(merged);
+        window.dispatchEvent(new Event("favoritesUpdated"));
 
-
-  // LOAD INITIAL
-
-
-
-  updateWishlist();
-
-
-
-  // LIVE UPDATE
-
-
-
-  window.addEventListener(
-
-    "favoritesUpdated",
-
-    updateWishlist
-
-  );
-
-
-
-  return () => {
-
-
-
-    window.removeEventListener(
-
-      "favoritesUpdated",
-
-      updateWishlist
-
-    );
-
-
-
-  };
-
-
-
-}, []);
-
-
+        // Réconcilie les favoris locaux avec le compte sans envoyer d'identifiant client.
+        Promise.allSettled(
+          merged
+            .filter((product) => isValidObjectId(product._id))
+            .map((product) =>
+              apiClient.post("/api/favorites", { productId: product._id }, getAuthConfig())
+            )
+        );
+      })
+      .catch((error) => console.warn("Synchronisation des favoris indisponible.", error));
+    return () => { cancelled = true; };
+  }, []);
 
   // TOTAL PANIER
 
@@ -621,590 +458,84 @@ const total = cart.reduce(
 
 
 const playSound = () => {
-
-  const audio = new Audio("/sounds/click.mp3");
-
-  audio.volume = 0.6;
-
-
-
-  audio.play();
-
-
-
-  navigator.vibrate(100);
-
+  try {
+    const audio = new Audio("/sounds/click.mp3");
+    audio.volume = 0.6;
+    audio.play().catch(() => {});
+    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(100);
+  } catch {
+    // Le son est facultatif et ne bloque jamais l'action.
+  }
 };
 
 
 
 const addToCart = (product) => {
-
-
-
-        playSound();
-
-
-
-  const existingProduct = cart.find(
-
-    (item) => item._id === product._id
-
-  );
-
-
-
-  if (existingProduct) {
-
-
-
-    const updatedCart = cart.map(
-
-      (item) =>
-
-
-
-        item._id === product._id
-
-
-
-          ? {
-
-              ...item,
-
-              quantity:
-
-                item.quantity + 1,
-
-            }
-
-
-
-          : item
-
+  if (!product || typeof product._id !== "string" || !product._id) return;
+  setCart((previousCart) => {
+    const current = normalizeCart(previousCart);
+    const existing = current.find((item) => item._id === product._id);
+    if (existing) return current.map((item) =>
+      item._id === product._id
+        ? { ...item, quantity: Math.min(99, (Number(item.quantity) || 1) + 1) }
+        : item
     );
-
-
-
-    setCart(updatedCart);
-
-
-
-  } else {
-
-
-
-    setCart([
-
-      ...cart,
-
-      {
-
-        ...product,
-
-        quantity: 1,
-
-        image: product.image,
-
-      },
-
-    ]);
-
-
-
-  }
-
-
-
+    return normalizeCart([...current, { ...product, quantity: 1 }]);
+  });
 };
-
-
 
 // ➕ AUGMENTER QUANTITÉ
 
 const increaseQty = (index) => {
-
-
-
-  const updatedCart = [...cart];
-
-
-
-  updatedCart[index].quantity += 1;
-
-
-
-  setCart(updatedCart);
-
-
-
+  setCart((previous) => previous.map((item, itemIndex) =>
+    itemIndex === index ? { ...item, quantity: Math.min(99, (Number(item.quantity) || 1) + 1) } : item
+  ));
 };
-
-
 
 // ➖ DIMINUER QUANTITÉ
-
 const decreaseQty = (index) => {
-
-
-
-  const updatedCart = [...cart];
-
-
-
-  if (updatedCart[index].quantity > 1) {
-
-    updatedCart[index].quantity -= 1;
-
-  }
-
-
-
-  setCart(updatedCart);
-
-
-
+  setCart((previous) => previous.map((item, itemIndex) =>
+    itemIndex === index ? { ...item, quantity: Math.max(1, (Number(item.quantity) || 1) - 1) } : item
+  ));
 };
 
-
-
-const toggleWishlist =
-
-  async (product) => {
-
-
-
-    const user =
-
-
-
-      readStoredUser();
-
-
-
-    // ======================
-
-    // IDENTIFIANT CLIENT
-
-    // ======================
-
-
-
-    const clientId =
-
-
-
-      user?._id ||
-
-
-
-      localStorage.getItem(
-
-        "guestId"
-
-      ) ||
-
-
-
-      (() => {
-
-
-
-        const newGuestId =
-
-
-
-          "guest_" +
-
-          Date.now();
-
-
-
-        localStorage.setItem(
-
-          "guestId",
-
-          newGuestId
-
-        );
-
-
-
-        return newGuestId;
-
-
-
-      })();
-
-
-
-    // ======================
-
-    // FAVORITES KEY
-
-    // ======================
-
-
-
-    const favoritesKey =
-
-      `favorites_${clientId}`;
-
-
-
-    let favorites =
-
-
-
-      JSON.parse(
-
-        localStorage.getItem(
-
-          favoritesKey
-
-        )
-
-      ) || [];
-
-
-
-    // ======================
-
-    // CHECK EXISTS
-
-    // ======================
-
-
-
-    const exists =
-
-
-
-      favorites.find(
-
-        (item) =>
-
-          item._id === product._id
-
-      );
-
-
-
-    // ======================
-
-    // REMOVE FAVORITE
-
-    // ======================
-
-
-
-    if (exists) {
-
-
-
-      favorites =
-
-
-
-        favorites.filter(
-
-          (item) =>
-
-            item._id !== product._id
-
-        );
-
-
-
-      // ======================
-
-      // DELETE SERVER
-
-      // ======================
-
-
-
-      if (user?._id) {
-
-
-
-        try {
-
-
-
-          await apiClient.delete(
-              `/api/favorites/${user._id}/${product._id}`,
-              getAuthConfig()
-            );
-
-
-
-        }
-
-
-
-        catch(err){
-
-
-
-          console.log(err);
-
-
-
-        }
-
-
-
+const toggleWishlist = async (product) => {
+  if (!product || typeof product._id !== "string" || !product._id) return;
+  const user = readStoredUser();
+  const clientId = user?._id || getStableGuestId();
+  const favoritesKey = `favorites_${clientId}`;
+  const current = normalizeFavorites(readSafeArray(favoritesKey));
+  const exists = current.some((item) => item._id === product._id);
+  const updated = exists
+    ? current.filter((item) => item._id !== product._id)
+    : normalizeFavorites([...current, product]);
+
+  writeSafeJSON(favoritesKey, updated);
+  setWishlist(updated);
+  window.dispatchEvent(new Event("favoritesUpdated"));
+
+  if (user?._id && isValidObjectId(product._id)) {
+    try {
+      if (exists) {
+        await apiClient.delete(`/api/favorites/${user._id}/${product._id}`, getAuthConfig());
+      } else {
+        await apiClient.post("/api/favorites", { productId: product._id }, getAuthConfig());
       }
-
-
-
-      // ======================
-
-      // SAVE LOCAL
-
-      // ======================
-
-
-
-      localStorage.setItem(
-
-
-
-        favoritesKey,
-
-
-
-        JSON.stringify(
-
-          favorites
-
-        )
-
-
-
-      );
-
-
-
-      // ======================
-
-      // UPDATE STATE
-
-      // ======================
-
-
-
-      setWishlist([...favorites]);
-
-
-
-      // ======================
-
-      // FAVORITES COUNT
-
-      // ======================
-
-
-
-
-
-      // ======================
-
-      // UPDATE UI
-
-      // ======================
-
-
-
-      window.dispatchEvent(
-
-        new Event("favoritesUpdated")
-
-      );
-
-
-
-      return;
-
-
-
+    } catch (error) {
+      console.warn("Synchronisation serveur des favoris impossible.", error);
     }
+  }
+};
 
-
-
-    // ======================
-
-    // ADD FAVORITE
-
-    // ======================
-
-
-
-    const alreadyAdded = favorites.some(
-
-  (item) =>
-
-    item._id === product._id
-
-);
-
-
-
-if (!alreadyAdded) {
-
-
-
-  favorites.push(product);
-
-
-
-}
-
-
-
-    // ======================
-
-    // SAVE SERVER
-
-    // ======================
-
-
-
-    if (user?._id) {
-
-
-
-      try {
-
-
-
-        await apiClient.post(
-          "/api/favorites",
-          {
-            userId: user._id,
-            productId: product._id,
-          },
-          getAuthConfig()
-        );
-
-
-
-      }
-
-
-
-      catch(err){
-
-
-
-        console.log(err);
-
-
-
-      }
-
-
-
-    }
-
-
-
-    // ======================
-
-    // SAVE LOCAL
-
-    // ======================
-
-
-
-    localStorage.setItem(
-
-
-
-      favoritesKey,
-
-
-
-      JSON.stringify(
-
-        favorites
-
-      )
-
-
-
-    );
-
-
-
-    // ======================
-
-    // UPDATE STATE
-
-    // ======================
-
-
-
-    setWishlist([...favorites]);
-
-
-
-    // ======================
-
-    // FAVORITES COUNT
-
-    // ======================
-
-
-
-    // ======================
-
-    // UPDATE UI
-
-    // ======================
-
-
-
-    window.dispatchEvent(
-
-      new Event("favoritesUpdated")
-
-    );
-
-
-
-  };
-
-
-
-  // SUPPRIMER PANIER
+// SUPPRIMER PANIER
 
 
 
   const removeFromCart = (indexToRemove) => {
+  setCart((previous) => previous.filter((_, index) => index !== indexToRemove));
+};
 
-
-
-    const updatedCart = cart.filter(
-
-      (_, index) =>
-
-        index !== indexToRemove
-
-    );
-
-
-
-    setCart(updatedCart);
-
-
-
-  };
-
-
-
-  // RECUP PRODUITS
+// RECUP PRODUITS
 
 
 
@@ -1234,7 +565,8 @@ if (!alreadyAdded) {
 
         setProducts([]);
 
-      });
+      })
+      .finally(() => setIsLoadingProducts(false));
 
 
 
@@ -1244,153 +576,25 @@ if (!alreadyAdded) {
 
  // ==============================
 
-// SAVE PANIER CLIENT
-
 // ==============================
-
-
-
+// SAUVEGARDE ET SYNCHRONISATION PANIER
+// ==============================
 useEffect(() => {
-
-
-
-  const user =
-
-
-
-    readStoredUser();
-
-
-
-  const clientId =
-
-
-
-    user?._id ||
-
-
-
-    localStorage.getItem(
-
-      "guestId"
-
-    );
-
-
-
-  const cartKey =
-
-    `cart_${clientId}`;
-
-
-
-  localStorage.setItem(
-
-
-
-    cartKey,
-
-
-
-    JSON.stringify(cart)
-
-
-
-  );
-
-
-
-  localStorage.setItem(
-
-
-
-    "cartCount",
-
-
-
-    cart.length
-
-
-
-  );
-
-
-
-  window.dispatchEvent(
-
-    new Event("cartUpdated")
-
-  );
-
-
-
+  const clientId = getClientStorageId();
+  const normalizedCart = normalizeCart(cart);
+  writeSafeJSON(`cart_${clientId}`, normalizedCart);
+  try { localStorage.setItem("cartCount", String(normalizedCart.length)); } catch {}
+  window.dispatchEvent(new Event("cartUpdated"));
 }, [cart]);
 
-
-
 // ==============================
-
-// SAVE FAVORIS CLIENT
-
+// SAUVEGARDE ET SYNCHRONISATION FAVORIS
 // ==============================
-
-
-
 useEffect(() => {
-
-
-
-  const user =
-
-
-
-    readStoredUser();
-
-
-
-  const clientId =
-
-
-
-    user?._id ||
-
-
-
-    localStorage.getItem(
-
-      "guestId"
-
-    );
-
-
-
-  const favoritesKey =
-
-    `favorites_${clientId}`;
-
-
-
-  localStorage.setItem(
-
-
-
-    favoritesKey,
-
-
-
-    JSON.stringify(wishlist)
-
-
-
-  );
-
-
-
+  writeSafeJSON(`favorites_${getClientStorageId()}`, normalizeFavorites(wishlist));
 }, [wishlist]);
 
-
-
-  // PRODUITS SIMILAIRES
+// PRODUITS SIMILAIRES
 
 
 
@@ -1540,6 +744,15 @@ const displayedProducts =
 
     : randomProducts;
 
+  const productsPerHorizontalRow = Math.max(2, Math.ceil(viewportWidth / 380) * 2);
+  const productRows = useMemo(() => {
+    const rows = [];
+    for (let index = 0; index < displayedProducts.length; index += productsPerHorizontalRow) {
+      rows.push(displayedProducts.slice(index, index + productsPerHorizontalRow));
+    }
+    return rows;
+  }, [displayedProducts, productsPerHorizontalRow]);
+
 
 
   return (
@@ -1547,6 +760,54 @@ const displayedProducts =
 
 
       <>
+    <style>{`
+      @keyframes konanBoutiqueSpin { to { transform: rotate(360deg); } }
+      .konan-boutique-spinner {
+        width: 42px; height: 42px;
+        border: 4px solid rgba(91,108,255,.16);
+        border-top-color: #5b6cff; border-right-color: #7c4dff;
+        border-radius: 50%; animation: konanBoutiqueSpin .8s linear infinite;
+        flex: 0 0 auto;
+      }
+      .konan-products-horizontal-row {
+        display: flex; flex-wrap: nowrap; gap: clamp(12px, 2vw, 22px);
+        width: 100%; overflow-x: auto; overflow-y: hidden;
+        padding: 5px 2px 16px; box-sizing: border-box;
+        -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+        touch-action: pan-x pan-y; scroll-snap-type: x proximity;
+        scrollbar-width: none;
+      }
+      .konan-products-horizontal-row::-webkit-scrollbar { display: none; }
+      .konan-product-link {
+        display: block;
+        flex: 0 0 clamp(300px, 30vw, 380px);
+        width: clamp(300px, 30vw, 380px);
+        min-width: 0;
+        scroll-snap-align: start;
+        box-sizing: border-box;
+      }
+      @media (min-width: 768px) and (max-width: 1100px) {
+        .konan-product-link {
+          flex-basis: 42vw;
+          width: 42vw;
+        }
+      }
+      @media (max-width: 767px) {
+        .konan-product-link {
+          flex-basis: min(86vw, 360px);
+          width: min(86vw, 360px);
+        }
+      }
+      @media (max-width: 380px) {
+        .konan-product-link {
+          flex-basis: 88vw;
+          width: 88vw;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .konan-boutique-spinner { animation-duration: 1.8s; }
+      }
+    `}</style>
 
     <SeoBreadcrumb
 
@@ -1588,13 +849,13 @@ const displayedProducts =
 
     background:
 
-      "linear-gradient(135deg,#f8fafc,#eef2ff)",
+      "var(--season-page, linear-gradient(135deg,#f8fafc,#eef2ff))",
 
 
 
     padding:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "8px"
 
@@ -1630,7 +891,7 @@ const displayedProducts =
 
     borderRadius:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "18px"
 
@@ -1640,7 +901,7 @@ const displayedProducts =
 
     padding:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "8px 10px"
 
@@ -1666,7 +927,7 @@ const displayedProducts =
 
     gap:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "8px"
 
@@ -1752,7 +1013,7 @@ const displayedProducts =
 
           width:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "38px"
 
@@ -1762,7 +1023,7 @@ const displayedProducts =
 
           height:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "38px"
 
@@ -1852,7 +1113,7 @@ const displayedProducts =
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
                 ? "15px"
 
@@ -1908,7 +1169,7 @@ const displayedProducts =
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
                 ? "9px"
 
@@ -1975,12 +1236,11 @@ const displayedProducts =
         flex: 1,
 
         maxWidth:
-
-          window.innerWidth < 768
-
-            ? "150px"
-
-            : "240px",
+          viewportWidth < 380
+            ? "95px"
+            : viewportWidth < 768
+              ? "130px"
+              : "240px",
 
       }}
 
@@ -2000,7 +1260,7 @@ const displayedProducts =
 
           transform: "translateY(-50%)",
 
-          color: "#9CA3AF",
+          color: "var(--season-muted, #9CA3AF)",
 
           fontSize: "13px",
 
@@ -2052,7 +1312,7 @@ const displayedProducts =
 
           border:
 
-            "1px solid #E5E7EB",
+            "1px solid var(--season-border, #E5E7EB)",
 
 
 
@@ -2062,7 +1322,7 @@ const displayedProducts =
 
           fontSize:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "12px"
 
@@ -2076,7 +1336,7 @@ const displayedProducts =
 
           background:
 
-            "linear-gradient(135deg,#FFFFFF,#F9FAFB)",
+            "var(--season-surface, linear-gradient(135deg,#FFFFFF,#F9FAFB))",
 
 
 
@@ -2102,13 +1362,13 @@ const displayedProducts =
 
           e.target.style.border =
 
-            "1px solid #5B6CFF";
+            "1px solid var(--season-primary, #5B6CFF)";
 
 
 
           e.target.style.boxShadow =
 
-            "0 8px 20px rgba(91,108,255,.15)";
+            "0 8px 20px var(--season-glow, rgba(91,108,255,.15))";
 
 
 
@@ -2122,7 +1382,7 @@ const displayedProducts =
 
           e.target.style.border =
 
-            "1px solid #E5E7EB";
+            "1px solid var(--season-border, #E5E7EB)";
 
 
 
@@ -2176,7 +1436,7 @@ const displayedProducts =
 
         width:
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
             ? "40px"
 
@@ -2186,7 +1446,7 @@ const displayedProducts =
 
         height:
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
             ? "40px"
 
@@ -2222,7 +1482,7 @@ const displayedProducts =
 
         fontSize:
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
             ? "16px"
 
@@ -2270,7 +1530,7 @@ const displayedProducts =
 
           width:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "18px"
 
@@ -2280,7 +1540,7 @@ const displayedProducts =
 
           height:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "18px"
 
@@ -2412,7 +1672,7 @@ const displayedProducts =
 
         justifyContent: "space-between",
 
-        gap: window.innerWidth < 768 ? "10px" : "18px",
+        gap: viewportWidth < 768 ? "10px" : "18px",
 
         width: "100%",
 
@@ -2468,7 +1728,7 @@ const displayedProducts =
 
 
 
-          height: window.innerWidth < 768 ? "46px" : "50px",
+          height: viewportWidth < 768 ? "46px" : "50px",
 
 
 
@@ -2480,7 +1740,7 @@ const displayedProducts =
 
 
 
-          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+          fontSize: viewportWidth < 768 ? "14px" : "15px",
 
 
 
@@ -2556,7 +1816,7 @@ const displayedProducts =
 
           background:
 
-            "linear-gradient(135deg,#5B6CFF,#7C4DFF)",
+            "linear-gradient(135deg,var(--season-primary, #5B6CFF),var(--season-secondary, #7C4DFF))",
 
 
 
@@ -2564,7 +1824,7 @@ const displayedProducts =
 
 
 
-          height: window.innerWidth < 768 ? "46px" : "50px",
+          height: viewportWidth < 768 ? "46px" : "50px",
 
 
 
@@ -2576,7 +1836,7 @@ const displayedProducts =
 
 
 
-          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+          fontSize: viewportWidth < 768 ? "14px" : "15px",
 
 
 
@@ -2656,7 +1916,7 @@ const displayedProducts =
 
 
 
-          height: window.innerWidth < 768 ? "46px" : "50px",
+          height: viewportWidth < 768 ? "46px" : "50px",
 
 
 
@@ -2668,7 +1928,7 @@ const displayedProducts =
 
 
 
-          fontSize: window.innerWidth < 768 ? "14px" : "15px",
+          fontSize: viewportWidth < 768 ? "14px" : "15px",
 
 
 
@@ -2726,13 +1986,7 @@ const displayedProducts =
 
   style={{
 
-    height:
-
-      window.innerWidth < 768
-
-        ? "180px"
-
-        : "240px",
+    height: viewportWidth < 360 ? "175px" : viewportWidth < 480 ? "190px" : viewportWidth < 768 ? "220px" : viewportWidth < 900 ? "260px" : "320px",
 
 
 
@@ -2748,13 +2002,13 @@ const displayedProducts =
 
 
 
-    marginBottom: "35px",
+    marginBottom: viewportWidth < 768 ? "20px" : "35px",
 
 
 
     boxShadow:
 
-      "0 25px 60px rgba(0,0,0,0.18)",
+      "0 18px 42px rgba(0,0,0,0.16)",
 
 
 
@@ -2777,6 +2031,18 @@ const displayedProducts =
     <div
 
       key={index}
+      role="button"
+      tabIndex={heroIndex === index ? 0 : -1}
+      aria-label={`Voir le produit ${slide.title}`}
+      onClick={() => {
+        if (heroIndex === index && slide._id) navigate(`/product/${slide._id}`);
+      }}
+      onKeyDown={(e) => {
+        if (heroIndex === index && (e.key === "Enter" || e.key === " ")) {
+          e.preventDefault();
+          if (slide._id) navigate(`/product/${slide._id}`);
+        }
+      }}
 
 
 
@@ -2821,6 +2087,8 @@ const displayedProducts =
 
 
         transform: "scale(1.04)",
+        pointerEvents: heroIndex === index ? "auto" : "none",
+        cursor: heroIndex === index ? "pointer" : "default",
 
       }}
 
@@ -2868,9 +2136,9 @@ const displayedProducts =
 
           left:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
-              ? "22px"
+              ? "14px"
 
               : "38px",
 
@@ -2878,9 +2146,9 @@ const displayedProducts =
 
           bottom:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
-              ? "14px"
+              ? "10px"
 
               : "28px",
 
@@ -2922,7 +2190,7 @@ const displayedProducts =
 
 
 
-            padding: "6px 12px",
+            padding: viewportWidth < 768 ? "4px 9px" : "6px 12px",
 
 
 
@@ -2948,11 +2216,11 @@ const displayedProducts =
 
 
 
-            marginBottom: "16px",
+            marginBottom: viewportWidth < 768 ? "8px" : "16px",
 
 
 
-            fontSize: "11px",
+            fontSize: viewportWidth < 768 ? "9px" : "11px",
 
 
 
@@ -2994,11 +2262,12 @@ const displayedProducts =
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 380
 
-                ? "20px"
-
-                : "40px",
+                ? "16px"
+                : viewportWidth < 768
+                  ? "18px"
+                  : "40px",
 
 
 
@@ -3030,15 +2299,15 @@ const displayedProducts =
 
           style={{
 
-            marginTop: "14px",
+            marginTop: viewportWidth < 768 ? "6px" : "14px",
 
 
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
-                ? "12px"
+                ? "10px"
 
                 : "16px",
 
@@ -3050,11 +2319,11 @@ const displayedProducts =
 
 
 
-            maxWidth: "520px",
+            maxWidth: viewportWidth < 768 ? "min(90%, 420px)" : "520px",
 
 
 
-            lineHeight: "22px",
+            lineHeight: viewportWidth < 768 ? "16px" : "22px",
 
 
 
@@ -3082,11 +2351,11 @@ const displayedProducts =
 
 
 
-            gap: "14px",
+            gap: viewportWidth < 768 ? "8px" : "14px",
 
 
 
-            marginTop: "20px",
+            marginTop: viewportWidth < 768 ? "10px" : "20px",
 
 
 
@@ -3100,19 +2369,18 @@ const displayedProducts =
 
           <button
 
-          onClick={() =>
-
-  navigate(`/product/${slide._id}`)
-
-}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/product/${slide._id}`);
+          }}
 
             style={{
 
               padding:
 
-                window.innerWidth < 768
+                viewportWidth < 768
 
-                  ? "12px 18px"
+                  ? "8px 12px"
 
                   : "14px 24px",
 
@@ -3128,7 +2396,7 @@ const displayedProducts =
 
               background:
 
-                "linear-gradient(135deg,#5b6cff,#7c4dff)",
+                "linear-gradient(135deg,var(--season-primary, #5b6cff),var(--season-secondary, #7c4dff))",
 
 
 
@@ -3156,7 +2424,7 @@ const displayedProducts =
 
 
 
-              fontSize: "14px",
+              fontSize: viewportWidth < 768 ? "11px" : "14px",
 
 
 
@@ -3184,19 +2452,18 @@ const displayedProducts =
 
           <button
 
-          onClick={() =>
-
-  navigate(`/product/${slide._id}`)
-
-}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/product/${slide._id}`);
+          }}
 
             style={{
 
               padding:
 
-                window.innerWidth < 768
+                viewportWidth < 768
 
-                  ? "12px 18px"
+                  ? "8px 12px"
 
                   : "14px 24px",
 
@@ -3248,7 +2515,7 @@ const displayedProducts =
 
 
 
-              fontSize: "14px",
+              fontSize: viewportWidth < 768 ? "11px" : "14px",
 
             }}
 
@@ -3282,7 +2549,16 @@ const displayedProducts =
 
   ))}
 
-
+  {isLoadingProducts && heroSlides.length === 0 && (
+    <div role="status" aria-live="polite" style={{
+      position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", gap: "12px", color: "#fff",
+      background: "linear-gradient(135deg,#111827,#27346b)", zIndex: 5,
+    }}>
+      <div className="konan-boutique-spinner" />
+      <span style={{ fontSize: "13px", fontWeight: 700 }}>Préparation de vos offres...</span>
+    </div>
+  )}
 
   {/* INDICATORS */}
 
@@ -3296,11 +2572,11 @@ const displayedProducts =
 
 
 
-      bottom: "20px",
+      bottom: viewportWidth < 768 ? "10px" : "20px",
 
 
 
-      right: "20px",
+      right: viewportWidth < 768 ? "12px" : "20px",
 
 
 
@@ -3336,13 +2612,13 @@ const displayedProducts =
 
             heroIndex === index
 
-              ? "30px"
+              ? (viewportWidth < 768 ? "22px" : "30px")
 
-              : "10px",
+              : (viewportWidth < 768 ? "7px" : "10px"),
 
 
 
-          height: "10px",
+          height: viewportWidth < 768 ? "7px" : "10px",
 
 
 
@@ -3454,7 +2730,7 @@ const displayedProducts =
 
     padding:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "14px"
 
@@ -3464,7 +2740,7 @@ window.innerWidth < 768
 
 borderRadius:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "20px"
 
@@ -3474,7 +2750,7 @@ window.innerWidth < 768
 
 marginBottom:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "18px"
 
@@ -3670,7 +2946,7 @@ window.innerWidth < 768
 
           width:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "50px"
 
@@ -3680,7 +2956,7 @@ window.innerWidth < 768
 
           height:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "50px"
 
@@ -3694,7 +2970,7 @@ window.innerWidth < 768
 
           background:
 
-            "linear-gradient(135deg,#5b6cff,#7c4dff)",
+            "linear-gradient(135deg,var(--season-primary, #5b6cff),var(--season-secondary, #7c4dff))",
 
 
 
@@ -3730,7 +3006,7 @@ window.innerWidth < 768
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
                 ? "20px"
 
@@ -3764,7 +3040,7 @@ window.innerWidth < 768
 
             fontSize:
 
-              window.innerWidth < 768
+              viewportWidth < 768
 
                 ? "23px"
 
@@ -3874,7 +3150,7 @@ window.innerWidth < 768
 
 
 
-          color: "#5b6cff",
+          color: "var(--season-primary, #5b6cff)",
 
 
 
@@ -4104,7 +3380,7 @@ window.innerWidth < 768
 
           style={{
 
-            color: "#5b6cff",
+            color: "var(--season-primary, #5b6cff)",
 
 
 
@@ -4152,7 +3428,7 @@ window.innerWidth < 768
 
 
 
-          color: "#5b6cff",
+          color: "var(--season-primary, #5b6cff)",
 
 
 
@@ -4366,7 +3642,7 @@ window.innerWidth < 768
 
       marginTop:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "12px"
 
@@ -4384,7 +3660,7 @@ window.innerWidth < 768
 
       padding:
 
-        window.innerWidth < 768
+        viewportWidth < 768
 
           ? "10px"
 
@@ -4402,7 +3678,7 @@ window.innerWidth < 768
 
       gap:
 
-        window.innerWidth < 768
+        viewportWidth < 768
 
           ? "12px"
 
@@ -4432,11 +3708,11 @@ window.innerWidth < 768
 
   style={{
 
-    width: window.innerWidth < 768 ? "120px" : "170px",
+    width: viewportWidth < 768 ? "120px" : "170px",
 
 
 
-    height: window.innerWidth < 768 ? "120px" : "170px",
+    height: viewportWidth < 768 ? "120px" : "170px",
 
 
 
@@ -4516,7 +3792,7 @@ window.innerWidth < 768
 
           fontSize:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "15px"
 
@@ -4704,7 +3980,7 @@ window.innerWidth < 768
 
             background:
 
-              "linear-gradient(135deg,#5b6cff,#7c4dff)",
+              "linear-gradient(135deg,var(--season-primary, #5b6cff),var(--season-secondary, #7c4dff))",
 
 
 
@@ -4830,7 +4106,7 @@ window.innerWidth < 768
 
           fontSize:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "15px"
 
@@ -4960,7 +4236,7 @@ window.innerWidth < 768
 
           fontSize:
 
-            window.innerWidth < 768
+            viewportWidth < 768
 
               ? "24px"
 
@@ -5006,19 +4282,7 @@ window.innerWidth < 768
 
 
 
-    localStorage.setItem(
-
-
-
-      `checkoutCart_${clientId}`,
-
-
-
-      JSON.stringify(cart)
-
-
-
-    );
+    writeSafeJSON(`checkoutCart_${getClientStorageId()}`, normalizeCart(cart));
 
 
 
@@ -5032,7 +4296,7 @@ window.innerWidth < 768
 
         width:
 
-          window.innerWidth < 768
+          viewportWidth < 768
 
             ? "100%"
 
@@ -5098,7 +4362,7 @@ window.innerWidth < 768
 
           padding:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "15px"
 
@@ -5116,7 +4380,7 @@ window.innerWidth < 768
 
           background:
 
-            "linear-gradient(135deg,#5b6cff,#7c4dff,#9333ea)",
+            "linear-gradient(135deg,var(--season-primary, #5b6cff),var(--season-secondary, #7c4dff),var(--season-decoration, #9333ea))",
 
 
 
@@ -5134,7 +4398,7 @@ window.innerWidth < 768
 
           fontSize:
 
-window.innerWidth < 768
+viewportWidth < 768
 
 ? "14px"
 
@@ -5274,7 +4538,7 @@ window.innerWidth < 768
 
       fontSize:
 
-        window.innerWidth < 768
+        viewportWidth < 768
 
           ? "20px"
 
@@ -5296,7 +4560,7 @@ window.innerWidth < 768
 
       style={{
 
-        color: "#5b6cff",
+        color: "var(--season-primary, #5b6cff)",
 
       }}
 
@@ -5646,7 +4910,7 @@ className="categoriesSlider"
 
   padding:
 
-    window.innerWidth < 768
+    viewportWidth < 768
 
       ? "8px 14px"
 
@@ -5666,7 +4930,7 @@ className="categoriesSlider"
 
     selectedCategory === cat
 
-      ? "#4B2E83"
+      ? "var(--season-primary, #4B2E83)"
 
       : "#fff",
 
@@ -5688,7 +4952,7 @@ className="categoriesSlider"
 
   fontSize:
 
-    window.innerWidth < 768
+    viewportWidth < 768
 
       ? "12px"
 
@@ -5758,49 +5022,176 @@ className="categoriesSlider"
 
        {/* PRODUITS */}
 
-
-
 <div
-
   style={{
-
     marginTop: "2px",
-
-
-
     flex: 1,
-
-
-
-    display: "grid",
-
-
-
-    gridTemplateColumns:
-
-      window.innerWidth < 768
-
-        ? "repeat(2,1fr)"
-
-        : "repeat(4,1fr)",
-
-
-
-    gap:
-
-      window.innerWidth < 768
-
-        ? "15px"
-
-        : "25px",
-
+    display: "flex",
+    flexDirection: "column",
+    gap: "12px",
+    width: "100%",
+    minWidth: 0,
   }}
-
 >
+  {isLoadingProducts ? (
+    <div role="status" aria-live="polite" style={{
+      minHeight: "220px", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", gap: "14px",
+      padding: "28px 16px", background: "rgba(255,255,255,.82)",
+      border: "1px solid #e8edff", borderRadius: "22px",
+      boxShadow: "0 12px 30px rgba(30,41,59,.06)",
+    }}>
+      <div className="konan-boutique-spinner" />
+      <strong style={{ color: "#27346b", fontSize: "15px", textAlign: "center" }}>
+        Chargement de nos produits...
+      </strong>
+      <span style={{ color: "#6b7280", fontSize: "12px", textAlign: "center" }}>
+        Nous préparons votre sélection KONAN SHOPPING
+      </span>
+    </div>
+  ) : displayedProducts.length === 0 ? (
+    products.length > 0 &&
+    selectedCategory !== "Tous" &&
+    !search.trim() &&
+    !selectedBrand ? (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          width: "100%",
+          boxSizing: "border-box",
+          padding: viewportWidth < 600 ? "28px 16px" : "42px 28px",
+          textAlign: "center",
+          background: "linear-gradient(145deg,#ffffff,#f8faff)",
+          borderRadius: "24px",
+          color: "#374151",
+          border: "1px solid #e3e9ff",
+          boxShadow: "0 14px 35px rgba(30,41,59,.07)",
+        }}
+      >
+        <div style={{
+          width: "68px",
+          height: "68px",
+          margin: "0 auto 18px",
+          borderRadius: "22px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg,#fff7ed,#ffedd5)",
+          color: "#ea580c",
+          fontSize: "30px",
+          boxShadow: "0 8px 20px rgba(234,88,12,.10)",
+        }}>
+          <FaBoxOpen />
+        </div>
 
+        <span style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+          padding: "6px 12px",
+          borderRadius: "30px",
+          background: "#fff7ed",
+          color: "#c2410c",
+          fontSize: "11px",
+          fontWeight: "800",
+          letterSpacing: ".4px",
+          textTransform: "uppercase",
+          marginBottom: "12px",
+        }}>
+          Stock temporairement épuisé
+        </span>
 
+        <h3 style={{
+          margin: "0 0 10px",
+          color: "#111827",
+          fontSize: viewportWidth < 600 ? "19px" : "23px",
+          fontWeight: "900",
+          lineHeight: 1.3,
+        }}>
+          La catégorie « {selectedCategory} » revient bientôt !
+        </h3>
 
-       {displayedProducts.map((product) => (
+        <p style={{
+          maxWidth: "560px",
+          margin: "0 auto 16px",
+          color: "#6b7280",
+          fontSize: "14px",
+          lineHeight: 1.7,
+        }}>
+          Tous les articles de cette catégorie sont momentanément indisponibles.
+          Notre équipe travaille à leur réapprovisionnement afin de vous proposer
+          à nouveau vos articles préférés.
+        </p>
+
+        <div style={{
+          display: "inline-flex",
+          flexDirection: "column",
+          gap: "5px",
+          padding: "12px 18px",
+          marginBottom: "20px",
+          borderRadius: "14px",
+          background: "#f8fafc",
+          border: "1px solid #e5e7eb",
+        }}>
+          <span style={{ color: "#6b7280", fontSize: "11px", fontWeight: "700" }}>
+            DATE DE RÉAPPROVISIONNEMENT
+          </span>
+          <strong style={{ color: "#27346b", fontSize: "14px" }}>
+            À confirmer auprès de notre service client
+          </strong>
+        </div>
+
+        <p style={{
+          margin: "0 auto 16px",
+          color: "#6b7280",
+          fontSize: "13px",
+          lineHeight: 1.6,
+        }}>
+          Contactez-nous pour connaître la prochaine disponibilité ou être informé
+          dès le retour des articles.
+        </p>
+
+        <a
+          href={`https://wa.me/237694641329?text=${encodeURIComponent(
+            `Bonjour KONAN SHOPPING, je souhaite connaître la date de réapprovisionnement de la catégorie : ${selectedCategory}.`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "9px",
+            width: viewportWidth < 480 ? "100%" : "auto",
+            maxWidth: "100%",
+            boxSizing: "border-box",
+            padding: "13px 20px",
+            borderRadius: "14px",
+            background: "linear-gradient(135deg,#16a34a,#15803d)",
+            color: "#fff",
+            textDecoration: "none",
+            fontSize: "14px",
+            fontWeight: "800",
+            boxShadow: "0 9px 20px rgba(22,163,74,.20)",
+          }}
+        >
+          <FaWhatsapp style={{ fontSize: "19px" }} />
+          Contacter le service client
+        </a>
+      </div>
+    ) : (
+      <div style={{
+        padding: "35px 18px", textAlign: "center", background: "#fff",
+        borderRadius: "20px", color: "#6b7280", border: "1px solid #eef2ff",
+      }}>
+        Aucun produit ne correspond à votre recherche.
+      </div>
+    )
+  ) : (
+    productRows.map((row, rowIndex) => (
+      <div key={`product-row-${rowIndex}`} className="konan-products-horizontal-row">
+        {row.map((product) => (
 
 
 
@@ -5870,7 +5261,7 @@ onMouseLeave={(e) => {
 
   padding:
 
-  window.innerWidth < 768
+  viewportWidth < 768
 
     ? "10px"
 
@@ -5922,7 +5313,7 @@ boxSizing: "border-box",
 
 minHeight:
 
-  window.innerWidth < 768
+  viewportWidth < 768
 
     ? "330px"
 
@@ -5978,15 +5369,7 @@ minHeight:
 
 (
 
-  safeParse(
-    localStorage.getItem(
-      `favorites_${
-        readStoredUser()?._id ||
-        localStorage.getItem("guestId")
-      }`
-    ),
-    []
-  ) || []
+  wishlist
 
 ).some(
 
@@ -6018,7 +5401,7 @@ minHeight:
 
     height:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "180px"
 
@@ -6464,7 +5847,7 @@ avis )
 
                     gap: "8px",
 
-                    marginTop: "&(px",
+                    marginTop: "8px",
 
                   }}
 
@@ -6556,13 +5939,13 @@ avis )
 
 
 
-    padding: window.innerWidth < 768 ? "10px" : "12px",
+    padding: viewportWidth < 768 ? "10px" : "12px",
 
 
 
 fontSize:
 
-  window.innerWidth < 768
+  viewportWidth < 768
 
     ? "12px"
 
@@ -6650,130 +6033,19 @@ fontSize:
 
 
 
-    const user =
-
-      readStoredUser();
-
-
-
-    const clientId =
-
-      user?._id ||
-
-      localStorage.getItem("guestId") ||
-
-      (() => {
-
-
-
-        const newGuestId =
-
-          "guest_" + Date.now();
-
-
-
-        localStorage.setItem(
-
-          "guestId",
-
-          newGuestId
-
-        );
-
-
-
-        return newGuestId;
-
-
-
-      })();
-
-
-
-    const cart =
-
-      safeParse(localStorage.getItem(`cart_${clientId}`), []) || [];
-
-
-
-    const existing =
-
-      cart.find(
-
-        (item) =>
-
-          item._id === product._id
-
-      );
-
-
-
-    if (existing) {
-
-
-
-      existing.quantity += 1;
-
-
-
-    } else {
-
-
-
-      cart.push({
-
-
-
-        ...product,
-
-
-
-        quantity: 1,
-
-
-
-      });
-
-
-
-    }
-
-
-
-    localStorage.setItem(
-
-
-
-      `cart_${clientId}`,
-
-
-
-      JSON.stringify(cart)
-
-
-
-    );
-
-
-
-    localStorage.setItem(
-
-      "cartCount",
-
-      cart.length
-
-    );
-
-
-
-    window.dispatchEvent(
-
-      new Event("cartUpdated")
-
-    );
-
-
-
+    const clientId = getClientStorageId();
+    const currentCart = normalizeCart(readSafeArray(`cart_${clientId}`));
+    const existing = currentCart.find((item) => item._id === product._id);
+    const nextCart = existing
+      ? currentCart.map((item) => item._id === product._id
+          ? { ...item, quantity: Math.min(99, (Number(item.quantity) || 1) + 1) }
+          : item)
+      : normalizeCart([...currentCart, { ...product, quantity: 1 }]);
+
+    writeSafeJSON(`cart_${clientId}`, nextCart);
+    writeSafeJSON(`checkoutCart_${clientId}`, nextCart);
+    setCart(nextCart);
+    window.dispatchEvent(new Event("cartUpdated"));
     navigate("/checkout");
 
 
@@ -6788,7 +6060,7 @@ fontSize:
 
     padding:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "10px"
 
@@ -6798,7 +6070,7 @@ fontSize:
 
     fontSize:
 
-      window.innerWidth < 768
+      viewportWidth < 768
 
         ? "12px"
 
@@ -6889,21 +6161,12 @@ fontSize:
 
 
   </Link>
-
-
-
-))}
-
-
-
-        </div>
-
-
-
+        ))}
       </div>
-
-
-
+    ))
+  )}
+      </div>
+      </div>
       {/* POPUP */}
 
 
@@ -6960,13 +6223,14 @@ fontSize:
 
             style={{
 
-              width: "1000px",
-
+              width: "min(1000px, calc(100vw - 24px))",
+              maxHeight: "90dvh",
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
+              boxSizing: "border-box",
               background: "white",
-
-              borderRadius: "30px",
-
-              padding: "40px",
+              borderRadius: viewportWidth < 600 ? "18px" : "30px",
+              padding: viewportWidth < 600 ? "16px" : viewportWidth < 900 ? "24px" : "40px",
 
             }}
 
@@ -6979,8 +6243,8 @@ fontSize:
               style={{
 
                 display: "flex",
-
-                gap: "40px",
+                flexDirection: viewportWidth < 768 ? "column" : "row",
+                gap: viewportWidth < 600 ? "16px" : "40px",
 
               }}
 
@@ -6996,12 +6260,10 @@ fontSize:
 
                 style={{
 
-                  width: "400px",
-
-                  height: "400px",
-
+                  width: viewportWidth < 768 ? "100%" : "min(400px, 42%)",
+                  maxWidth: "100%",
+                  height: viewportWidth < 600 ? "min(72vw, 320px)" : viewportWidth < 900 ? "320px" : "400px",
                   objectFit: "cover",
-
                   borderRadius: "20px",
 
                 }}
@@ -7273,11 +6535,11 @@ fontSize:
                 style={{
 
                   display: "grid",
-
-                  gridTemplateColumns:
-
-                    "repeat(3,1fr)",
-
+                  gridTemplateColumns: viewportWidth < 560
+                    ? "repeat(1,minmax(0,1fr))"
+                    : viewportWidth < 900
+                      ? "repeat(2,minmax(0,1fr))"
+                      : "repeat(3,minmax(0,1fr))",
                   gap: "20px",
 
                 }}

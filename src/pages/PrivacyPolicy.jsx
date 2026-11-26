@@ -56,11 +56,13 @@ function PrivacyPolicy() {
 
 <div
 
+  className="konan-privacy-policy-page"
+
   style={{
 
     minHeight: "100vh",
 
-    background: "#F6F8FC",
+    background: "color-mix(in srgb, var(--season-primary, #2563eb) 3%, white)",
 
     padding:
 
@@ -75,6 +77,127 @@ function PrivacyPolicy() {
 >
 
 
+<style>{`
+  .konan-privacy-policy-page {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+    overflow-x: clip;
+    padding-left: max(8px, env(safe-area-inset-left, 0px)) !important;
+    padding-right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .konan-privacy-policy-page *,
+  .konan-privacy-policy-page *::before,
+  .konan-privacy-policy-page *::after {
+    box-sizing: border-box;
+    min-width: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .konan-privacy-policy-page img,
+  .konan-privacy-policy-page svg {
+    max-width: 100%;
+  }
+  .konan-privacy-policy-page h1,
+  .konan-privacy-policy-page h2,
+  .konan-privacy-policy-page h3,
+  .konan-privacy-policy-page p,
+  .konan-privacy-policy-page span,
+  .konan-privacy-policy-page b {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  .konan-privacy-policy-page a {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+  }
+  .konan-privacy-policy-page a:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--season-primary, #2563eb) 55%, transparent);
+    outline-offset: 3px;
+  }
+  @media (min-width: 768px) {
+    .konan-privacy-policy-page {
+      padding: 22px max(22px, env(safe-area-inset-right, 0px)) 22px
+        max(22px, env(safe-area-inset-left, 0px)) !important;
+    }
+    .konan-privacy-policy-page > div {
+      width: 100%;
+      max-width: 1180px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  @media (max-width: 767px) {
+    .konan-privacy-policy-page {
+      padding: max(8px, env(safe-area-inset-top, 0px))
+        max(8px, env(safe-area-inset-right, 0px))
+        max(90px, calc(76px + env(safe-area-inset-bottom, 0px)))
+        max(8px, env(safe-area-inset-left, 0px)) !important;
+    }
+    .konan-privacy-policy-page > div {
+      width: 100%;
+      max-width: 100%;
+    }
+    .konan-privacy-policy-page h1 {
+      font-size: clamp(18px, 5.2vw, 25px) !important;
+      overflow-wrap: anywhere;
+    }
+    .konan-privacy-policy-page h2 {
+      font-size: clamp(16px, 4.5vw, 20px) !important;
+    }
+    .konan-privacy-policy-page h3 {
+      font-size: clamp(15px, 4vw, 18px) !important;
+    }
+    .konan-privacy-policy-page p,
+    .konan-privacy-policy-page span {
+      overflow-wrap: anywhere;
+    }
+    .konan-privacy-policy-page a[href^="https://wa.me/"] {
+      max-width: 100%;
+      min-height: 44px;
+      touch-action: manipulation;
+    }
+  }
+  @media (max-width: 380px) {
+    .konan-privacy-policy-page {
+      padding-left: max(6px, env(safe-area-inset-left, 0px)) !important;
+      padding-right: max(6px, env(safe-area-inset-right, 0px)) !important;
+    }
+    .konan-privacy-policy-page > div > div {
+      border-radius: 14px;
+    }
+  }
+  @media (max-width: 320px) {
+    .konan-privacy-policy-page {
+      padding-left: max(4px, env(safe-area-inset-left, 0px)) !important;
+      padding-right: max(4px, env(safe-area-inset-right, 0px)) !important;
+    }
+    .konan-privacy-policy-page h1 {
+      font-size: 17px !important;
+    }
+  }
+  @media (orientation: landscape) and (max-height: 500px) {
+    .konan-privacy-policy-page {
+      padding-top: max(6px, env(safe-area-inset-top, 0px));
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    }
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .konan-privacy-policy-page a {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+  }
+`}</style>
+
+
+
 
 {/* ================= HERO ================= */}
 
@@ -86,7 +209,7 @@ function PrivacyPolicy() {
 
     background:
 
-      "linear-gradient(135deg,#4B2E83,#2563EB)",
+      "linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 
 
 
@@ -116,7 +239,7 @@ function PrivacyPolicy() {
 
     boxShadow:
 
-      "0 8px 22px rgba(37,99,235,.15)",
+      "0 8px 22px color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent)",
 
 
 
@@ -518,7 +641,7 @@ function PrivacyPolicy() {
 
       style={{
 
-        color: "#2563EB",
+        color: "var(--season-primary, #2563eb)",
 
         fontSize:
 
@@ -736,7 +859,7 @@ function PrivacyPolicy() {
 
           background:
 
-            "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+            "linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white),color-mix(in srgb, var(--season-primary, #2563eb) 16%, white))",
 
 
 
@@ -764,7 +887,7 @@ function PrivacyPolicy() {
 
           style={{
 
-            color: "#2563EB",
+            color: "var(--season-primary, #2563eb)",
 
 
 
@@ -986,7 +1109,7 @@ function PrivacyPolicy() {
 
           background:
 
-            "linear-gradient(135deg,#EEF2FF,#DBEAFE)",
+            "linear-gradient(135deg,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white),color-mix(in srgb, var(--season-primary, #2563eb) 16%, white))",
 
 
 
@@ -1014,7 +1137,7 @@ function PrivacyPolicy() {
 
           style={{
 
-            color: "#2563EB",
+            color: "var(--season-primary, #2563eb)",
 
 
 
@@ -1248,7 +1371,7 @@ function PrivacyPolicy() {
 
   style={{
 
-    color: "#2563EB",
+    color: "var(--season-primary, #2563eb)",
 
 
 
@@ -1330,7 +1453,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 fontSize:
 
@@ -1496,7 +1619,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1630,7 +1753,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1810,7 +1933,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -1942,7 +2065,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2120,7 +2243,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2290,7 +2413,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2420,7 +2543,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2594,7 +2717,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2726,7 +2849,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -2904,7 +3027,7 @@ window.innerWidth < 768
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -3036,7 +3159,7 @@ gap:"10px",
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, #2563eb)",
 
 
 
@@ -3128,7 +3251,7 @@ window.innerWidth < 768
 
     background:
 
-      "linear-gradient(135deg,#2563EB,#4B2E83)",
+      "linear-gradient(135deg,var(--season-primary, #2563eb),var(--season-secondary, #3b82f6))",
 
 
 
@@ -3162,7 +3285,7 @@ window.innerWidth < 768
 
     boxShadow:
 
-      "0 10px 25px rgba(37,99,235,.16)",
+      "0 10px 25px color-mix(in srgb, var(--season-primary, #2563eb) 16%, transparent)",
 
 
 
@@ -3454,7 +3577,7 @@ window.innerWidth < 768
 
 
 
-      color: "#2563EB",
+      color: "var(--season-primary, #2563eb)",
 
 
 
@@ -3588,7 +3711,7 @@ window.innerWidth < 768
 
 
 
-      color: "#2563EB",
+      color: "var(--season-primary, #2563eb)",
 
 
 

@@ -1,0 +1,114 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME SAINT-VALENTIN
+ * Fichier : src/theme/themes/valentine.css
+ *
+ * Activé lorsque data-season="valentine".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="valentine"] {
+  --season-primary: #d6336c;
+  --season-secondary: #8f1748;
+  --season-glow: rgba(214, 51, 108, 0.11);
+  --season-decoration: rgba(214, 51, 108, 0.27);
+}
+
+/* Ambiance rose et bordeaux discrète sur le header. */
+:root[data-season="valentine"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(214, 51, 108, 0.25);
+  box-shadow: 0 5px 20px rgba(143, 23, 72, 0.07);
+}
+
+/* Petits cœurs décoratifs en CSS, sans image ni SVG. */
+:root[data-season="valentine"] .konan-seasonal-header::before {
+  content: "♥   ♥      ♥   ♥       ♥";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 3px;
+  left: 0;
+  right: 0;
+  height: 28px;
+  overflow: hidden;
+  color: rgba(214, 51, 108, 0.28);
+  font-size: 15px;
+  letter-spacing: clamp(8px, 3vw, 28px);
+  line-height: 24px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Le contenu et les liens du header restent cliquables. */
+:root[data-season="valentine"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="valentine"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Contours doux des raccourcis Favoris, Panier et Compte. */
+:root[data-season="valentine"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(214, 51, 108, 0.25);
+  box-shadow:
+    0 3px 12px rgba(143, 23, 72, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+/* Accent en forme de petit cœur au-dessus de chaque raccourci. */
+:root[data-season="valentine"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "♥";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -10px;
+  right: 7px;
+  color: #d6336c;
+  font-size: 10px;
+  line-height: 1;
+}
+
+:root[data-season="valentine"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="valentine"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier visible et assorti au thème. */
+:root[data-season="valentine"] button:focus-visible,
+:root[data-season="valentine"] a:focus-visible {
+  outline: 2px solid #d6336c;
+  outline-offset: 3px;
+}
+
+/* Sur mobile, réduire les éléments décoratifs. */
+@media (max-width: 600px) {
+  :root[data-season="valentine"] .konan-seasonal-header::before {
+    font-size: 12px;
+    letter-spacing: 8px;
+    opacity: 0.75;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="valentine"] .konan-seasonal-header,
+  :root[data-season="valentine"] .konan-seasonal-header *,
+  :root[data-season="valentine"] button,
+  :root[data-season="valentine"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

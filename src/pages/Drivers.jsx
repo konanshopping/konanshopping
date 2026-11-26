@@ -1003,7 +1003,7 @@ useEffect(() => {
             background:
               linear-gradient(
                 180deg,
-                #eff6ff 0%,
+                color-mix(in srgb, var(--season-primary, #2563eb) 7%, white) 0%,
                 #f8fafc 45%,
                 #ffffff 100%
               );
@@ -1038,8 +1038,8 @@ useEffect(() => {
             background:
               linear-gradient(
                 135deg,
-                #2563eb,
-                #4f46e5
+                var(--season-primary, #2563eb),
+                var(--season-secondary, #3b82f6)
               );
             color: white;
             font-size: 28px;
@@ -1063,8 +1063,8 @@ useEffect(() => {
             height: 34px;
             margin: 25px auto 0;
             border:
-              3px solid #dbeafe;
-            border-top-color: #2563eb;
+              3px solid color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
+            border-top-color: var(--season-primary, #2563eb);
             border-radius: 50%;
             animation:
               driverSpin .8s linear infinite;
@@ -2038,7 +2038,7 @@ useEffect(() => {
           background:
             linear-gradient(
               180deg,
-              #eff6ff 0%,
+              color-mix(in srgb, var(--season-primary, #2563eb) 7%, white) 0%,
               #f8fafc 35%,
               #ffffff 100%
             );
@@ -2089,14 +2089,14 @@ useEffect(() => {
           background:
             linear-gradient(
               135deg,
-              #2563eb,
-              #4f46e5
+              var(--season-primary, #2563eb),
+              var(--season-secondary, #3b82f6)
             );
           color: white;
           font-size: 24px;
           box-shadow:
             0 12px 30px
-            rgba(37,99,235,.20);
+            color-mix(in srgb, var(--season-primary, #2563eb) 20%, transparent);
         }
 
         .eyebrow {
@@ -2128,10 +2128,10 @@ useEffect(() => {
           justify-content: center;
           gap: 8px;
           padding: 0 16px;
-          border: 1px solid #dbeafe;
+          border: 1px solid color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
           border-radius: 13px;
           background: #ffffff;
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
           font-size: 12px;
           font-weight: 900;
           cursor: pointer;
@@ -2219,7 +2219,7 @@ useEffect(() => {
           border-radius: 11px;
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
           font-size: 15px;
           font-weight: 950;
         }
@@ -2277,10 +2277,10 @@ useEffect(() => {
           background:
             linear-gradient(
               135deg,
-              #dbeafe,
-              #eff6ff
+              color-mix(in srgb, var(--season-primary, #2563eb) 15%, white),
+              color-mix(in srgb, var(--season-primary, #2563eb) 7%, white)
             );
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
           font-size: 25px;
         }
 
@@ -2387,7 +2387,7 @@ useEffect(() => {
 
         .last-delivery > svg {
           flex-shrink: 0;
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
         }
 
         .last-delivery span {
@@ -2432,8 +2432,8 @@ useEffect(() => {
         }
 
         .route-button {
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
         }
 
         .delete-button {
@@ -2471,8 +2471,8 @@ useEffect(() => {
           align-items: center;
           justify-content: center;
           border-radius: 18px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 26px;
         }
 
@@ -2545,8 +2545,8 @@ useEffect(() => {
           justify-content: center;
           overflow: hidden;
           border-radius: 16px;
-          background: #dbeafe;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 21px;
         }
 
@@ -2648,8 +2648,8 @@ useEffect(() => {
           justify-content: center;
           margin-bottom: 14px;
           border-radius: 18px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 25px;
         }
 
@@ -2682,7 +2682,7 @@ useEffect(() => {
           padding: 11px 15px;
           border: none;
           border-radius: 11px;
-          background: #2563eb;
+          background: var(--season-primary, #2563eb);
           color: #ffffff;
           font-size: 11px;
           font-weight: 900;
@@ -2715,7 +2715,7 @@ useEffect(() => {
 
         .route-modal-footer > div svg {
           flex-shrink: 0;
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
         }
 
         .route-modal-footer button {
@@ -2728,8 +2728,8 @@ useEffect(() => {
           padding: 0 12px;
           border: none;
           border-radius: 10px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 9px;
           font-weight: 900;
           cursor: pointer;
@@ -2906,6 +2906,264 @@ useEffect(() => {
 
         }
 
+
+        /* ==========================================
+           RESPONSIVE / iOS SAFARI
+           Ajustements visuels uniquement.
+        ========================================== */
+
+        .drivers-page,
+        .drivers-page * {
+          box-sizing: border-box;
+        }
+
+        .drivers-page {
+          min-height: 100vh;
+          min-height: 100dvh;
+          min-height: 100svh;
+          width: 100%;
+          max-width: 100%;
+          padding-left: max(24px, env(safe-area-inset-left));
+          padding-right: max(24px, env(safe-area-inset-right));
+          padding-bottom: max(24px, env(safe-area-inset-bottom));
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+          overscroll-behavior-x: none;
+        }
+
+        .drivers-container,
+        .drivers-section,
+        .drivers-grid,
+        .driver-card,
+        .driver-main-info,
+        .route-modal,
+        .route-map-wrapper {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .drivers-page img,
+        .drivers-page svg {
+          max-width: 100%;
+        }
+
+        .drivers-page button {
+          touch-action: manipulation;
+          -webkit-appearance: none;
+          appearance: none;
+        }
+
+        .driver-email,
+        .driver-details,
+        .info-row-content strong,
+        .route-driver-profile,
+        .route-modal-footer,
+        .error-banner {
+          overflow-wrap: anywhere;
+        }
+
+        .route-overlay {
+          padding-top: max(20px, env(safe-area-inset-top));
+          padding-bottom: max(20px, env(safe-area-inset-bottom));
+          padding-left: max(20px, env(safe-area-inset-left));
+          padding-right: max(20px, env(safe-area-inset-right));
+        }
+
+        .route-modal {
+          height: min(90vh, 850px);
+          height: min(90dvh, 850px);
+          max-height: calc(100svh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+        }
+
+        .route-map-wrapper {
+          min-height: 220px;
+          touch-action: pan-x pan-y;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .route-map-wrapper .leaflet-container {
+          isolation: isolate;
+          touch-action: pan-x pan-y;
+        }
+
+        .route-modal-header,
+        .route-modal-footer {
+          flex-shrink: 0;
+        }
+
+        .route-modal-footer {
+          padding-bottom: max(11px, env(safe-area-inset-bottom));
+        }
+
+        @media (max-width: 1100px) {
+          .drivers-page {
+            padding-left: max(18px, env(safe-area-inset-left));
+            padding-right: max(18px, env(safe-area-inset-right));
+          }
+        }
+
+        @media (max-width: 700px) {
+          .drivers-page {
+            padding-top: max(12px, env(safe-area-inset-top));
+            padding-left: max(10px, env(safe-area-inset-left));
+            padding-right: max(10px, env(safe-area-inset-right));
+            padding-bottom: max(16px, env(safe-area-inset-bottom));
+          }
+
+          .drivers-header,
+          .header-left,
+          .section-heading,
+          .driver-top,
+          .driver-actions {
+            min-width: 0;
+          }
+
+          .drivers-header h1 {
+            font-size: clamp(18px, 5vw, 22px);
+            overflow-wrap: anywhere;
+          }
+
+          .global-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .drivers-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .driver-card {
+            width: 100%;
+          }
+
+          .driver-actions button,
+          .refresh-button,
+          .error-banner button,
+          .route-modal-footer button,
+          .retry-route,
+          .close-route {
+            min-height: 44px;
+          }
+
+          .route-overlay {
+            padding: 0;
+            align-items: stretch;
+          }
+
+          .route-modal {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            height: 100svh;
+            max-height: none;
+            border-radius: 0;
+            padding-bottom: env(safe-area-inset-bottom);
+          }
+
+          .route-modal-header {
+            padding-top: max(10px, env(safe-area-inset-top));
+          }
+
+          .route-map-wrapper {
+            min-height: 180px;
+            flex: 1 1 auto;
+          }
+
+          .route-modal-footer {
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+          }
+        }
+
+        @media (max-width: 420px) {
+          .drivers-page {
+            padding-left: max(7px, env(safe-area-inset-left));
+            padding-right: max(7px, env(safe-area-inset-right));
+          }
+
+          .global-stats {
+            gap: 7px;
+          }
+
+          .driver-details {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .driver-actions {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .driver-actions button {
+            width: 100%;
+          }
+
+          .route-summary {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
+          .route-modal-footer {
+            gap: 7px;
+          }
+        }
+
+        @media (max-width: 340px) {
+          .global-stats {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .driver-details {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .route-summary {
+            gap: 5px;
+            padding-left: 5px;
+            padding-right: 5px;
+          }
+
+          .route-summary-card {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+        }
+
+        @media (orientation: landscape) and (max-height: 520px) {
+          .route-modal {
+            height: 100vh;
+            height: 100dvh;
+            max-height: 100svh;
+          }
+
+          .route-modal-header {
+            padding-top: max(6px, env(safe-area-inset-top));
+            padding-bottom: 6px;
+          }
+
+          .route-driver-avatar {
+            width: 38px;
+            height: 38px;
+          }
+
+          .route-summary {
+            padding-top: 5px;
+            padding-bottom: 5px;
+          }
+
+          .route-modal-footer {
+            padding-top: 5px;
+            padding-bottom: max(5px, env(safe-area-inset-bottom));
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .drivers-page *,
+          .drivers-page *::before,
+          .drivers-page *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
       `}</style>
 
     </div>
@@ -3074,7 +3332,7 @@ function DriverRouteMap({
             }
             pathOptions={{
               color:
-                "#60A5FA",
+                "var(--season-secondary, #3b82f6)",
               weight:
                 10,
               opacity:
@@ -3091,7 +3349,7 @@ function DriverRouteMap({
             }
             pathOptions={{
               color:
-                "#2563EB",
+                "var(--season-primary, #2563eb)",
               weight:
                 4,
               opacity:
@@ -3289,7 +3547,7 @@ function DriverRouteMap({
               radius={3}
               pathOptions={{
                 color:
-                  "#2563EB",
+                  "var(--season-primary, #2563eb)",
                 fillColor:
                   "#ffffff",
                 fillOpacity:
@@ -3504,8 +3762,8 @@ function StatCard({
         }
 
         .stat-card.blue .stat-icon {
-          background: #dbeafe;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 15%, white);
+          color: var(--season-primary, #2563eb);
         }
 
         .stat-card.green .stat-icon {
@@ -3597,8 +3855,8 @@ function InfoRow({
           align-items: center;
           justify-content: center;
           border-radius: 8px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 10px;
         }
 
@@ -3707,7 +3965,7 @@ function MiniStat({
         }
 
         .mini-stat.blue .mini-stat-icon {
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
         }
 
         .mini-stat.green .mini-stat-icon {
@@ -3786,8 +4044,8 @@ function RouteSummaryCard({
           align-items: center;
           justify-content: center;
           border-radius: 9px;
-          background: #eff6ff;
-          color: #2563eb;
+          background: color-mix(in srgb, var(--season-primary, #2563eb) 7%, white);
+          color: var(--season-primary, #2563eb);
           font-size: 12px;
         }
 

@@ -91,6 +91,27 @@ const ALLOWED_REVIEW_IMAGE_TYPES = new Set([
   "image/gif",
 ]);
 
+// Nettoyage défensif des textes saisis côté interface.
+// Le backend doit refaire ces validations : cette fonction ne remplace pas la sécurité serveur.
+const sanitizeText = (value, maxLength = 2000) => {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "")
+    .replace(/<\s*script\b[^>]*>[\s\S]*?<\s*\/\s*script\s*>/gi, "")
+    .trim()
+    .slice(0, Math.max(0, Number(maxLength) || 2000));
+};
+
+// Ne montre pas au visiteur les détails techniques ou les réponses brutes du serveur.
+const safeServerMessage = (error, fallback = "Une erreur est survenue. Réessayez.") => {
+  const status = Number(error?.response?.status);
+  if (status === 401 || status === 403) return "Veuillez vous reconnecter ou vérifier vos autorisations.";
+  if (status === 413) return "Les fichiers envoyés sont trop volumineux.";
+  if (status === 429) return "Trop de tentatives. Veuillez patienter avant de réessayer.";
+  if (!error?.response) return "Impossible de contacter le serveur. Vérifiez votre connexion.";
+  return fallback;
+};
+
 const safeParse = (value, fallback) => {
   if (typeof value !== "string" || !value.trim()) return fallback;
   try {
@@ -186,24 +207,32 @@ const navigate = useNavigate();
 
 
    const [mobile, setMobile] = useState(
-  window.innerWidth <= 768
+  () => typeof window !== "undefined" && window.matchMedia
+    ? window.matchMedia("(max-width: 768px)").matches
+    : typeof window !== "undefined" && window.innerWidth <= 768
 );
 
 useEffect(() => {
-  const handleResize = () => {
-    setMobile(window.innerWidth <= 768);
+  const handleViewportChange = () => {
+    const width =
+      window.visualViewport?.width ||
+      document.documentElement?.clientWidth ||
+      window.innerWidth;
+
+    setMobile(width <= 768);
   };
 
-  window.addEventListener(
-    "resize",
-    handleResize
-  );
+  handleViewportChange();
 
-  return () =>
-    window.removeEventListener(
-      "resize",
-      handleResize
-    );
+  window.addEventListener("resize", handleViewportChange, { passive: true });
+  window.addEventListener("orientationchange", handleViewportChange, { passive: true });
+  window.visualViewport?.addEventListener("resize", handleViewportChange, { passive: true });
+
+  return () => {
+    window.removeEventListener("resize", handleViewportChange);
+    window.removeEventListener("orientationchange", handleViewportChange);
+    window.visualViewport?.removeEventListener("resize", handleViewportChange);
+  };
 }, []);
 
 const getTimeAgo = (date) => {
@@ -367,6 +396,39 @@ const [showReviewsSection, setShowReviewsSection] = useState(false);
 const [imageZoom, setImageZoom] = useState(1);
 const [showFullDescription, setShowFullDescription] = useState(false);
 
+// Visionneuse adaptée à iOS : fermeture clavier/Echap et blocage du scroll arrière-plan.
+useEffect(() => {
+  if (!selectedImage) return undefined;
+
+  const previousBodyOverflow = document.body.style.overflow;
+  const previousBodyPosition = document.body.style.position;
+  const previousBodyWidth = document.body.style.width;
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+
+  document.body.style.overflow = "hidden";
+  document.body.style.position = "fixed";
+  document.body.style.width = "100%";
+  document.body.style.top = `-${scrollY}px`;
+
+  const handleViewerKeyDown = (event) => {
+    if (event.key === "Escape") {
+      setImageZoom(1);
+      setSelectedImage(null);
+    }
+  };
+
+  window.addEventListener("keydown", handleViewerKeyDown);
+
+  return () => {
+    document.body.style.overflow = previousBodyOverflow;
+    document.body.style.position = previousBodyPosition;
+    document.body.style.width = previousBodyWidth;
+    document.body.style.top = "";
+    window.removeEventListener("keydown", handleViewerKeyDown);
+    window.scrollTo(0, scrollY);
+  };
+}, [selectedImage]);
+
 // Affichage uniquement : ne modifie jamais le vrai prix utilisé par le panier/commande.
 const getDisplayReferencePrice = (currentPrice) => {
   const price = Number(currentPrice) || 0;
@@ -488,7 +550,7 @@ if (!product)
 
             box-shadow:
               0 0 10px
-              rgba(75,46,131,.15);
+              color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent);
           }
 
           50% {
@@ -498,7 +560,7 @@ if (!product)
 
             box-shadow:
               0 0 24px
-              rgba(124,58,237,.35);
+              color-mix(in srgb, var(--season-secondary, #3b82f6) 35%, transparent);
           }
 
         }
@@ -577,13 +639,13 @@ if (!product)
               inset: 0,
 
               border:
-                "3px solid #ECECF8",
+                "3px solid color-mix(in srgb, var(--season-primary, #2563eb) 12%, white)",
 
               borderTop:
-                "3px solid #4B2E83",
+                "3px solid var(--season-primary, #2563eb)",
 
               borderRight:
-                "3px solid #7C3AED",
+                "3px solid var(--season-secondary, #3b82f6)",
 
               borderRadius: "50%",
 
@@ -627,7 +689,7 @@ if (!product)
                 "pulse 1.8s ease-in-out infinite",
 
               boxShadow:
-                "0 8px 22px rgba(75,46,131,.18)",
+                "0 8px 22px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
             }}
           >
 
@@ -673,7 +735,7 @@ if (!product)
             textTransform: "lowercase",
 
             background:
-              "linear-gradient(90deg,#B8BCC8 20%,#4B2E83 50%,#B8BCC8 80%)",
+              "linear-gradient(90deg,#B8BCC8 20%,var(--season-primary, #2563eb) 50%,#B8BCC8 80%)",
 
             backgroundSize:
               "200% auto",
@@ -882,11 +944,6 @@ async () => {
     // FORM DATA
 
     const formData = new FormData();
-
-    formData.append(
-      "clientId",
-      String(clientId).slice(0, 100)
-    );
 
     formData.append(
       "name",
@@ -1504,25 +1561,24 @@ return (
     />
 
 <div
+  className="ks-product-details-root"
   style={{
     minHeight: "100vh",
+    minHeight: "100svh",
 
     background:
-      "linear-gradient(135deg,#f8fafc,#eef2ff)",
+      "linear-gradient(135deg,#f8fafc,color-mix(in srgb, var(--season-primary, #2563eb) 8%, white))",
 
-    padding: mobile ? "max(8px, env(safe-area-inset-top)) max(0px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(0px, env(safe-area-inset-left))" : "26px",
+    padding: mobile
+      ? "max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left))"
+      : "clamp(18px, 2.2vw, 32px)",
 
     width: "100%",
-
     maxWidth: "1600px",
-
     margin: "0 auto",
-
-    overflowX: "hidden",
-
+    overflowX: "clip",
     boxSizing: "border-box",
-
-    fontFamily: "Arial",
+    fontFamily: "Arial, sans-serif",
   }}
 >
 
@@ -1533,7 +1589,7 @@ return (
   style={{
     border: "none",
     background: "transparent",
-    color: "#4f46e5",
+    color: "var(--season-primary, #2563eb)",
     fontWeight: "700",
     fontSize: mobile ? "15px" : "14px",
     display: "inline-flex",
@@ -1583,8 +1639,10 @@ return (
   style={{
     width: "100%",
     height: mobile
-      ? "min(100vw, 560px)"
-      : "min(42vw, 620px)",
+      ? "min(92vw, 560px)"
+      : "clamp(320px, 42vw, 620px)",
+    aspectRatio: "1 / 1",
+    minHeight: 0,
 
     overflow: "hidden",
     borderRadius: mobile ? "18px" : "22px",
@@ -1689,7 +1747,7 @@ return (
 
 <h1
   style={{
-    fontSize: mobile ? "30px" : "38px",
+    fontSize: mobile ? "clamp(22px, 7vw, 30px)" : "clamp(30px, 3vw, 38px)",
 
     marginBottom: "16px",
 
@@ -1927,7 +1985,7 @@ Basé sur {product.reviews?.length || 0} avis
       style={{
         margin: 0,
         color: "#111827",
-        fontSize: mobile ? "34px" : "42px",
+        fontSize: mobile ? "clamp(26px, 8vw, 34px)" : "clamp(34px, 3.2vw, 42px)",
         fontWeight: "900",
         lineHeight: "1",
         letterSpacing: "-1px",
@@ -1971,7 +2029,7 @@ Basé sur {product.reviews?.length || 0} avis
     padding: mobile ? "15px" : "18px",
     borderRadius: mobile ? "17px" : "20px",
     background: "#ffffff",
-    border: "1px solid #eef2ff",
+    border: "1px solid color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
     boxShadow: "0 8px 22px rgba(15,23,42,.045)",
     width: "100%",
     boxSizing: "border-box",
@@ -1996,7 +2054,7 @@ Basé sur {product.reviews?.length || 0} avis
         fontWeight: "900",
       }}
     >
-      <FaGem style={{ color: "#6366f1", fontSize: "14px" }} />
+      <FaGem style={{ color: "var(--season-secondary, #3b82f6)", fontSize: "14px" }} />
       Description
     </div>
 
@@ -2037,7 +2095,7 @@ Basé sur {product.reviews?.length || 0} avis
         padding: "8px 0",
         border: "none",
         background: "transparent",
-        color: "#4f46e5",
+        color: "var(--season-primary, #2563eb)",
         fontSize: mobile ? "13px" : "13px",
         fontWeight: "900",
         cursor: "pointer",
@@ -2122,7 +2180,7 @@ Basé sur {product.reviews?.length || 0} avis
     border: "none",
 
     background:
-      "linear-gradient(135deg,#6d28d9,#4f46e5)",
+      "linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 
     color: "white",
 
@@ -2139,7 +2197,7 @@ Basé sur {product.reviews?.length || 0} avis
     transition: "0.3s",
 
     boxShadow:
-      "0 10px 25px rgba(79,70,229,0.20)",
+      "0 10px 25px color-mix(in srgb, var(--season-primary, #2563eb) 20%, transparent)",
   }}
 >
 <div
@@ -2288,7 +2346,7 @@ style={{
     marginTop: "24px",
     background: "linear-gradient(135deg,#ffffff,#f8fafc)",
     borderRadius: mobile ? "18px" : "22px",
-    border: "1px solid rgba(99,102,241,0.10)",
+    border: "1px solid color-mix(in srgb, var(--season-primary, #2563eb) 10%, transparent)",
     boxShadow: "0 12px 30px rgba(15,23,42,0.05)",
     width: "100%",
     boxSizing: "border-box",
@@ -2347,7 +2405,7 @@ style={{
               borderRadius: "999px",
               background: "#f8fafc",
               border: "1px solid #e5e7eb",
-              color: "#4f46e5",
+              color: "var(--season-primary, #2563eb)",
               fontSize: "10px",
               fontWeight: "800",
             }}
@@ -2392,8 +2450,8 @@ style={{
         width: mobile ? "34px" : "38px",
         height: mobile ? "34px" : "38px",
         borderRadius: "12px",
-        background: "#eef2ff",
-        color: "#4f46e5",
+        background: "color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
+        color: "var(--season-primary, #2563eb)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -2572,7 +2630,7 @@ Votre avis compte pour la communauté Konan Shopping Cameroun.
 
     background: "#f9fafb",
 
-    border: "1px dashed #c7d2fe",
+    border: "1px dashed color-mix(in srgb, var(--season-primary, #2563eb) 30%, white)",
 
     padding: mobile ? "12px 16px" : "10px 14px",
 
@@ -2584,7 +2642,7 @@ Votre avis compte pour la communauté Konan Shopping Cameroun.
 
     fontWeight: "700",
 
-    color: "#4f46e5",
+    color: "var(--season-primary, #2563eb)",
 
     maxWidth: "100%",
 
@@ -2719,7 +2777,7 @@ Ajouter des photos
     border: "none",
 
     background:
-      "linear-gradient(135deg,#6d28d9,#4f46e5)",
+      "linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 
     color: "white",
 
@@ -2744,7 +2802,7 @@ Ajouter des photos
     transition: "0.3s ease",
 
     boxShadow:
-      "0 10px 20px rgba(79,70,229,0.16)",
+      "0 10px 20px color-mix(in srgb, var(--season-primary, #2563eb) 16%, transparent)",
   }}
 >
   <FaStar />
@@ -2809,7 +2867,7 @@ new Date(a.createdAt)
     background: "#fff",
     padding: mobile ? "12px" : "14px",
     borderRadius: "16px",
-    border: "1px solid #eef2ff",
+    border: "1px solid color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
     boxShadow: "0 6px 16px rgba(0,0,0,.05)",
     width: "100%",
     boxSizing: "border-box",
@@ -2842,7 +2900,7 @@ new Date(a.createdAt)
     width: mobile ? "34px" : "38px",
     height: mobile ? "34px" : "38px",
     borderRadius: "50%",
-    background: "linear-gradient(135deg,#6d28d9,#4f46e5)",
+    background: "linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -3092,14 +3150,7 @@ onClick={async()=>{
 try{
 
 await api.put(
-  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/like`,
-
-{
-
-clientId,
-
-}
-
+  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/like`
 );
 
 getProduct();
@@ -3119,7 +3170,7 @@ catch(err){
 
 style={{
 border:"none",
-background:"#eff6ff",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 9%, white)",
 color:"#2563eb",
 padding: mobile ? "6px 10px" : "8px 12px",
 borderRadius:"10px",
@@ -3129,7 +3180,7 @@ display:"flex",
 alignItems:"center",
 gap:"5px",
 fontSize: mobile ? "11px" : "12px",
-boxShadow:"0 2px 8px rgba(37,99,235,.10)",
+boxShadow:"0 2px 8px color-mix(in srgb, var(--season-primary, #2563eb) 10%, transparent)",
 }}
 >
 
@@ -3148,14 +3199,7 @@ onClick={async()=>{
 try{
 
 await api.put(
-  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/dislike`,
-
-{
-
-clientId,
-
-}
-
+  `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/dislike`
 );
 
 getProduct();
@@ -3195,8 +3239,9 @@ boxShadow:"0 2px 8px rgba(239,68,68,.10)",
 
 </button>
 
-{/* REPLY */}
+{/* REPLY — réservé aux clients connectés, vérification aussi faite par le backend */}
 
+{user?._id && (
 <button
 type="button"
 onClick={()=>
@@ -3209,8 +3254,8 @@ openReply===review._id
 
 style={{
 border:"none",
-background:"#eef2ff",
-color:"#4f46e5",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
+color:"var(--season-primary, #2563eb)",
 padding: mobile ? "6px 10px" : "8px 12px",
 borderRadius:"10px",
 cursor:"pointer",
@@ -3227,6 +3272,7 @@ fontSize: mobile ? "11px" : "12px",
 {review.replies?.length||0}
 
 </button>
+)}
 
 </div>
 
@@ -3234,7 +3280,7 @@ fontSize: mobile ? "11px" : "12px",
 
 {/* REPLY */}
 
-{openReply === review._id && (
+{openReply === review._id && user?._id && (
 
 <div
 style={{
@@ -3293,11 +3339,6 @@ try{
   await api.post(
     `/api/product/${encodeURIComponent(product._id)}/review/${encodeURIComponent(review._id)}/reply`,
     {
-      clientId: String(clientId).slice(0, 100),
-      name: sanitizeText(
-        user?.name || "Invité",
-        MAX_REVIEW_NAME_LENGTH
-      ),
       comment: safeReply,
     }
   );
@@ -3336,7 +3377,7 @@ style={{
 marginTop:"10px",
 width:"100%",
 border:"none",
-background:"linear-gradient(135deg,#6d28d9,#4f46e5)",
+background:"linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 color:"white",
 padding: mobile ? "12px" : "14px",
 borderRadius:"12px",
@@ -3372,7 +3413,7 @@ marginTop:"10px",
 marginLeft: mobile ? "0" : "20px",
 padding: mobile ? "10px" : "14px",
 background:"#f8fafc",
-border:"1px solid #eef2ff",
+border:"1px solid color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 borderRadius:"12px",
 boxSizing:"border-box",
 }}
@@ -3392,7 +3433,7 @@ wordBreak:"break-word",
 
 <FaUserCircle
 style={{
-color:"#6366f1",
+color:"var(--season-secondary, #3b82f6)",
 }}
 />
 
@@ -3494,7 +3535,7 @@ boxShadow:"0 6px 16px rgba(0,0,0,.04)",
 <FaCommentDots
 style={{
 fontSize: mobile ? "34px" : "40px",
-color:"#6366f1",
+color:"var(--season-secondary, #3b82f6)",
 marginBottom:"10px",
 }}
 />
@@ -3542,7 +3583,7 @@ Soyez le premier à donner votre avis ⭐
       style={{
         background: "transparent",
         border: "none",
-        color: "#5b21b6",
+        color: "var(--season-primary, #2563eb)",
         fontWeight: "800",
         fontSize: "17px",
         cursor: "pointer",
@@ -3598,7 +3639,7 @@ Soyez le premier à donner votre avis ⭐
 >
 <FaGem
   style={{
-    color: "#7c3aed",
+    color: "var(--season-secondary, #3b82f6)",
   }}
 />
 
@@ -3612,7 +3653,7 @@ Produits similaires
     gridTemplateColumns:
       mobile
         ? "repeat(2,minmax(0,1fr))"
-        : "repeat(auto-fit,minmax(220px,1fr))",
+        : "repeat(auto-fit,minmax(min(220px, 100%),1fr))",
 
     gap: mobile ? "12px" : "18px",
 
@@ -3977,7 +4018,7 @@ width: "100%",
 border: "none",
 
 background:
-"linear-gradient(135deg,#6d28d9,#4f46e5)",
+"linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, #2563eb))",
 
 color: "white",
 
@@ -4002,7 +4043,7 @@ gap: "8px",
 transition: "0.3s ease",
 
 boxShadow:
-"0 12px 24px rgba(79,70,229,0.18)",
+"0 12px 24px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
 letterSpacing: "0.3px",
 }}
@@ -4015,7 +4056,7 @@ e.currentTarget.style.transform =
 "translateY(-3px)";
 
 e.currentTarget.style.boxShadow =
-"0 18px 30px rgba(79,70,229,0.28)";
+"0 18px 30px color-mix(in srgb, var(--season-primary, #2563eb) 28%, transparent)";
 
 }
 
@@ -4029,7 +4070,7 @@ e.currentTarget.style.transform =
 "translateY(0px)";
 
 e.currentTarget.style.boxShadow =
-"0 12px 24px rgba(79,70,229,0.18)";
+"0 12px 24px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)";
 
 }
 
@@ -4067,8 +4108,12 @@ Ajouter
     style={{
       position: "fixed",
       inset: 0,
+      width: "100%",
+      height: "100vh",
+      height: "100dvh",
+      minHeight: "100svh",
       zIndex: 999999,
-      background: "radial-gradient(circle at 50% 45%, rgba(99,102,241,.14), transparent 34%), rgba(3,7,18,.91)",
+      background: "radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--season-primary, #2563eb) 14%, transparent), transparent 34%), rgba(3,7,18,.91)",
       backdropFilter: "blur(18px)",
       WebkitBackdropFilter: "blur(14px)",
       display: "flex",
@@ -4251,28 +4296,66 @@ Ajouter
 `}</style>
 
 <style>{`
-  html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
-    overscroll-behavior-x: none;
-  }
-
-  *, *::before, *::after {
+  .ks-product-details-root,
+  .ks-product-details-root * {
     box-sizing: border-box;
   }
 
-  img {
+  .ks-product-details-root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior-x: none;
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  .ks-product-details-root img {
     max-width: 100%;
   }
 
-  button, input, textarea, select {
+  .ks-product-details-root button,
+  .ks-product-details-root input,
+  .ks-product-details-root textarea,
+  .ks-product-details-root select {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    font-family: inherit;
   }
 
-  button, input, textarea, select {
-    font: inherit;
+  .ks-product-details-root input,
+  .ks-product-details-root textarea,
+  .ks-product-details-root select {
+    font-size: 16px !important;
+    max-width: 100%;
+  }
+
+  .ks-product-details-root button {
+    max-width: 100%;
+  }
+
+  @supports (height: 100dvh) {
+    .ks-product-details-root {
+      min-height: 100dvh;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .ks-product-details-root {
+      padding-left: max(8px, env(safe-area-inset-left));
+      padding-right: max(8px, env(safe-area-inset-right));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ks-product-details-root *,
+    .ks-product-details-root *::before,
+    .ks-product-details-root *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 `}</style>
 
@@ -4284,7 +4367,7 @@ Ajouter
 
 const badgeStyle = {
 
-background: "#eef2ff",
+background: "color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 padding: window.innerWidth <= 768 ? "7px 10px" : "8px 12px",
 
@@ -4294,7 +4377,7 @@ fontSize: window.innerWidth <= 768 ? "11px" : "12px",
 
 fontWeight: "700",
 
-color: "#4f46e5",
+color: "var(--season-primary, #2563eb)",
 
 display: "flex",
 
@@ -4332,7 +4415,7 @@ color: "#111827",
 outline: "none",
 
 background:
-"linear-gradient(135deg,#ffffff,#f9fafb)",
+"linear-gradient(135deg,#ffffff,color-mix(in srgb, var(--season-primary, #2563eb) 3%, white))",
 
 boxShadow:
 "0 4px 12px rgba(0,0,0,0.03)",

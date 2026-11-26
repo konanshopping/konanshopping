@@ -323,38 +323,145 @@ return (
 
 
 <div
-
-
-
+className="konan-payment-page"
 style={{
-
-
-
 minHeight:"100vh",
-
-
-
+minHeight:"100svh",
 width:"100%",
-
-
-
 background:"#F6F9FF",
-
-
-
 overflowX:"hidden",
-
-
-
 padding:isMobile?"0":"24px",
-
-
-
+boxSizing:"border-box",
 }}
-
-
-
 >
+<style>{`
+  .konan-payment-page,
+  .konan-payment-page * {
+    box-sizing: border-box;
+  }
+
+  .konan-payment-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+
+  .konan-payment-page img,
+  .konan-payment-page svg {
+    max-width: 100%;
+  }
+
+  .konan-payment-page h1,
+  .konan-payment-page h2,
+  .konan-payment-page h3,
+  .konan-payment-page p,
+  .konan-payment-page a,
+  .konan-payment-page span {
+    overflow-wrap: anywhere;
+  }
+
+  .konan-payment-page a {
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 767px) {
+    .konan-payment-page {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    .konan-payment-page > div:first-of-type {
+      padding-top: calc(18px + env(safe-area-inset-top)) !important;
+    }
+
+    .konan-payment-page > div,
+    .konan-payment-page footer {
+      max-width: 100%;
+      min-width: 0;
+    }
+
+    .konan-payment-page h1 {
+      font-size: clamp(26px, 7.5vw, 36px) !important;
+      overflow-wrap: normal;
+    }
+
+    .konan-payment-page h2 {
+      font-size: clamp(19px, 5.4vw, 25px) !important;
+      overflow-wrap: normal;
+    }
+
+    .konan-payment-page p {
+      overflow-wrap: anywhere;
+    }
+
+    .konan-payment-page a {
+      min-height: 42px;
+      max-width: 100%;
+    }
+
+    .konan-payment-page footer {
+      padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+    }
+  }
+
+  @media (max-width: 390px) {
+    .konan-payment-page {
+      font-size: 14px;
+    }
+
+    .konan-payment-page > div:first-of-type {
+      padding-left: 14px !important;
+      padding-right: 14px !important;
+    }
+
+    .konan-payment-page h1 {
+      font-size: clamp(25px, 7vw, 30px) !important;
+      letter-spacing: -0.35px !important;
+    }
+
+    .konan-payment-page h2 {
+      font-size: clamp(18px, 5.2vw, 22px) !important;
+    }
+
+    .konan-payment-page a {
+      overflow-wrap: anywhere;
+    }
+  }
+
+  @media (max-width: 340px) {
+    .konan-payment-page > div:first-of-type {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+
+    .konan-payment-page footer {
+      padding-left: 14px !important;
+      padding-right: 14px !important;
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .konan-payment-page {
+      min-height: 100svh;
+    }
+
+    .konan-payment-page > div:first-of-type {
+      padding-top: calc(12px + env(safe-area-inset-top)) !important;
+      padding-bottom: 18px !important;
+    }
+  }
+
+  @media (hover: none) and (pointer: coarse) {
+    .konan-payment-page a {
+      -webkit-touch-callout: none;
+    }
+  }
+`}</style>
 
 
 

@@ -1,0 +1,626 @@
+/*
+ * KONAN SHOPPING CAMEROUN — BLACK FRIDAY ULTRA PREMIUM
+ * Fichier : src/theme/themes/black-friday.css
+ *
+ * Activation : data-season="black-friday"
+ * CSS uniquement : aucune modification de React, des routes,
+ * des événements, des données ou de la logique commerciale.
+ * Compatible desktop, Android, iPhone et Safari iOS.
+ */
+
+/* ======================================================
+   1. IDENTITÉ VISUELLE
+====================================================== */
+
+:root[data-season="black-friday"] {
+  color-scheme: light;
+
+  --season-primary: #171717;
+  --season-secondary: #c79a35;
+  --season-glow: rgba(199, 154, 53, 0.16);
+  --season-decoration: rgba(199, 154, 53, 0.24);
+
+  --bf-black: #111111;
+  --bf-black-soft: #202020;
+  --bf-black-deep: #090909;
+  --bf-gold: #c79a35;
+  --bf-gold-light: #f8e7ad;
+  --bf-gold-mid: #dfb957;
+  --bf-gold-dark: #805b16;
+  --bf-cream: #fffaf0;
+
+  --season-page: #faf9f6;
+  --season-surface: #ffffff;
+  --season-border: rgba(199, 154, 53, 0.24);
+  --season-text: #24211b;
+  --season-muted: #777168;
+
+  --bf-shadow-soft: 0 8px 24px rgba(17, 17, 17, 0.07);
+  --bf-shadow-gold: 0 8px 26px rgba(164, 119, 29, 0.14);
+  --bf-radius: 16px;
+}
+
+/* ======================================================
+   2. AMBIANCE GÉNÉRALE
+====================================================== */
+
+:root[data-season="black-friday"] body {
+  background-color: var(--season-page);
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(199, 154, 53, 0.09), transparent 34%),
+    radial-gradient(ellipse at 100% 12%, rgba(23, 23, 23, 0.055), transparent 34%),
+    linear-gradient(180deg, #fffefa 0%, #faf9f6 48%, #f7f5ef 100%);
+  background-attachment: scroll;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Empêche les effets décoratifs de perturber les interactions */
+:root[data-season="black-friday"] body::before,
+:root[data-season="black-friday"] body::after {
+  pointer-events: none;
+}
+
+/* ======================================================
+   3. EN-TÊTE — SIGNATURE BLACK FRIDAY
+====================================================== */
+
+:root[data-season="black-friday"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(199, 154, 53, 0.48);
+  background:
+    linear-gradient(110deg, #111111 0%, #24211b 46%, #111111 100%);
+  box-shadow:
+    0 9px 28px rgba(0, 0, 0, 0.16),
+    0 2px 12px rgba(199, 154, 53, 0.12);
+}
+
+/* Lumière dorée dans l'en-tête */
+:root[data-season="black-friday"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(240, 205, 120, 0.20), transparent 42%),
+    radial-gradient(ellipse at 88% 0%, rgba(199, 154, 53, 0.16), transparent 42%),
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.025), transparent);
+  opacity: 1;
+}
+
+/* Double filet métallique */
+:root[data-season="black-friday"] .konan-seasonal-header::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  left: 3%;
+  right: 3%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--bf-gold-dark) 18%,
+    var(--bf-gold-light) 48%,
+    var(--bf-gold) 76%,
+    transparent
+  );
+  box-shadow: 0 1px 8px rgba(240, 213, 139, 0.35);
+}
+
+:root[data-season="black-friday"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="black-friday"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 3;
+}
+
+/* Liens et textes de l'en-tête */
+:root[data-season="black-friday"] .konan-seasonal-header a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-season="black-friday"] .konan-seasonal-header,
+:root[data-season="black-friday"] .konan-seasonal-header a {
+  color: #fffaf0;
+}
+
+/* ======================================================
+   4. LOGO — BLACK FRIDAY ÉDITION SPÉCIALE
+====================================================== */
+
+:root[data-season="black-friday"] .konan-seasonal-logo-mark {
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 3px 7px rgba(199, 154, 53, 0.22));
+}
+
+/* Petit médaillon doré */
+:root[data-season="black-friday"] .konan-seasonal-logo-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  width: 10px;
+  height: 10px;
+  top: -3px;
+  right: -3px;
+  border: 2px solid #171717;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff0b8, #c79a35 58%, #805b16);
+  box-shadow:
+    0 0 0 2px rgba(240, 213, 139, 0.18),
+    0 2px 9px rgba(199, 154, 53, 0.5);
+}
+
+/* Remplacement visuel du nom par BLACK FRIDAY.
+   Le symbole du logo est conservé. */
+:root[data-season="black-friday"] .konan-seasonal-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+:root[data-season="black-friday"] .konan-seasonal-logo
+> :not(.konan-seasonal-logo-mark) {
+  display: none !important;
+}
+
+:root[data-season="black-friday"] .konan-seasonal-logo::after {
+  content: "BLACK FRIDAY";
+  display: inline-block;
+  max-width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(17px, 2vw, 25px);
+  font-weight: 950;
+  font-style: italic;
+  letter-spacing: clamp(1px, 0.16vw, 2.4px);
+  line-height: 1.05;
+  white-space: nowrap;
+  background: linear-gradient(
+    105deg,
+    #946b1d 0%,
+    #d7ad4d 18%,
+    #fff0b8 37%,
+    #c79a35 53%,
+    #f5df9d 69%,
+    #9a711f 88%,
+    #e7c36d 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: #e7c36d;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.5));
+  animation: bf-metallic-shine 5s linear infinite;
+}
+
+@keyframes bf-metallic-shine {
+  to {
+    background-position: 220% center;
+  }
+}
+
+/* ======================================================
+   5. FAVORIS, PANIER ET COMPTE
+====================================================== */
+
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(220, 183, 93, 0.42);
+  border-radius: 13px;
+  background: linear-gradient(145deg, #292721, #151515);
+  color: #fff4d5;
+  box-shadow:
+    0 4px 13px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease,
+    background 0.22s ease;
+}
+
+/* Barre dorée sur les raccourcis */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  left: 10px;
+  right: 10px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #805b16, #fff0b8, #c79a35);
+}
+
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div:hover {
+    border-color: #f0d58b;
+    background: linear-gradient(145deg, #393225, #171717);
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.22),
+      0 0 14px rgba(199, 154, 53, 0.16);
+    transform: translateY(-2px);
+  }
+}
+
+/* ======================================================
+   6. CARTES PRODUITS — FINITION LUXE
+====================================================== */
+
+:root[data-season="black-friday"] .konan-seasonal-product-card {
+  position: relative;
+  background: linear-gradient(160deg, #ffffff 0%, #fffefa 100%) !important;
+  border: 1px solid rgba(199, 154, 53, 0.23) !important;
+  border-radius: var(--bf-radius);
+  box-shadow:
+    0 5px 18px rgba(23, 23, 23, 0.055),
+    0 1px 5px rgba(199, 154, 53, 0.045) !important;
+  color: var(--season-text);
+  transition:
+    border-color 0.24s ease,
+    box-shadow 0.24s ease,
+    transform 0.24s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :root[data-season="black-friday"] .konan-seasonal-product-card:hover {
+    border-color: rgba(199, 154, 53, 0.62) !important;
+    box-shadow:
+      0 13px 30px rgba(23, 23, 23, 0.10),
+      0 4px 14px rgba(199, 154, 53, 0.10) !important;
+    transform: translateY(-3px);
+  }
+}
+
+/* ======================================================
+   7. CARTES RACCOURCIS
+====================================================== */
+
+:root[data-season="black-friday"] .konan-seasonal-quick-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fcfaf5 68%, #f5ecd8 100%) !important;
+  border: 1px solid rgba(199, 154, 53, 0.27) !important;
+  border-radius: 15px;
+  box-shadow: var(--bf-shadow-soft);
+  color: var(--season-text);
+}
+
+:root[data-season="black-friday"] .konan-seasonal-quick-card h3 {
+  color: var(--bf-black) !important;
+}
+
+/* ======================================================
+   8. BOUTONS ET INTERACTIONS
+====================================================== */
+
+:root[data-season="black-friday"] button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root[data-season="black-friday"] button:focus-visible,
+:root[data-season="black-friday"] a:focus-visible {
+  outline: 2px solid var(--bf-gold);
+  outline-offset: 3px;
+}
+
+/* ======================================================
+   9. RESPONSIVE — TABLETTES ET MOBILES
+====================================================== */
+
+@media (max-width: 768px) {
+  :root[data-season="black-friday"] .konan-seasonal-header {
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.13);
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-header::after {
+    left: 5%;
+    right: 5%;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-logo {
+    gap: 9px;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-logo::after {
+    font-size: clamp(14px, 3.2vw, 19px);
+    letter-spacing: 1px;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-product-card {
+    border-radius: 13px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root[data-season="black-friday"] .konan-seasonal-logo {
+    gap: 7px;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-logo::after {
+    font-size: 13px;
+    letter-spacing: 0.65px;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-logo-mark::after {
+    width: 8px;
+    height: 8px;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  }
+}
+
+/* iPhone / Safari : prise en compte des zones de sécurité */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    :root[data-season="black-friday"] .konan-seasonal-header {
+      padding-left: max(0px, env(safe-area-inset-left));
+      padding-right: max(0px, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Évite les effets de survol collants sur les écrans tactiles */
+@media (hover: none), (pointer: coarse) {
+  :root[data-season="black-friday"] .konan-seasonal-product-card:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div:hover {
+    transform: none;
+  }
+}
+
+/* ======================================================
+   10. SAFARI iOS — RENDU ET INTERACTIONS
+====================================================== */
+
+:root[data-season="black-friday"] img,
+:root[data-season="black-friday"] svg {
+  max-width: 100%;
+}
+
+:root[data-season="black-friday"] a,
+:root[data-season="black-friday"] button {
+  touch-action: manipulation;
+}
+
+/* Le thème ne force aucun scroll horizontal */
+:root[data-season="black-friday"] body {
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  :root[data-season="black-friday"] body {
+    overflow-x: hidden;
+  }
+}
+
+/* ======================================================
+   11. ACCESSIBILITÉ ET MOUVEMENT
+====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="black-friday"] *,
+  :root[data-season="black-friday"] *::before,
+  :root[data-season="black-friday"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ======================================================
+   12. FAVORIS, PANIER ET COMPTE — VINTAGE HERITAGE
+   Finition inspirée des anciennes maisons de luxe :
+   cuir sombre, papier ivoire, laiton patiné et gravure.
+   CSS uniquement : les liens et leurs fonctionnalités
+   restent strictement inchangés.
+====================================================== */
+
+/* Conteneurs des trois raccourcis */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  min-height: 42px;
+  border: 1px solid #a98749 !important;
+  border-radius: 7px !important;
+
+  background:
+    linear-gradient(135deg, rgba(255, 248, 226, 0.10), transparent 42%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(145deg, #342b1d 0%, #211b13 48%, #120f0b 100%) !important;
+
+  color: #f5e8c5 !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 238, 190, 0.20),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.42),
+    inset 0 0 0 3px rgba(169, 135, 73, 0.10),
+    0 4px 0 #090806,
+    0 6px 14px rgba(0, 0, 0, 0.24) !important;
+
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease,
+    filter 0.22s ease;
+}
+
+/* Double encadrement fin façon plaque ancienne */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 4px;
+  width: auto;
+  height: auto;
+  border: 1px solid rgba(221, 190, 125, 0.35);
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 235, 184, 0.10),
+    transparent
+  );
+  opacity: 0.9;
+}
+
+/* Les contenus restent au-dessus de l'encadrement */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Typographie classique et contraste ivoire */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+}
+
+/* Icônes : teinte laiton, sans modifier leur forme ni leur action */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] svg,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] svg,
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] svg {
+  color: #d9b66f !important;
+  stroke: currentColor;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.65));
+}
+
+/* Pastilles de quantité ou notifications : sceau de cire doré */
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] [class*="badge"],
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] [class*="badge"],
+:root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] [class*="badge"] {
+  border: 1px solid #f0d99e;
+  background: linear-gradient(145deg, #e4c77f, #9b702d) !important;
+  color: #21180b !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    0 1px 4px rgba(0, 0, 0, 0.35);
+  text-shadow: none;
+}
+
+/* Interaction réservée aux appareils avec vrai survol */
+@media (hover: hover) and (pointer: fine) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div:hover,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div:hover {
+    border-color: #f0d99e !important;
+    background:
+      linear-gradient(135deg, rgba(255, 248, 226, 0.16), transparent 42%),
+      linear-gradient(145deg, #493a25 0%, #2b2115 52%, #171109 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 238, 190, 0.28),
+      inset 0 0 0 3px rgba(221, 190, 125, 0.14),
+      0 5px 0 #090806,
+      0 9px 20px rgba(0, 0, 0, 0.30),
+      0 0 13px rgba(199, 154, 53, 0.16) !important;
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+  }
+}
+
+/* Clic tactile : sensation de bouton gravé */
+@media (hover: none), (pointer: coarse) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div:active,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div:active,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div:active {
+    transform: translateY(1px);
+    box-shadow:
+      inset 0 2px 5px rgba(0, 0, 0, 0.32),
+      0 2px 0 #090806 !important;
+  }
+}
+
+/* Adaptation téléphone : conserver des zones tactiles confortables */
+@media (max-width: 600px) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+    min-height: 40px;
+    border-radius: 6px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 238, 190, 0.17),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+      inset 0 0 0 2px rgba(169, 135, 73, 0.09),
+      0 3px 0 #090806,
+      0 4px 9px rgba(0, 0, 0, 0.20) !important;
+  }
+
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div::before,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div::before,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div::before {
+    inset: 3px;
+  }
+}
+
+/* Safari iOS : évite les transitions ou filtres lourds au toucher */
+@supports (-webkit-touch-callout: none) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+   transform: translateZ(0);
+-webkit-transform: translateZ(0);
+  }
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/favorites"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/checkout"] > div,
+  :root[data-season="black-friday"] .konan-seasonal-header a[href="/account"] > div {
+    transition: none !important;
+  }
+}
+

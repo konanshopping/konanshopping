@@ -50,6 +50,8 @@ import Message from "./pages/Message";
 import ResetPassword
 from "./pages/ResetPassword";
 
+import "./theme/konan-new-year-wishes.js";
+
 import AdminMessages from "./pages/AdminMessages";
 
 import ProductDetails from "./pages/ProductDetails";
@@ -194,6 +196,61 @@ import InstallButton from "./components/InstallButton";
 // Le backend reste l'autorité réelle.
 // Le frontend ne considère jamais localStorage comme une preuve de connexion.
 // Les JWT sont dans des cookies HttpOnly et sont envoyés automatiquement par Axios.
+
+// ======================================================
+// STOCKAGE LOCAL ROBUSTE — DONNÉES D'INTERFACE UNIQUEMENT
+// ======================================================
+// Le contenu du navigateur n'est jamais une preuve d'authentification.
+// Les autorisations restent exclusivement vérifiées par le backend.
+function readSafeLocalJSON(key, fallback = null) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+function readStoredClientUser() {
+  const user = readSafeLocalJSON("user", null);
+  return user && typeof user === "object" && typeof user._id === "string"
+    ? user
+    : null;
+}
+
+function getStableGuestId() {
+  try {
+    let guestId = localStorage.getItem("guestId");
+    if (!guestId || typeof guestId !== "string" || guestId.length > 100) {
+      guestId = `guest_${window.crypto?.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2)}`}`;
+      localStorage.setItem("guestId", guestId);
+    }
+    return guestId;
+  } catch {
+    // Le site reste utilisable si le navigateur bloque le stockage local.
+    return `guest_session_${Date.now()}`;
+  }
+}
+
+function getClientStorageId(user = readStoredClientUser()) {
+  return user?._id || getStableGuestId();
+}
+
+function readSafeArray(key) {
+  const value = readSafeLocalJSON(key, []);
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeProductList(items) {
+  const unique = new Map();
+  for (const item of Array.isArray(items) ? items : []) {
+    if (item && typeof item._id === "string") {
+      unique.set(item._id, item);
+    }
+  }
+  return [...unique.values()];
+}
 
 const AuthSessionContext = createContext({
   loading: true,
@@ -350,11 +407,23 @@ function RequireUserOrAdmin({ children }) {
 
 function Home() {
 
+  // Largeur réactive : les adaptations mobiles se mettent à jour
+  // aussi lors d’un redimensionnement ou d’un changement d’orientation.
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
+
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth);
+    window.addEventListener("resize", updateViewportWidth, { passive: true });
+    return () => window.removeEventListener("resize", updateViewportWidth);
+  }, []);
+
   console.log("HOME RENDER");
 
   const navigate = useNavigate();
 
   const location = useLocation();
+  const { authenticated, role, user: sessionUser } = useAuthSession();
+  const currentClient = authenticated && role === "user" ? sessionUser : null;
 
 const [favoritesCount,
 setFavoritesCount] =
@@ -381,32 +450,18 @@ useEffect(() => {
   const updateFavorites =
     () => {
 
-      const user =
-
-        JSON.parse(
-          localStorage.getItem(
-            "user"
-          )
-        );
+      const user = currentClient;
 
       const clientId =
 
         user?._id ||
 
-        localStorage.getItem(
-          "guestId"
-        );
+        getStableGuestId();
 
       const favoritesKey =
         `favorites_${clientId}`;
 
-      const favorites =
-
-        JSON.parse(
-          localStorage.getItem(
-            favoritesKey
-          )
-        ) || [];
+      const favorites = readSafeArray(favoritesKey);
 
       setFavoritesCount(
         favorites.length
@@ -420,37 +475,25 @@ useEffect(() => {
 
   // LIVE UPDATE
 
-  window.addEventListener(
-    "favoritesUpdated",
-    updateFavorites
-  );
+  window.addEventListener("favoritesUpdated", updateFavorites);
+  window.addEventListener("storage", updateFavorites);
 
   return () => {
 
-    window.removeEventListener(
-      "favoritesUpdated",
-      updateFavorites
-    );
+    window.removeEventListener("favoritesUpdated", updateFavorites);
+    window.removeEventListener("storage", updateFavorites);
 
   };
 
-}, []);
+}, [currentClient?._id]);
 
-const user =
-
-  JSON.parse(
-    localStorage.getItem(
-      "user"
-    )
-  );
+const user = currentClient;
 
 const clientId =
 
   user?._id ||
 
-  localStorage.getItem(
-    "guestId"
-  );
+  getStableGuestId();
 
 // JWT uniquement pour les appels backend nécessitant l'identité du client.
 const authHeaders = {};
@@ -458,34 +501,94 @@ const authHeaders = {};
 const favoritesKey =
   `favorites_${clientId}`;
 
+// À la connexion, fusionner les données invitées vers le compte.
+// Le localStorage ne sert qu'à conserver le panier/favoris de l'interface.
+// Le backend doit toujours vérifier la session pour toute opération sensible.
+useEffect(() => {
+  if (!authenticated || role !== "user" || !currentClient?._id) return;
+
+  const guestId = (() => {
+    try { return localStorage.getItem("guestId"); } catch { return null; }
+  })();
+  if (!guestId || guestId === currentClient._id) return;
+
+  const guestCartKey = `cart_${guestId}`;
+  const accountCartKey = `cart_${currentClient._id}`;
+  const guestFavoritesKey = `favorites_${guestId}`;
+  const accountFavoritesKey = `favorites_${currentClient._id}`;
+
+  const guestCart = readSafeArray(guestCartKey);
+  const accountCart = readSafeArray(accountCartKey);
+  const mergedCartMap = new Map();
+
+  for (const item of accountCart) {
+    if (item?._id) mergedCartMap.set(item._id, { ...item, quantity: Math.max(1, Number(item.quantity) || 1) });
+  }
+  for (const item of guestCart) {
+    if (!item?._id) continue;
+    const previous = mergedCartMap.get(item._id);
+    mergedCartMap.set(item._id, {
+      ...(previous || {}),
+      ...item,
+      quantity: Math.min(99, (previous?.quantity || 0) + Math.max(1, Number(item.quantity) || 1))
+    });
+  }
+
+  const mergedCart = [...mergedCartMap.values()];
+  const mergedFavorites = normalizeProductList([
+    ...readSafeArray(accountFavoritesKey),
+    ...readSafeArray(guestFavoritesKey)
+  ]);
+
+  try {
+    localStorage.setItem(accountCartKey, JSON.stringify(mergedCart));
+    localStorage.setItem(accountFavoritesKey, JSON.stringify(mergedFavorites));
+    localStorage.removeItem(guestCartKey);
+    localStorage.removeItem(guestFavoritesKey);
+  } catch (error) {
+    console.warn("Fusion locale panier/favoris impossible :", error);
+  }
+
+  setCart(mergedCart);
+  setLikedProducts(mergedFavorites.map((item) => item._id));
+  setFavoritesCount(mergedFavorites.length);
+  window.dispatchEvent(new Event("cartUpdated"));
+  window.dispatchEvent(new Event("favoritesUpdated"));
+
+  // Synchroniser les favoris sur le serveur, sans faire confiance à un userId fourni.
+  Promise.allSettled(
+    mergedFavorites.map((product) =>
+      axios.post(
+        "https://konanshopping.com/api/favorites",
+        { productId: product._id },
+        { withCredentials: true }
+      )
+    )
+  ).then(() => {
+    // Le backend est la source de vérité pour les favoris des comptes connectés.
+  });
+}, [authenticated, role, currentClient?._id]);
+
 const [likedProducts, setLikedProducts] =
   useState([]);
 
 useEffect(() => {
+  const updateLikedProducts = () => {
+    const favorites = readSafeArray(favoritesKey);
+    setLikedProducts(favorites.map((item) => item._id));
+  };
 
-  console.log("Effect 2");
+  updateLikedProducts();
+  window.addEventListener("favoritesUpdated", updateLikedProducts);
+  window.addEventListener("storage", updateLikedProducts);
 
-  const favorites =
-    JSON.parse(
-      localStorage.getItem(
-        "favorites"
-      )
-    ) || [];
+  return () => {
+    window.removeEventListener("favoritesUpdated", updateLikedProducts);
+    window.removeEventListener("storage", updateLikedProducts);
+  };
+}, [favoritesKey]);
 
-  setLikedProducts(
-    favorites.map(
-      (item) => item._id
-    )
-  );
-
-}, []);
-
-const admin =
-  JSON.parse(
-    localStorage.getItem(
-      "admin"
-    )
-  );
+const admin = readSafeLocalJSON("admin", null);
 
 const placeholders = [
   "Que recherchez-vous aujourd’hui ?",
@@ -703,9 +806,7 @@ useEffect(() => {
   // CLIENT CONNECTÉ ?
   // =====================
 
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+  const user = currentClient;
 
   if (user) return;
 
@@ -791,38 +892,9 @@ const [homeLoading, setHomeLoading] =
     const [suggestions, setSuggestions] =
 useState([]);
 
-  const [cart, setCart] =
-  useState(() => {
-
-    const user =
-
-      JSON.parse(
-        localStorage.getItem(
-          "user"
-        )
-      );
-
-    const clientId =
-
-      user?._id ||
-
-      localStorage.getItem(
-        "guestId"
-      );
-
-    const cartKey =
-      `cart_${clientId}`;
-
-    const savedCart =
-
-      localStorage.getItem(
-        cartKey
-      );
-
-    return savedCart
-      ? JSON.parse(savedCart)
-      : [];
-
+  const [cart, setCart] = useState(() => {
+    const clientId = getClientStorageId();
+    return readSafeArray(`cart_${clientId}`);
   });
 
  const [search, setSearch] = useState("");
@@ -907,9 +979,21 @@ useEffect(() => {
           "PRODUITS RÉCUPÉRÉS DU CACHE"
         );
 
-        setProducts(
-          JSON.parse(cached)
-        );
+        const cachedProducts = (() => {
+          try {
+            const parsed = JSON.parse(cached);
+            return Array.isArray(parsed) ? parsed : null;
+          } catch {
+            sessionStorage.removeItem("konan_home_products");
+            return null;
+          }
+        })();
+
+        if (cachedProducts) {
+          setProducts(cachedProducts);
+        } else {
+          sessionStorage.removeItem("konan_home_products");
+        }
 
         setHomeLoading(false);
 
@@ -1009,13 +1093,7 @@ useEffect(() => {
 
   const addToCart = (product) => {
 
-  const user =
-
-    JSON.parse(
-      localStorage.getItem(
-        "user"
-      )
-    );
+  const user = currentClient;
 
   // =====================
   // IDENTIFIANT CLIENT
@@ -1025,9 +1103,7 @@ useEffect(() => {
 
     user?._id ||
 
-    localStorage.getItem(
-      "guestId"
-    ) ||
+    getStableGuestId() ||
 
     (() => {
 
@@ -1154,41 +1230,169 @@ useEffect(() => {
 const [visibleProducts, setVisibleProducts] =
   useState(8);
 
+// État visuel indépendant : il ne modifie ni les produits,
+// ni le panier, ni les règles métier ou d'authentification.
+const [loadingMoreProducts, setLoadingMoreProducts] = useState(false);
+
+// Le nombre de produits regroupés dans chaque rangée évolue
+// avec la largeur réelle de l'écran (mobile, tablette, PC et TV).
+const productsPerHorizontalRow = Math.max(
+  4,
+  Math.ceil(viewportWidth / 320) * 2
+);
+
+
+// Liste complète réellement affichable après les filtres existants.
+// La règle de recherche/catégorie est conservée à l'identique afin
+// de connaître le vrai nombre de produits avant d'autoriser le footer.
+const productsForDisplay = useMemo(() => {
+  const sourceProducts =
+    aiProducts.length > 0 ? aiProducts : randomizedProducts;
+
+  const matchingProducts = sourceProducts.filter((product) => {
+    const normalize = (text = "") =>
+      text
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[user?._id || getStableGuestId()u0300-user?._id || getStableGuestId()u036f]/g, "")
+        .replace(/[^user?._id || getStableGuestId()wuser?._id || getStableGuestId()s]/g, " ");
+
+    const stopWords = [
+      "je","j","veux","voudrais","cherche",
+      "recherche","montre","moi","une","un",
+      "des","de","du","la","le","les","pour",
+      "avec","et","ou","svp","stp","sil","plait"
+    ];
+
+    const keywords = normalize(searchQuery)
+      .split(/user?._id || getStableGuestId()s+/)
+      .filter(
+        word =>
+          word &&
+          !stopWords.includes(word)
+      );
+
+    const text = normalize(`
+      ${product.name}
+      ${product.category}
+      ${product.description || ""}
+      ${product.brand || ""}
+    `);
+
+    const matchSearch =
+      !searchClicked ||
+      keywords.length === 0
+        ? true
+        : keywords.some(word => text.includes(word));
+
+    const matchCategory =
+      selectedCategory === "Tous"
+        ? true
+        : product.category === selectedCategory;
+
+    return matchSearch && matchCategory;
+  });
+
+  if (searchClicked && matchingProducts.length > 0) {
+    return matchingProducts;
+  }
+
+  return randomizedProducts.filter(product =>
+    selectedCategory === "Tous"
+      ? true
+      : product.category === selectedCategory
+  );
+}, [
+  searchClicked,
+  aiProducts,
+  randomizedProducts,
+  searchQuery,
+  selectedCategory
+]);
+
+const showProductsFooter =
+  visibleProducts >= productsForDisplay.length &&
+  !loadingMoreProducts;
+
 
 useEffect(() => {
 
   console.log("Effect 11");
 
+  let animationFrame = null;
+  let lastRevealAt = 0;
+
   const handleScroll = () => {
+    if (animationFrame !== null) return;
 
-    console.log("scroll déclenché");
-    console.log("visible :", visibleProducts);
+    animationFrame = window.requestAnimationFrame(() => {
+      animationFrame = null;
 
-    console.log(
-      window.innerHeight +
-      window.scrollY,
-      document.documentElement.scrollHeight
-    );
+      const distanceToBottom =
+        document.documentElement.scrollHeight -
+        (window.innerHeight + window.scrollY);
 
-    if (
-      window.innerHeight +
-      window.scrollY >=
-      document.documentElement.scrollHeight - 300
-    ) {
+      const availableProducts = productsForDisplay.length;
 
-      console.log("AJOUT DE 4 PRODUITS");
+      // Préparer la suite avant que le client n'arrive au bas de la page.
+      if (
+        distanceToBottom <= 1000 &&
+        visibleProducts < availableProducts &&
+        !loadingMoreProducts
+      ) {
+        const now = Date.now();
 
-      setVisibleProducts(prev => prev + 4);
+        // Évite les déclenchements répétés pendant un même défilement.
+        if (now - lastRevealAt < 500) return;
 
-    }
+        lastRevealAt = now;
+        setLoadingMoreProducts(true);
+
+        setVisibleProducts((current) =>
+          Math.min(current + 8, availableProducts)
+        );
+
+      }
+    });
   };
 
-  window.addEventListener("scroll", handleScroll);
+  window.addEventListener("scroll", handleScroll, { passive: true });
 
-  return () =>
+  return () => {
     window.removeEventListener("scroll", handleScroll);
 
-}, [visibleProducts]);
+    if (animationFrame !== null) {
+      window.cancelAnimationFrame(animationFrame);
+    }
+
+  };
+
+}, [visibleProducts, productsForDisplay.length, loadingMoreProducts]);
+
+// Le spinner ne disparaît qu'après le rendu effectif du nouveau lot.
+// Deux frames laissent React/DOM peindre les cartes avant de le retirer.
+// Les 350 ms minimum évitent un clignotement trop bref sur les appareils rapides.
+useEffect(() => {
+  if (!loadingMoreProducts) return;
+
+  let firstFrame = null;
+  let secondFrame = null;
+  let spinnerTimer = null;
+
+  firstFrame = window.requestAnimationFrame(() => {
+    secondFrame = window.requestAnimationFrame(() => {
+      spinnerTimer = window.setTimeout(() => {
+        setLoadingMoreProducts(false);
+      }, 350);
+    });
+  });
+
+  return () => {
+    if (firstFrame !== null) window.cancelAnimationFrame(firstFrame);
+    if (secondFrame !== null) window.cancelAnimationFrame(secondFrame);
+    if (spinnerTimer !== null) window.clearTimeout(spinnerTimer);
+  };
+}, [loadingMoreProducts]);
 
 useEffect(() => {
 
@@ -1301,6 +1505,64 @@ if (
 
   return (
   <>
+  <style>{`
+    .konan-products-horizontal-row {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+
+    .konan-products-horizontal-row::-webkit-scrollbar,
+    .konan-products-horizontal-row::-webkit-scrollbar-track,
+    .konan-products-horizontal-row::-webkit-scrollbar-thumb {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+
+    .konan-products-horizontal-row > a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    @keyframes konanPremiumSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes konanSpinnerPulse {
+      0%, 100% { opacity: .65; transform: scale(.96); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+
+    .konan-loading-spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--season-glow, rgba(75,46,131,.13));
+      border-top-color: var(--season-primary, #5B3CC4);
+      border-right-color: var(--season-primary, #5B3CC4);
+      border-radius: 50%;
+      animation: konanPremiumSpin .78s linear infinite;
+      flex: 0 0 auto;
+    }
+
+    .konan-loading-pulse {
+      animation: konanSpinnerPulse 1.35s ease-in-out infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .konan-products-horizontal-row {
+        scroll-behavior: auto;
+      }
+
+      .konan-loading-spinner,
+      .konan-loading-pulse {
+        animation: none !important;
+      }
+    }
+  `}</style>
+
   <SeoOrganization />
   <SeoWebsite />
 
@@ -1316,10 +1578,12 @@ if (
   <div
       style={{
         minHeight: "100vh",
-        background: "#f5f5f7",
+        background: "var(--season-page, #f5f5f7)",
         fontFamily: "Arial",
         width: "100%",
         maxWidth: "100%",
+        boxSizing: "border-box",
+        paddingBottom: viewportWidth < 768 ? "calc(110px + env(safe-area-inset-bottom, 0px))" : "32px",
       }}
     >
 
@@ -1350,9 +1614,10 @@ if (
 ========================================================= */}
 
 <div
+  className="konan-seasonal-header"
   style={{
     position: "fixed",
-    top: 0,
+    top: "env(safe-area-inset-top, 0px)",
     left: 0,
     right: 0,
 
@@ -1363,7 +1628,7 @@ if (
     backdropFilter: "blur(20px)",
     WebkitBackdropFilter: "blur(20px)",
 
-    borderBottom: "1px solid rgba(229,231,235,0.85)",
+    borderBottom: "1px solid var(--season-border, rgba(229,231,235,0.85))",
 
     zIndex: 9999,
 
@@ -1375,24 +1640,24 @@ if (
 
     padding: compactHeader
       ? (
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "6px 10px"
             : "7px 22px"
         )
       : (
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "8px 10px 9px"
             : "10px 22px 12px"
         ),
 
     maxHeight: compactHeader
       ? (
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "58px"
             : "68px"
         )
       : (
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "150px"
             : "110px"
         ),
@@ -1424,12 +1689,12 @@ if (
       alignItems: "center",
 
       justifyContent:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "space-between"
           : "space-between",
 
       gap:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "8px"
           : "14px",
 
@@ -1447,6 +1712,7 @@ if (
 
     <Link
       to="/"
+      className="konan-seasonal-logo"
       style={{
         textDecoration: "none",
 
@@ -1457,7 +1723,7 @@ if (
         gap: compactHeader
           ? "0"
           : (
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "6px"
                 : "9px"
             ),
@@ -1466,6 +1732,7 @@ if (
       }}
     >
 
+      <span className="konan-seasonal-logo-mark">
       <img
         src="/logo.jpg"
         alt="Konan Shopping"
@@ -1475,12 +1742,12 @@ if (
           width:
             compactHeader
               ? (
-                  window.innerWidth < 768
+                  viewportWidth < 768
                     ? "34px"
                     : "40px"
                 )
               : (
-                  window.innerWidth < 768
+                  viewportWidth < 768
                     ? "34px"
                     : "42px"
                 ),
@@ -1488,12 +1755,12 @@ if (
           height:
             compactHeader
               ? (
-                  window.innerWidth < 768
+                  viewportWidth < 768
                     ? "34px"
                     : "40px"
                 )
               : (
-                  window.innerWidth < 768
+                  viewportWidth < 768
                     ? "34px"
                     : "42px"
                 ),
@@ -1501,7 +1768,7 @@ if (
           objectFit: "cover",
 
           borderRadius:
-            window.innerWidth < 768
+            viewportWidth < 768
               ? "9px"
               : "11px",
 
@@ -1511,6 +1778,7 @@ if (
             "0 3px 10px rgba(75,46,131,0.12)",
         }}
       />
+      </span>
 
       <div
         style={{
@@ -1527,11 +1795,11 @@ if (
             margin: 0,
 
             fontSize:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "10px"
                 : "13px",
 
-            color: "#1F1B4B",
+            color: "var(--season-text, #1F1B4B)",
 
             fontWeight: "900",
 
@@ -1549,11 +1817,11 @@ if (
             margin: 0,
 
             fontSize:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "10px"
                 : "13px",
 
-            color: "#5B3CC4",
+            color: "var(--season-secondary, #5B3CC4)",
 
             fontWeight: "900",
 
@@ -1575,7 +1843,7 @@ if (
         Sur mobile elle descend sur la deuxième ligne
     =================================================== */}
 
-    {window.innerWidth >= 768 && !compactHeader && (
+    {viewportWidth >= 768 && !compactHeader && (
 
       <div
         style={{
@@ -1704,13 +1972,13 @@ if (
               background:
                 "transparent",
 
-              color: "#111827",
+              color: "var(--season-text, #111827)",
 
               WebkitTextFillColor:
-                "#111827",
+                "var(--season-text, #111827)",
 
               caretColor:
-                "#4B2E83",
+                "var(--season-primary, #4B2E83)",
             }}
           />
 
@@ -1732,7 +2000,7 @@ if (
     width: "42px",
     height: "42px",
     border: "none",
-    background: "#4B2E83",
+    background: "var(--season-primary, #4B2E83)",
     color: "#FFFFFF",
     display: "flex",
     alignItems: "center",
@@ -1767,7 +2035,7 @@ if (
 
               right: 0,
 
-              background: "#FFFFFF",
+              background: "var(--season-surface, #FFFFFF)",
 
               borderRadius: "18px",
 
@@ -1851,7 +2119,7 @@ if (
 
                         fontWeight: "700",
 
-                        color: "#111827",
+                        color: "var(--season-text, #111827)",
 
                         overflow:
                           "hidden",
@@ -1908,12 +2176,12 @@ if (
 
         gap: compactHeader
           ? (
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "6px"
                 : "9px"
             )
           : (
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "5px"
                 : "8px"
             ),
@@ -1930,28 +2198,28 @@ if (
         style={{
           textDecoration: "none",
 
-          color: "#111827",
+          color: "var(--season-text, #111827)",
         }}
       >
 
         <div
           style={{
             width:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             height:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             borderRadius:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "11px"
                 : "13px",
 
-            background: "#FFFFFF",
+            background: "var(--season-surface, #FFFFFF)",
 
             display: "flex",
 
@@ -1974,7 +2242,7 @@ if (
           <FaHeart
             style={{
               fontSize:
-                window.innerWidth < 768
+                viewportWidth < 768
                   ? "16px"
                   : "18px",
             }}
@@ -1999,7 +2267,7 @@ if (
                 borderRadius: "999px",
 
                 background:
-                  "#5B3CC4",
+                  "var(--season-secondary, #5B3CC4)",
 
                 color: "#FFFFFF",
 
@@ -2050,17 +2318,17 @@ if (
         <div
           style={{
             width:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             height:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             borderRadius:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "11px"
                 : "13px",
 
@@ -2089,7 +2357,7 @@ if (
           <FaShoppingCart
             style={{
               fontSize:
-                window.innerWidth < 768
+                viewportWidth < 768
                   ? "16px"
                   : "18px",
             }}
@@ -2115,7 +2383,7 @@ if (
                 "999px",
 
               background:
-                "#5B3CC4",
+                "var(--season-secondary, #5B3CC4)",
 
               color:
                 "#FFFFFF",
@@ -2166,17 +2434,17 @@ if (
         <div
           style={{
             width:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             height:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "36px"
                 : "42px",
 
             borderRadius:
-              window.innerWidth < 768
+              viewportWidth < 768
                 ? "11px"
                 : "13px",
 
@@ -2202,7 +2470,7 @@ if (
           <FaUserCircle
             style={{
               fontSize:
-                window.innerWidth < 768
+                viewportWidth < 768
                   ? "18px"
                   : "20px",
             }}
@@ -2221,7 +2489,7 @@ if (
       RECHERCHE MOBILE
   ===================================================== */}
 
-  {window.innerWidth < 768 && !compactHeader && (
+  {viewportWidth < 768 && !compactHeader && (
 
     <div
       style={{
@@ -2347,13 +2615,13 @@ if (
             background:
               "transparent",
 
-            color: "#111827",
+            color: "var(--season-text, #111827)",
 
             WebkitTextFillColor:
               "#111827",
 
             caretColor:
-              "#4B2E83",
+              "var(--season-primary, #4B2E83)",
           }}
         />
 
@@ -2382,7 +2650,7 @@ if (
 
     border: "none",
 
-    background: "#4B2E83",
+    background: "var(--season-primary, #4B2E83)",
 
     color: "#FFFFFF",
 
@@ -2590,12 +2858,12 @@ if (
       display: "flex",
 
       gap:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "8px"
           : "10px",
 
       marginTop:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "8px"
           : "12px",
 
@@ -2697,7 +2965,7 @@ if (
 
               background:
                 index === 1
-                  ? "#4B2E83"
+                  ? "var(--season-primary, #4B2E83)"
                   : "#F3F4F6",
 
               color:
@@ -2706,7 +2974,7 @@ if (
                   : "#111827",
 
               padding:
-                window.innerWidth < 768
+                viewportWidth < 768
                   ? "8px 14px"
                   : "9px 16px",
 
@@ -2717,7 +2985,7 @@ if (
                 "800",
 
               fontSize:
-                window.innerWidth < 768
+                viewportWidth < 768
                   ? "11px"
                   : "12px",
 
@@ -2754,14 +3022,14 @@ if (
   style={{
     height: compactHeader
       ? (
-          window.innerWidth < 768
-            ? "68px"
-            : "82px"
+          viewportWidth < 768
+            ? "calc(68px + env(safe-area-inset-top, 0px))"
+            : "calc(82px + env(safe-area-inset-top, 0px))"
         )
       : (
-          window.innerWidth < 768
-            ? "148px"
-            : "105px"
+          viewportWidth < 768
+            ? "calc(148px + env(safe-area-inset-top, 0px))"
+            : "calc(105px + env(safe-area-inset-top, 0px))"
         ),
 
     transition:
@@ -2776,7 +3044,7 @@ if (
 
 <div
   style={{
-    background: "#FFFFFF",
+    background: "var(--season-surface, #FFFFFF)",
     borderRadius: "18px",
     padding: "8px",
     display: "flex",
@@ -2804,7 +3072,7 @@ if (
       border: "none",
       borderRadius: "10px",
       background: "#F5F3FF",
-      color: "#4B2E83",
+      color: "var(--season-primary, #4B2E83)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -2854,9 +3122,9 @@ if (
         outline: "none",
         background: "transparent",
         fontSize: "12px",
-        color: "#111827",
-        WebkitTextFillColor: "#111827",
-        caretColor: "#4B2E83",
+        color: "var(--season-text, #111827)",
+        WebkitTextFillColor: "var(--season-text, #111827)",
+        caretColor: "var(--season-primary, #4B2E83)",
       }}
     />
 
@@ -2872,7 +3140,7 @@ if (
       border: "none",
       borderRadius: "10px",
       background: "#F5F3FF",
-      color: "#4B2E83",
+      color: "var(--season-primary, #4B2E83)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
@@ -2988,11 +3256,12 @@ if (
    {/* QUICK ACTIONS */}
 
 <div
+  className="konan-seasonal-quick-grid"
   style={{
     display: "grid",
 
     gridTemplateColumns:
-      window.innerWidth < 768
+      viewportWidth < 768
         ? "repeat(2,1fr)"
         : "repeat(4,1fr)",
 
@@ -3014,6 +3283,7 @@ if (
   >
 
     <div
+      className="konan-seasonal-quick-card konan-seasonal-quick-card--categories"
       style={quickCard}
     >
 
@@ -3047,6 +3317,7 @@ if (
   >
 
     <div
+      className="konan-seasonal-quick-card konan-seasonal-quick-card--whatsapp"
       style={quickCard}
     >
 
@@ -3078,6 +3349,7 @@ if (
   >
 
     <div
+      className="konan-seasonal-quick-card konan-seasonal-quick-card--popular"
       style={quickCard}
     >
 
@@ -3109,6 +3381,7 @@ if (
   >
 
     <div
+      className="konan-seasonal-quick-card konan-seasonal-quick-card--offers"
       style={quickCard}
     >
 
@@ -3171,7 +3444,7 @@ if (
        style={{
           border: "none",
 
-          background: "#4B2E83",
+          background: "var(--season-primary, #4B2E83)",
 
           color: "white",
 
@@ -3203,7 +3476,7 @@ if (
       display: "flex",
       gap: "8px",
       overflowX: "auto",
-      paddingBottom: "8px",
+      paddingBottom: "2px",
       scrollbarWidth: "none",
       msOverflowStyle: "none",
     }}
@@ -3235,7 +3508,7 @@ if (
 
           background:
             selectedCategory === category
-              ? "#4B2E83"
+              ? "var(--season-primary, #4B2E83)"
               : "#FFFFFF",
 
           color:
@@ -3330,7 +3603,7 @@ if (
         style={{
           border: "none",
 
-          background: "#4B2E83",
+          background: "var(--season-primary, #4B2E83)",
 
           color: "white",
 
@@ -3361,16 +3634,13 @@ if (
 
 <div
   style={{
-    display: "grid",
-
-    gridTemplateColumns:
-      window.innerWidth < 768
-        ? "repeat(2,1fr)"
-        : "repeat(auto-fill,minmax(240px,1fr))",
-
-    gap: "14px",
-
+    display: "flex",
+    flexDirection: "column",
+    gap: "18px",
     width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
+    boxSizing: "border-box",
   }}
 >
 
@@ -3393,7 +3663,7 @@ fontSize:"20px",
 
 fontWeight:"800",
 
-color:"#111827",
+color:"var(--season-text, #111827)",
 
 marginBottom:"10px",
 }}
@@ -3401,7 +3671,7 @@ marginBottom:"10px",
 
 <FaRobot
 style={{
-color:"#4B2E83",
+color:"var(--season-primary, #4B2E83)",
 }}
 />
 
@@ -3419,7 +3689,7 @@ Résultats IA
 <div
 style={{
 
-background:"#FFFFFF",
+background:"var(--season-surface, #FFFFFF)",
 
 padding:"25px",
 
@@ -3480,7 +3750,7 @@ color:"#4F46E5",
 <h2
 style={{
 
-color:"#111827",
+color:"var(--season-text, #111827)",
 
 fontSize:"22px",
 
@@ -3529,8 +3799,8 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
     text
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s]/g, " ");
+      .replace(/[user?._id || getStableGuestId()u0300-user?._id || getStableGuestId()u036f]/g, "")
+      .replace(/[^user?._id || getStableGuestId()wuser?._id || getStableGuestId()s]/g, " ");
 
   const stopWords = [
     "je","j","veux","voudrais","cherche",
@@ -3540,7 +3810,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
   ];
 
   const keywords = normalize(searchQuery)
-    .split(/\s+/)
+    .split(/user?._id || getStableGuestId()s+/)
     .filter(
       word =>
         word &&
@@ -3571,7 +3841,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 <div
   style={{
     gridColumn: "1 / -1",
-    background: "#FFFFFF",
+    background: "var(--season-surface, #FFFFFF)",
     border: "1px solid #ECEFF3",
     borderRadius: "18px",
     padding: "18px 16px",
@@ -3597,7 +3867,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
     <FaSearch
       style={{
         fontSize: "22px",
-        color: "#4B2E83",
+        color: "var(--season-primary, #4B2E83)",
       }}
     />
 
@@ -3608,7 +3878,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
       margin: 0,
       fontSize: "18px",
       fontWeight: "800",
-      color: "#111827",
+      color: "var(--season-text, #111827)",
     }}
   >
     Aucun résultat trouvé
@@ -3628,7 +3898,7 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 
     <span
       style={{
-        color: "#4B2E83",
+        color: "var(--season-primary, #4B2E83)",
         fontWeight: "700",
       }}
     >
@@ -3644,118 +3914,45 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
 
 )}
 
-{(
-  (
-    searchClicked &&
-    (aiProducts.length > 0
-      ? aiProducts
-      : randomizedProducts)
-      .filter((product) => {
+{productsForDisplay.slice(0, visibleProducts)
 
-        const normalize = (text = "") =>
-          text
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^\w\s]/g, " ");
+.reduce((rows, product, index) => {
+  const rowIndex = Math.floor(index / productsPerHorizontalRow);
 
-        const stopWords = [
-          "je","j","veux","voudrais","cherche",
-          "recherche","montre","moi","une","un",
-          "des","de","du","la","le","les","pour",
-          "avec","et","ou","svp","stp","sil","plait"
-        ];
+  if (!rows[rowIndex]) {
+    rows[rowIndex] = [];
+  }
 
-        const keywords = normalize(searchQuery)
-          .split(/\s+/)
-          .filter(
-            word =>
-              word &&
-              !stopWords.includes(word)
-          );
+  rows[rowIndex].push(product);
+  return rows;
+}, [])
 
-        const text = normalize(`
-          ${product.name}
-          ${product.category}
-          ${product.description || ""}
-          ${product.brand || ""}
-        `);
+.map((row, rowIndex) => (
 
-        const matchSearch =
-          keywords.length === 0
-            ? true
-            : keywords.some(word =>
-                text.includes(word)
-              );
-
-        const matchCategory =
-          selectedCategory === "Tous"
-            ? true
-            : product.category === selectedCategory;
-
-        return matchSearch && matchCategory;
-
-      }).length > 0
-  )
-    ? (aiProducts.length > 0
-        ? aiProducts
-        : randomizedProducts).filter((product) => {
-
-        const normalize = (text = "") =>
-          text
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^\w\s]/g, " ");
-
-        const stopWords = [
-          "je","j","veux","voudrais","cherche",
-          "recherche","montre","moi","une","un",
-          "des","de","du","la","le","les","pour",
-          "avec","et","ou","svp","stp","sil","plait"
-        ];
-
-        const keywords = normalize(searchQuery)
-          .split(/\s+/)
-          .filter(
-            word =>
-              word &&
-              !stopWords.includes(word)
-          );
-
-        const text = normalize(`
-          ${product.name}
-          ${product.category}
-          ${product.description || ""}
-          ${product.brand || ""}
-        `);
-
-        const matchSearch =
-          !searchClicked ||
-          keywords.length === 0
-            ? true
-            : keywords.some(word =>
-                text.includes(word)
-              );
-
-        const matchCategory =
-          selectedCategory === "Tous"
-            ? true
-            : product.category === selectedCategory;
-
-        return matchSearch && matchCategory;
-
-      })
-    : randomizedProducts.filter(product =>
-  selectedCategory === "Tous"
-    ? true
-    : product.category === selectedCategory
-)
-)
-
-.slice(0, visibleProducts)
-
-.map((product) => (
+<div
+  key={`products-row-${rowIndex}`}
+  className="konan-products-horizontal-row"
+  style={{
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "stretch",
+    gap: "14px",
+    width: "100%",
+    maxWidth: "100%",
+    minWidth: 0,
+    boxSizing: "border-box",
+    overflowX: "auto",
+    overflowY: "hidden",
+    WebkitOverflowScrolling: "touch",
+    overscrollBehaviorX: "contain",
+    touchAction: "pan-x pan-y",
+    scrollSnapType: "x proximity",
+    scrollbarWidth: "none",
+    paddingBottom: "8px",
+  }}
+>
+{row.map((product) => (
 
 <Link
   to={`/product/${product._id}`}
@@ -3773,12 +3970,23 @@ Essayez une autre image ou utilisez une photo plus claire pour améliorer la rec
     visibleProducts,
 }}
 style={{
-textDecoration:"none",
-color:"#111827",
+textDecoration: "none",
+color: "var(--season-text, #111827)",
+display: "block",
+flex: viewportWidth < 600
+  ? "0 0 78vw"
+  : viewportWidth < 1024
+    ? "0 0 min(42vw, 320px)"
+    : "0 0 clamp(230px, 22vw, 340px)",
+minWidth: viewportWidth < 600 ? "210px" : "230px",
+maxWidth: viewportWidth < 600 ? "340px" : "340px",
+boxSizing: "border-box",
+scrollSnapAlign: "start",
 }}
 >
 
 <div
+className="konan-seasonal-product-card"
 
 onMouseEnter={(e) => {
 
@@ -3808,13 +4016,13 @@ onMouseLeave={(e) => {
 
 style={{
 
-background:"#FFFFFF",
+background:"var(--season-surface, #FFFFFF)",
 
 borderRadius:"16px",
 
 overflow:"hidden",
 
-border:"1px solid #F3F4F6",
+border:"1px solid var(--season-border, #F3F4F6)",
 
 boxShadow:"0 4px 12px rgba(0,0,0,0.05)",
 
@@ -3835,11 +4043,13 @@ style={{
 width:"100%",
 
 height:
-window.innerWidth < 768
-? "190px"
-: "230px",
+viewportWidth < 380
+? "155px"
+: viewportWidth < 768
+  ? "180px"
+  : "230px",
 
-background:"#F9FAFB",
+background:"var(--season-surface-soft, #F9FAFB)",
 
 overflow:"hidden",
 
@@ -3885,10 +4095,7 @@ transition:"transform .35s ease",
 
     e.preventDefault();
 
-    const user =
-      JSON.parse(
-        localStorage.getItem("user")
-      );
+    const user = currentClient;
 
     // ======================
     // FAVORIS LOCAL
@@ -3898,9 +4105,7 @@ transition:"transform .35s ease",
 
       user?._id ||
 
-      localStorage.getItem(
-        "guestId"
-      ) ||
+      getStableGuestId() ||
 
       (() => {
 
@@ -3921,13 +4126,7 @@ transition:"transform .35s ease",
     const favoritesKey =
       `favorites_${clientId}`;
 
-    let favorites =
-
-      JSON.parse(
-        localStorage.getItem(
-          favoritesKey
-        )
-      ) || [];
+    let favorites = readSafeArray(favoritesKey);
 
     const alreadyExists =
       favorites.find(
@@ -3993,12 +4192,7 @@ transition:"transform .35s ease",
           await axios.post(
             "https://konanshopping.com/api/favorites",
             {
-
-              userId: user._id,
-
-              productId:
-                product._id,
-
+              productId: product._id,
             },
             { headers: authHeaders }
           );
@@ -4071,11 +4265,7 @@ window.dispatchEvent(
 
     background:
 
-JSON.parse(
-  localStorage.getItem(
-    favoritesKey
-  )
-)?.find(
+readSafeArray(favoritesKey)?.find(
   (item) =>
     item._id === product._id
 )
@@ -4086,11 +4276,7 @@ JSON.parse(
 
     color:
 
-JSON.parse(
-  localStorage.getItem(
-    favoritesKey
-  )
-)?.find(
+readSafeArray(favoritesKey)?.find(
   (item) =>
     item._id === product._id
 )
@@ -4146,11 +4332,7 @@ style={{
 
 color:
 
-JSON.parse(
-localStorage.getItem(
-favoritesKey
-)
-)?.find(
+readSafeArray(favoritesKey)?.find(
 (item) =>
 item._id === product._id
 )
@@ -4163,11 +4345,7 @@ transition: "0.3s",
 
 filter:
 
-JSON.parse(
-localStorage.getItem(
-favoritesKey
-)
-)?.find(
+readSafeArray(favoritesKey)?.find(
 (item) =>
 item._id === product._id
 )
@@ -4206,11 +4384,11 @@ item._id === product._id
         margin: 0,
 
         fontSize:
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "15px"
             : "18px", // réduit
 
-        color: "#111827",
+        color: "var(--season-text, #111827)",
 
         marginBottom: "8px",
 
@@ -4298,7 +4476,7 @@ return (
 
 <span
   style={{
-    color: "#111827",
+    color: "var(--season-text, #111827)",
 
     fontSize: "11px",
 
@@ -4356,10 +4534,10 @@ avis )
       style={{
         margin: 0,
 
-        color: "#4B2E83",
+        color: "var(--season-primary, #4B2E83)",
 
         fontSize:
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "18px"
             : "24px", // réduit
 
@@ -4440,6 +4618,7 @@ addedProduct === product._id
 </button>
 
       <button
+      className="konan-seasonal-button"
       translate="no"
         style={{
           flex: 1,
@@ -4472,8 +4651,45 @@ addedProduct === product._id
 </div>
 
 </Link>
+))}
+</div>
 ))
 }
+
+{loadingMoreProducts && (
+  <div
+    role="status"
+    aria-live="polite"
+    aria-label="Chargement des produits suivants"
+    style={{
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "12px",
+      padding: "22px 14px 28px",
+      boxSizing: "border-box",
+    }}
+  >
+    <div className="konan-loading-spinner" />
+    <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+      <span
+        className="konan-loading-pulse"
+        style={{
+          color: "#30205F",
+          fontSize: "13px",
+          fontWeight: 800,
+          letterSpacing: ".1px",
+        }}
+      >
+        Préparation des produits
+      </span>
+      <span style={{ color: "#8A8498", fontSize: "11px" }}>
+        Encore quelques articles arrivent…
+      </span>
+    </div>
+  </div>
+)}
 
 {/* BOTTOM NAVIGATION */}
 
@@ -4481,7 +4697,9 @@ addedProduct === product._id
   style={{
   position: "fixed",
 
-  bottom: showBottomNav ? "8px" : "-120px",
+  bottom: showBottomNav
+    ? "calc(8px + env(safe-area-inset-bottom, 0px))"
+    : "-120px",
 
   left: "50%",
 
@@ -4601,7 +4819,7 @@ addedProduct === product._id
               fontSize: "9px",
               color:
                 index === 0
-                  ? "#4B2E83"
+                  ? "var(--season-primary, #4B2E83)"
                   : "#6b7280",
               fontWeight:
                 index === 0
@@ -4668,7 +4886,7 @@ addedProduct === product._id
               fontSize: "11px",
               color:
                 index === 0
-                  ? "#4B2E83"
+                  ? "var(--season-primary, #4B2E83)"
                   : "#6b7280",
               fontWeight:
                 index === 0
@@ -4771,7 +4989,7 @@ showAlert && (
     <h3
     translate="no"
       style={{
-        color: "#111827",
+        color: "var(--season-text, #111827)",
         fontWeight: "800",
         fontSize: "18px",
         marginBottom: "8px",
@@ -4959,7 +5177,7 @@ boxShadow:
         <FaCrown
           style={{
             fontSize: "28px",
-            color: "#5B6CFF",
+            color: "var(--season-primary, #5B6CFF)",
           }}
         />
 
@@ -4987,7 +5205,7 @@ boxShadow:
           border:
             "1px solid rgba(255,255,255,.25)",
 
-          color: "#5B6CFF",
+          color: "var(--season-primary, #5B6CFF)",
 
           fontWeight: "800",
 
@@ -5013,7 +5231,7 @@ boxShadow:
 
           fontWeight: "900",
 
-          color: "#111827",
+          color: "var(--season-text, #111827)",
 
           whiteSpace: "nowrap",
         }}
@@ -5023,7 +5241,7 @@ boxShadow:
 
         <span
           style={{
-            color: "#5B6CFF",
+            color: "var(--season-primary, #5B6CFF)",
 
             textShadow:
               "0 2px 10px rgba(91,108,255,.25)",
@@ -5061,7 +5279,7 @@ boxShadow:
 
           <FaGem
             style={{
-              color: "#5B6CFF",
+              color: "var(--season-primary, #5B6CFF)",
               fontSize: "15px",
             }}
           />
@@ -5083,7 +5301,7 @@ boxShadow:
 
           <FaCrown
             style={{
-              color: "#5B6CFF",
+              color: "var(--season-primary, #5B6CFF)",
               fontSize: "15px",
             }}
           />
@@ -5104,7 +5322,7 @@ boxShadow:
 
           <FaTruck
             style={{
-              color: "#5B6CFF",
+              color: "var(--season-primary, #5B6CFF)",
               fontSize: "15px",
             }}
           />
@@ -5207,23 +5425,25 @@ boxShadow:
 
 )}
 
-{/* ================= FOOTER PREMIUM ================= */}
+{showProductsFooter && (
+  <>
+  {/* ================= FOOTER PREMIUM ================= */}
 
 <div
   style={{
     marginTop: "30px",
 
-    background: "#FFFFFF",
+    background: "var(--season-surface, #FFFFFF)",
 
-    borderTop: "1px solid #E5E7EB",
+    borderTop: "1px solid var(--season-border, #E5E7EB)",
 
     borderRadius:
-      window.innerWidth < 768
+      viewportWidth < 768
         ? "18px 18px 0 0"
         : "24px 24px 0 0",
 
     padding:
-      window.innerWidth < 768
+      viewportWidth < 768
         ? "18px 14px"
         : "30px 28px",
 
@@ -5250,12 +5470,12 @@ boxShadow:
 
       style={{
         width:
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "34px"
             : "42px",
 
         height:
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "34px"
             : "42px",
 
@@ -5274,13 +5494,13 @@ boxShadow:
         margin: 0,
 
         fontSize:
-          window.innerWidth < 768
+          viewportWidth < 768
             ? "17px"
             : "21px",
 
         fontWeight: "900",
 
-        color: "#111827",
+        color: "var(--season-text, #111827)",
       }}
     >
       KONAN SHOPPING
@@ -5297,7 +5517,7 @@ boxShadow:
       color: "#6B7280",
 
       fontSize:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "12px"
           : "13px",
 
@@ -5321,7 +5541,7 @@ boxShadow:
       justifyContent: "center",
       alignItems: "center",
       flexWrap: "wrap",
-      gap: window.innerWidth < 768 ? "16px" : "28px",
+      gap: viewportWidth < 768 ? "16px" : "28px",
       marginBottom: "20px",
     }}
   >
@@ -5333,9 +5553,9 @@ boxShadow:
         alignItems: "center",
         gap: "6px",
         textDecoration: "none",
-        color: "#4B2E83",
+        color: "var(--season-primary, #4B2E83)",
         fontWeight: "700",
-        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        fontSize: viewportWidth < 768 ? "12px" : "13px",
         whiteSpace: "nowrap",
         transition: ".25s",
       }}
@@ -5356,9 +5576,9 @@ boxShadow:
         alignItems: "center",
         gap: "6px",
         textDecoration: "none",
-        color: "#4B2E83",
+        color: "var(--season-primary, #4B2E83)",
         fontWeight: "700",
-        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        fontSize: viewportWidth < 768 ? "12px" : "13px",
         whiteSpace: "nowrap",
         transition: ".25s",
       }}
@@ -5383,7 +5603,7 @@ boxShadow:
         textDecoration: "none",
         color: "#16A34A",
         fontWeight: "700",
-        fontSize: window.innerWidth < 768 ? "12px" : "13px",
+        fontSize: viewportWidth < 768 ? "12px" : "13px",
         whiteSpace: "nowrap",
         transition: ".25s",
       }}
@@ -5410,7 +5630,7 @@ boxShadow:
       justifyContent: "center",
 
       gap:
-        window.innerWidth < 768
+        viewportWidth < 768
           ? "12px"
           : "22px",
 
@@ -5434,7 +5654,7 @@ boxShadow:
       }}
     >
 
-      <FaTruck color="#4B2E83" />
+      <FaTruck color="var(--season-primary, #4B2E83)" />
 
       Livraison rapide
 
@@ -5456,7 +5676,7 @@ boxShadow:
       }}
     >
 
-      <FaLock color="#4B2E83" />
+      <FaLock color="var(--season-primary, #4B2E83)" />
 
       Paiement sécurisé
 
@@ -5478,7 +5698,7 @@ boxShadow:
       }}
     >
 
-      <FaHeadset color="#4B2E83" />
+      <FaHeadset color="var(--season-primary, #4B2E83)" />
 
       Assistance 7j/7
 
@@ -5525,6 +5745,9 @@ boxShadow:
 
 </div>
 
+  </>
+)}
+
 <InstallButton />
 
 </div>
@@ -5534,6 +5757,14 @@ boxShadow:
 }
 
 function App() {
+
+  const [appViewportWidth, setAppViewportWidth] = useState(() => window.innerWidth);
+
+  useEffect(() => {
+    const updateAppViewportWidth = () => setAppViewportWidth(window.innerWidth);
+    window.addEventListener("resize", updateAppViewportWidth, { passive: true });
+    return () => window.removeEventListener("resize", updateAppViewportWidth);
+  }, []);
 
   const [chatPosition, setChatPosition] =
     useState({
@@ -5702,6 +5933,37 @@ function App() {
   };
 
 }, []);
+
+  // Repositionnement visuel du chatbot après rotation ou redimensionnement.
+  // Aucun comportement métier ou échange avec Botpress n'est modifié.
+  useEffect(() => {
+    const repositionBotpress = () => {
+      if (window.location.pathname !== "/") return;
+
+      const botpress = document.querySelector(".bpChatContainer");
+      if (!botpress) return;
+
+      botpress.style.position = "fixed";
+      botpress.style.zIndex = "99999";
+
+      if (window.innerWidth < 768) {
+        botpress.style.bottom = "170px";
+        botpress.style.right = "15px";
+      } else {
+        botpress.style.bottom = "30px";
+        botpress.style.right = "30px";
+      }
+    };
+
+    window.addEventListener("resize", repositionBotpress, { passive: true });
+    window.addEventListener("orientationchange", repositionBotpress);
+    repositionBotpress();
+
+    return () => {
+      window.removeEventListener("resize", repositionBotpress);
+      window.removeEventListener("orientationchange", repositionBotpress);
+    };
+  }, []);
 
   return (
 
@@ -6056,7 +6318,7 @@ function App() {
 }
 
 const quickCard = {
-  background: "white",
+  background: "var(--season-surface, white)",
 
   borderRadius: "16px",
 
@@ -6071,7 +6333,7 @@ const quickCard = {
 
   minHeight: "90px",
 
-  border: "1px solid #f3f4f6",
+  border: "1px solid var(--season-border, #f3f4f6)",
 };
 
 const quickTitle = {
@@ -6079,7 +6341,7 @@ const quickTitle = {
 
   fontSize: "13px",
 
-  color: "#111827",
+  color: "var(--season-text, #111827)",
 
   lineHeight: "1.4",
 

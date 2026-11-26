@@ -1,188 +1,217 @@
+
+/* =========================================================
+   KONAN SHOPPING CAMEROUN
+   GLOBAL STYLES — RESPONSIVE / iOS / ANDROID
+   ========================================================= */
+
+/* DESIGN TOKENS */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
+  --text: #4b5563;
+  --text-h: #111827;
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --code-bg: #f3f4f6;
+
+  /* Identité visuelle Konan Shopping */
+  --accent: var(--season-primary, #2563eb);
+  --accent-dark: var(--season-secondary, #1d4ed8);
+  --accent-bg: var(--season-glow, rgba(37, 99, 235, 0.10));
+  --accent-border: var(--season-decoration, rgba(37, 99, 235, 0.35));
+  --social-bg: rgba(243, 244, 246, 0.7);
+
+  /* Zones de sécurité iOS (encoche, Dynamic Island, barre d'accueil) */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
 
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px,
-    rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    0 10px 15px -3px rgba(15, 23, 42, 0.08),
+    0 4px 6px -2px rgba(15, 23, 42, 0.04);
 
   --sans:
-    system-ui,
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
+    Arial,
     sans-serif;
 
   --heading:
-    system-ui,
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
     "Segoe UI",
     Roboto,
+    Arial,
     sans-serif;
 
   --mono:
     ui-monospace,
+    SFMono-Regular,
     Consolas,
     monospace;
 
-  font: 18px/145% var(--sans);
-
-  letter-spacing: 0.18px;
-
-  color-scheme: light dark;
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 
   color: var(--text);
-
   background: var(--bg);
 
+  /* Évite un thème sombre automatique incohérent avec l'interface */
+  color-scheme: light;
+
   font-synthesis: none;
-
   text-rendering: optimizeLegibility;
-
   -webkit-font-smoothing: antialiased;
-
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-/* DARK MODE */
-
-@media (prefers-color-scheme: dark) {
-
-  :root {
-
-    --text: #9ca3af;
-
-    --text-h: #f3f4f6;
-
-    --bg: #16171d;
-
-    --border: #2e303a;
-
-    --code-bg: #1f2028;
-
-    --accent: #c084fc;
-
-    --accent-bg:
-      rgba(192, 132, 252, 0.15);
-
-    --accent-border:
-      rgba(192, 132, 252, 0.5);
-
-    --social-bg:
-      rgba(47, 48, 58, 0.5);
-
-    --shadow:
-      rgba(0, 0, 0, 0.4)
-      0 10px 15px -3px,
-
-      rgba(0, 0, 0, 0.25)
-      0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
 }
 
 /* RESET */
-
-* {
-  margin: 0;
-  padding: 0;
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-/* FULL WIDTH */
+/*
+ * SCROLL GLOBAL
+ * Le défilement vertical est centralisé sur html.
+ * body et #root ne créent pas de deuxième zone de scroll.
+ */
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
-html,
 body {
   width: 100%;
+  min-width: 320px;
+  max-width: 100%;
   min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* BODY */
-
-body {
+  min-height: 100svh;
+  min-height: 100dvh;
   margin: 0;
-  background: #f5f5f5;
-  font-family: Arial, sans-serif;
+  overflow-x: clip;
+  overflow-y: visible;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
 }
-
-/* ROOT */
 
 #root {
-  width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  margin: 0;
+  overflow: visible;
+}
+
+/* ÉLÉMENTS DE BASE */
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+  font: inherit;
+}
+
+/* Évite le zoom automatique de Safari iOS au focus des champs. */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-border);
+  outline-offset: 3px;
 }
 
 /* TITRES */
-
 h1,
 h2 {
-  font-family: var(--heading);
-  font-weight: 500;
   color: var(--text-h);
+  font-family: var(--heading);
+  font-weight: 600;
 }
 
 h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
   margin: 32px 0;
-
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
 }
 
 h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
   margin: 0 0 8px;
-
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
+  font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
-
-/* PARAGRAPHES */
 
 p {
   margin: 0;
 }
 
 /* CODE */
-
 code,
 .counter {
-  font-family: var(--mono);
   display: inline-flex;
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text-h);
+  font-family: var(--mono);
 }
 
 code {
-  font-size: 15px;
-  line-height: 135%;
   padding: 4px 8px;
   background: var(--code-bg);
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
+/* ANIMATION PULSE — conservée pour les composants existants */
 @keyframes pulse {
-
   0% {
     transform: scale(1);
     opacity: 1;
@@ -197,243 +226,180 @@ code {
     transform: scale(1);
     opacity: 1;
   }
-
 }
 
-/* =========================
-   PREMIUM NAVBAR ICONS
-========================= */
-
-.bottomNavIcon{
-
-  width:50px;
-
-  height:50px;
-
-  border-radius:18px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  transition:all 0.35s ease;
-
-  position:relative;
-
-  color:#6d28d9;
-}
-
-/* HOVER EFFECT */
-
-.bottomNavIcon:hover{
-
-  transform:
-  translateY(-8px)
-  scale(1.12);
-
-  background:
-  linear-gradient(
-    135deg,
-    #6d28d9,
-    #4f46e5
-  );
-
-  color:white;
-
-  box-shadow:
-  0 15px 35px
-  rgba(109,40,217,0.35);
-}
-
-/* GLOW */
-
-.bottomNavIcon::before{
-
-  content:"";
-
-  position:absolute;
-
-  inset:0;
-
-  border-radius:18px;
-
-  background:
-  linear-gradient(
-    135deg,
-    #8b5cf6,
-    #6366f1
-  );
-
-  opacity:0;
-
-  transition:0.4s;
-
-  z-index:-1;
-
-  filter:blur(20px);
-}
-
-.bottomNavIcon:hover::before{
-
-  opacity:0.7;
-}
-
-/* ICON ANIMATION */
-
-.bottomNavIcon svg{
-
-  transition:0.3s;
-}
-
-.bottomNavIcon:hover svg{
-
-  transform:
-  rotate(-10deg)
-  scale(1.1);
-}
-
-/* =========================
-   WHOLE NAV ITEM
-========================= */
-
-.bottomNavItem{
-
-  transition:0.35s ease;
-
-  position:relative;
-}
-
-/* HOVER WHOLE BUTTON */
-
-.bottomNavItem:hover{
-
-  transform:
-  translateY(-8px);
-
-}
-
-/* ICON EFFECT */
-
-.bottomNavItem:hover .bottomNavIcon{
-
-  background:
-  linear-gradient(
-    135deg,
-    #6d28d9,
-    #4f46e5
-  );
-
-  color:white;
-
-  box-shadow:
-  0 15px 35px
-  rgba(109,40,217,0.35);
-
-  transform:scale(1.12);
-}
+/* =========================================================
+   NAVIGATION INFÉRIEURE
+   ========================================================= */
 
 .bottomNavItem {
-  transition: all 0.3s ease;
+  position: relative;
+  transition:
+    transform 0.28s ease,
+    background-color 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
 .bottomNavIcon {
-  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  width: 50px;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  color: var(--accent);
+  transition:
+    transform 0.28s ease,
+    color 0.28s ease,
+    background-color 0.28s ease,
+    box-shadow 0.28s ease;
 }
 
-.bottomNavItem:hover {
-  transform: translateY(-6px) scale(1.05);
-  background: rgba(75, 46, 131, 0.08);
-  box-shadow: 0 8px 20px rgba(75, 46, 131, 0.15);
+.bottomNavIcon svg {
+  transition: transform 0.28s ease;
 }
 
-.bottomNavItem:hover .bottomNavIcon {
-  transform: scale(1.25) rotate(-6deg);
-  color: #4B2E83;
+/* Effets hover uniquement sur les appareils qui disposent d'un vrai pointeur */
+@media (hover: hover) and (pointer: fine) {
+  .bottomNavItem:hover {
+    transform: translateY(-4px);
+    background: var(--accent-bg);
+    box-shadow: 0 8px 20px var(--accent-bg);
+  }
+
+  .bottomNavItem:hover .bottomNavIcon,
+  .bottomNavIcon:hover {
+    transform: translateY(-2px) scale(1.06);
+    background: linear-gradient(
+      135deg,
+      var(--accent),
+      var(--accent-dark)
+    );
+    color: #ffffff;
+    box-shadow: 0 10px 24px var(--accent-bg);
+  }
+
+  .bottomNavIcon:hover svg {
+    transform: scale(1.06);
+  }
+}
+
+.bottomNavItem:active .bottomNavIcon {
+  transform: scale(0.96);
+}
+
+/* =========================================================
+   CATÉGORIES — DÉFILEMENT HORIZONTAL
+   ========================================================= */
+
+.categoriesContainer {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  cursor: grab;
+}
+
+.categoriesContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.categoriesContainer:active {
+  cursor: grabbing;
+}
+
+.categoriesSlider {
+  display: flex;
+  width: max-content;
+  gap: 12px;
+  padding: 6px 4px;
+  animation: scrollCategories 180s linear infinite;
 }
 
 @keyframes scrollCategories {
-
-  0% {
+  from {
     transform: translateX(0);
   }
 
-  100% {
+  to {
     transform: translateX(-50%);
   }
-
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+/* Sur écran tactile, laisser le client faire défiler les catégories au doigt */
+@media (hover: none), (pointer: coarse) {
+  .categoriesSlider {
+    animation: none;
+  }
+
+  .categoriesContainer {
+    cursor: auto;
+  }
 }
 
-html,
-body,
-#root {
-  width: 100%;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+
+  h1 {
+    margin: 20px 0;
+  }
 }
 
-/* CONTENEUR */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
 
-.categoriesContainer{
-    overflow-x:auto;
-    overflow-y:hidden;
+  h1 {
+    font-size: clamp(1.75rem, 6vw, 2.25rem);
+    line-height: 1.16;
+  }
 
-    scroll-behavior:smooth;
+  h2 {
+    font-size: clamp(1.2rem, 4.5vw, 1.4rem);
+  }
 
-    -webkit-overflow-scrolling:touch;
-
-    scrollbar-width:none;
-
-    cursor:grab;
+  /* Évite les animations de survol persistantes sur mobile */
+  .bottomNavItem:hover,
+  .bottomNavIcon:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
 
-.categoriesContainer::-webkit-scrollbar{
-    display:none;
+@media (max-width: 380px) {
+  .bottomNavIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
 }
 
-/* SLIDER */
+/* Respecte les préférences d'accessibilité */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-.categoriesSlider{
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 
-    display:flex;
-
-    width:max-content;
-
-    gap:12px;
-
-    padding:6px 4px;
-
-    animation:scrollCategories 180s linear infinite;
-
-}
-
-/* Pause automatique */
-
-.categoriesContainer:hover .categoriesSlider,
-.categoriesContainer:active .categoriesSlider{
-
-    animation-play-state:paused;
-
-}
-
-/* Animation lente */
-
-@keyframes scrollCategories{
-
-    from{
-        transform:translateX(0);
-    }
-
-    to{
-        transform:translateX(-50%);
-    }
-
+  .categoriesSlider {
+    animation: none !important;
+  }
 }

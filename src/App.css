@@ -1,89 +1,106 @@
 /* =========================================
    KONAN SHOPPING CAMEROUN
-   APP.CSS
-========================================= */
+   APP.CSS — RESPONSIVE / iOS / ANDROID
+   ========================================= */
 
-:root{
+/* ===========================
+   VARIABLES DE DESIGN
+=========================== */
 
-  --primary:#2563eb;
-  --primary-dark:#1d4ed8;
-  --secondary:#60a5fa;
+:root {
+  /* Couleurs de marque pilotées par le thème saisonnier actif */
+  --primary: var(--season-primary, #2563eb);
+  --primary-dark: var(--season-secondary, #1d4ed8);
+  --secondary: var(--season-decoration, #60a5fa);
 
-  --success:#22c55e;
-  --warning:#f59e0b;
-  --danger:#ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
-  --bg:#f5f7fb;
-  --card:#ffffff;
+  --bg: var(--season-page, #f5f7fb);
+  --card: var(--season-surface, #ffffff);
 
-  --text:#111827;
-  --text-light:#6b7280;
+  --text: var(--season-text, #111827);
+  --text-light: var(--season-muted, #6b7280);
 
-  --border:#e5e7eb;
+  --border: var(--season-border, #e5e7eb);
 
-  --radius:18px;
+  --radius: 18px;
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 
-  --shadow:0 10px 30px rgba(15,23,42,.06);
-
+  /* Zones de sécurité iOS : encoche, Dynamic Island et barre d'accueil */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
 }
 
 /* ===========================
    RESET
 =========================== */
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-html{
-
-  width:100%;
-  min-height:100%;
-
-  scroll-behavior:smooth;
-
-  overflow-x:hidden;
-
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
-body{
-
-  width:100%;
-  min-height:100vh;
-
-  background:var(--bg);
-
-  color:var(--text);
-
-  font-family:
-    Inter,
-    Poppins,
-    Arial,
-    sans-serif;
-
-  overflow-x:hidden;
-  overflow-y:auto;
-
+body {
+  width: 100%;
+  min-width: 320px;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  /* Le défilement vertical est centralisé sur html. */
+  overflow-x: clip;
+  overflow-y: visible;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-#root{
-
-  width:100%;
-  min-height:100vh;
-
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
 }
 
 /* ===========================
    CONTENEUR PRINCIPAL
 =========================== */
 
-main{
-
-  width:100%;
-  min-height:100vh;
-
+main {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
 }
 
 .home,
@@ -92,864 +109,738 @@ main{
 .adminOrders,
 .adminClients,
 .adminStats,
-.adminSettings{
-
-  width:100%;
-  min-height:100vh;
-
+.adminSettings {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
 }
 
 /* ===========================
-   GLOBAL
+   ÉLÉMENTS GLOBAUX
 =========================== */
 
-img{
-
-  max-width:100%;
-  display:block;
-
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
 }
 
-a{
-
-  text-decoration:none;
-  color:inherit;
-
+img,
+video {
+  height: auto;
 }
 
-button{
-
-  border:none;
-  cursor:pointer;
-  font-family:inherit;
-
-  transition:.25s;
-
+img {
+  display: block;
 }
 
-button:hover{
-
-  transform:translateY(-2px);
-
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-input,
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+/* Champs de saisie classiques.
+   Les cases à cocher, boutons radio et contrôles spécialisés
+   gardent leur apparence et leur comportement natifs. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):not([type="color"]),
 select,
-textarea{
-
-  width:100%;
-
-  padding:14px 16px;
-
-  border-radius:14px;
-
-  border:1px solid var(--border);
-
-  outline:none;
-
-  background:white;
-
-  font-size:14px;
-
-  transition:.25s;
-
+textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  outline: none;
+  background: var(--card, #ffffff);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 input:focus,
 select:focus,
-textarea:focus{
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--season-glow, rgba(37, 99, 235, 0.10));
+}
 
-  border-color:var(--primary);
+textarea {
+  resize: vertical;
+}
 
-  box-shadow:
-    0 0 0 4px rgba(37,99,235,.10);
-
+/* Focus visible pour navigation clavier */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--season-decoration, rgba(37, 99, 235, 0.45));
+  outline-offset: 2px;
 }
 
 /* ===========================
    CONTAINER
 =========================== */
 
-.container{
-
-  width:100%;
-
-  max-width:1400px;
-
-  margin:auto;
-
-  padding:0 24px;
-
+.container {
+  width: 100%;
+  max-width: 1400px;
+  min-width: 0;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 24px;
+  padding-left: 24px;
 }
 
 /* ===========================
    TITRES
 =========================== */
 
-h1{
-
-  font-size:36px;
-  font-weight:800;
-
+h1 {
+  font-size: clamp(28px, 3.2vw, 36px);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-h2{
-
-  font-size:28px;
-  font-weight:700;
-
+h2 {
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-h3{
-
-  font-size:22px;
-
+h3 {
+  font-size: clamp(18px, 2vw, 22px);
+  line-height: 1.25;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-p{
-
-  color:var(--text-light);
-
+p {
+  color: var(--text-light);
 }
 
 /* ===========================
-   CARD
+   CARTES
 =========================== */
 
-.card{
-
-  background:white;
-
-  border-radius:20px;
-
-  padding:22px;
-
-  box-shadow:var(--shadow);
-
-  transition:.25s;
-
+.card {
+  min-width: 0;
+  padding: 22px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 }
 
-.card:hover{
-
-  transform:translateY(-3px);
-
+/* Hover uniquement sur les appareils avec souris */
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    transform: translateY(-3px);
+  }
 }
 
 /* ===========================
    BOUTONS
 =========================== */
 
-.btn{
-
-  height:50px;
-
-  display:flex;
-
-  justify-content:center;
-  align-items:center;
-
-  gap:10px;
-
-  border-radius:14px;
-
-  font-weight:700;
-
+.btn {
+  display: flex;
+  min-height: 50px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-radius: 14px;
+  font-weight: 700;
+  text-align: center;
+  touch-action: manipulation;
 }
 
-.btnPrimary{
-
-  background:linear-gradient(
+.btnPrimary {
+  background: linear-gradient(
     135deg,
     var(--primary),
     var(--primary-dark)
   );
-
-  color:white;
-
+  color: #ffffff;
 }
 
-.btnDanger{
+.btnDanger {
+  background: #fee2e2;
+  color: #dc2626;
+}
 
-  background:#fee2e2;
+@media (hover: hover) and (pointer: fine) {
+  button:hover {
+    transform: translateY(-2px);
+  }
 
-  color:#dc2626;
+  .btnPrimary:hover {
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.20);
+  }
+}
 
+button:active {
+  transform: scale(0.98);
 }
 
 /* ===========================
-   GRID
+   GRILLES
 =========================== */
 
-.grid{
-
-  display:grid;
-
-  gap:20px;
-
+.grid {
+  display: grid;
+  min-width: 0;
+  gap: 20px;
 }
 
-.grid2{
-
-  grid-template-columns:
-    repeat(auto-fit,minmax(300px,1fr));
-
+.grid2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
 }
 
-.grid3{
-
-  grid-template-columns:
-    repeat(auto-fit,minmax(250px,1fr));
-
+.grid3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
 }
 
-.grid4{
+.grid4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+}
 
-  grid-template-columns:
-    repeat(auto-fit,minmax(220px,1fr));
-
+.grid > * {
+  min-width: 0;
 }
 
 /* ===========================
    SCROLLBAR
 =========================== */
 
-::-webkit-scrollbar{
-
-  width:8px;
-
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-::-webkit-scrollbar-thumb{
-
-  background:#cbd5e1;
-
-  border-radius:50px;
-
+::-webkit-scrollbar-thumb {
+  border-radius: 50px;
+  background: #cbd5e1;
 }
 
-::-webkit-scrollbar-thumb:hover{
-
-  background:#94a3b8;
-
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
-/* ===========================
-   RESPONSIVE
-=========================== */
+/* =========================================================
+   KONAN SHOPPING — SYSTÈME DE NOTIFICATIONS PREMIUM
+   Présentation uniquement : les appels toast() et leur logique
+   restent inchangés.
+========================================================= */
 
-@media(max-width:992px){
+.Toastify__toast-container {
+  z-index: 999999 !important;
+  width: min(410px, calc(100vw - 28px)) !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
 
-  .container{
+.Toastify__toast-container > * {
+  pointer-events: auto !important;
+}
 
-    padding:0 18px;
+/* Carte de notification */
 
+.konan-toast {
+  --konan-toast-accent: #2563eb;
+  --konan-toast-soft: #eff6ff;
+  --konan-toast-icon-bg: #dbeafe;
+  --konan-toast-icon-color: #1d4ed8;
+
+  position: relative !important;
+  display: flex !important;
+  align-items: stretch !important;
+  min-height: 76px !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(226, 232, 240, 0.92) !important;
+  border-left: 4px solid var(--konan-toast-accent) !important;
+  border-radius: 17px !important;
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0f172a !important;
+  box-shadow:
+    0 16px 42px rgba(15, 23, 42, 0.13),
+    0 3px 10px rgba(15, 23, 42, 0.055),
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset !important;
+  -webkit-backdrop-filter: blur(18px) saturate(1.25) !important;
+  backdrop-filter: blur(18px) saturate(1.25) !important;
+  font-family: Inter, Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  animation: konanToastEnter 420ms cubic-bezier(.2, .85, .25, 1) both !important;
+  transform-origin: top right !important;
+  will-change: transform, opacity !important;
+}
+
+/* Un léger reflet supérieur donne un rendu plus soigné */
+
+.konan-toast::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 4px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+/* Corps : conserve la structure de contenu Toastify existante */
+
+.konan-toast-body {
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 76px !important;
+  align-items: center !important;
+  gap: 13px !important;
+  margin: 0 !important;
+  padding: 14px 48px 14px 14px !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  line-height: 1.48 !important;
+}
+
+.konan-toast .Toastify__toast-body {
+  min-width: 0 !important;
+}
+
+.konan-toast .Toastify__toast-body > div:last-child {
+  min-width: 0 !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.48 !important;
+  letter-spacing: -0.01em !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Icône */
+
+.konan-toast .Toastify__toast-icon {
+  display: flex !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  flex: 0 0 42px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  border: 1px solid rgba(15, 23, 42, 0.035) !important;
+  border-radius: 13px !important;
+  background: var(--konan-toast-icon-bg) !important;
+  color: var(--konan-toast-icon-color) !important;
+}
+
+.konan-toast .Toastify__toast-icon svg {
+  width: 21px !important;
+  height: 21px !important;
+}
+
+/* Variantes */
+
+.konan-toast.Toastify__toast--success {
+  --konan-toast-accent: #16a34a;
+  --konan-toast-soft: #f0fdf4;
+  --konan-toast-icon-bg: #dcfce7;
+  --konan-toast-icon-color: #15803d;
+  background: linear-gradient(112deg, #ffffff 0%, #f7fdf8 100%) !important;
+}
+
+.konan-toast.Toastify__toast--error {
+  --konan-toast-accent: #dc2626;
+  --konan-toast-soft: #fef2f2;
+  --konan-toast-icon-bg: #fee2e2;
+  --konan-toast-icon-color: #b91c1c;
+  background: linear-gradient(112deg, #ffffff 0%, #fff8f8 100%) !important;
+}
+
+.konan-toast.Toastify__toast--warning {
+  --konan-toast-accent: #d97706;
+  --konan-toast-soft: #fffbeb;
+  --konan-toast-icon-bg: #fef3c7;
+  --konan-toast-icon-color: #b45309;
+  background: linear-gradient(112deg, #ffffff 0%, #fffdf6 100%) !important;
+}
+
+.konan-toast.Toastify__toast--info {
+  --konan-toast-accent: #2563eb;
+  --konan-toast-soft: #eff6ff;
+  --konan-toast-icon-bg: #dbeafe;
+  --konan-toast-icon-color: #1d4ed8;
+  background: linear-gradient(112deg, #ffffff 0%, #f7faff 100%) !important;
+}
+
+/* Fermeture : zone de clic nette, discrète et accessible */
+
+.konan-toast .Toastify__close-button {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  display: flex !important;
+  width: 28px !important;
+  height: 28px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.16) !important;
+  border-radius: 9px !important;
+  background: rgba(241, 245, 249, 0.9) !important;
+  color: #64748b !important;
+  opacity: 1 !important;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease !important;
+}
+
+.konan-toast .Toastify__close-button svg {
+  width: 13px !important;
+  height: 13px !important;
+}
+
+.konan-toast .Toastify__close-button:focus-visible {
+  outline: 2px solid #2563eb !important;
+  outline-offset: 2px !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .konan-toast .Toastify__close-button:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    transform: scale(1.05) !important;
+  }
+}
+
+.konan-toast .Toastify__close-button:active {
+  transform: scale(.94) !important;
+}
+
+/* Barre de durée : fine et cohérente avec le type de message */
+
+.konan-toast .Toastify__progress-bar {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 3px !important;
+  border-radius: 0 !important;
+  background: var(--konan-toast-accent) !important;
+  opacity: .9 !important;
+}
+
+.konan-toast .Toastify__progress-bar--wrp {
+  position: absolute !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  height: 3px !important;
+  overflow: hidden !important;
+  background: rgba(148, 163, 184, .12) !important;
+}
+
+.konan-toast .Toastify__progress-bar--success,
+.konan-toast .Toastify__progress-bar--error,
+.konan-toast .Toastify__progress-bar--warning,
+.konan-toast .Toastify__progress-bar--info {
+  background: var(--konan-toast-accent) !important;
+}
+
+/* Entrée / sortie */
+
+@keyframes konanToastEnter {
+  from {
+    opacity:  0;
+    transform: translate3d(18px, -8px, 0) scale(.975);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.konan-toast.Toastify__toast--closing {
+  animation: konanToastExit 180ms ease-in both !important;
+}
+
+@keyframes konanToastExit {
+  to {
+    opacity: 0;
+    transform: translate3d(12px, -4px, 0) scale(.985);
+  }
+}
+
+/* Respect des préférences système */
+
+@media (prefers-reduced-motion: reduce) {
+  .konan-toast,
+  .konan-toast.Toastify__toast--closing {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLETTES
+========================================================= */
+
+@media (max-width: 992px) {
+  .container {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILES
+========================================================= */
+
+@media (max-width: 768px) {
+  .container {
+    padding-right: 16px;
+    padding-left: 16px;
   }
 
-}
-
-@media(max-width:768px){
-
-  .container{
-
-    padding:0 16px;
-
+  h1 {
+    font-size: clamp(25px, 6vw, 30px);
   }
 
-  h1{
-
-    font-size:28px;
-
-  }
-
-  h2{
-
-    font-size:22px;
-
+  h2 {
+    font-size: 22px;
   }
 
   .grid2,
   .grid3,
-  .grid4{
-
-    grid-template-columns:1fr;
-
+  .grid4 {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .card{
-
-    padding:18px;
-
+  .card {
+    padding: 18px;
+    border-radius: 18px;
   }
 
-}
-
-@media(max-width:480px){
-
-  .container{
-
-    padding:0 14px;
-
+  /* Notifications mobiles : largeur confortable + zones de sécurité iOS */
+  .Toastify__toast-container {
+    top: calc(10px + var(--safe-area-top)) !important;
+    right: calc(10px + var(--safe-area-right)) !important;
+    left: calc(10px + var(--safe-area-left)) !important;
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
   }
 
+  .konan-toast {
+    width: 100% !important;
+    min-height: 70px !important;
+    margin-bottom: 9px !important;
+    border-radius: 15px !important;
+  }
+
+  .konan-toast-body {
+    min-height: 70px !important;
+    gap: 10px !important;
+    padding: 12px 43px 12px 11px !important;
+  }
+
+  .konan-toast .Toastify__toast-icon {
+    width: 37px !important;
+    min-width: 37px !important;
+    height: 37px !important;
+    flex-basis: 37px !important;
+    border-radius: 11px !important;
+  }
+
+  .konan-toast .Toastify__toast-body > div:last-child {
+    font-size: 12px !important;
+    line-height: 1.42 !important;
+  }
+
+  .konan-toast .Toastify__close-button {
+    top: 8px !important;
+    right: 8px !important;
+    width: 26px !important;
+    height: 26px !important;
+  }
 }
 
 /* =========================================================
-   KONAN SHOPPING
-   NOTIFICATIONS PROFESSIONNELLES
-   DESIGN TYPE DRIVER TRACKING
+   TRÈS PETITS ÉCRANS
 ========================================================= */
 
-.Toastify__toast-container{
-
-  z-index:999999 !important;
-
-  width:390px !important;
-
-  max-width:
-    calc(100vw - 24px) !important;
-
-  padding:0 !important;
-
+@media (max-width: 480px) {
+  .container {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
 }
 
+@media (max-width: 380px) {
+  .Toastify__toast-container {
+    right: calc(8px + var(--safe-area-right)) !important;
+    left: calc(8px + var(--safe-area-left)) !important;
+  }
 
-/* =========================================================
-   NOTIFICATION PRINCIPALE
-========================================================= */
+  .konan-toast-body {
+    gap: 8px !important;
+    padding-left: 9px !important;
+    padding-right: 39px !important;
+  }
 
-.konan-toast{
+  .konan-toast .Toastify__toast-icon {
+    width: 33px !important;
+    min-width: 33px !important;
+    height: 33px !important;
+    flex-basis: 33px !important;
+  }
 
-  position:relative !important;
-
-  min-height:78px !important;
-
-  margin-bottom:12px !important;
-
-  padding:0 !important;
-
-  border-radius:18px !important;
-
-  background:
-    rgba(255,255,255,.96) !important;
-
-  border:
-    1px solid
-    rgba(229,231,235,.95) !important;
-
-  color:#111827 !important;
-
-  box-shadow:
-    0 18px 45px
-    rgba(15,23,42,.14),
-
-    0 5px 15px
-    rgba(15,23,42,.06) !important;
-
-  overflow:hidden !important;
-
-  backdrop-filter:
-    blur(20px) !important;
-
-  -webkit-backdrop-filter:
-    blur(20px) !important;
-
-  font-family:
-    Inter,
-    Poppins,
-    Arial,
-    sans-serif !important;
-
-  animation:
-    konanNotificationIn
-    .4s
-    cubic-bezier(.22,1,.36,1)
-    both !important;
-
+  .konan-toast .Toastify__toast-body > div:last-child {
+    font-size: 11.5px !important;
+  }
 }
 
-
 /* =========================================================
-   CONTENU
+   ACCESSIBILITÉ — RÉDUCTION DES ANIMATIONS
 ========================================================= */
 
-.konan-toast-body{
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
-  width:100% !important;
-
-  min-height:78px !important;
-
-  margin:0 !important;
-
-  padding:
-    14px
-    48px
-    14px
-    14px !important;
-
-  display:flex !important;
-
-  align-items:center !important;
-
-  gap:12px !important;
-
-  color:#111827 !important;
-
-  font-size:13px !important;
-
-  line-height:1.4 !important;
-
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 
 /* =========================================================
-   ICÔNE
+   GARDE-FOUS RESPONSIVE — iOS / TABLETTES / GRANDS ÉCRANS
+   Correctifs de dimensions uniquement : aucune logique React
+   ni aucun comportement métier n'est modifié.
 ========================================================= */
 
-.konan-toast
-.Toastify__toast-icon{
+/* Empêche les éléments flex/grid longs de forcer un débordement. */
+#root,
+main,
+.container,
+.grid,
+.grid > *,
+.card {
+  min-width: 0;
+}
 
-  width:44px !important;
+/* Les médias restent contenus dans leur parent. */
+img,
+picture,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
 
-  min-width:44px !important;
+/* Les longues références, URL et textes ne cassent pas la largeur. */
+.card,
+.container,
+.grid > * {
+  overflow-wrap: anywhere;
+}
 
-  height:44px !important;
+/* Évite que les champs dépassent les cartes sur iPhone. */
+input,
+select,
+textarea {
+  min-width: 0;
+  max-width: 100%;
+  font-size: 16px;
+}
 
-  margin:0 !important;
+/* Les navigateurs iOS gèrent mieux le défilement tactile des zones scrollables. */
+@supports (-webkit-touch-callout: none) {
+  .Toastify__toast-container {
+    padding-top: var(--safe-area-top);
+  }
+}
 
-  border-radius:14px !important;
+/* Très grands écrans : la largeur du container reste maîtrisée. */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1400px;
+  }
+}
 
-  display:flex !important;
-
-  align-items:center !important;
-
-  justify-content:center !important;
-
-  flex-shrink:0 !important;
-
+/* Préserve la lisibilité et les marges sur les appareils très étroits. */
+@media (max-width: 360px) {
+  .container {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
 }
 
 
 /* =========================================================
-   SUCCÈS
+   CORRECTION GLOBALE DU DOUBLE SCROLL
+   Une seule barre verticale pour les pages principales.
+   Les zones internes (tableaux, menus, modales) restent libres
+   de conserver leur propre défilement lorsqu'elles le nécessitent.
 ========================================================= */
 
-.konan-toast.Toastify__toast--success{
-
-  border-left:
-    5px solid #22c55e !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #f0fdf4 100%
-    ) !important;
-
+html {
+  overflow-x: clip;
+  overflow-y: auto;
 }
 
-.konan-toast.Toastify__toast--success
-.Toastify__toast-icon{
-
-  background:#DCFCE7 !important;
-
-  color:#16A34A !important;
-
+body,
+#root {
+  overflow-x: clip;
+  overflow-y: visible !important;
 }
 
-
-/* =========================================================
-   ERREUR
-========================================================= */
-
-.konan-toast.Toastify__toast--error{
-
-  border-left:
-    5px solid #EF4444 !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #FEF2F2 100%
-    ) !important;
-
-}
-
-.konan-toast.Toastify__toast--error
-.Toastify__toast-icon{
-
-  background:#FEE2E2 !important;
-
-  color:#DC2626 !important;
-
-}
-
-
-/* =========================================================
-   WARNING
-========================================================= */
-
-.konan-toast.Toastify__toast--warning{
-
-  border-left:
-    5px solid #F59E0B !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #FFFBEB 100%
-    ) !important;
-
-}
-
-.konan-toast.Toastify__toast--warning
-.Toastify__toast-icon{
-
-  background:#FEF3C7 !important;
-
-  color:#D97706 !important;
-
-}
-
-
-/* =========================================================
-   INFORMATION
-========================================================= */
-
-.konan-toast.Toastify__toast--info{
-
-  border-left:
-    5px solid #2563EB !important;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #EFF6FF 100%
-    ) !important;
-
-}
-
-.konan-toast.Toastify__toast--info
-.Toastify__toast-icon{
-
-  background:#DBEAFE !important;
-
-  color:#2563EB !important;
-
-}
-
-
-/* =========================================================
-   TEXTE
-========================================================= */
-
-.konan-toast
-.Toastify__toast-body > div:last-child{
-
-  color:#111827 !important;
-
-  font-weight:700 !important;
-
-  font-size:13px !important;
-
-  line-height:1.45 !important;
-
-}
-
-
-/* =========================================================
-   BOUTON FERMER
-========================================================= */
-
-.konan-toast
-.Toastify__close-button{
-
-  position:absolute !important;
-
-  top:12px !important;
-
-  right:12px !important;
-
-  width:25px !important;
-
-  height:25px !important;
-
-  border-radius:50% !important;
-
-  background:#F3F4F6 !important;
-
-  color:#64748B !important;
-
-  opacity:1 !important;
-
-  display:flex !important;
-
-  justify-content:center !important;
-
-  align-items:center !important;
-
-  padding:0 !important;
-
-  transition:
-    all .2s ease !important;
-
-}
-
-.konan-toast
-.Toastify__close-button:hover{
-
-  background:#E5E7EB !important;
-
-  color:#111827 !important;
-
-  transform:
-    scale(1.08) !important;
-
-}
-
-
-/* =========================================================
-   BARRE DE PROGRESSION
-========================================================= */
-
-.konan-toast
-.Toastify__progress-bar{
-
-  position:absolute !important;
-
-  left:0 !important;
-
-  bottom:0 !important;
-
-  height:4px !important;
-
-  width:100% !important;
-
-  border-radius:0 !important;
-
-  opacity:1 !important;
-
-}
-
-
-/* SUCCESS */
-
-.konan-toast.Toastify__toast--success
-.Toastify__progress-bar{
-
-  background:
-    linear-gradient(
-      90deg,
-      #22C55E,
-      #16A34A
-    ) !important;
-
-}
-
-
-/* ERROR */
-
-.konan-toast.Toastify__toast--error
-.Toastify__progress-bar{
-
-  background:
-    linear-gradient(
-      90deg,
-      #EF4444,
-      #DC2626
-    ) !important;
-
-}
-
-
-/* WARNING */
-
-.konan-toast.Toastify__toast--warning
-.Toastify__progress-bar{
-
-  background:
-    linear-gradient(
-      90deg,
-      #F59E0B,
-      #D97706
-    ) !important;
-
-}
-
-
-/* INFO */
-
-.konan-toast.Toastify__toast--info
-.Toastify__progress-bar{
-
-  background:
-    linear-gradient(
-      90deg,
-      #2563EB,
-      #1D4ED8
-    ) !important;
-
-}
-
-
-/* =========================================================
-   ANIMATION ENTRÉE
-========================================================= */
-
-@keyframes konanNotificationIn{
-
-  0%{
-
-    opacity:0;
-
-    transform:
-      translateX(35px)
-      scale(.96);
-
-  }
-
-  100%{
-
-    opacity:1;
-
-    transform:
-      translateX(0)
-      scale(1);
-
-  }
-
-}
-
-
-/* =========================================================
-   MOBILE
-========================================================= */
-
-@media(max-width:768px){
-
-  .Toastify__toast-container{
-
-    width:
-      calc(100vw - 20px) !important;
-
-    max-width:none !important;
-
-    left:10px !important;
-
-    right:10px !important;
-
-    top:12px !important;
-
-    padding:0 !important;
-
-  }
-
-
-  .konan-toast{
-
-    width:100% !important;
-
-    min-height:72px !important;
-
-    margin-bottom:10px !important;
-
-    border-radius:16px !important;
-
-  }
-
-
-  .konan-toast-body{
-
-    min-height:72px !important;
-
-    padding:
-      12px
-      42px
-      12px
-      12px !important;
-
-    gap:10px !important;
-
-    font-size:12px !important;
-
-  }
-
-
-  .konan-toast
-  .Toastify__toast-icon{
-
-    width:38px !important;
-
-    min-width:38px !important;
-
-    height:38px !important;
-
-    border-radius:11px !important;
-
-  }
-
-
-  .konan-toast
-  .Toastify__close-button{
-
-    top:9px !important;
-
-    right:9px !important;
-
-    width:23px !important;
-
-    height:23px !important;
-
-  }
-
-
-  .konan-toast
-  .Toastify__toast-body > div:last-child{
-
-    font-size:12px !important;
-
-  }
-
-}
-
-
-/* =========================================================
-   PETITS ÉCRANS
-========================================================= */
-
-@media(max-width:380px){
-
-  .Toastify__toast-container{
-
-    width:
-      calc(100vw - 16px) !important;
-
-    left:8px !important;
-
-    right:8px !important;
-
-  }
-
-  .konan-toast-body{
-
-    padding-left:10px !important;
-
-    gap:8px !important;
-
-  }
-
-  .konan-toast
-  .Toastify__toast-icon{
-
-    width:34px !important;
-
-    min-width:34px !important;
-
-    height:34px !important;
-
-  }
-
+/*
+ * Les pages principales ne doivent pas devenir des scroll containers.
+ * Cette règle neutralise notamment les overflow-y:auto définis
+ * dans les styles des composants React sur leur élément <main>.
+ */
+main {
+  overflow-y: visible !important;
+  overscroll-behavior-y: auto;
 }

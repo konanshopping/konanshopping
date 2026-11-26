@@ -22,13 +22,13 @@ function KonanLoader() {
           0%,100%{
             transform:translate(-50%,-50%) scale(1);
             box-shadow:
-              0 0 10px rgba(75,46,131,.15);
+              0 0 10px color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent);
           }
 
           50%{
             transform:translate(-50%,-50%) scale(1.08);
             box-shadow:
-              0 0 24px rgba(124,58,237,.35);
+              0 0 24px color-mix(in srgb, var(--season-secondary, #3b82f6) 35%, transparent);
           }
 
         }
@@ -92,11 +92,11 @@ function KonanLoader() {
               position:"absolute",
               inset:0,
 
-              border:"3px solid #ECECF8",
+              border:"3px solid color-mix(in srgb, var(--season-primary, #2563eb) 10%, white)",
 
-              borderTop:"3px solid #4B2E83",
+              borderTop:"3px solid var(--season-primary, #2563eb)",
 
-              borderRight:"3px solid #7C3AED",
+              borderRight:"3px solid var(--season-secondary, #3b82f6)",
 
               borderRadius:"50%",
 
@@ -129,7 +129,7 @@ function KonanLoader() {
               animation:"logoPulse 1.8s ease-in-out infinite",
 
               boxShadow:
-                "0 8px 22px rgba(75,46,131,.18)",
+                "0 8px 22px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
             }}
           >
 
@@ -166,7 +166,7 @@ function KonanLoader() {
             textTransform:"lowercase",
 
             background:
-              "linear-gradient(90deg,#B8BCC8 20%,#4B2E83 50%,#B8BCC8 80%)",
+              "linear-gradient(90deg,#B8BCC8 20%,var(--season-primary, #2563eb) 50%,#B8BCC8 80%)",
 
             backgroundSize:"200% auto",
 

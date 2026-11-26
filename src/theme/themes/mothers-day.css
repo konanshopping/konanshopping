@@ -1,0 +1,128 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME FÊTE DES MÈRES
+ * Fichier : src/theme/themes/mothers-day.css
+ *
+ * Activé lorsque data-season="mothers-day".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="mothers-day"] {
+  --season-primary: #c34f78;
+  --season-secondary: #8f365d;
+  --season-glow: rgba(195, 79, 120, 0.11);
+  --season-decoration: rgba(195, 79, 120, 0.27);
+}
+
+/* Rose poudré et bordeaux : une ambiance douce et raffinée. */
+:root[data-season="mothers-day"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(195, 79, 120, 0.25);
+  box-shadow: 0 5px 20px rgba(143, 54, 93, 0.07);
+}
+
+:root[data-season="mothers-day"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: 48px;
+  opacity: 0.72;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(232, 183, 199, 0.34), transparent 48%),
+    radial-gradient(ellipse at 88% 0%, rgba(195, 79, 120, 0.16), transparent 48%);
+}
+
+/* Petits cœurs délicats, sans image ni SVG. */
+:root[data-season="mothers-day"] .konan-seasonal-header::after {
+  content: "♥     ♥      ♥";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 1px;
+  right: 12px;
+  color: rgba(195, 79, 120, 0.34);
+  font-size: 14px;
+  letter-spacing: 11px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* Les éléments interactifs restent au-dessus des décorations. */
+:root[data-season="mothers-day"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="mothers-day"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Finition rose sur Favoris, Panier et Compte. */
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(195, 79, 120, 0.27);
+  box-shadow:
+    0 3px 12px rgba(143, 54, 93, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c34f78, #f0cbd8, #8f365d);
+}
+
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="mothers-day"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier visible. */
+:root[data-season="mothers-day"] button:focus-visible,
+:root[data-season="mothers-day"] a:focus-visible {
+  outline: 2px solid #c34f78;
+  outline-offset: 3px;
+}
+
+/* Décoration plus discrète sur mobile. */
+@media (max-width: 600px) {
+  :root[data-season="mothers-day"] .konan-seasonal-header::before {
+    height: 34px;
+    opacity: 0.48;
+  }
+
+  :root[data-season="mothers-day"] .konan-seasonal-header::after {
+    right: 5px;
+    font-size: 12px;
+    letter-spacing: 6px;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="mothers-day"] .konan-seasonal-header,
+  :root[data-season="mothers-day"] .konan-seasonal-header *,
+  :root[data-season="mothers-day"] button,
+  :root[data-season="mothers-day"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

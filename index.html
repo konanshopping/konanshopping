@@ -1,10 +1,30 @@
+
 <!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Responsive -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- RESPONSIVE + COMPATIBILITÉ MOBILE ET iOS -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+
+    <meta name="theme-color" content="#2563EB" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <!-- INSTALLATION PWA / iOS -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="default"
+    />
+    <meta
+      name="apple-mobile-web-app-title"
+      content="Konan Shopping"
+    />
 
     <!-- SEO -->
     <title>KONAN SHOPPING CAMEROUN | Boutique en ligne fiable</title>
@@ -21,37 +41,67 @@
 
     <meta name="author" content="Konan Shopping Cameroun" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#2563EB" />
 
-
-    <!-- Icônes -->
+    <!-- ICÔNES -->
     <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- Canonical -->
-    <link rel="canonical" href="https://konanshopping.com/" />
+    <!-- CANONICAL -->
+    <link
+      rel="canonical"
+      href="https://konanshopping.com/"
+    />
 
-    <!-- Open Graph -->
+    <!-- OPEN GRAPH : FACEBOOK, WHATSAPP, ETC. -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="KONAN SHOPPING CAMEROUN" />
+    <meta
+      property="og:title"
+      content="KONAN SHOPPING CAMEROUN"
+    />
     <meta
       property="og:description"
       content="Votre boutique en ligne fiable au Cameroun."
     />
-    <meta property="og:image" content="https://konanshopping.com/logo.jpg" />
-    <meta property="og:url" content="https://konanshopping.com/" />
-    <meta property="og:site_name" content="Konan Shopping Cameroun" />
+    <meta
+      property="og:image"
+      content="https://konanshopping.com/logo.jpg"
+    />
+    <meta
+      property="og:url"
+      content="https://konanshopping.com/"
+    />
+    <meta
+      property="og:site_name"
+      content="Konan Shopping Cameroun"
+    />
+    <meta property="og:locale" content="fr_CM" />
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="KONAN SHOPPING CAMEROUN" />
+    <!-- TWITTER / X -->
+    <meta
+      name="twitter:card"
+      content="summary_large_image"
+    />
+    <meta
+      name="twitter:title"
+      content="KONAN SHOPPING CAMEROUN"
+    />
     <meta
       name="twitter:description"
       content="Découvrez des milliers de produits avec une livraison rapide partout au Cameroun."
     />
-    <meta name="twitter:image" content="https://konanshopping.com/logo.jpg" />
+    <meta
+      name="twitter:image"
+      content="https://konanshopping.com/logo.jpg"
+    />
 
-    <!-- Schema.org -->
+    <!-- FONT AWESOME -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <!-- DONNÉES STRUCTURÉES SCHEMA.ORG -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -71,15 +121,17 @@
   </head>
 
   <body>
+    <!-- APPLICATION REACT -->
     <div id="root"></div>
 
-    <script type="module" src="/src/main.jsx"></script>
+    <script
+      type="module"
+      src="/src/main.jsx"
+    ></script>
 
-    <script src="https://fr.monetbil.com/widget/v2/monetbil.min.js"></script>
-
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <!-- MONETBIL : INTÉGRATION EXISTANTE CONSERVÉE -->
+    <script
+      src="https://fr.monetbil.com/widget/v2/monetbil.min.js"
+    ></script>
   </body>
 </html>

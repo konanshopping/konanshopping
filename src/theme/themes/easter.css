@@ -1,0 +1,337 @@
+
+/*
+ * =========================================================
+ * KONAN SHOPPING CAMEROUN — THÈME DE PÂQUES
+ * Fichier : src/theme/themes/easter.css
+ *
+ * Activation : document.documentElement.dataset.season = "easter"
+ *
+ * Décoration :
+ * - Image easter-eggs.jpg dans le header
+ * - Pluie d'œufs pastel décorés
+ * - Poussins et coquilles
+ *
+ * Compatible desktop, mobile et iOS.
+ *
+ * IMPORTANT : fichier CSS uniquement.
+ * Aucune logique métier, API, authentification, paiement,
+ * commande ou sécurité n'est modifiée.
+ * =========================================================
+ */
+
+
+/* =========================================================
+   1. VARIABLES DU THÈME
+========================================================= */
+
+:root[data-season="easter"] {
+  --season-primary: #7c5ac7;
+  --season-secondary: #3f7c63;
+  --season-glow: rgba(124, 90, 199, 0.11);
+  --season-decoration: rgba(63, 124, 99, 0.25);
+}
+
+
+/* =========================================================
+   2. PLUIE DE PÂQUES SUR TOUT LE SITE
+   Les deux couches sont décoratives et ne capturent aucun clic.
+========================================================= */
+
+:root[data-season="easter"] body {
+  position: relative;
+}
+
+/*
+ * Couche arrière : œufs entiers avec volume, reflets,
+ * rayures et motifs décoratifs réalisés en CSS.
+ */
+
+:root[data-season="easter"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(ellipse 13px 18px at 8% 8%, #f5eaff 0 48%, #b99bdf 70%, transparent 74%),
+    radial-gradient(ellipse 12px 17px at 31% 34%, #e4f8e9 0 48%, #83bd98 70%, transparent 74%),
+    radial-gradient(ellipse 14px 19px at 57% 16%, #fff0f3 0 48%, #e7a6bf 70%, transparent 74%),
+    radial-gradient(ellipse 12px 17px at 82% 44%, #fff4d9 0 48%, #e7c06f 70%, transparent 74%),
+    radial-gradient(ellipse 13px 18px at 19% 70%, #e9f6ff 0 48%, #8ebbdc 70%, transparent 74%),
+    radial-gradient(ellipse 12px 17px at 72% 88%, #f8eaff 0 48%, #c4a1df 70%, transparent 74%);
+
+  background-size: 100% 520px;
+  background-repeat: repeat-y;
+  background-position: 0 0;
+
+  opacity: .48;
+  animation: konan-easter-rain 13s linear infinite;
+  contain: strict;
+}
+
+
+/* Poussins et coquilles : deuxième couche */
+
+:root[data-season="easter"] body::after {
+  content: "🐣        ◡          🐥       ◡       🐣";
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+  white-space: pre;
+  text-align: center;
+
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-size: clamp(14px, 1.5vw, 20px);
+  line-height: 48vh;
+  letter-spacing: 2vw;
+
+  opacity: .13;
+  animation: konan-easter-chicks 19s linear infinite;
+  contain: strict;
+}
+
+
+/* Animations */
+
+@keyframes konan-easter-rain {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 520px;
+  }
+}
+
+@keyframes konan-easter-chicks {
+  from {
+    transform: translate3d(0, -100vh, 0);
+  }
+
+  to {
+    transform: translate3d(0, 100vh, 0);
+  }
+}
+
+
+/* =========================================================
+   3. HEADER — IMAGE DE PÂQUES
+   Même principe de positionnement que le thème de Noël.
+   
+   Image utilisée : public/easter-eggs.jpg
+   URL publique : /easter-eggs.jpg
+========================================================= */
+
+:root[data-season="easter"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+
+  border-bottom: 1px solid rgba(124, 90, 199, 0.22);
+  box-shadow: 0 5px 20px rgba(63, 124, 99, 0.06);
+}
+
+
+/* IMAGE DE PÂQUES DANS LE HEADER */
+
+:root[data-season="easter"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 115px;
+
+  background-image: url("/easter-eggs.jpg");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 115px;
+}
+
+
+/* Petites décorations florales */
+
+:root[data-season="easter"] .konan-seasonal-header::after {
+  content: "✿   ·   ✿";
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+
+  top: 1px;
+  right: 12px;
+
+  color: rgba(124, 90, 199, 0.34);
+  font-size: 18px;
+  letter-spacing: 9px;
+  line-height: 25px;
+  white-space: nowrap;
+}
+
+
+/* Le contenu du header reste au-dessus de l'image */
+
+:root[data-season="easter"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 3;
+}
+
+
+/* Logo au premier plan */
+
+:root[data-season="easter"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 4;
+}
+
+
+/* =========================================================
+   4. FAVORIS — PANIER — COMPTE
+========================================================= */
+
+:root[data-season="easter"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="easter"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="easter"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+
+  border: 1px solid rgba(124, 90, 199, 0.24);
+
+  box-shadow:
+    0 3px 12px rgba(63, 124, 99, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+
+/* Ligne décorative sur les boutons */
+
+:root[data-season="easter"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="easter"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="easter"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+
+  top: -2px;
+  left: 8px;
+  right: 8px;
+
+  height: 3px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    #7c5ac7,
+    #f0c9d8,
+    #78ad91
+  );
+}
+
+
+/* Contenu des boutons au-dessus de la décoration */
+
+:root[data-season="easter"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="easter"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="easter"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* =========================================================
+   5. ACCESSIBILITÉ — NAVIGATION CLAVIER
+========================================================= */
+
+:root[data-season="easter"] button:focus-visible,
+:root[data-season="easter"] a:focus-visible {
+  outline: 2px solid #7c5ac7;
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   6. RESPONSIVE — MOBILE ET iOS
+========================================================= */
+
+@media (max-width: 600px) {
+
+  /* Image de Pâques adaptée aux écrans mobiles */
+
+  :root[data-season="easter"] .konan-seasonal-header::before {
+    height: 75px;
+    background-size: 100% 75px;
+    background-position: center top;
+  }
+
+  /* Pluie d'œufs */
+
+  :root[data-season="easter"] body::before {
+    opacity: 0.57;
+    background-size: 340px 540px;
+    animation-duration: 27s;
+  }
+
+  /* Poussins */
+
+  :root[data-season="easter"] body::after {
+    font-size: 16px;
+    line-height: 30vh;
+    letter-spacing: 1vw;
+    opacity: 0.14;
+    animation-duration: 32s;
+  }
+
+  /* Décorations florales */
+
+  :root[data-season="easter"] .konan-seasonal-header::after {
+    right: 5px;
+    font-size: 14px;
+    letter-spacing: 6px;
+  }
+}
+
+
+/* Très petits écrans */
+
+@media (max-width: 380px) {
+
+  :root[data-season="easter"] body::before {
+    opacity: 0.48;
+    background-size: 300px 500px;
+  }
+
+  :root[data-season="easter"] body::after {
+    font-size: 14px;
+    letter-spacing: 0.5vw;
+    line-height: 27vh;
+  }
+}
+
+
+/* =========================================================
+   7. ACCESSIBILITÉ — RÉDUCTION DES ANIMATIONS
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  :root[data-season="easter"] body::before,
+  :root[data-season="easter"] body::after {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  :root[data-season="easter"] .konan-seasonal-header,
+  :root[data-season="easter"] .konan-seasonal-header *,
+  :root[data-season="easter"] button,
+  :root[data-season="easter"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

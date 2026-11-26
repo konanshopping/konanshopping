@@ -1072,6 +1072,8 @@ function Message() {
 
 
 
+        className="konan-message-page konan-message-loading"
+
         style={{
 
 
@@ -1531,6 +1533,8 @@ function Message() {
     <div
 
 
+
+      className="konan-message-page"
 
       style={{
 
@@ -5763,6 +5767,92 @@ function Message() {
 
 
 
+
+
+          /* KONAN SHOPPING — responsive et Safari iOS */
+          .konan-message-page {
+            width: 100%;
+            min-width: 0;
+            min-height: 100vh !important;
+            min-height: 100svh !important;
+            min-height: 100dvh !important;
+            padding-left: max(12px, env(safe-area-inset-left)) !important;
+            padding-right: max(12px, env(safe-area-inset-right)) !important;
+            padding-top: max(12px, env(safe-area-inset-top)) !important;
+            padding-bottom: max(90px, calc(90px + env(safe-area-inset-bottom))) !important;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            overscroll-behavior-y: contain;
+          }
+          .konan-message-page *,
+          .konan-message-page *::before,
+          .konan-message-page *::after {
+            box-sizing: border-box;
+            min-width: 0;
+          }
+          .konan-message-page img,
+          .konan-message-page svg {
+            max-width: 100%;
+          }
+          .konan-message-page button,
+          .konan-message-page a,
+          .konan-message-page [role="button"] {
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+          }
+          .konan-message-page button { min-height: 42px; }
+          .konan-message-page input,
+          .konan-message-page textarea,
+          .konan-message-page select {
+            font-size: 16px !important;
+            -webkit-appearance: none;
+            appearance: none;
+          }
+          .konan-message-page > div { max-width: 100%; }
+          @media (min-width: 768px) {
+            .konan-message-page:not(.konan-message-loading) {
+              padding: 20px 24px 100px !important;
+            }
+          }
+          @media (max-width: 600px) {
+            .konan-message-page:not(.konan-message-loading) {
+              padding-left: max(10px, env(safe-area-inset-left)) !important;
+              padding-right: max(10px, env(safe-area-inset-right)) !important;
+            }
+          }
+          @media (max-width: 420px) {
+            .konan-message-page:not(.konan-message-loading) {
+              padding-left: max(8px, env(safe-area-inset-left)) !important;
+              padding-right: max(8px, env(safe-area-inset-right)) !important;
+            }
+            .konan-message-page h1 {
+              overflow-wrap: anywhere;
+              word-break: normal;
+            }
+          }
+          @media (max-width: 360px) {
+            .konan-message-page:not(.konan-message-loading) {
+              padding-left: max(6px, env(safe-area-inset-left)) !important;
+              padding-right: max(6px, env(safe-area-inset-right)) !important;
+            }
+            .konan-message-page h1 { font-size: 18px !important; }
+          }
+          @media (max-height: 520px) and (orientation: landscape) {
+            .konan-message-page {
+              padding-top: max(8px, env(safe-area-inset-top)) !important;
+              padding-bottom: max(24px, env(safe-area-inset-bottom)) !important;
+            }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .konan-message-page *,
+            .konan-message-page *::before,
+            .konan-message-page *::after {
+              scroll-behavior: auto !important;
+              animation-duration: .01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: .01ms !important;
+            }
+          }
 
         `}
 

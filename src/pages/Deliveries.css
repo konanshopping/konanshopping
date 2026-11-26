@@ -4,7 +4,7 @@
 
 .deliveriesPage{
   min-height:100vh;
-  background:#f4f7ff;
+  background:color-mix(in srgb, var(--season-primary, #2563eb) 5%, white);
   padding:30px;
 }
 
@@ -44,8 +44,8 @@
   background:
   linear-gradient(
     135deg,
-    #2563eb,
-    #7c3aed
+    var(--season-primary, #2563eb),
+    var(--season-secondary, #3b82f6)
   );
 
   color:white;
@@ -60,7 +60,7 @@
 
   box-shadow:
   0 10px 25px
-  rgba(37,99,235,0.25);
+  color-mix(in srgb, var(--season-primary, #2563eb) 25%, transparent);
 
   transition:0.3s;
 }
@@ -110,7 +110,7 @@
 
 .statCard svg{
   font-size:28px;
-  color:#2563eb;
+  color:var(--season-primary, #2563eb);
 }
 
 .statCard h2{
@@ -379,12 +379,12 @@
 
   border-radius:20px;
 
-  background:#eff6ff;
+  background:color-mix(in srgb, var(--season-primary, #2563eb) 8%, white);
 }
 
 .gpsBox h4{
   margin-bottom:10px;
-  color:#1d4ed8;
+  color:color-mix(in srgb, var(--season-primary, #2563eb) 78%, black);
 }
 
 .gpsBox p{
@@ -406,8 +406,8 @@
   background:
   linear-gradient(
     135deg,
-    #2563eb,
-    #7c3aed
+    var(--season-primary, #2563eb),
+    var(--season-secondary, #3b82f6)
   );
 
   color:white;
@@ -464,8 +464,8 @@
   background:
   linear-gradient(
     135deg,
-    #2563eb,
-    #7c3aed
+    var(--season-primary, #2563eb),
+    var(--season-secondary, #3b82f6)
   );
 
   color:white;
@@ -493,7 +493,7 @@
 
   font-weight:700;
 
-  background:#f4f7ff;
+  background:color-mix(in srgb, var(--season-primary, #2563eb) 5%, white);
 }
 
 /* =========================

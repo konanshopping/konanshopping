@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 
 
@@ -67,72 +67,90 @@ const sanitizeText = (value, maxLength) => {
 
 
 const normalizeHistory = (history) => {
-
   if (!Array.isArray(history)) return [];
 
-
-
   return history
-
     .slice(-MAX_HISTORY_ITEMS)
-
     .map((message) => {
+      if (!message || typeof message !== "object") return null;
 
-      if (
+      const role =
+        message.sender === "user" || message.role === "user"
+          ? "user"
+          : message.sender === "ai" || message.role === "ai"
+            ? "ai"
+            : "";
 
-        !message ||
-
-        typeof message !== "object"
-
-      ) {
-
-        return null;
-
-      }
-
-
-
-      const sender =
-
-        message.sender === "user" ||
-
-        message.sender === "ai"
-
-          ? message.sender
-
-          : "";
-
-
-
-      const text = sanitizeText(
-
-        message.text,
-
-        MAX_HISTORY_MESSAGE_LENGTH
-
-      );
-
-
-
-      if (!sender || !text) return null;
-
-
+      const text = sanitizeText(message.text, MAX_HISTORY_MESSAGE_LENGTH);
+      if (!role || !text) return null;
 
       return {
-
-        sender,
-
+        role,
         text,
-
+        products: Array.isArray(message.products)
+          ? message.products.slice(0, 12).map((product) => ({
+              _id: sanitizeText(product?._id, 100),
+            }))
+          : [],
       };
-
     })
-
     .filter(Boolean);
-
 };
 
+const safeStorageGet = (key) => {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
 
+const safeStorageSet = (key, value) => {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const safeParse = (value, fallback) => {
+  try {
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const getGuestId = () => {
+  const existing = sanitizeText(safeStorageGet("guestId"), 100);
+  if (existing) return existing;
+
+  const generated = `guest_${(
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}_${Math.random().toString(36).slice(2)}`
+  )}`;
+  safeStorageSet("guestId", generated);
+  return generated;
+};
+
+const getClientId = () => {
+  const storedUser = safeParse(safeStorageGet("user"), null);
+  return sanitizeText(storedUser?._id, 100) || getGuestId();
+};
+
+const normalizeProducts = (value) =>
+  Array.isArray(value)
+    ? value
+        .filter((product) =>
+          product &&
+          typeof product === "object" &&
+          typeof product._id === "string" &&
+          product._id.length > 0
+        )
+        .slice(0, 12)
+    : [];
 
 // ======================================================
 // 🔐 AUTHENTIFICATION PAR COOKIE HTTPONLY
@@ -275,6 +293,10 @@ api.interceptors.response.use(
 
 function Messages() {
 
+  const requestInProgress = useRef(false);
+  const [products, setProducts] = useState([]);
+  const [pendingRedirect, setPendingRedirect] = useState("");
+
 
 
   const [input, setInput] =
@@ -315,227 +337,147 @@ function Messages() {
 
 
 
-  // =========================
+    // ======================================================
+  // ACTIONS PANIER / FAVORIS
+  // L'identité réelle est toujours vérifiée par le backend.
+  // ======================================================
 
-  // SEND MESSAGE
+  const addProductToCart = async (product) => {
+    const clientId = getClientId();
+    const cartKey = `cart_${clientId}`;
+    const savedCart = safeParse(safeStorageGet(cartKey), []);
+    const cart = Array.isArray(savedCart) ? savedCart : [];
+    const exists = cart.some((item) => String(item?._id) === String(product._id));
+    const updated = exists
+      ? cart.map((item) => String(item?._id) === String(product._id)
+          ? { ...item, quantity: Math.min(99, Math.max(1, Number(item.quantity) || 1) + 1) }
+          : item)
+      : [...cart, { ...product, quantity: 1 }].slice(0, 100);
 
-  // =========================
+    safeStorageSet(cartKey, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent("cartUpdated", { detail: { cart: updated, clientId } }));
 
-
-
-  const sendMessage = async () => {
-
-
-
-    const currentInput =
-
-      sanitizeText(
-
-        input,
-
-        MAX_MESSAGE_LENGTH
-
-      );
-
-
-
-    if (!currentInput || loading) {
-
-      return;
-
+    const storedUser = safeParse(safeStorageGet("user"), null);
+    if (storedUser?._id) {
+      await api.post("/api/cart", { productId: product._id, quantity: 1 });
     }
-
-
-
-    const userMessage = {
-
-      sender: "user",
-
-      text: currentInput,
-
-    };
-
-
-
-    // Historique sécurisé avant ajout
-
-    // du nouveau message.
-
-    const currentHistory =
-
-      normalizeHistory(messages);
-
-
-
-    setMessages((prev) => [
-
-      ...prev,
-
-      userMessage,
-
-    ]);
-
-
-
-    setInput("");
-
-
-
-    setLoading(true);
-
-
-
-    try {
-
-
-
-      const res = await api.post(
-
-        "/api/ai-chat",
-
-        {
-
-
-
-          message:
-
-            currentInput,
-
-
-
-          currentPage:
-
-            sanitizeText(
-
-              window.location.pathname,
-
-              MAX_PAGE_LENGTH
-
-            ),
-
-
-
-          history:
-
-            currentHistory
-
-              .map(
-
-                (m) =>
-
-                  `${m.sender}: ${m.text}`
-
-              )
-
-              .join("\n"),
-
-
-
-        }
-
-      );
-
-
-
-      const reply =
-
-        typeof res?.data?.reply ===
-
-        "string"
-
-          ? sanitizeText(
-
-              res.data.reply,
-
-              MAX_HISTORY_MESSAGE_LENGTH
-
-            )
-
-          : "";
-
-
-
-      const aiMessage = {
-
-
-
-        sender: "ai",
-
-
-
-        text:
-
-          reply ||
-
-          "Je n'ai pas trouvé de réponse.",
-
-
-
-      };
-
-
-
-      setMessages((prev) => [
-
-        ...prev,
-
-        aiMessage,
-
-      ]);
-
-
-
-    } catch (error) {
-
-const errorMessage = {
-
-
-
-        sender: "ai",
-
-
-
-        text:
-
-          getSafeServerMessage(
-
-            error
-
-          ),
-
-
-
-      };
-
-
-
-      setMessages((prev) => [
-
-        ...prev,
-
-        errorMessage,
-
-      ]);
-
-
-
-    } finally {
-
-
-
-      setLoading(false);
-
-
-
-    }
-
-
-
   };
 
+  const addProductToFavorites = async (product) => {
+    const clientId = getClientId();
+    const favoritesKey = `favorites_${clientId}`;
+    const savedFavorites = safeParse(safeStorageGet(favoritesKey), []);
+    const favorites = Array.isArray(savedFavorites) ? savedFavorites : [];
+    const exists = favorites.some((item) => String(item?._id || item) === String(product._id));
 
+    if (!exists) {
+      const updated = [...favorites, product].slice(0, 200);
+      safeStorageSet(favoritesKey, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent("favoritesUpdated", { detail: { favorites: updated, clientId } }));
+    }
 
+    const storedUser = safeParse(safeStorageGet("user"), null);
+    if (storedUser?._id) {
+      await api.post("/api/favorites", { productId: product._id });
+    }
+  };
 
+  const executeAssistantAction = async (action, recommendedProducts) => {
+    if (!action || typeof action !== "object") return;
+
+    if (action.type === "navigate") {
+      if (["/checkout", "/favorites"].includes(action.destination)) {
+        setPendingRedirect(action.destination);
+      }
+      return;
+    }
+
+    if (!["add_to_cart", "add_to_favorites"].includes(action.type)) return;
+
+    const productId = sanitizeText(action.productId, 100);
+    const product =
+      recommendedProducts.find((item) => String(item._id) === productId) ||
+      (action.product && String(action.product._id) === productId ? action.product : null);
+
+    if (!product || !productId) return;
+
+    if (action.type === "add_to_cart") {
+      await addProductToCart(product);
+      setPendingRedirect("/checkout");
+      setMessages((prev) => [...prev, {
+        sender: "ai",
+        text: `${product.name} a été ajouté à votre panier. Voulez-vous ouvrir votre panier ?`,
+      }].slice(-42));
+    } else {
+      await addProductToFavorites(product);
+      setPendingRedirect("/favorites");
+      setMessages((prev) => [...prev, {
+        sender: "ai",
+        text: `${product.name} a été ajouté à vos favoris. Voulez-vous voir vos favoris ?`,
+      }].slice(-42));
+    }
+  };
+
+  // =========================
+  // SEND MESSAGE
+  // =========================
+
+  const sendMessage = async () => {
+    const currentInput = sanitizeText(input, MAX_MESSAGE_LENGTH);
+    if (!currentInput || loading || requestInProgress.current) return;
+
+    requestInProgress.current = true;
+    const userMessage = { sender: "user", text: currentInput };
+    const currentHistory = normalizeHistory(messages);
+
+    setMessages((prev) => [...prev, userMessage].slice(-42));
+    setInput("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/api/ai-chat", {
+        message: currentInput,
+        currentPage: sanitizeText(window.location.pathname, MAX_PAGE_LENGTH),
+        history: currentHistory,
+      });
+
+      const reply = typeof res?.data?.reply === "string"
+        ? sanitizeText(res.data.reply, MAX_HISTORY_MESSAGE_LENGTH)
+        : "";
+
+      const recommendedProducts = normalizeProducts(
+        res?.data?.products || res?.data?.recommendations || []
+      );
+
+      const aiMessage = {
+        sender: "ai",
+        text: reply || "Je n'ai pas trouvé de réponse.",
+        products: recommendedProducts,
+      };
+
+      setMessages((prev) => [...prev, aiMessage].slice(-42));
+
+      if (res?.data?.action) {
+        try {
+          await executeAssistantAction(res.data.action, recommendedProducts);
+        } catch (actionError) {
+          console.error("Action Konan IA non exécutée :", actionError?.response?.status || "API");
+          setMessages((prev) => [...prev, {
+            sender: "ai",
+            text: "Je n'ai pas pu terminer cette action. Vous pouvez réessayer depuis la boutique.",
+          }].slice(-42));
+        }
+      }
+    } catch (error) {
+      setMessages((prev) => [...prev, {
+        sender: "ai",
+        text: getSafeServerMessage(error),
+      }].slice(-42));
+    } finally {
+      requestInProgress.current = false;
+      setLoading(false);
+    }
+  };
 
   return (
 
@@ -964,6 +906,18 @@ const errorMessage = {
                 >
 
                   {msg.text}
+                  {Array.isArray(msg.products) && msg.products.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: "10px", marginTop: "12px" }}>
+                      {msg.products.slice(0, 8).map((product) => (
+                        <div key={product._id} style={{ border: "1px solid #E5E7EB", borderRadius: "12px", padding: "9px", background: "#FFFFFF", color: "#111827", minWidth: 0 }}>
+                          {product.image && <img src={product.image} alt={sanitizeText(product.name, 120)} loading="lazy" referrerPolicy="no-referrer" style={{ width: "100%", height: "105px", objectFit: "cover", borderRadius: "8px" }} />}
+                          <div style={{ fontWeight: 800, fontSize: "12px", marginTop: "7px" }}>{sanitizeText(product.name, 120)}</div>
+                          <div style={{ color: "#4F46E5", fontWeight: 800, fontSize: "12px", marginTop: "4px" }}>{Number(product.price || 0).toLocaleString("fr-FR")} FCFA</div>
+                          <button type="button" onClick={() => { window.location.href = `/product/${encodeURIComponent(product._id)}`; }} style={{ width: "100%", marginTop: "8px", border: 0, borderRadius: "8px", padding: "8px", color: "#FFFFFF", background: "#4F46E5", fontWeight: 700, cursor: "pointer" }}>Voir le produit</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                 </div>
 
@@ -1170,6 +1124,15 @@ const errorMessage = {
 
 
 
+
+      {pendingRedirect && (
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", flexWrap: "wrap", padding: "8px 14px", background: "#F5F7FB" }}>
+          <button type="button" onClick={() => { const destination = pendingRedirect; setPendingRedirect(""); window.location.href = destination; }} style={{ border: 0, borderRadius: "10px", padding: "10px 16px", background: "#4F46E5", color: "#FFFFFF", fontWeight: 800, cursor: "pointer" }}>
+            {pendingRedirect === "/checkout" ? "Ouvrir mon panier" : "Voir mes favoris"}
+          </button>
+          <button type="button" onClick={() => setPendingRedirect("")} style={{ border: "1px solid #D1D5DB", borderRadius: "10px", padding: "10px 16px", background: "#FFFFFF", color: "#374151", fontWeight: 700, cursor: "pointer" }}>Continuer</button>
+        </div>
+      )}
 
       {/* INPUT */}
 

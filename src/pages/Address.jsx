@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
 
-
-
 import {
 
   FaChevronLeft,
@@ -18,8 +16,6 @@ import {
 
 } from "react-icons/fa";
 
-
-
 import {
 
   FaShoppingCart,
@@ -33,8 +29,6 @@ import {
   FaShieldAlt
 
 } from "react-icons/fa";
-
-
 
 import {
 
@@ -54,8 +48,6 @@ import {
 
 } from "react-icons/fa";
 
-
-
 import {
 
   FaAward,
@@ -68,8 +60,6 @@ import {
 
 } from "react-icons/fa";
 
-
-
 import {
 
   FaQuestionCircle,
@@ -81,8 +71,6 @@ import {
   FaEnvelope,
 
 } from "react-icons/fa";
-
-
 
 const isSafeExternalUrl = (url) => {
   try {
@@ -97,11 +85,7 @@ const WHATSAPP_URL = "https://wa.me/237694641329";
 
 function Address() {
 
-
-
 return (
-
-
 
 <div
 
@@ -109,7 +93,7 @@ style={{
 
 minHeight:"100vh",
 
-background:"#F5F7FB",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 4%, white)",
 
 padding:
 
@@ -123,19 +107,13 @@ window.innerWidth < 768
 
 >
 
-
-
 {/* ================= HERO ================= */}
-
-
 
 <div
 
 style={{
 
-background:"linear-gradient(135deg,#4B2E83,#2563EB)",
-
-
+background:"linear-gradient(135deg,var(--season-secondary, #3b82f6),var(--season-primary, var(--season-primary, #2563eb)))",
 
 borderRadius:
 
@@ -145,8 +123,6 @@ window.innerWidth < 768
 
 : "26px",
 
-
-
 padding:
 
 window.innerWidth < 768
@@ -155,33 +131,21 @@ window.innerWidth < 768
 
 : "30px",
 
-
-
 position:"relative",
-
-
 
 overflow:"hidden",
 
-
-
 color:"#FFFFFF",
-
-
 
 boxShadow:
 
-"0 10px 28px rgba(37,99,235,.18)",
-
-
+"0 10px 28px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
 marginBottom:"14px",
 
 }}
 
 >
-
-
 
 <div
 
@@ -204,8 +168,6 @@ background:"rgba(255,255,255,.08)",
 }}
 
 />
-
-
 
 <Link
 
@@ -233,19 +195,11 @@ marginBottom:"14px",
 
 >
 
-
-
 <FaChevronLeft />
-
-
 
 Retour à l'accueil
 
-
-
 </Link>
-
-
 
 <div
 
@@ -261,8 +215,6 @@ gap:"12px",
 
 >
 
-
-
 <div
 
 style={{
@@ -275,8 +227,6 @@ window.innerWidth < 768
 
 : "65px",
 
-
-
 height:
 
 window.innerWidth < 768
@@ -285,39 +235,23 @@ window.innerWidth < 768
 
 : "65px",
 
-
-
 borderRadius:"14px",
-
-
 
 background:"rgba(255,255,255,.15)",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
 
-
-
 backdropFilter:"blur(10px)",
-
-
 
 flexShrink:0,
 
 }}
 
 >
-
-
 
 <FaInfoCircle
 
@@ -335,15 +269,9 @@ window.innerWidth < 768
 
 />
 
-
-
 </div>
 
-
-
 <div>
-
-
 
 <h1
 
@@ -367,15 +295,9 @@ lineHeight:"1.1",
 
 >
 
-
-
 À propos de KONAN SHOPPING
 
-
-
 </h1>
-
-
 
 <p
 
@@ -403,8 +325,6 @@ maxWidth:"560px",
 
 >
 
-
-
 Découvrez le fonctionnement de
 
 <b translate="no">
@@ -417,35 +337,21 @@ nos services, notre processus de commande,
 
 la livraison et nos engagements envers nos clients.
 
-
-
 </p>
 
-
+</div>
 
 </div>
 
-
-
 </div>
-
-
-
-</div>
-
-
 
 {/* ================= QUI SOMMES-NOUS ================= */}
-
-
 
 <div
 
 style={{
 
 background:"#FFFFFF",
-
-
 
 borderRadius:
 
@@ -455,8 +361,6 @@ window.innerWidth < 768
 
 : "20px",
 
-
-
 padding:
 
 window.innerWidth < 768
@@ -465,23 +369,15 @@ window.innerWidth < 768
 
 : "24px",
 
-
-
 border:"1px solid #EEF2F7",
 
-
-
 boxShadow:"0 3px 12px rgba(0,0,0,.04)",
-
-
 
 marginBottom:"14px",
 
 }}
 
 >
-
-
 
 <h2
 
@@ -491,23 +387,15 @@ margin:0,
 
 marginBottom:"14px",
 
-
-
 display:"flex",
 
 alignItems:"center",
 
 gap:"10px",
 
-
-
 color:"#111827",
 
-
-
 fontWeight:"800",
-
-
 
 fontSize:
 
@@ -521,27 +409,19 @@ window.innerWidth < 768
 
 >
 
-
-
 <FaStore
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 }}
 
 />
 
-
-
 Qui sommes-nous ?
 
-
-
 </h2>
-
-
 
 <p
 
@@ -549,11 +429,7 @@ style={{
 
 margin:0,
 
-
-
 color:"#6B7280",
-
-
 
 fontSize:
 
@@ -563,15 +439,11 @@ window.innerWidth < 768
 
 : "14px",
 
-
-
 lineHeight:"24px",
 
 }}
 
 >
-
-
 
 <b translate="no">
 
@@ -587,35 +459,23 @@ facilement des produits de qualité tout en bénéficiant
 
 d'un paiement uniquement à la livraison.
 
-
-
 Notre objectif est de proposer une expérience
 
 d'achat simple, rapide, transparente et sécurisée
 
 pour tous nos clients au Cameroun.
 
-
-
 </p>
-
-
 
 </div>
 
-
-
 {/* ================= NOS VALEURS ================= */}
-
-
 
 <div
 
 style={{
 
 display:"grid",
-
-
 
 gridTemplateColumns:
 
@@ -625,19 +485,13 @@ window.innerWidth < 768
 
 : "repeat(2,1fr)",
 
-
-
 gap:"12px",
-
-
 
 marginBottom:"16px",
 
 }}
 
 >
-
-
 
 {[
 
@@ -651,8 +505,6 @@ text:"La satisfaction de nos clients est au cœur de chacune de nos décisions."
 
 },
 
-
-
 {
 
 icon:<FaGlobeAfrica />,
@@ -663,11 +515,7 @@ text:"Faciliter les achats en ligne partout au Cameroun grâce à une livraison 
 
 },
 
-
-
 ].map((item,index)=>(
-
-
 
 <div
 
@@ -677,27 +525,17 @@ style={{
 
 background:"#FFFFFF",
 
-
-
 borderRadius:"16px",
-
-
 
 padding:"15px",
 
-
-
 border:"1px solid #EEF2F7",
-
-
 
 boxShadow:"0 3px 10px rgba(0,0,0,.04)",
 
 }}
 
 >
-
-
 
 <div
 
@@ -715,8 +553,6 @@ marginBottom:"10px",
 
 >
 
-
-
 <div
 
 style={{
@@ -727,7 +563,7 @@ height:"42px",
 
 borderRadius:"12px",
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 display:"flex",
 
@@ -735,7 +571,7 @@ justifyContent:"center",
 
 alignItems:"center",
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 fontSize:"18px",
 
@@ -743,15 +579,9 @@ fontSize:"18px",
 
 >
 
-
-
 {item.icon}
 
-
-
 </div>
-
-
 
 <h3
 
@@ -769,19 +599,11 @@ color:"#111827",
 
 >
 
-
-
 {item.title}
-
-
 
 </h3>
 
-
-
 </div>
-
-
 
 <p
 
@@ -799,39 +621,23 @@ lineHeight:"23px",
 
 >
 
-
-
 {item.text}
-
-
 
 </p>
 
-
-
 </div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 {/* ================= COMMENT COMMANDER ================= */}
-
-
 
 <div
 
   style={{
 
     background: "#FFFFFF",
-
-
 
     borderRadius:
 
@@ -841,8 +647,6 @@ lineHeight:"23px",
 
         : "20px",
 
-
-
     padding:
 
       window.innerWidth < 768
@@ -851,17 +655,11 @@ lineHeight:"23px",
 
         : "24px",
 
-
-
     border: "1px solid #EEF2F7",
-
-
 
     boxShadow:
 
       "0 3px 12px rgba(0,0,0,.04)",
-
-
 
     marginBottom: "14px",
 
@@ -869,39 +667,23 @@ lineHeight:"23px",
 
 >
 
-
-
   <h2
 
     style={{
 
       margin: 0,
 
-
-
       marginBottom: "16px",
-
-
 
       display: "flex",
 
-
-
       alignItems: "center",
-
-
 
       gap: "10px",
 
-
-
       color: "#111827",
 
-
-
       fontWeight: "800",
-
-
 
       fontSize:
 
@@ -915,27 +697,19 @@ lineHeight:"23px",
 
   >
 
-
-
     <FaShoppingCart
 
       style={{
 
-        color: "#2563EB",
+        color: "var(--season-primary, var(--season-primary, #2563eb))",
 
       }}
 
     />
 
-
-
     Comment passer une commande ?
 
-
-
   </h2>
-
-
 
   <div
 
@@ -943,15 +717,11 @@ lineHeight:"23px",
 
       display: "grid",
 
-
-
       gap: "14px",
 
     }}
 
   >
-
-
 
     {[
 
@@ -965,8 +735,6 @@ lineHeight:"23px",
 
       },
 
-
-
       {
 
         icon: <FaShoppingCart />,
@@ -976,8 +744,6 @@ lineHeight:"23px",
         text: "Contrôlez les quantités, appliquez un coupon si disponible puis confirmez votre commande.",
 
       },
-
-
 
       {
 
@@ -989,8 +755,6 @@ lineHeight:"23px",
 
       },
 
-
-
       {
 
         icon: <FaClipboardCheck />,
@@ -1001,11 +765,7 @@ lineHeight:"23px",
 
       },
 
-
-
     ].map((item,index)=>(
-
-
 
       <div
 
@@ -1015,11 +775,7 @@ lineHeight:"23px",
 
           display:"flex",
 
-
-
           alignItems:"flex-start",
-
-
 
           gap:"14px",
 
@@ -1027,47 +783,27 @@ lineHeight:"23px",
 
       >
 
-
-
         <div
 
           style={{
 
             width:"42px",
 
-
-
             height:"42px",
-
-
 
             borderRadius:"12px",
 
-
-
-            background:"#EEF4FF",
-
-
+            background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
             display:"flex",
 
-
-
             justifyContent:"center",
-
-
 
             alignItems:"center",
 
-
-
-            color:"#2563EB",
-
-
+            color:"var(--season-primary, var(--season-primary, #2563eb))",
 
             flexShrink:0,
-
-
 
             fontSize:"18px",
 
@@ -1075,19 +811,11 @@ lineHeight:"23px",
 
         >
 
-
-
           {item.icon}
-
-
 
         </div>
 
-
-
         <div>
-
-
 
           <h3
 
@@ -1095,15 +823,9 @@ lineHeight:"23px",
 
               margin:0,
 
-
-
               color:"#111827",
 
-
-
               fontSize:"15px",
-
-
 
               fontWeight:"800",
 
@@ -1111,15 +833,9 @@ lineHeight:"23px",
 
           >
 
-
-
             {item.title}
 
-
-
           </h3>
-
-
 
           <p
 
@@ -1127,19 +843,11 @@ lineHeight:"23px",
 
               marginTop:"4px",
 
-
-
               marginBottom:0,
-
-
 
               color:"#6B7280",
 
-
-
               fontSize:"13px",
-
-
 
               lineHeight:"22px",
 
@@ -1147,47 +855,27 @@ lineHeight:"23px",
 
           >
 
-
-
             {item.text}
-
-
 
           </p>
 
-
-
         </div>
-
-
 
       </div>
 
-
-
     ))}
-
-
 
   </div>
 
-
-
 </div>
 
-
-
 {/* ================= TRAITEMENT DE LA COMMANDE ================= */}
-
-
 
 <div
 
   style={{
 
     background:"#FFFFFF",
-
-
 
     borderRadius:
 
@@ -1197,8 +885,6 @@ lineHeight:"23px",
 
         : "20px",
 
-
-
     padding:
 
       window.innerWidth<768
@@ -1207,11 +893,7 @@ lineHeight:"23px",
 
         : "24px",
 
-
-
     border:"1px solid #EEF2F7",
-
-
 
     boxShadow:"0 3px 12px rgba(0,0,0,.04)",
 
@@ -1219,39 +901,23 @@ lineHeight:"23px",
 
 >
 
-
-
   <h2
 
     style={{
 
       margin:0,
 
-
-
       marginBottom:"16px",
-
-
 
       display:"flex",
 
-
-
       alignItems:"center",
-
-
 
       gap:"10px",
 
-
-
       color:"#111827",
 
-
-
       fontWeight:"800",
-
-
 
       fontSize:
 
@@ -1265,27 +931,19 @@ lineHeight:"23px",
 
   >
 
-
-
     <FaCogs
 
       style={{
 
-        color:"#2563EB",
+        color:"var(--season-primary, var(--season-primary, #2563eb))",
 
       }}
 
     />
 
-
-
     Que se passe-t-il après votre commande ?
 
-
-
   </h2>
-
-
 
   <div
 
@@ -1293,51 +951,31 @@ lineHeight:"23px",
 
       display:"grid",
 
-
-
       gap:"12px",
 
     }}
 
   >
 
-
-
     {[
 
       "Votre commande est reçue par notre équipe.",
 
-
-
       "Nos équipes vérifient la disponibilité des produits.",
-
-
 
       "Les articles sont préparés et soigneusement emballés.",
 
-
-
       "Un livreur est affecté à votre commande.",
-
-
 
       "Vous êtes contacté pour confirmer votre disponibilité.",
 
-
-
       "La commande est livrée à l'adresse indiquée.",
 
-
-
       "Vous payez uniquement après réception de votre commande.",
-
-
 
       "Votre commande est ensuite marquée comme livrée.",
 
     ].map((item,index)=>(
-
-
 
       <div
 
@@ -1347,11 +985,7 @@ lineHeight:"23px",
 
           display:"flex",
 
-
-
           alignItems:"center",
-
-
 
           gap:"12px",
 
@@ -1359,19 +993,13 @@ lineHeight:"23px",
 
       >
 
-
-
         <FaCheckCircle
 
           style={{
 
             color:"#22C55E",
 
-
-
             fontSize:"16px",
-
-
 
             flexShrink:0,
 
@@ -1379,19 +1007,13 @@ lineHeight:"23px",
 
         />
 
-
-
         <span
 
           style={{
 
             color:"#4B5563",
 
-
-
             fontSize:"13px",
-
-
 
             lineHeight:"22px",
 
@@ -1399,35 +1021,19 @@ lineHeight:"23px",
 
         >
 
-
-
           {item}
-
-
 
         </span>
 
-
-
       </div>
-
-
 
     ))}
 
-
-
   </div>
-
-
 
 </div>
 
-
-
 {/* ================= LIVRAISON ================= */}
-
-
 
 <div
 
@@ -1450,8 +1056,6 @@ lineHeight:"23px",
   }}
 
 >
-
-
 
   <h2
 
@@ -1477,27 +1081,19 @@ lineHeight:"23px",
 
   >
 
-
-
     <FaTruck
 
       style={{
 
-        color: "#2563EB",
+        color: "var(--season-primary, var(--season-primary, #2563eb))",
 
       }}
 
     />
 
-
-
     Nos modes de livraison
 
-
-
   </h2>
-
-
 
   <div
 
@@ -1511,8 +1107,6 @@ lineHeight:"23px",
 
   >
 
-
-
     {[
 
       {
@@ -1525,8 +1119,6 @@ lineHeight:"23px",
 
       },
 
-
-
       {
 
         icon: <FaBuilding />,
@@ -1536,8 +1128,6 @@ lineHeight:"23px",
         text: "Vous pouvez choisir de recevoir votre commande sur votre lieu de travail.",
 
       },
-
-
 
       {
 
@@ -1549,8 +1139,6 @@ lineHeight:"23px",
 
       },
 
-
-
       {
 
         icon: <FaClock />,
@@ -1561,11 +1149,7 @@ lineHeight:"23px",
 
       },
 
-
-
     ].map((item,index)=>(
-
-
 
       <div
 
@@ -1583,8 +1167,6 @@ lineHeight:"23px",
 
       >
 
-
-
         <div
 
           style={{
@@ -1595,7 +1177,7 @@ lineHeight:"23px",
 
             borderRadius:"12px",
 
-            background:"#EEF4FF",
+            background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
             display:"flex",
 
@@ -1603,7 +1185,7 @@ lineHeight:"23px",
 
             alignItems:"center",
 
-            color:"#2563EB",
+            color:"var(--season-primary, var(--season-primary, #2563eb))",
 
             flexShrink:0,
 
@@ -1613,19 +1195,11 @@ lineHeight:"23px",
 
         >
 
-
-
           {item.icon}
-
-
 
         </div>
 
-
-
         <div>
-
-
 
           <h3
 
@@ -1643,15 +1217,9 @@ lineHeight:"23px",
 
           >
 
-
-
             {item.title}
 
-
-
           </h3>
-
-
 
           <p
 
@@ -1671,45 +1239,27 @@ lineHeight:"23px",
 
           >
 
-
-
             {item.text}
-
-
 
           </p>
 
-
-
         </div>
-
-
 
       </div>
 
-
-
     ))}
-
-
 
   </div>
 
-
-
 </div>
 
-
-
 {/* ================= PAIEMENT ================= */}
-
-
 
 <div
 
   style={{
 
-    background:"linear-gradient(135deg,#2563EB,#4B2E83)",
+    background:"linear-gradient(135deg,var(--season-primary, var(--season-primary, #2563eb)),var(--season-secondary, #3b82f6))",
 
     borderRadius:window.innerWidth<768?"16px":"22px",
 
@@ -1717,13 +1267,11 @@ lineHeight:"23px",
 
     color:"#FFFFFF",
 
-    boxShadow:"0 12px 30px rgba(37,99,235,.18)",
+    boxShadow:"0 12px 30px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
   }}
 
 >
-
-
 
   <div
 
@@ -1740,8 +1288,6 @@ lineHeight:"23px",
     }}
 
   >
-
-
 
     <div
 
@@ -1765,8 +1311,6 @@ lineHeight:"23px",
 
     >
 
-
-
       <FaMoneyBillWave
 
         style={{
@@ -1777,15 +1321,9 @@ lineHeight:"23px",
 
       />
 
-
-
     </div>
 
-
-
     <div>
-
-
 
       <h2
 
@@ -1807,15 +1345,9 @@ lineHeight:"23px",
 
       >
 
-
-
         Paiement sécurisé
 
-
-
       </h2>
-
-
 
       <p
 
@@ -1835,23 +1367,13 @@ lineHeight:"23px",
 
       >
 
-
-
         Chez KONAN SHOPPING, aucun paiement n'est demandé avant la livraison.
-
-
 
       </p>
 
-
-
     </div>
 
-
-
   </div>
-
-
 
   <div
 
@@ -1864,8 +1386,6 @@ lineHeight:"23px",
     }}
 
   >
-
-
 
     {[
 
@@ -1883,8 +1403,6 @@ lineHeight:"23px",
 
     ].map((item,index)=>(
 
-
-
       <div
 
         key={index}
@@ -1901,8 +1419,6 @@ lineHeight:"23px",
 
       >
 
-
-
         <FaCheckCircle
 
           style={{
@@ -1914,8 +1430,6 @@ lineHeight:"23px",
           }}
 
         />
-
-
 
         <span
 
@@ -1929,35 +1443,19 @@ lineHeight:"23px",
 
         >
 
-
-
           {item}
-
-
 
         </span>
 
-
-
       </div>
-
-
 
     ))}
 
-
-
   </div>
-
-
 
 </div>
 
-
-
 {/* ================= NOS ENGAGEMENTS ================= */}
-
-
 
 <div
 
@@ -1965,11 +1463,7 @@ lineHeight:"23px",
 
     marginTop: "14px",
 
-
-
     background: "#FFFFFF",
-
-
 
     borderRadius:
 
@@ -1979,8 +1473,6 @@ lineHeight:"23px",
 
         : "20px",
 
-
-
     padding:
 
       window.innerWidth < 768
@@ -1989,25 +1481,17 @@ lineHeight:"23px",
 
         : "24px",
 
-
-
     border: "1px solid #EEF2F7",
-
-
 
     boxShadow:
 
       "0 3px 12px rgba(0,0,0,.04)",
-
-
 
     marginBottom: "14px",
 
   }}
 
 >
-
-
 
 <h2
 
@@ -2017,23 +1501,15 @@ margin:0,
 
 marginBottom:"16px",
 
-
-
 display:"flex",
 
 alignItems:"center",
 
 gap:"10px",
 
-
-
 fontWeight:"800",
 
-
-
 color:"#111827",
-
-
 
 fontSize:
 
@@ -2047,27 +1523,19 @@ window.innerWidth<768
 
 >
 
-
-
 <FaAward
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 }}
 
 />
 
-
-
 Nos engagements
 
-
-
 </h2>
-
-
 
 <div
 
@@ -2080,8 +1548,6 @@ gap:"14px",
 }}
 
 >
-
-
 
 {[
 
@@ -2099,8 +1565,6 @@ gap:"14px",
 
 ].map((item,index)=>(
 
-
-
 <div
 
 key={index}
@@ -2117,8 +1581,6 @@ gap:"12px",
 
 >
 
-
-
 <FaCheckCircle
 
 style={{
@@ -2130,8 +1592,6 @@ fontSize:"16px",
 }}
 
 />
-
-
 
 <span
 
@@ -2147,43 +1607,25 @@ lineHeight:"22px",
 
 >
 
-
-
 {item}
-
-
 
 </span>
 
-
-
 </div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* ================= POURQUOI NOUS CHOISIR ================= */}
-
-
 
 <div
 
 style={{
 
 background:"#FFFFFF",
-
-
 
 borderRadius:
 
@@ -2193,8 +1635,6 @@ window.innerWidth<768
 
 : "20px",
 
-
-
 padding:
 
 window.innerWidth<768
@@ -2203,23 +1643,15 @@ window.innerWidth<768
 
 : "24px",
 
-
-
 border:"1px solid #EEF2F7",
 
-
-
 boxShadow:"0 3px 12px rgba(0,0,0,.04)",
-
-
 
 marginBottom:"14px",
 
 }}
 
 >
-
-
 
 <h2
 
@@ -2229,23 +1661,15 @@ margin:0,
 
 marginBottom:"16px",
 
-
-
 display:"flex",
 
 alignItems:"center",
 
 gap:"10px",
 
-
-
 fontWeight:"800",
 
-
-
 color:"#111827",
-
-
 
 fontSize:
 
@@ -2259,35 +1683,25 @@ window.innerWidth<768
 
 >
 
-
-
 <FaStar
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 }}
 
 />
 
-
-
 Pourquoi choisir KONAN SHOPPING ?
 
-
-
 </h2>
-
-
 
 <div
 
 style={{
 
 display:"grid",
-
-
 
 gridTemplateColumns:
 
@@ -2297,15 +1711,11 @@ window.innerWidth<768
 
 : "repeat(2,1fr)",
 
-
-
 gap:"14px",
 
 }}
 
 >
-
-
 
 {[
 
@@ -2319,8 +1729,6 @@ text:"Des produits sélectionnés auprès de vendeurs sérieux.",
 
 },
 
-
-
 {
 
 icon:<FaTruck />,
@@ -2330,8 +1738,6 @@ title:"Livraison",
 text:"Livraison rapide selon votre localisation.",
 
 },
-
-
 
 {
 
@@ -2343,8 +1749,6 @@ text:"Une assistance disponible pour répondre à vos questions.",
 
 },
 
-
-
 {
 
 icon:<FaLock />,
@@ -2355,11 +1759,7 @@ text:"Vos informations personnelles restent protégées.",
 
 },
 
-
-
 ].map((item,index)=>(
-
-
 
 <div
 
@@ -2375,8 +1775,6 @@ gap:"12px",
 
 >
 
-
-
 <div
 
 style={{
@@ -2387,7 +1785,7 @@ height:"42px",
 
 borderRadius:"12px",
 
-background:"#EEF4FF",
+background:"color-mix(in srgb, var(--season-primary, #2563eb) 8%, white)",
 
 display:"flex",
 
@@ -2395,7 +1793,7 @@ justifyContent:"center",
 
 alignItems:"center",
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 flexShrink:0,
 
@@ -2405,19 +1803,11 @@ fontSize:"18px",
 
 >
 
-
-
 {item.icon}
-
-
 
 </div>
 
-
-
 <div>
-
-
 
 <h3
 
@@ -2435,15 +1825,9 @@ color:"#111827",
 
 >
 
-
-
 {item.title}
 
-
-
 </h3>
-
-
 
 <p
 
@@ -2463,47 +1847,27 @@ color:"#6B7280",
 
 >
 
-
-
 {item.text}
-
-
 
 </p>
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* ================= SERVICE CLIENT ================= */}
-
-
 
 <div
 
 style={{
 
-background:"linear-gradient(135deg,#2563EB,#4B2E83)",
-
-
+background:"linear-gradient(135deg,var(--season-primary, var(--season-primary, #2563eb)),var(--season-secondary, #3b82f6))",
 
 borderRadius:
 
@@ -2513,8 +1877,6 @@ window.innerWidth<768
 
 : "22px",
 
-
-
 padding:
 
 window.innerWidth<768
@@ -2523,25 +1885,17 @@ window.innerWidth<768
 
 : "30px",
 
-
-
 color:"#FFFFFF",
-
-
 
 textAlign:"center",
 
-
-
 boxShadow:
 
-"0 12px 30px rgba(37,99,235,.18)",
+"0 12px 30px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
 }}
 
 >
-
-
 
 <div
 
@@ -2553,15 +1907,9 @@ height:"60px",
 
 margin:"0 auto 16px",
 
-
-
 borderRadius:"50%",
 
-
-
 background:"rgba(255,255,255,.15)",
-
-
 
 display:"flex",
 
@@ -2573,8 +1921,6 @@ alignItems:"center",
 
 >
 
-
-
 <FaHeadset
 
 style={{
@@ -2585,11 +1931,7 @@ fontSize:"28px",
 
 />
 
-
-
 </div>
-
-
 
 <h2
 
@@ -2611,15 +1953,9 @@ window.innerWidth<768
 
 >
 
-
-
 Un service client à votre écoute
 
-
-
 </h2>
-
-
 
 <p
 
@@ -2629,23 +1965,13 @@ marginTop:"12px",
 
 marginBottom:"20px",
 
-
-
 fontSize:"13px",
-
-
 
 lineHeight:"24px",
 
-
-
 opacity:.95,
 
-
-
 maxWidth:"620px",
-
-
 
 marginInline:"auto",
 
@@ -2653,71 +1979,41 @@ marginInline:"auto",
 
 >
 
-
-
 Notre équipe accompagne chaque client avant,
 
 pendant et après la livraison afin de garantir
 
 une expérience d'achat simple, rapide et fiable.
 
-
-
 </p>
-
-
 
 <a
 
 href={isSafeExternalUrl(WHATSAPP_URL) ? WHATSAPP_URL : "/"}
 
-
-
 target="_blank"
 
-
-
 rel="noopener noreferrer"
-
-
 
 style={{
 
 display:"inline-flex",
 
-
-
 alignItems:"center",
-
-
 
 gap:"10px",
 
-
-
 padding:"14px 24px",
-
-
 
 background:"#FFFFFF",
 
-
-
-color:"#2563EB",
-
-
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 borderRadius:"14px",
 
-
-
 fontWeight:"800",
 
-
-
 textDecoration:"none",
-
-
 
 fontSize:"14px",
 
@@ -2725,27 +2021,15 @@ fontSize:"14px",
 
 >
 
-
-
 <FaWhatsapp />
-
-
 
 Contacter le service client
 
-
-
 </a>
-
-
 
 </div>
 
-
-
 {/* ================= FAQ ================= */}
-
-
 
 <div
 
@@ -2753,11 +2037,7 @@ Contacter le service client
 
     marginTop: "14px",
 
-
-
     background: "#FFFFFF",
-
-
 
     borderRadius:
 
@@ -2767,8 +2047,6 @@ Contacter le service client
 
         : "20px",
 
-
-
     padding:
 
       window.innerWidth < 768
@@ -2777,25 +2055,17 @@ Contacter le service client
 
         : "24px",
 
-
-
     border: "1px solid #EEF2F7",
-
-
 
     boxShadow:
 
       "0 3px 12px rgba(0,0,0,.04)",
-
-
 
     marginBottom: "14px",
 
   }}
 
 >
-
-
 
 <h2
 
@@ -2805,23 +2075,15 @@ margin:0,
 
 marginBottom:"18px",
 
-
-
 display:"flex",
 
 alignItems:"center",
 
 gap:"10px",
 
-
-
 fontWeight:"800",
 
-
-
 color:"#111827",
-
-
 
 fontSize:
 
@@ -2835,27 +2097,19 @@ window.innerWidth<768
 
 >
 
-
-
 <FaQuestionCircle
 
 style={{
 
-color:"#2563EB",
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 }}
 
 />
 
-
-
 Questions fréquentes
 
-
-
 </h2>
-
-
 
 <div
 
@@ -2869,8 +2123,6 @@ gap:"16px",
 
 >
 
-
-
 {[
 
 {
@@ -2881,8 +2133,6 @@ r:"Après validation, notre équipe vous contacte et vous informe de l'évolutio
 
 },
 
-
-
 {
 
 q:"Quand dois-je payer ?",
@@ -2890,8 +2140,6 @@ q:"Quand dois-je payer ?",
 r:"Le paiement s'effectue uniquement lors de la livraison après réception de votre commande."
 
 },
-
-
 
 {
 
@@ -2901,8 +2149,6 @@ r:"Oui, tant que la préparation de votre commande n'a pas commencé."
 
 },
 
-
-
 {
 
 q:"Comment contacter KONAN SHOPPING ?",
@@ -2911,11 +2157,7 @@ r:"Vous pouvez nous joindre directement via WhatsApp, téléphone ou e-mail."
 
 },
 
-
-
 ].map((item,index)=>(
-
-
 
 <div
 
@@ -2937,8 +2179,6 @@ index!==3
 
 >
 
-
-
 <h3
 
 style={{
@@ -2957,15 +2197,9 @@ fontSize:"15px",
 
 >
 
-
-
 {item.q}
 
-
-
 </h3>
-
-
 
 <p
 
@@ -2983,43 +2217,25 @@ lineHeight:"23px",
 
 >
 
-
-
 {item.r}
-
-
 
 </p>
 
-
-
 </div>
-
-
 
 ))}
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 {/* ================= CONTACT ================= */}
-
-
 
 <div
 
 style={{
 
-background:"linear-gradient(135deg,#2563EB,#4B2E83)",
-
-
+background:"linear-gradient(135deg,var(--season-primary, var(--season-primary, #2563eb)),var(--season-secondary, #3b82f6))",
 
 borderRadius:
 
@@ -3029,8 +2245,6 @@ window.innerWidth<768
 
 :"24px",
 
-
-
 padding:
 
 window.innerWidth<768
@@ -3039,25 +2253,17 @@ window.innerWidth<768
 
 :"30px",
 
-
-
 color:"#FFFFFF",
-
-
 
 boxShadow:
 
-"0 12px 35px rgba(37,99,235,.18)",
-
-
+"0 12px 35px color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent)",
 
 marginBottom:"16px",
 
 }}
 
 >
-
-
 
 <h2
 
@@ -3083,23 +2289,15 @@ textAlign:"center",
 
 >
 
-
-
 Nous contacter
 
-
-
 </h2>
-
-
 
 <div
 
 style={{
 
 display:"grid",
-
-
 
 gridTemplateColumns:
 
@@ -3109,15 +2307,11 @@ window.innerWidth<768
 
 :"repeat(2,1fr)",
 
-
-
 gap:"16px",
 
 }}
 
 >
-
-
 
 <div
 
@@ -3132,8 +2326,6 @@ gap:"12px",
 }}
 
 >
-
-
 
 <FaMapMarkerAlt
 
@@ -3145,33 +2337,19 @@ fontSize:"20px",
 
 />
 
-
-
 <div>
-
-
 
 <b>Adresse</b>
 
-
-
 <br/>
-
-
 
 ODZA Borne 10
 
 Yaoundé - Cameroun
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 <div
 
@@ -3186,8 +2364,6 @@ gap:"12px",
 }}
 
 >
-
-
 
 <FaPhoneAlt
 
@@ -3199,31 +2375,17 @@ fontSize:"18px",
 
 />
 
-
-
 <div>
-
-
 
 <b>Téléphone</b>
 
-
-
 <br/>
-
-
 
 +237 694 64 13 29 / +237 6 91 01 67 20
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 <div
 
@@ -3238,8 +2400,6 @@ gap:"12px",
 }}
 
 >
-
-
 
 <FaWhatsapp
 
@@ -3251,31 +2411,17 @@ fontSize:"20px",
 
 />
 
-
-
 <div>
-
-
 
 <b>WhatsApp</b>
 
-
-
 <br/>
-
-
 
 Disponible 7j/7
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 <div
 
@@ -3291,8 +2437,6 @@ gap:"12px",
 
 >
 
-
-
 <FaEnvelope
 
 style={{
@@ -3303,95 +2447,51 @@ fontSize:"18px",
 
 />
 
-
-
 <div>
-
-
 
 <b>Email</b>
 
-
-
 <br/>
-
-
 
 konanshoppingcameroun@gmail.com
 
-
+</div>
 
 </div>
 
-
-
 </div>
-
-
-
-</div>
-
-
 
 <a
 
 href={isSafeExternalUrl(WHATSAPP_URL) ? WHATSAPP_URL : "/"}
 
-
-
 target="_blank"
 
-
-
 rel="noopener noreferrer"
-
-
 
 style={{
 
 marginTop:"22px",
 
-
-
 display:"flex",
-
-
 
 justifyContent:"center",
 
-
-
 alignItems:"center",
-
-
 
 gap:"10px",
 
-
-
 height:"48px",
-
-
 
 background:"#FFFFFF",
 
-
-
-color:"#2563EB",
-
-
+color:"var(--season-primary, var(--season-primary, #2563eb))",
 
 textDecoration:"none",
 
-
-
 borderRadius:"14px",
 
-
-
 fontWeight:"800",
-
-
 
 fontSize:"14px",
 
@@ -3399,27 +2499,15 @@ fontSize:"14px",
 
 >
 
-
-
 <FaWhatsapp />
-
-
 
 Discuter avec notre équipe
 
-
-
 </a>
-
-
 
 </div>
 
-
-
 {/* ================= FOOTER ================= */}
-
-
 
 <div
 
@@ -3427,23 +2515,13 @@ style={{
 
 background:"#FFFFFF",
 
-
-
 borderRadius:"18px",
-
-
 
 padding:"18px",
 
-
-
 border:"1px solid #EEF2F7",
 
-
-
 boxShadow:"0 3px 12px rgba(0,0,0,.04)",
-
-
 
 textAlign:"center",
 
@@ -3451,23 +2529,15 @@ textAlign:"center",
 
 >
 
-
-
 <p
 
 style={{
 
 margin:0,
 
-
-
 fontSize:"13px",
 
-
-
 color:"#6B7280",
-
-
 
 lineHeight:"24px",
 
@@ -3475,19 +2545,11 @@ lineHeight:"24px",
 
 >
 
-
-
 <b translate="no">
-
-
 
 KONAN SHOPPING CAMEROUN
 
-
-
 </b>
-
-
 
 est une plateforme de commerce électronique
 
@@ -3495,54 +2557,28 @@ spécialisée dans la vente en ligne de produits
 
 de qualité avec un paiement sécurisé à la livraison.
 
-
-
 <br/><br/>
-
-
 
 © {new Date().getFullYear()}
 
-
-
 <b translate="no">
-
-
 
 {" "}KONAN SHOPPING CAMEROUN
 
-
-
 </b>
-
-
 
 <br/>
 
-
-
 Tous droits réservés.
-
-
 
 </p>
 
-
-
 </div>
 
-
-
 </div>
-
-
 
 );
 
-
-
 }
-
-
 
 export default Address;

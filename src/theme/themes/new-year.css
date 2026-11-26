@@ -1,0 +1,702 @@
+/*
+========================================================
+ KONAN SHOPPING CAMEROUN — THÈME NOUVEL AN PREMIUM
+ Fichier : src/theme/themes/new-year.css
+
+ Activation :
+ document.documentElement.dataset.season = "new-year"
+
+ Assets à placer dans /public :
+ - konan-santa-hat.png          (image du bonnet déjà existante)
+ - konan-new-year-garland.png   (guirlande lumineuse du header)
+
+ Aucun changement React, JavaScript ou logique métier.
+========================================================
+*/
+
+/* 1. IDENTITÉ VISUELLE */
+:root[data-season="new-year"] {
+  --season-primary: #c99a2e;
+  --season-secondary: #142b4d;
+  --season-glow: rgba(201, 154, 46, 0.24);
+  --season-decoration: rgba(201, 154, 46, 0.30);
+  --season-page: #ffffff;
+  --season-surface: #fffdf7;
+  --season-border: rgba(185, 133, 32, 0.28);
+  --season-text: #1b2c43;
+  --season-muted: #6d7785;
+}
+
+/* 2. HEADER : GUIRLANDE RÉALISTE
+   Image transparente conseillée : 1680 × 300 px environ.
+   Le header conserve sa position sticky/fixed définie ailleurs. */
+:root[data-season="new-year"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(201, 154, 46, 0.38);
+  box-shadow:
+    0 5px 24px rgba(15, 35, 62, 0.09),
+    0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+:root[data-season="new-year"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 104px;
+  background-image: url("/konan-new-year-garland.png");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 104px;
+  opacity: 0.98;
+  filter: drop-shadow(0 2px 5px rgba(218, 165, 55, 0.28));
+  animation: konan-new-year-garland-glow 4.8s ease-in-out infinite;
+}
+
+/* Reflets lumineux très fins au-dessus du header. */
+:root[data-season="new-year"] .konan-seasonal-header::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 231, 181, 0.9) 18%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 231, 181, 0.9) 82%,
+    transparent
+  );
+  opacity: 0.72;
+  box-shadow: 0 0 12px rgba(224, 170, 58, 0.42);
+}
+
+:root[data-season="new-year"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+:root[data-season="new-year"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 4;
+}
+
+/* 3. BONNET SUR LE SYMBOLE DU LOGO
+   Réutilise exclusivement /konan-santa-hat.png.
+   Mouvement léger : le bonnet oscille sans déplacer le logo. */
+:root[data-season="new-year"] .konan-seasonal-logo-mark {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+:root[data-season="new-year"] .konan-seasonal-logo-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 12;
+  pointer-events: none;
+  width: 132%;
+  height: 122%;
+  top: -58%;
+  left: -15%;
+  background-image: url("/konan-santa-hat.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  transform: rotate(-27deg);
+  transform-origin: 78% 82%;
+  filter:
+    drop-shadow(0 2px 2px rgba(10, 20, 35, 0.24))
+    drop-shadow(0 0 5px rgba(255, 231, 181, 0.22));
+  animation: konan-new-year-hat-sway 4.2s ease-in-out infinite;
+}
+
+/* 4. RACCOURCIS DU HEADER */
+:root[data-season="new-year"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(201, 154, 46, 0.38);
+  box-shadow:
+    0 4px 14px rgba(15, 35, 62, 0.07),
+    0 0 0 2px rgba(201, 154, 46, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+:root[data-season="new-year"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 9px;
+  right: 9px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #946b18, #fff1c2, #c99a2e);
+  box-shadow: 0 0 8px rgba(255, 220, 135, 0.42);
+}
+
+:root[data-season="new-year"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="new-year"] .konan-seasonal-header a[href="/favorites"] > div:hover,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/checkout"] > div:hover,
+:root[data-season="new-year"] .konan-seasonal-header a[href="/account"] > div:hover {
+  border-color: rgba(201, 154, 46, 0.68);
+  box-shadow: 0 6px 18px rgba(15, 35, 62, 0.10), 0 0 12px rgba(226, 174, 70, 0.16);
+  transform: translateY(-1px);
+}
+
+/* 5. ÉTOILES FILANTES ANIMÉES — GIF + MOUVEMENT FLUIDE
+   Fichier requis dans /public : /konan-new-year-stars.gif
+   Le GIF fournit les étoiles lumineuses et leurs traînées.
+   Le déplacement CSS donne une vraie chute continue, avec dérive latérale.
+   La couche est non interactive et reste derrière les interfaces flottantes. */
+:root[data-season="new-year"] body {
+  position: relative;
+  background-color: var(--season-page);
+}
+
+:root[data-season="new-year"] body::before {
+  content: "";
+  position: fixed;
+  inset: -100vh -8vw -100vh;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.30;
+  background-image:
+    url("/konan-new-year-stars.gif"),
+    url("/konan-new-year-stars.gif");
+  background-repeat: repeat, repeat;
+  background-size:
+    610px 406px,
+    790px 526px;
+  background-position:
+    0 0,
+    285px 170px;
+  filter: drop-shadow(0 0 3px rgba(225, 177, 78, 0.14));
+  animation:
+    konan-new-year-stars-drift 58s linear infinite,
+    konan-new-year-stars-sway 19s ease-in-out infinite;
+  will-change: transform, background-position;
+}
+
+/* 6. EXPLOSIONS DE FEUX D'ARTIFICE — GIF TRANSPARENT
+   Fichier requis dans /public : /konan-new-year-fireworks.gif
+   Le GIF contient de vraies séquences visuelles d'explosion :
+   montée lumineuse, ouverture en éventail, pluie d'étincelles et extinction.
+   Une explosion à la fois, avec de longues pauses entre les salves, est affichée
+   pour créer une ambiance de réveillon sans masquer le contenu. */
+:root[data-season="new-year"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background-image: url("/konan-new-year-fireworks.gif");
+  background-repeat: no-repeat;
+  background-position: 16% 18%;
+  background-size: 300px 296px;
+  filter:
+    drop-shadow(0 0 4px rgba(219, 160, 52, 0.15))
+    saturate(0.82);
+  animation: konan-new-year-fireworks-appear 26s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+
+
+/* 6 BIS. DEUX AUTRES POINTS DE TIR
+   Les trois calques utilisent le vrai GIF, mais à des positions et avec
+   des décalages temporels différents : les explosions ne se superposent pas. */
+html[data-season="new-year"] {
+  position: relative;
+}
+
+html[data-season="new-year"]::before,
+html[data-season="new-year"]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url("/konan-new-year-fireworks.gif");
+  background-repeat: no-repeat;
+  background-size: 270px 266px;
+  opacity: 0;
+  filter:
+    drop-shadow(0 0 4px rgba(219, 160, 52, 0.13))
+    saturate(0.82);
+  animation: konan-new-year-fireworks-appear 26s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Deuxième zone : haut droit. */
+html[data-season="new-year"]::before {
+  background-position: 84% 10%;
+  animation-delay: -8.7s;
+}
+
+/* Troisième zone : bas gauche, avec une taille plus discrète. */
+html[data-season="new-year"]::after {
+  background-position: 12% 76%;
+  background-size: 225px 222px;
+  animation-delay: -17.3s;
+}
+
+@media (max-width: 768px) {
+  html[data-season="new-year"]::before {
+    background-position: 86% 14%;
+    background-size: 205px 202px;
+  }
+
+  html[data-season="new-year"]::after {
+    background-position: 10% 72%;
+    background-size: 175px 173px;
+  }
+}
+
+@media (max-width: 420px) {
+  html[data-season="new-year"]::before {
+    background-size: 175px 173px;
+  }
+
+  html[data-season="new-year"]::after {
+    background-size: 150px 148px;
+  }
+}
+
+
+/* 6. PETITS ÉLÉMENTS FESTIFS SUR LES CARTES */
+:root[data-season="new-year"] .konan-seasonal-product-card {
+  background: var(--season-surface) !important;
+  border: 1px solid rgba(201, 154, 46, 0.20) !important;
+  box-shadow:
+    0 5px 18px rgba(20, 43, 77, 0.065),
+    0 1px 4px rgba(201, 154, 46, 0.045) !important;
+  color: var(--season-text);
+  transition: box-shadow 240ms ease, border-color 240ms ease, transform 240ms ease;
+}
+
+:root[data-season="new-year"] .konan-seasonal-product-card:hover {
+  border-color: rgba(201, 154, 46, 0.42) !important;
+  box-shadow: 0 9px 25px rgba(20, 43, 77, 0.10), 0 0 12px rgba(224, 178, 79, 0.12) !important;
+}
+
+:root[data-season="new-year"] .konan-seasonal-quick-card {
+  background: linear-gradient(145deg, #fffefa, #fff9eb) !important;
+  border: 1px solid rgba(201, 154, 46, 0.22) !important;
+  box-shadow: 0 5px 16px rgba(20, 43, 77, 0.065);
+  color: var(--season-text);
+}
+
+:root[data-season="new-year"] .konan-seasonal-quick-card h3 {
+  color: #946b18 !important;
+}
+
+/* 7. BOUTONS ET ACCESSIBILITÉ CLAVIER */
+:root[data-season="new-year"] button,
+:root[data-season="new-year"] a[role="button"] {
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+
+:root[data-season="new-year"] button:focus-visible,
+:root[data-season="new-year"] a[role="button"]:focus-visible {
+  outline: 2px solid #c99a2e;
+  outline-offset: 3px;
+}
+
+/* 8. ANIMATIONS */
+@keyframes konan-new-year-garland-glow {
+  0%, 100% {
+    opacity: 0.90;
+    filter: drop-shadow(0 2px 4px rgba(218, 165, 55, 0.22));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 2px 9px rgba(255, 207, 99, 0.48));
+  }
+}
+
+@keyframes konan-new-year-hat-sway {
+  0%, 100% { transform: rotate(-27deg) translateY(0); }
+  50% { transform: rotate(-23deg) translateY(-2px); }
+}
+
+@keyframes konan-new-year-stars-drift {
+  0% {
+    transform: translate3d(-0.8vw, -12vh, 0);
+    background-position: 0 0, 285px 170px;
+  }
+  50% {
+    transform: translate3d(0.6vw, 44vh, 0);
+    background-position: 0 620px, 285px 760px;
+  }
+  100% {
+    transform: translate3d(1.2vw, 100vh, 0);
+    background-position: 0 1240px, 285px 1520px;
+  }
+}
+
+@keyframes konan-new-year-stars-sway {
+  0%, 100% { margin-left: -0.25vw; }
+  50% { margin-left: 0.35vw; }
+}
+
+/* Chaque séquence donne un temps de respiration entre les salves. */
+@keyframes konan-new-year-fireworks-appear {
+  0%, 7%, 100% {
+    opacity: 0;
+    transform: scale(.94);
+  }
+  9% {
+    opacity: .42;
+    transform: scale(.98);
+  }
+  14% {
+    opacity: .50;
+    transform: scale(1);
+  }
+  19% {
+    opacity: .28;
+    transform: scale(1.035);
+  }
+  24% {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+  58% {
+    opacity: 0;
+    transform: scale(.96);
+  }
+  61% {
+    opacity: .38;
+    transform: scale(.99);
+  }
+  67% {
+    opacity: .46;
+    transform: scale(1.015);
+  }
+  73% {
+    opacity: .18;
+    transform: scale(1.05);
+  }
+  78% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+/* 9. MOBILE / IPHONE */
+@media (max-width: 768px) {
+  :root[data-season="new-year"] .konan-seasonal-header::before {
+    height: 78px;
+    background-size: auto 78px;
+    background-position: center top;
+  }
+
+  :root[data-season="new-year"] .konan-seasonal-logo-mark::after {
+    width: 126%;
+    height: 116%;
+    top: -55%;
+    left: -13%;
+  }
+
+  :root[data-season="new-year"] body::before {
+    opacity: 0.24;
+    background-size: 470px 313px, 610px 406px;
+  }
+
+  :root[data-season="new-year"] body::after {
+    background-position: 18% 16%;
+    background-size: 220px 217px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root[data-season="new-year"] .konan-seasonal-header::before {
+    height: 66px;
+    background-size: auto 66px;
+  }
+
+  :root[data-season="new-year"] body::before {
+    opacity: 0.20;
+    background-size: 390px 260px, 510px 340px;
+  }
+
+  :root[data-season="new-year"] body::after {
+    background-size: 185px 183px;
+  }
+}
+
+/* 10. ACCESSIBILITÉ : RÉDUCTION DES ANIMATIONS */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="new-year"] .konan-seasonal-header::before,
+  :root[data-season="new-year"] .konan-seasonal-logo-mark::after,
+  :root[data-season="new-year"] body::before {
+    animation: none !important;
+    transform: none !important;
+    opacity: 0.16;
+  }
+
+  :root[data-season="new-year"] body::after,
+  html[data-season="new-year"]::before,
+  html[data-season="new-year"]::after {
+    display: none !important;
+  }
+
+  :root[data-season="new-year"] .konan-seasonal-product-card,
+  :root[data-season="new-year"] .konan-seasonal-quick-card,
+  :root[data-season="new-year"] .konan-seasonal-header a[href="/favorites"] > div,
+  :root[data-season="new-year"] .konan-seasonal-header a[href="/checkout"] > div,
+  :root[data-season="new-year"] .konan-seasonal-header a[href="/account"] > div,
+  :root[data-season="new-year"] button,
+  :root[data-season="new-year"] a[role="button"] {
+    transition: none !important;
+  }
+}
+
+/* ========================================================
+   11. PLUIE DE MOTS DU NOUVEL AN — DEUX FLUX CONTINUS
+   Les deux lignes sont créées par konan-new-year-wishes.js.
+   L'année est calculée automatiquement par le JavaScript.
+   Effet inspiré de la pluie de mots de la Fête des Pères.
+======================================================== */
+
+:root[data-season="new-year"] .konan-new-year-words-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+:root[data-season="new-year"] .konan-new-year-words-flow {
+  position: absolute;
+  top: -100vh;
+  width: 100%;
+  height: 200vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  pointer-events: none;
+  white-space: pre-wrap;
+  word-break: normal;
+  text-transform: uppercase;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(10px, 1.05vw, 14px);
+  font-weight: 650;
+  letter-spacing: .15em;
+  line-height: 8.5rem;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, .75), 0 0 8px rgba(176, 125, 30, .18);
+  will-change: transform, opacity;
+}
+
+:root[data-season="new-year"] .konan-new-year-words-flow--gold {
+  left: 0;
+  padding: 0 5vw;
+  color: rgba(174, 123, 28, .30);
+  text-align: left;
+  animation:
+    konan-new-year-words-fall 38s linear infinite,
+    konan-new-year-words-glimmer 7.5s ease-in-out infinite;
+}
+
+:root[data-season="new-year"] .konan-new-year-words-flow--blue {
+  right: 0;
+  padding: 0 7vw;
+  color: rgba(145, 105, 36, .22);
+  font-style: italic;
+  text-align: right;
+  line-height: 10rem;
+  animation:
+    konan-new-year-words-drift 49s linear infinite,
+    konan-new-year-words-glimmer-soft 9s ease-in-out infinite;
+}
+
+@keyframes konan-new-year-words-fall {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(1.5vw, 50%, 0); }
+}
+
+@keyframes konan-new-year-words-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-2vw, 50%, 0); }
+}
+
+@keyframes konan-new-year-words-glimmer {
+  0%, 100% { opacity: .62; }
+  50%      { opacity: 1; }
+}
+
+@keyframes konan-new-year-words-glimmer-soft {
+  0%, 100% { opacity: .58; }
+  50%      { opacity: .92; }
+}
+
+@media (max-width: 768px) {
+  :root[data-season="new-year"] .konan-new-year-words-flow {
+    font-size: 10px;
+    letter-spacing: .09em;
+    line-height: 7rem;
+    padding-inline: 3vw;
+  }
+
+  :root[data-season="new-year"] .konan-new-year-words-flow--blue {
+    line-height: 8rem;
+  }
+}
+
+@media (max-width: 420px) {
+  :root[data-season="new-year"] .konan-new-year-words-flow {
+    font-size: 9px;
+    letter-spacing: .06em;
+    line-height: 6rem;
+  }
+
+  :root[data-season="new-year"] .konan-new-year-words-flow--blue {
+    line-height: 7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="new-year"] .konan-new-year-words-flow {
+    animation: none !important;
+    transform: none !important;
+    opacity: .55;
+  }
+}
+
+
+/* ========================================================
+   12. OR MÉTALLIQUE PREMIUM + POUSSIÈRE DE PAILLETTES
+   Or champagne, reflets ivoire et ombres bronze.
+   Les particules restent décoratives et non interactives.
+======================================================== */
+
+:root[data-season="new-year"] {
+  --season-primary: #c99a2e;
+  --season-secondary: #142b4d;
+  --season-glow: rgba(221, 177, 83, .25);
+  --season-decoration: rgba(190, 139, 43, .30);
+  --season-border: rgba(185, 133, 32, .30);
+  --season-surface: #fffdf7;
+}
+
+:root[data-season="new-year"] .konan-seasonal-header {
+  border-bottom-color: rgba(184, 132, 35, .48);
+  box-shadow:
+    0 5px 24px rgba(15, 35, 62, .09),
+    0 1px 0 rgba(255, 248, 225, .95),
+    0 3px 16px rgba(190, 139, 43, .10);
+}
+
+:root[data-season="new-year"] .konan-seasonal-product-card,
+:root[data-season="new-year"] .konan-seasonal-quick-card {
+  border-color: rgba(185, 133, 32, .28) !important;
+  box-shadow:
+    0 5px 18px rgba(20, 43, 77, .065),
+    0 1px 5px rgba(190, 139, 43, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .95) !important;
+}
+
+:root[data-season="new-year"] .konan-seasonal-quick-card h3 {
+  color: #9a701f !important;
+}
+
+/* Petites poussières dorées en suspension sur toute la page. */
+:root[data-season="new-year"] .konan-new-year-words-layer::before,
+:root[data-season="new-year"] .konan-new-year-words-layer::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+}
+
+:root[data-season="new-year"] .konan-new-year-words-layer::before {
+  opacity: .48;
+  background-image:
+    radial-gradient(circle, rgba(255, 220, 132, .95) 0 1px, transparent 1.8px),
+    radial-gradient(circle, rgba(183, 128, 29, .72) 0 .8px, transparent 1.7px),
+    radial-gradient(circle, rgba(255, 239, 190, .95) 0 1.2px, transparent 2px);
+  background-size: 137px 163px, 211px 197px, 283px 239px;
+  background-position: 0 0, 61px 83px, 137px 39px;
+  animation: konan-new-year-gold-dust-fall 34s linear infinite;
+}
+
+:root[data-season="new-year"] .konan-new-year-words-layer::after {
+  opacity: .30;
+  background-image:
+    radial-gradient(circle, rgba(213, 164, 66, .85) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle, rgba(255, 231, 174, .95) 0 1px, transparent 2px);
+  background-size: 307px 271px, 179px 223px;
+  background-position: 83px 29px, 17px 113px;
+  filter: blur(.25px);
+  animation: konan-new-year-gold-dust-drift 48s linear infinite;
+}
+
+@keyframes konan-new-year-gold-dust-fall {
+  from { transform: translate3d(-.5vw, -8vh, 0); }
+  to   { transform: translate3d(1.2vw, 32vh, 0); }
+}
+
+@keyframes konan-new-year-gold-dust-drift {
+  from { transform: translate3d(1vw, -12vh, 0) rotate(0deg); }
+  to   { transform: translate3d(-1.5vw, 28vh, 0) rotate(2deg); }
+}
+
+/* Reflet métallique discret sur les inscriptions qui tombent. */
+:root[data-season="new-year"] .konan-new-year-words-flow--gold {
+  color: rgba(157, 105, 20, .34);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, .92),
+    0 0 5px rgba(229, 183, 91, .28),
+    0 0 13px rgba(166, 117, 32, .12);
+}
+
+:root[data-season="new-year"] .konan-new-year-words-flow--blue {
+  color: rgba(137, 99, 35, .25);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, .90),
+    0 0 9px rgba(219, 176, 91, .18);
+}
+
+@media (max-width: 768px) {
+  :root[data-season="new-year"] .konan-new-year-words-layer::before {
+    opacity: .34;
+    background-size: 113px 147px, 181px 173px, 241px 211px;
+  }
+
+  :root[data-season="new-year"] .konan-new-year-words-layer::after {
+    opacity: .22;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="new-year"] .konan-new-year-words-layer::before,
+  :root[data-season="new-year"] .konan-new-year-words-layer::after {
+    animation: none !important;
+    opacity: .18;
+  }
+}

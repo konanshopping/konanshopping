@@ -1,0 +1,69 @@
+/*
+ * KONAN SHOPPING CAMEROUN
+ * Styles communs aux thèmes saisonniers
+ *
+ * Important :
+ * - Ce fichier ne remplace pas index.css.
+ * - Il ne contient aucune règle globale de reset, de typographie,
+ *   de navigation ou de mise en page générale.
+ * - Les décorations propres à chaque fête restent dans leur fichier
+ *   (christmas.css, valentine.css, etc.).
+ */
+
+/* Variables saisonnières de base */
+:root {
+  --season-primary: #2563eb;
+  --season-secondary: #1d4ed8;
+  --season-glow: rgba(37, 99, 235, 0.10);
+  --season-decoration: rgba(37, 99, 235, 0.22);
+}
+
+/*
+ * Zone réservée aux décorations saisonnières du header.
+ * Les thèmes pourront ajouter leurs propres éléments visuels
+ * sans bloquer les liens ni les boutons du site.
+ */
+.konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Le contenu réel du header reste au-dessus des décorations. */
+.konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Le logo conserve son comportement normal. */
+.konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/*
+ * Couche décorative facultative.
+ * Les thèmes peuvent utiliser ::before ou ::after.
+ * pointer-events:none garantit que les clics traversent la décoration.
+ */
+.konan-seasonal-header::before,
+.konan-seasonal-header::after {
+  pointer-events: none;
+}
+
+/* Transitions discrètes entre les couleurs saisonnières. */
+.konan-seasonal-header,
+.konan-seasonal-logo {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+/* Accessibilité : réduire les animations si l'utilisateur le demande. */
+@media (prefers-reduced-motion: reduce) {
+  .konan-seasonal-header,
+  .konan-seasonal-logo {
+    transition: none !important;
+    animation: none !important;
+  }
+}

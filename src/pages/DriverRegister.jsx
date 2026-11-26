@@ -1613,17 +1613,7 @@ export default function DriverRegister() {
 
               circle at 0% 0%,
 
-              rgba(
-
-                37,
-
-                99,
-
-                235,
-
-                .12
-
-              ),
+              color-mix(in srgb, var(--season-primary, #2563eb) 12%, transparent),
 
               transparent 32%
 
@@ -1635,17 +1625,7 @@ export default function DriverRegister() {
 
               circle at 100% 100%,
 
-              rgba(
-
-                79,
-
-                70,
-
-                229,
-
-                .10
-
-              ),
+              color-mix(in srgb, var(--season-secondary, #4f46e5) 10%, transparent),
 
               transparent 32%
 
@@ -1657,7 +1637,7 @@ export default function DriverRegister() {
 
               135deg,
 
-              #eef4ff,
+              color-mix(in srgb, var(--season-primary, #2563eb) 7%, white),
 
               #f8fafc
 
@@ -1709,17 +1689,7 @@ export default function DriverRegister() {
 
           background:
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .10
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 10%, transparent);
 
 
 
@@ -1765,17 +1735,7 @@ export default function DriverRegister() {
 
           background:
 
-            rgba(
-
-              79,
-
-              70,
-
-              229,
-
-              .10
-
-            );
+            color-mix(in srgb, var(--season-secondary, #4f46e5) 10%, transparent);
 
 
 
@@ -1943,9 +1903,9 @@ export default function DriverRegister() {
 
               135deg,
 
-              #2563eb,
+              var(--season-primary, #2563eb),
 
-              #4f46e5
+              var(--season-secondary, #4f46e5)
 
             );
 
@@ -1955,17 +1915,7 @@ export default function DriverRegister() {
 
             0 15px 35px
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .28
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 28%, transparent);
 
 
 
@@ -1981,7 +1931,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -2135,7 +2085,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -2271,7 +2221,7 @@ export default function DriverRegister() {
 
           border-color:
 
-            #2563eb;
+            var(--season-primary, #2563eb);
 
 
 
@@ -2279,17 +2229,7 @@ export default function DriverRegister() {
 
             0 0 0 4px
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .09
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 9%, transparent);
 
 
 
@@ -2499,7 +2439,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -2581,13 +2521,13 @@ export default function DriverRegister() {
 
           border-color:
 
-            #2563eb;
+            var(--season-primary, #2563eb);
 
 
 
           background:
 
-            #eff6ff;
+            color-mix(in srgb, var(--season-primary, #2563eb) 9%, white);
 
 
 
@@ -2599,7 +2539,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -2685,7 +2625,7 @@ export default function DriverRegister() {
 
             4px solid
 
-            #dbeafe;
+            color-mix(in srgb, var(--season-primary, #2563eb) 22%, white);
 
 
 
@@ -2693,17 +2633,7 @@ export default function DriverRegister() {
 
             0 10px 30px
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .18
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent);
 
 
 
@@ -2751,7 +2681,7 @@ export default function DriverRegister() {
 
 
 
-          background: #2563eb;
+          background: var(--season-primary, #2563eb);
 
 
 
@@ -2817,7 +2747,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -2881,9 +2811,9 @@ export default function DriverRegister() {
 
               135deg,
 
-              #2563eb,
+              var(--season-primary, #2563eb),
 
-              #4f46e5
+              var(--season-secondary, #4f46e5)
 
             );
 
@@ -2909,17 +2839,7 @@ export default function DriverRegister() {
 
             0 12px 30px
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .25
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 25%, transparent);
 
 
 
@@ -2947,17 +2867,7 @@ export default function DriverRegister() {
 
             0 16px 35px
 
-            rgba(
-
-              37,
-
-              99,
-
-              235,
-
-              .30
-
-            );
+            color-mix(in srgb, var(--season-primary, #2563eb) 30%, transparent);
 
 
 
@@ -3057,7 +2967,7 @@ export default function DriverRegister() {
 
 
 
-          color: #2563eb;
+          color: var(--season-primary, #2563eb);
 
 
 
@@ -3932,6 +3842,282 @@ export default function DriverRegister() {
         }
 
 
+
+
+
+        /* ==================================================
+           RESPONSIVE FINAL — iOS / MOBILE / TABLET / DESKTOP
+           Styles additionnels uniquement : aucune logique React modifiée.
+        ================================================== */
+
+        .driver-register-page {
+          /* La page devient elle-même une zone scrollable fiable.
+             Cela évite que le formulaire soit coupé lorsque son contenu
+             dépasse la hauteur de l'écran. */
+          width: 100%;
+          height: 100vh;
+          height: 100svh;
+          height: 100dvh;
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
+          padding:
+            max(20px, env(safe-area-inset-top))
+            max(20px, env(safe-area-inset-right))
+            max(20px, env(safe-area-inset-bottom))
+            max(20px, env(safe-area-inset-left));
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+          overflow-x: hidden;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior-y: contain;
+          touch-action: pan-y;
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+
+        .driver-register-card {
+          min-width: 0;
+          max-height: none;
+          height: auto;
+          flex: 0 0 auto;
+          margin: auto;
+          overflow: visible;
+        }
+
+        .driver-form,
+        .driver-field,
+        .driver-input,
+        .driver-photo-section {
+          min-width: 0;
+        }
+
+        .driver-input input {
+          min-width: 0;
+          -webkit-appearance: none;
+          appearance: none;
+          border-radius: 0;
+          line-height: 1.35;
+        }
+
+        .driver-password-button,
+        .driver-photo-upload,
+        .driver-submit,
+        .driver-notification-close,
+        .driver-login-footer a {
+          -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+
+        .driver-password-button,
+        .driver-notification-close {
+          min-width: 44px;
+          min-height: 44px;
+        }
+
+        .driver-photo-upload,
+        .driver-submit {
+          min-height: 52px;
+        }
+
+        .driver-notification {
+          top: max(12px, env(safe-area-inset-top));
+          right: max(12px, env(safe-area-inset-right));
+        }
+
+        @media (min-width: 601px) and (max-width: 900px) {
+          .driver-register-page {
+            align-items: flex-start;
+            padding: 28px 22px;
+          }
+
+          .driver-register-card {
+            max-width: 560px;
+            padding: 32px clamp(22px, 5vw, 38px);
+          }
+        }
+
+        @media (max-width: 600px) {
+          .driver-register-page {
+            width: 100%;
+            width: 100vw;
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            padding:
+              max(0px, env(safe-area-inset-top))
+              max(0px, env(safe-area-inset-right))
+              max(0px, env(safe-area-inset-bottom))
+              max(0px, env(safe-area-inset-left));
+            height: 100vh;
+            height: 100svh;
+            height: 100dvh;
+            align-items: flex-start;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+          }
+
+          .driver-register-card {
+            width: 100%;
+            min-width: 0;
+            min-height: 100vh;
+            min-height: 100svh;
+            min-height: 100dvh;
+            height: auto;
+            padding:
+              24px
+              clamp(16px, 5vw, 24px)
+              max(28px, env(safe-area-inset-bottom));
+            border-radius: 0;
+            overflow: visible;
+          }
+
+          .driver-header h1 {
+            font-size: clamp(25px, 7vw, 31px);
+            line-height: 1.15;
+            overflow-wrap: anywhere;
+          }
+
+          .driver-header p {
+            width: 100%;
+            overflow-wrap: anywhere;
+          }
+
+          .driver-security {
+            line-height: 1.45;
+            text-align: center;
+            flex-wrap: wrap;
+          }
+
+          .driver-input {
+            min-height: 54px;
+          }
+
+          /* 16px évite le zoom automatique des champs sur Safari iOS. */
+          .driver-input input {
+            font-size: 16px !important;
+            line-height: 1.35;
+          }
+
+          .driver-password-button {
+            width: 44px;
+            height: 44px;
+          }
+
+          .driver-photo-upload {
+            min-height: 56px;
+            padding: 12px;
+            text-align: center;
+            line-height: 1.4;
+          }
+
+          .driver-submit {
+            min-height: 56px;
+            padding: 14px 16px;
+            font-size: 14px;
+          }
+
+          .driver-login-footer {
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+          }
+
+          .driver-login-footer a {
+            min-height: 44px;
+            padding: 8px 4px;
+          }
+
+          .driver-notification {
+            top: max(10px, env(safe-area-inset-top));
+            left: max(10px, env(safe-area-inset-left));
+            right: max(10px, env(safe-area-inset-right));
+            width: auto;
+            max-width: none;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .driver-register-card {
+            padding-left: 14px;
+            padding-right: 14px;
+          }
+
+          .driver-security {
+            padding: 10px 8px;
+            font-size: 9px;
+          }
+
+          .driver-input {
+            gap: 8px;
+            padding-left: 11px;
+            padding-right: 9px;
+          }
+
+          .driver-input input {
+            font-size: 16px !important;
+          }
+        }
+
+        @media (max-width: 340px) {
+          .driver-register-card {
+            padding-left: 11px;
+            padding-right: 11px;
+          }
+
+          .driver-brand {
+            letter-spacing: 1.2px;
+          }
+
+          .driver-header h1 {
+            font-size: 24px;
+          }
+
+          .driver-photo-upload {
+            font-size: 11px;
+          }
+        }
+
+        @media (max-height: 560px) and (orientation: landscape) {
+          .driver-register-page {
+            align-items: flex-start;
+            padding-top: max(12px, env(safe-area-inset-top));
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+          }
+
+          .driver-register-card {
+            min-height: auto;
+            margin: 0 auto;
+          }
+
+          .driver-logo {
+            width: 54px;
+            height: 54px;
+            font-size: 22px;
+          }
+
+          .driver-brand {
+            margin-top: 8px;
+          }
+
+          .driver-header h1 {
+            font-size: 25px;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .driver-register-card *,
+          .driver-register-page * {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
 
       `}</style>
 

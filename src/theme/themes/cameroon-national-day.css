@@ -1,0 +1,128 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME FÊTE NATIONALE DU CAMEROUN
+ * Fichier : src/theme/themes/cameroon-national-day.css
+ *
+ * Activé lorsque data-season="cameroon-national-day".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="cameroon-national-day"] {
+  --season-primary: #176b42;
+  --season-secondary: #b42335;
+  --season-glow: rgba(23, 107, 66, 0.10);
+  --season-decoration: rgba(180, 35, 53, 0.25);
+}
+
+/* Identité camerounaise : vert, rouge et accents dorés. */
+:root[data-season="cameroon-national-day"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(23, 107, 66, 0.25);
+  box-shadow: 0 5px 20px rgba(23, 107, 66, 0.07);
+}
+
+:root[data-season="cameroon-national-day"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: 48px;
+  opacity: 0.75;
+  background:
+    linear-gradient(90deg,
+      rgba(23, 107, 66, 0.15) 0 32%,
+      rgba(255, 255, 255, 0.62) 32% 68%,
+      rgba(180, 35, 53, 0.14) 68% 100%);
+}
+
+/* Étoile dorée centrale stylisée avec du texte, sans SVG. */
+:root[data-season="cameroon-national-day"] .konan-seasonal-header::after {
+  content: "★";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(184, 135, 36, 0.58);
+  font-size: 18px;
+  line-height: 25px;
+}
+
+/* Le contenu interactif du header reste au-dessus du décor. */
+:root[data-season="cameroon-national-day"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="cameroon-national-day"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Finition tricolore sur Favoris, Panier et Compte. */
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(23, 107, 66, 0.28);
+  box-shadow:
+    0 3px 12px rgba(23, 107, 66, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #176b42 0 46%, #ffffff 46% 54%, #b42335 54% 100%);
+}
+
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="cameroon-national-day"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier visible. */
+:root[data-season="cameroon-national-day"] button:focus-visible,
+:root[data-season="cameroon-national-day"] a:focus-visible {
+  outline: 2px solid #176b42;
+  outline-offset: 3px;
+}
+
+/* Décoration plus légère sur mobile. */
+@media (max-width: 600px) {
+  :root[data-season="cameroon-national-day"] .konan-seasonal-header::before {
+    height: 34px;
+    opacity: 0.5;
+  }
+
+  :root[data-season="cameroon-national-day"] .konan-seasonal-header::after {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="cameroon-national-day"] .konan-seasonal-header,
+  :root[data-season="cameroon-national-day"] .konan-seasonal-header *,
+  :root[data-season="cameroon-national-day"] button,
+  :root[data-season="cameroon-national-day"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

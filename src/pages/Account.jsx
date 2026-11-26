@@ -88,7 +88,21 @@ const safeParse = (value, fallback = null) => {
 
 
 
-const getStoredUser = () => safeParse(localStorage.getItem("user"), null);
+const getStoredUser = () => {
+  try {
+    return safeParse(localStorage.getItem("user"), null);
+  } catch {
+    return null;
+  }
+};
+
+const removeStoredUser = () => {
+  try {
+    localStorage.removeItem("user");
+  } catch {
+    // Le cookie HttpOnly reste la source d'authentification côté serveur.
+  }
+};
 
 
 
@@ -302,42 +316,25 @@ function Account() {
 
 
 
-const logout = () => {
-
-
-
-
-
-
-
-  localStorage.removeItem(
-
-
-
-    "user"
-
-
-
-  );
-
-
-
-
-
-
-
-  window.location.href =
-
-
-
-    "/login";
-
-
-
-
-
-
-
+const logout = async () => {
+  try {
+    // Le backend supprime les cookies HttpOnly : retirer seulement le localStorage
+    // ne suffit pas à fermer une session sécurisée.
+    await axios.post(
+      `${API_BASE_URL}/auth/logout`,
+      {},
+      {
+        withCredentials: true,
+        timeout: API_TIMEOUT,
+        headers: { Accept: "application/json" },
+      }
+    );
+    removeStoredUser();
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Erreur de déconnexion sécurisée :", error);
+    alert("La déconnexion sécurisée n'a pas pu être confirmée. Vérifiez votre connexion puis réessayez.");
+  }
 };
 
 
@@ -526,11 +523,57 @@ const [cancelledOrders, setCancelledOrders] =
 
   useState(0);
 
+const [sessionVerified, setSessionVerified] = useState(false);
 
 
 
 
 
+
+
+    useEffect(() => {
+      let active = true;
+
+      const verifySession = async () => {
+        try {
+          // La session réelle est vérifiée par le cookie HttpOnly.
+          // Le contenu de localStorage sert uniquement à afficher le profil.
+          const response = await axios.get(`${API_BASE_URL}/auth/session`, {
+            withCredentials: true,
+            timeout: API_TIMEOUT,
+            headers: { Accept: "application/json" },
+          });
+
+          const sessionUser = response?.data?.user;
+          const authenticated =
+            response?.data?.authenticated === true &&
+            response?.data?.type === "user" &&
+            sessionUser &&
+            isValidObjectId(String(sessionUser._id || ""));
+
+          if (
+            !authenticated ||
+            String(sessionUser._id) !== userId
+          ) {
+            removeStoredUser();
+            if (active) window.location.replace("/login");
+            return;
+          }
+
+          if (active) setSessionVerified(true);
+        } catch (error) {
+          console.error("Vérification de session impossible :", error);
+          removeStoredUser();
+          if (active) window.location.replace("/login");
+        }
+      };
+
+      verifySession();
+
+      return () => {
+        active = false;
+      };
+    }, [userId]);
 
     useEffect(() => {
 
@@ -572,7 +615,7 @@ const [cancelledOrders, setCancelledOrders] =
 
 
 
-            `https://konanshopping.com/api/users/${userId}`
+            `/users/${userId}`
 
 
 
@@ -730,7 +773,7 @@ useEffect(() => {
 
 
 
-          "https://konanshopping.com/api/messages",
+          "/messages",
 
 
 
@@ -962,7 +1005,7 @@ useEffect(() => {
 
 
 
-      `https://konanshopping.com/api/my-orders/${userId}`
+      `/my-orders/${userId}`
 
 
 
@@ -1454,6 +1497,10 @@ const features = [
 
 
 
+if (!sessionVerified) {
+  return null;
+}
+
 return (
 
 
@@ -1464,12 +1511,7 @@ return (
 
   <div
 
-
-
     style={{
-
-
-
       minHeight: "100vh",
 
 
@@ -1482,7 +1524,7 @@ return (
 
 
 
-        "linear-gradient(to bottom,#eef2ff,#f8fafc)",
+        "var(--season-page, #f8fafc)",
 
 
 
@@ -1507,6 +1549,8 @@ return (
 
 
   >
+    {/* Palette saisonnière via les variables globales ; effets réalistes à ajouter dans une étape ultérieure. */}
+
 
 
 
@@ -1534,7 +1578,7 @@ return (
 
 
 
-          "linear-gradient(135deg,#4f46e5,#7c3aed)",
+          "linear-gradient(135deg,var(--season-primary, #4f46e5),var(--season-secondary, #7c3aed))",
 
 
 
@@ -1578,7 +1622,7 @@ return (
 
 
 
-          "0 12px 30px rgba(79,70,229,0.25)",
+          "var(--season-button-shadow, 0 12px 30px rgba(79,70,229,0.25))",
 
 
 
@@ -2096,7 +2140,7 @@ return (
 
   if (!currentUserId || !isValidObjectId(currentUserId)) {
 
-    localStorage.removeItem("user");
+    removeStoredUser();
 
     window.location.href = "/login";
 
@@ -2166,7 +2210,7 @@ return (
 
 
 
-          `https://konanshopping.com/api/users/${userId}/avatar`,
+          `/users/${userId}/avatar`,
 
 
 
@@ -2559,8 +2603,6 @@ return (
 
 
   <div
-
-
 
     style={{
 
@@ -3666,7 +3708,7 @@ return (
 
 
 
-            "rgba(255,255,255,0.95)",
+            "var(--season-surface, rgba(255,255,255,0.95))",
 
 
 
@@ -3746,7 +3788,7 @@ return (
 
 
 
-            "1px solid rgba(99,102,241,0.08)",
+            "1px solid var(--season-border, rgba(99,102,241,0.12))",
 
 
 
@@ -3842,7 +3884,7 @@ return (
 
 
 
-              "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+              "linear-gradient(135deg,var(--season-glow, #ede9fe),var(--season-surface, #ddd6fe))",
 
 
 
@@ -3890,7 +3932,7 @@ return (
 
 
 
-            color: "#5b3cc4",
+            color: "var(--season-primary, #5b3cc4)",
 
 
 
@@ -3902,7 +3944,7 @@ return (
 
 
 
-              "0 6px 15px rgba(91,60,196,0.15)",
+              "var(--season-button-shadow, 0 6px 15px rgba(91,60,196,0.15))",
 
 
 
@@ -3950,7 +3992,7 @@ return (
 
 
 
-            color: "#111827",
+            color: "var(--season-text, #111827)",
 
 
 
@@ -4038,7 +4080,7 @@ return (
 
 
 
-      "rgba(255,255,255,0.95)",
+      "var(--season-surface, rgba(255,255,255,0.95))",
 
 
 
@@ -4074,7 +4116,7 @@ return (
 
 
 
-      "1px solid rgba(99,102,241,0.08)",
+      "1px solid var(--season-border, rgba(99,102,241,0.12))",
 
 
 
@@ -4198,7 +4240,7 @@ return (
 
 
 
-        color: "#111827",
+        color: "var(--season-text, #111827)",
 
 
 
@@ -4250,7 +4292,7 @@ return (
 
 
 
-        color: "#5b3cc4",
+        color: "var(--season-primary, #5b3cc4)",
 
 
 
@@ -4566,7 +4608,7 @@ return (
 
 
 
-      "linear-gradient(135deg,#ede9fe,#ddd6fe)",
+      "linear-gradient(135deg,var(--season-glow, #ede9fe),var(--season-surface, #ddd6fe))",
 
 
 
@@ -4606,7 +4648,7 @@ return (
 
 
 
-    color: "#5b3cc4",
+    color: "var(--season-primary, #5b3cc4)",
 
 
 
@@ -4618,7 +4660,7 @@ return (
 
 
 
-      "0 6px 15px rgba(91,60,196,0.15)",
+      "var(--season-button-shadow, 0 6px 15px rgba(91,60,196,0.15))",
 
 
 
@@ -4746,7 +4788,7 @@ return (
 
 
 
-      color: "#5b3cc4",
+      color: "var(--season-primary, #5b3cc4)",
 
 
 
@@ -4798,7 +4840,7 @@ return (
 
 
 
-        "0 4px 10px rgba(91,60,196,0.15)",
+        "var(--season-button-shadow, 0 4px 10px rgba(91,60,196,0.15))",
 
 
 
@@ -4846,7 +4888,7 @@ return (
 
 
 
-            color: "#4b5563",
+            color: "var(--season-muted, #4b5563)",
 
 
 
@@ -4954,7 +4996,7 @@ return (
 
 
 
-      "linear-gradient(135deg,rgba(96,165,250,0.95),rgba(59,130,246,0.88))",
+      "linear-gradient(135deg,var(--season-primary, rgba(96,165,250,0.95)),var(--season-secondary, rgba(59,130,246,0.88)))",
 
 
 
@@ -5626,7 +5668,7 @@ return (
 
 
 
-        "rgba(255,255,255,0.95)",
+        "var(--season-surface, rgba(255,255,255,0.95))",
 
 
 
@@ -5634,7 +5676,7 @@ return (
 
 
 
-      color: "#2563eb",
+      color: "var(--season-primary, #2563eb)",
 
 
 
@@ -5810,7 +5852,7 @@ return (
 
 
 
-      "rgba(255,255,255,0.95)",
+      "var(--season-surface, rgba(255,255,255,0.95))",
 
 
 
@@ -5846,7 +5888,7 @@ return (
 
 
 
-      "1px solid rgba(99,102,241,0.08)",
+      "1px solid var(--season-border, rgba(99,102,241,0.12))",
 
 
 
@@ -5970,7 +6012,7 @@ return (
 
 
 
-        color: "#111827",
+        color: "var(--season-text, #111827)",
 
 
 
@@ -6278,7 +6320,7 @@ return (
 
 
 
-                "linear-gradient(135deg,#dbeafe,#bfdbfe)",
+                "linear-gradient(135deg,var(--season-glow, #dbeafe),var(--season-surface, #bfdbfe))",
 
 
 
@@ -6326,7 +6368,7 @@ return (
 
 
 
-              color: "#2563eb",
+              color: "var(--season-primary, #2563eb)",
 
 
 
@@ -6338,7 +6380,7 @@ return (
 
 
 
-                "0 6px 15px rgba(37,99,235,0.15)",
+                "var(--season-button-shadow, 0 6px 15px rgba(37,99,235,0.15))",
 
 
 
@@ -6386,7 +6428,7 @@ return (
 
 
 
-              color: "#374151",
+              color: "var(--season-muted, #374151)",
 
 
 
@@ -6642,7 +6684,7 @@ return (
 
 
 
-          "rgba(255,255,255,0.95)",
+          "var(--season-surface, rgba(255,255,255,0.95))",
 
 
 
@@ -6774,7 +6816,7 @@ return (
 
 
 
-            "rgba(79,70,229,0.12)",
+            "var(--season-glow, rgba(79,70,229,0.12))",
 
 
 
@@ -6830,7 +6872,7 @@ return (
 
 
 
-            color: "#4f46e5",
+            color: "var(--season-primary, #4f46e5)",
 
 
 
@@ -6894,7 +6936,7 @@ return (
 
 
 
-          color: "#0f172a",
+          color: "var(--season-text, #0f172a)",
 
 
 
@@ -6958,7 +7000,7 @@ return (
 
 
 
-          color: "#374151",
+          color: "var(--season-muted, #374151)",
 
 
 
@@ -7078,7 +7120,7 @@ return (
 
 
 
-            "linear-gradient(135deg,#4f46e5,#4338ca)",
+            "linear-gradient(135deg,var(--season-primary, #4f46e5),var(--season-secondary, #4338ca))",
 
 
 
@@ -7238,7 +7280,7 @@ return (
 
 
 
-      `https://konanshopping.com/api/users/${userId}/avatar`,
+      `/users/${userId}/avatar`,
 
 
 
@@ -7682,7 +7724,7 @@ return (
 
 
 
-          "rgba(255,255,255,0.92)",
+          "var(--season-surface, rgba(255,255,255,0.92))",
 
 
 
@@ -7934,7 +7976,7 @@ return (
 
 
 
-          color: "#0f172a",
+          color: "var(--season-text, #0f172a)",
 
 
 
@@ -7990,7 +8032,7 @@ return (
 
 
 
-          color: "#374151",
+          color: "var(--season-muted, #374151)",
 
 
 
@@ -8142,7 +8184,7 @@ return (
 
 
 
-              "#ffffff",
+              "var(--season-surface, #ffffff)",
 
 
 
@@ -8150,7 +8192,7 @@ return (
 
 
 
-            color: "#111827",
+            color: "var(--season-text, #111827)",
 
 
 
@@ -8258,39 +8300,7 @@ return (
 
 
 
-          onClick={() => {
-
-
-
-
-
-
-
-            localStorage.removeItem(
-
-
-
-              "user"
-
-
-
-            );
-
-
-
-
-
-
-
-            navigate("/");
-
-
-
-
-
-
-
-          }}
+          onClick={logout}
 
 
 
@@ -8518,7 +8528,7 @@ return (
 
 
 
-    background: "#FFFFFF",
+    background: "var(--season-surface, #FFFFFF)",
 
 
 
@@ -8786,7 +8796,7 @@ return (
 
 
 
-        color: "#111827",
+        color: "var(--season-text, #111827)",
 
 
 
@@ -8842,7 +8852,7 @@ return (
 
 
 
-      color: "#6B7280",
+      color: "var(--season-muted, #6B7280)",
 
 
 
@@ -8998,7 +9008,7 @@ return (
 
 
 
-      color: "#4B2E83",
+      color: "var(--season-primary, #4B2E83)",
 
 
 
@@ -9090,7 +9100,7 @@ return (
 
 
 
-      color: "#4B2E83",
+      color: "var(--season-primary, #4B2E83)",
 
 
 
@@ -9370,7 +9380,7 @@ return (
 
 
 
-        color: "#374151",
+        color: "var(--season-muted, #374151)",
 
 
 
@@ -9402,7 +9412,7 @@ return (
 
 
 
-      <FaTruck color="#4B2E83" />
+      <FaTruck color="var(--season-primary, #4B2E83)" />
 
 
 
@@ -9458,7 +9468,7 @@ return (
 
 
 
-        color: "#374151",
+        color: "var(--season-muted, #374151)",
 
 
 
@@ -9490,7 +9500,7 @@ return (
 
 
 
-      <FaLock color="#4B2E83" />
+      <FaLock color="var(--season-primary, #4B2E83)" />
 
 
 
@@ -9546,7 +9556,7 @@ return (
 
 
 
-        color: "#374151",
+        color: "var(--season-muted, #374151)",
 
 
 
@@ -9578,7 +9588,7 @@ return (
 
 
 
-      <FaHeadset color="#4B2E83" />
+      <FaHeadset color="var(--season-primary, #4B2E83)" />
 
 
 
@@ -9634,7 +9644,7 @@ return (
 
 
 
-      background: "#E5E7EB",
+      background: "var(--season-border, #E5E7EB)",
 
 
 
@@ -9690,7 +9700,7 @@ return (
 
 
 
-      color: "#9CA3AF",
+      color: "var(--season-muted, #9CA3AF)",
 
 
 

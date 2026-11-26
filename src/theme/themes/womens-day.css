@@ -1,0 +1,128 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME JOURNÉE INTERNATIONALE DES DROITS DES FEMMES
+ * Fichier : src/theme/themes/womens-day.css
+ *
+ * Activé lorsque data-season="womens-day".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="womens-day"] {
+  --season-primary: #8b3a78;
+  --season-secondary: #54245f;
+  --season-glow: rgba(139, 58, 120, 0.11);
+  --season-decoration: rgba(139, 58, 120, 0.28);
+}
+
+/* Dégradé violet discret dans la partie supérieure du header. */
+:root[data-season="womens-day"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(139, 58, 120, 0.25);
+  box-shadow: 0 5px 20px rgba(84, 36, 95, 0.07);
+}
+
+:root[data-season="womens-day"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: 48px;
+  opacity: 0.7;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(214, 168, 205, 0.35), transparent 45%),
+    radial-gradient(ellipse at 88% 0%, rgba(139, 58, 120, 0.16), transparent 48%);
+}
+
+/* Le contenu du header reste au-dessus de la décoration. */
+:root[data-season="womens-day"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="womens-day"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Motif floral léger, sans SVG ni image externe. */
+:root[data-season="womens-day"] .konan-seasonal-header::after {
+  content: "✿     ✿      ✿";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 3px;
+  right: 12px;
+  color: rgba(139, 58, 120, 0.28);
+  font-size: 17px;
+  letter-spacing: 12px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* Finition assortie sur Favoris, Panier et Compte. */
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(139, 58, 120, 0.25);
+  box-shadow:
+    0 3px 12px rgba(84, 36, 95, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8b3a78, #e0b6d5, #8b3a78);
+}
+
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="womens-day"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier clairement visible. */
+:root[data-season="womens-day"] button:focus-visible,
+:root[data-season="womens-day"] a:focus-visible {
+  outline: 2px solid #8b3a78;
+  outline-offset: 3px;
+}
+
+/* Décoration plus légère sur les petits écrans. */
+@media (max-width: 600px) {
+  :root[data-season="womens-day"] .konan-seasonal-header::after {
+    right: 5px;
+    font-size: 13px;
+    letter-spacing: 6px;
+  }
+
+  :root[data-season="womens-day"] .konan-seasonal-header::before {
+    height: 34px;
+    opacity: 0.5;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="womens-day"] .konan-seasonal-header,
+  :root[data-season="womens-day"] .konan-seasonal-header *,
+  :root[data-season="womens-day"] button,
+  :root[data-season="womens-day"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

@@ -1,0 +1,292 @@
+/*
+========================================================
+ KONAN SHOPPING CAMEROUN — THÈME DE NOËL
+ Guirlande + neige dense et visible + bonnets saisonniers
+========================================================
+*/
+
+/* 1. COULEURS */
+:root[data-season="christmas"] {
+  --season-primary: #b42335;
+  --season-secondary: #176b42;
+  --season-glow: rgba(180, 35, 53, 0.10);
+  --season-decoration: rgba(23, 107, 66, 0.24);
+
+  --season-page: #fffaf8;
+  --season-surface: #fffdfb;
+  --season-border: rgba(180, 35, 53, 0.18);
+  --season-text: #26372e;
+  --season-muted: #68776e;
+}
+
+/* 2. HEADER : NE PAS MODIFIER SA POSITION FIXE/STICKY */
+:root[data-season="christmas"] .konan-seasonal-header {
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(180, 35, 53, 0.20);
+}
+
+/* GUIRLANDE */
+:root[data-season="christmas"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 115px;
+  background-image: url("/konan-christmas-garland.png");
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% 115px;
+}
+
+/* Le contenu reste au-dessus de la guirlande */
+:root[data-season="christmas"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 2;
+}
+
+:root[data-season="christmas"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 4;
+}
+
+/* 3. BONNET : PORTÉ PAR LE SYMBOLE À GAUCHE DU NOM
+   Fichier requis : public/konan-santa-hat.png */
+:root[data-season="christmas"] .konan-seasonal-logo-mark {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+:root[data-season="christmas"] .konan-seasonal-logo-mark::after {
+  content: "";
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  width: 132%;
+  height: 118%;
+  top: -57%;
+  left: -14%;
+  background-image: url("/konan-santa-hat.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  transform: rotate(-27deg);
+  transform-origin: 78% 82%;
+  filter: drop-shadow(0 2px 2px rgba(20, 25, 35, 0.22));
+}
+
+/* 4. BONNET SUR LA SPHÈRE KONAN AI
+   Ajouter la classe "konan-ai-seasonal-sphere" au div qui
+   enveloppe la sphère (anneaux + icône FaBrain) dans AiMode.jsx.
+   Le bonnet n'existe visuellement que lorsque data-season="christmas".
+   Fichier requis : public/konan-santa-hat.png */
+:root[data-season="christmas"] .konan-ai-seasonal-sphere {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+
+:root[data-season="christmas"] .konan-ai-seasonal-sphere::after {
+  content: "";
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  width: 48%;
+  height: 48%;
+  min-width: 76px;
+  min-height: 76px;
+  max-width: 145px;
+  max-height: 145px;
+  top: -24%;
+  left: 50%;
+  background-image: url("/konan-santa-hat.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: contain;
+  transform: translateX(-50%) rotate(-14deg);
+  transform-origin: 50% 85%;
+  filter: drop-shadow(0 4px 5px rgba(15, 23, 42, 0.22));
+}
+
+/* 5. BOUTONS DU HEADER */
+:root[data-season="christmas"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="christmas"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="christmas"] .konan-seasonal-header a[href="/account"] > div {
+  border: 1px solid rgba(180, 35, 53, 0.20);
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.07),
+    0 0 0 2px rgba(180, 35, 53, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* 6. NEIGE : COUCHE DENSE DE PETITS FLOCONS */
+:root[data-season="christmas"] body::before {
+  content: "";
+  position: fixed;
+  inset: -100vh -15vw 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.88;
+
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,1) 0 1.5px, rgba(205,229,255,.85) 1.8px, transparent 3px),
+    radial-gradient(circle, rgba(225,241,255,.98) 0 1.8px, rgba(130,177,220,.42) 2.2px, transparent 3.8px),
+    radial-gradient(circle, rgba(255,255,255,.98) 0 1.2px, rgba(170,207,242,.65) 1.6px, transparent 3px),
+    radial-gradient(circle, rgba(235,246,255,.98) 0 2px, rgba(130,177,220,.38) 2.5px, transparent 4px),
+    radial-gradient(circle, rgba(255,255,255,.95) 0 1px, rgba(180,215,245,.7) 1.5px, transparent 2.8px),
+    radial-gradient(circle, rgba(224,240,255,.95) 0 1.5px, transparent 3px),
+    radial-gradient(circle, rgba(255,255,255,.95) 0 1.2px, transparent 2.8px);
+
+  background-size:
+    47px 59px,
+    73px 89px,
+    91px 107px,
+    127px 139px,
+    59px 83px,
+    163px 151px,
+    211px 193px;
+
+  background-position:
+    7px 13px,
+    31px 47px,
+    53px 19px,
+    17px 71px,
+    41px 29px,
+    89px 101px,
+    113px 37px;
+
+  animation: konan-snow-wind 13s linear infinite;
+}
+
+/* 7. NEIGE DE PREMIER PLAN : FLOCONS PLUS GROS */
+:root[data-season="christmas"] body::after {
+  content: "";
+  position: fixed;
+  inset: -100vh -18vw 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.72;
+
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,1) 0 2.5px, rgba(176,211,245,.75) 3px, transparent 5px),
+    radial-gradient(circle, rgba(235,247,255,1) 0 3px, rgba(120,169,215,.55) 3.7px, transparent 6px),
+    radial-gradient(circle, rgba(255,255,255,.98) 0 2px, rgba(170,207,242,.65) 2.8px, transparent 5px),
+    radial-gradient(circle, rgba(230,244,255,.98) 0 3.5px, rgba(120,169,215,.45) 4px, transparent 7px),
+    radial-gradient(circle, rgba(255,255,255,.98) 0 1.8px, rgba(170,207,242,.55) 2.5px, transparent 4.5px);
+
+  background-size:
+    173px 191px,
+    257px 229px,
+    311px 283px,
+    389px 347px,
+    223px 263px;
+
+  background-position:
+    23px 61px,
+    131px 17px,
+    71px 149px,
+    197px 83px,
+    43px 211px;
+
+  filter: drop-shadow(0 1px 2px rgba(80, 125, 170, 0.28));
+  animation: konan-snow-wind-slow 21s linear infinite;
+}
+
+/* 8. VENT : FLOCONS QUI DESCENDENT EN DIAGONALE */
+@keyframes konan-snow-wind {
+  0%   { transform: translate3d(-2vw, 0, 0); }
+  25%  { transform: translate3d(3vw, 25vh, 0); }
+  50%  { transform: translate3d(6vw, 50vh, 0); }
+  75%  { transform: translate3d(2vw, 75vh, 0); }
+  100% { transform: translate3d(-2vw, 100vh, 0); }
+}
+
+@keyframes konan-snow-wind-slow {
+  0%   { transform: translate3d(3vw, 0, 0); }
+  25%  { transform: translate3d(-2vw, 25vh, 0); }
+  50%  { transform: translate3d(-5vw, 50vh, 0); }
+  75%  { transform: translate3d(-1vw, 75vh, 0); }
+  100% { transform: translate3d(3vw, 100vh, 0); }
+}
+
+/* 9. CARTES PRODUITS */
+:root[data-season="christmas"] .konan-seasonal-product-card {
+  background: var(--season-surface) !important;
+  border: 1px solid rgba(23, 107, 66, 0.20) !important;
+  box-shadow:
+    0 5px 18px rgba(23, 107, 66, 0.08),
+    0 1px 4px rgba(180, 35, 53, 0.04) !important;
+  color: var(--season-text);
+  transition: box-shadow .25s ease, border-color .25s ease;
+}
+
+:root[data-season="christmas"] .konan-seasonal-product-card:hover {
+  border-color: rgba(180, 35, 53, 0.38) !important;
+  box-shadow: 0 8px 24px rgba(23, 107, 66, 0.12) !important;
+}
+
+/* 10. CARTES RACCOURCIS */
+:root[data-season="christmas"] .konan-seasonal-quick-card {
+  background: linear-gradient(145deg, #fffdfb, #fff1ef) !important;
+  border: 1px solid rgba(180, 35, 53, 0.20) !important;
+  box-shadow: 0 5px 16px rgba(23, 107, 66, 0.08);
+  color: var(--season-text);
+}
+
+:root[data-season="christmas"] .konan-seasonal-quick-card h3 {
+  color: #176b42 !important;
+}
+
+/* 11. FOND GÉNÉRAL */
+:root[data-season="christmas"] body {
+  background-color: var(--season-page);
+}
+
+/* 12. MOBILE / IPHONE */
+@media (max-width: 600px) {
+  :root[data-season="christmas"] .konan-seasonal-header::before {
+    height: 75px;
+    background-size: 100% 75px;
+  }
+
+  :root[data-season="christmas"] body::before {
+    opacity: 0.82;
+    background-size:
+      39px 51px,
+      61px 77px,
+      79px 97px,
+      109px 127px,
+      51px 73px,
+      139px 131px,
+      181px 167px;
+  }
+
+  :root[data-season="christmas"] body::after {
+    opacity: 0.66;
+  }
+
+  :root[data-season="christmas"] .konan-ai-seasonal-sphere::after {
+    width: 52%;
+    height: 52%;
+    min-width: 68px;
+    min-height: 68px;
+    top: -27%;
+  }
+}
+
+/* 13. ACCESSIBILITÉ */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="christmas"] body::before,
+  :root[data-season="christmas"] body::after {
+    animation: none !important;
+  }
+
+  :root[data-season="christmas"] .konan-seasonal-product-card,
+  :root[data-season="christmas"] .konan-seasonal-quick-card {
+    transition: none !important;
+  }
+}

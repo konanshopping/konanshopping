@@ -1,0 +1,130 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME FÊTE DU TRAVAIL
+ * Fichier : src/theme/themes/labour-day.css
+ *
+ * Activé lorsque data-season="labour-day".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="labour-day"] {
+  --season-primary: #176b42;
+  --season-secondary: #b42335;
+  --season-glow: rgba(23, 107, 66, 0.10);
+  --season-decoration: rgba(180, 35, 53, 0.24);
+}
+
+/* Identité verte avec accents rouges, sobre et professionnelle. */
+:root[data-season="labour-day"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(23, 107, 66, 0.25);
+  box-shadow: 0 5px 20px rgba(23, 107, 66, 0.06);
+}
+
+:root[data-season="labour-day"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: 46px;
+  opacity: 0.7;
+  background:
+    linear-gradient(90deg,
+      rgba(23, 107, 66, 0.12) 0 33.33%,
+      rgba(255, 255, 255, 0.55) 33.33% 66.66%,
+      rgba(180, 35, 53, 0.10) 66.66% 100%);
+}
+
+/* Petits points festifs évoquant une célébration collective. */
+:root[data-season="labour-day"] .konan-seasonal-header::after {
+  content: "•     •      •";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 2px;
+  right: 12px;
+  color: rgba(23, 107, 66, 0.34);
+  font-size: 17px;
+  letter-spacing: 13px;
+  line-height: 23px;
+  white-space: nowrap;
+}
+
+/* Le contenu du header reste au premier plan et cliquable. */
+:root[data-season="labour-day"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="labour-day"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Bordure verte et rouge sur Favoris, Panier et Compte. */
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(23, 107, 66, 0.26);
+  box-shadow:
+    0 3px 12px rgba(23, 107, 66, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #176b42 0 48%, #ffffff 48% 52%, #b42335 52% 100%);
+}
+
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="labour-day"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier visible. */
+:root[data-season="labour-day"] button:focus-visible,
+:root[data-season="labour-day"] a:focus-visible {
+  outline: 2px solid #176b42;
+  outline-offset: 3px;
+}
+
+/* Décoration allégée sur les petits écrans. */
+@media (max-width: 600px) {
+  :root[data-season="labour-day"] .konan-seasonal-header::before {
+    height: 32px;
+    opacity: 0.48;
+  }
+
+  :root[data-season="labour-day"] .konan-seasonal-header::after {
+    right: 5px;
+    font-size: 13px;
+    letter-spacing: 7px;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="labour-day"] .konan-seasonal-header,
+  :root[data-season="labour-day"] .konan-seasonal-header *,
+  :root[data-season="labour-day"] button,
+  :root[data-season="labour-day"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

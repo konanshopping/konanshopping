@@ -1,0 +1,128 @@
+/*
+ * KONAN SHOPPING CAMEROUN — THÈME RAMADAN
+ * Fichier : src/theme/themes/ramadan.css
+ *
+ * Activé lorsque data-season="ramadan".
+ * Styles isolés : ne remplace pas index.css et ne modifie pas React.
+ */
+
+:root[data-season="ramadan"] {
+  --season-primary: #176b5b;
+  --season-secondary: #b88b3d;
+  --season-glow: rgba(23, 107, 91, 0.11);
+  --season-decoration: rgba(184, 139, 61, 0.30);
+}
+
+/* Ambiance vert émeraude et or, élégante et apaisante. */
+:root[data-season="ramadan"] .konan-seasonal-header {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  border-bottom: 1px solid rgba(184, 139, 61, 0.34);
+  box-shadow: 0 5px 20px rgba(23, 107, 91, 0.07);
+}
+
+:root[data-season="ramadan"] .konan-seasonal-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: 50px;
+  opacity: 0.72;
+  background:
+    radial-gradient(ellipse at 14% 0%, rgba(184, 139, 61, 0.23), transparent 48%),
+    radial-gradient(ellipse at 86% 0%, rgba(23, 107, 91, 0.18), transparent 48%);
+}
+
+/* Croissant et étoiles en caractères, sans SVG ni image externe. */
+:root[data-season="ramadan"] .konan-seasonal-header::after {
+  content: "☾   ✦      ✧";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: 1px;
+  right: 12px;
+  color: rgba(184, 139, 61, 0.62);
+  font-size: 17px;
+  letter-spacing: 9px;
+  line-height: 25px;
+  white-space: nowrap;
+}
+
+/* Le contenu du header reste au-dessus de la décoration. */
+:root[data-season="ramadan"] .konan-seasonal-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+:root[data-season="ramadan"] .konan-seasonal-logo {
+  position: relative;
+  z-index: 2;
+}
+
+/* Finition or et émeraude sur Favoris, Panier et Compte. */
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/favorites"] > div,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/checkout"] > div,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/account"] > div {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid rgba(184, 139, 61, 0.34);
+  box-shadow:
+    0 3px 12px rgba(23, 107, 91, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/favorites"] > div::before,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/checkout"] > div::before,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/account"] > div::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  top: -2px;
+  left: 8px;
+  right: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #176b5b, #e5ca8c, #176b5b);
+}
+
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/favorites"] > div > *,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/checkout"] > div > *,
+:root[data-season="ramadan"] .konan-seasonal-header a[href="/account"] > div > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Focus clavier visible. */
+:root[data-season="ramadan"] button:focus-visible,
+:root[data-season="ramadan"] a:focus-visible {
+  outline: 2px solid #b88b3d;
+  outline-offset: 3px;
+}
+
+/* Décoration plus discrète sur mobile. */
+@media (max-width: 600px) {
+  :root[data-season="ramadan"] .konan-seasonal-header::before {
+    height: 34px;
+    opacity: 0.48;
+  }
+
+  :root[data-season="ramadan"] .konan-seasonal-header::after {
+    right: 5px;
+    font-size: 13px;
+    letter-spacing: 6px;
+  }
+}
+
+/* Respect des préférences d'accessibilité. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-season="ramadan"] .konan-seasonal-header,
+  :root[data-season="ramadan"] .konan-seasonal-header *,
+  :root[data-season="ramadan"] button,
+  :root[data-season="ramadan"] a {
+    transition: none !important;
+    animation: none !important;
+  }
+}

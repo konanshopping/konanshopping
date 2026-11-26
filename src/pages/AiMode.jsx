@@ -1,12 +1,11 @@
 import React, {
-
   useState,
-
-  useEffect
-
+  useEffect,
+  useRef
 } from "react";
 
 import axios from "axios";
+import { FaHeart } from "react-icons/fa";
 
 import { Link } from "react-router-dom";
 
@@ -86,6 +85,50 @@ const safeParse = (value, fallback = null) => {
 
 };
 
+// Stockage local tolérant aux restrictions de confidentialité du navigateur.
+const safeStorageGet = (key) => {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const safeStorageSet = (key, value) => {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const safeStorageRemove = (key) => {
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Le site reste utilisable même si le stockage est bloqué.
+  }
+};
+
+const getGuestId = () => {
+  const existing = normalizeText(safeStorageGet("guestId"), 100);
+  if (existing) return existing;
+
+  const generated = `guest_${(
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `${Date.now()}_${Math.random().toString(36).slice(2)}`
+  )}`;
+  safeStorageSet("guestId", generated);
+  return generated;
+};
+
+const getCurrentClientId = () => {
+  const storedUser = safeParse(safeStorageGet("user"), null);
+  return normalizeText(storedUser?._id, 100) || getGuestId();
+};
+
 const normalizeText = (value, maxLength) =>
 
   typeof value === "string"
@@ -140,24 +183,29 @@ const normalizeHistory = (value) =>
 
           role: item.role,
 
-          text: normalizeText(item.text, MAX_HISTORY_TEXT_LENGTH)
+          text: normalizeText(item.text, MAX_HISTORY_TEXT_LENGTH),
+
+          products: normalizeProductList(item.products).slice(0, 12).map((product) => ({ _id: product._id }))
 
         }))
 
     : [];
 
 const api = axios.create({
-
   baseURL: API_BASE_URL,
-
   timeout: API_TIMEOUT,
-
+  withCredentials: true,
   headers: {
-
-    Accept: "application/json"
-
+    Accept: "application/json",
+    "X-Requested-With": "XMLHttpRequest"
   }
+});
 
+api.interceptors.request.use((config) => {
+  config.withCredentials = true;
+  config.headers = config.headers || {};
+  config.headers.Accept = "application/json";
+  return config;
 });
 
 const normalizeCart = (items) =>
@@ -189,6 +237,8 @@ const normalizeCart = (items) =>
     : [];
 
 function AiMode() {
+
+const requestInProgress = useRef(false);
 
 const [adding,setAdding] =
 
@@ -260,7 +310,7 @@ handleInteraction
 
 }, []);
 
-const user = safeParse(localStorage.getItem("user"), null);
+const user = safeParse(safeStorageGet("user"), null);
 
 const userId = user?._id;
 
@@ -280,6 +330,16 @@ const [products,setProducts] =
 
 useState([]);
 
+const [favoriteIds, setFavoriteIds] = useState(() => {
+  const clientId = getCurrentClientId();
+  const saved = normalizeProductList(
+    safeParse(safeStorageGet(`favorites_${clientId}`), [])
+  );
+  return saved.map((item) => String(item._id));
+});
+
+const [favoriteNotice, setFavoriteNotice] = useState("");
+
 const [reply,setReply] =
 
 useState("");
@@ -289,6 +349,9 @@ const [featuredProducts,
 setFeaturedProducts] =
 
 useState([]);
+
+const [inputText, setInputText] = useState("");
+const [pendingRedirect, setPendingRedirect] = useState(null);
 
 useEffect(() => {
 
@@ -340,310 +403,314 @@ setLastCommand] =
 
 useState("");
 
-const addToCart = (product) => {
+const addToCart = async (product) => {
+  if (!isValidProduct(product)) throw new Error("Produit invalide.");
+  const productId = String(product._id);
+  const currentUser = safeParse(safeStorageGet("user"), null);
+  const loggedIn = Boolean(currentUser?._id);
 
-  if (typeof playSound === "function") playSound();
+  // Le panier local est la source partagée avec Checkout et la boutique.
+  setCart((previous) => {
+    const current = normalizeCart(previous);
+    const found = current.find((item) => String(item._id) === productId);
+    if (found) {
+      return current.map((item) => String(item._id) === productId
+        ? { ...item, quantity: Math.min(99, (Number(item.quantity) || 1) + 1) }
+        : item);
+    }
+    return normalizeCart([...current, { ...product, quantity: 1 }]);
+  });
 
-  const existingProduct =
-
-    cart.find(
-
-      (item) =>
-
-      item._id === product._id
-
-    );
-
-  if (existingProduct) {
-
-    const updatedCart =
-
-      cart.map((item)=>
-
-        item._id === product._id
-
-        ? {
-
-          ...item,
-
-          quantity:
-
-          item.quantity + 1
-
-        }
-
-        : item
-
-      );
-
-    setCart(normalizeCart(updatedCart));
-
+  // Pour un compte connecté, synchronise aussi avec le backend.
+  // Pour un visiteur, le panier est conservé dans cart_guestId.
+  if (loggedIn) {
+    try {
+      await api.post("/api/cart", { productId, quantity: 1 });
+    } catch (error) {
+      console.warn("Panier local conservé ; synchronisation serveur à vérifier.", error?.response?.status || "réseau");
+    }
   }
-
-  else {
-
-    setCart([
-
-      ...cart,
-
-      {
-
-        ...product,
-
-        quantity:1,
-
-        image:
-
-        product.image
-
-      }
-
-    ]);
-
-  }
-
+  return true;
 };
 
-const [cart, setCart] =
+const addToFavorites = async (product) => {
+  if (!isValidProduct(product)) {
+    throw new Error("Produit invalide.");
+  }
 
-useState(() => {
+  const productId = String(product._id);
+  const currentUser = safeParse(safeStorageGet("user"), null);
+  const clientId = normalizeText(currentUser?._id, 100) || getGuestId();
+  const favoritesKey = `favorites_${clientId}`;
 
-  const user = safeParse(localStorage.getItem("user"), null);
+  // Enregistrement local immédiat, également disponible aux visiteurs.
+  const saved = normalizeProductList(
+    safeParse(safeStorageGet(favoritesKey), [])
+  );
+  const alreadySaved = saved.some(
+    (item) => String(item._id) === productId
+  );
+  const updated = alreadySaved
+    ? saved
+    : [...saved, product].slice(-100);
 
-  const clientId =
+  const localSaved = safeStorageSet(
+    favoritesKey,
+    JSON.stringify(updated)
+  );
+  if (!localSaved) {
+    throw new Error("Le navigateur ne permet pas d'enregistrer ce favori.");
+  }
 
-    user?._id ||
+  safeStorageSet("favoritesCount", String(updated.length));
+  setFavoriteIds((previous) =>
+    previous.includes(productId) ? previous : [...previous, productId]
+  );
 
-    normalizeText(localStorage.getItem("guestId"), 100) ||
+  try {
+    window.dispatchEvent(new CustomEvent("favoritesUpdated", {
+      detail: { favorites: updated, clientId }
+    }));
+  } catch {
+    try { window.dispatchEvent(new Event("favoritesUpdated")); } catch {}
+  }
 
-    (() => {
-
-      const newGuestId =
-
-        "guest_" + Date.now();
-
-      localStorage.setItem(
-
-        "guestId",
-
-        newGuestId
-
+  // Le serveur identifie le client grâce au cookie HttpOnly.
+  if (currentUser?._id) {
+    try {
+      await api.post("/api/favorites", { productId });
+      return { savedLocally: true, serverSynced: true, alreadySaved };
+    } catch (error) {
+      console.warn(
+        "Favori conservé localement ; synchronisation serveur échouée.",
+        error?.response?.status || error?.message || "réseau"
       );
+      return {
+        savedLocally: true,
+        serverSynced: false,
+        alreadySaved,
+        status: error?.response?.status || null
+      };
+    }
+  }
 
-      return newGuestId;
+  return { savedLocally: true, serverSynced: false, alreadySaved };
+};
 
-    })();
+const performAssistantAction = async (action) => {
+  if (!action || typeof action !== "object") return;
+  if (action.type === "navigate") {
+    const allowed = new Set(["/checkout", "/favorites", "/boutique"]);
+    if (allowed.has(action.destination)) window.location.assign(action.destination);
+    return;
+  }
+  const product = action.product;
+  if (!isValidProduct(product) || String(product._id) !== String(action.productId)) return;
+  if (action.type === "add_to_cart") {
+    await addToCart(product);
+    setPendingRedirect({ path: "/checkout", label: "Ouvrir mon panier" });
+    setMessages((prev) => [...prev, {
+      role: "ai",
+      text: `${product.name} a bien été ajouté à votre panier. Souhaitez-vous que je vous redirige vers votre panier pour vérifier votre commande ?`,
+      products: [product],
+      actionPrompt: "checkout"
+    }].slice(-MAX_HISTORY_MESSAGES * 2));
+  } else if (action.type === "add_to_favorites") {
+    const favoriteResult = await addToFavorites(product);
+    setPendingRedirect({ path: "/favorites", label: "Voir mes favoris" });
+    const favoriteMessage = favoriteResult.serverSynced
+      ? `${product.name} a bien été ajouté à vos favoris et synchronisé avec votre compte ❤️ Voulez-vous ouvrir votre liste de favoris ?`
+      : `${product.name} est enregistré dans les favoris de cet appareil ❤️${safeParse(safeStorageGet("user"), null)?._id ? " La synchronisation avec votre compte n'a pas abouti : vérifiez votre connexion puis réessayez." : " Connectez-vous pour retrouver vos favoris sur vos autres appareils."} Voulez-vous ouvrir votre liste de favoris ?`;
+    setMessages((prev) => [...prev, {
+      role: "ai",
+      text: favoriteMessage,
+      products: [product],
+      actionPrompt: "favorites"
+    }].slice(-MAX_HISTORY_MESSAGES * 2));
+  }
+};
 
-  const cartKey =
+const handleRedirectAnswer = (answer) => {
+  if (!pendingRedirect) return false;
+  const normalized = normalizeText(answer, 100).toLowerCase();
+  if (/^(oui|ouais|ok|okay|d accord|vas y|bien sur|je veux|yes)\b/.test(normalized)) {
+    const destination = pendingRedirect.path;
+    setPendingRedirect(null);
+    window.location.assign(destination);
+    return true;
+  }
+  if (/^(non|pas maintenant|plus tard|pas besoin)\b/.test(normalized)) {
+    setMessages((prev) => [...prev, { role: "user", text: answer }, { role: "ai", text: "Très bien. Je reste disponible si vous souhaitez continuer vos achats." }].slice(-MAX_HISTORY_MESSAGES * 2));
+    setPendingRedirect(null);
+    return true;
+  }
+  return false;
+};
 
-    `cart_${clientId}`;
-
-  const savedCart =
-
-    localStorage.getItem(cartKey);
-
-  return savedCart
-
-    ? JSON.parse(savedCart)
-
-    : [];
-
+const [cart, setCart] = useState(() => {
+  const clientId = getCurrentClientId();
+  const savedCart = safeParse(
+    safeStorageGet(`cart_${clientId}`),
+    []
+  );
+  return normalizeCart(savedCart);
 });
 
 useEffect(() => {
-
-  const user = safeParse(localStorage.getItem("user"), null);
-
-  const clientId =
-
-    user?._id ||
-
-    localStorage.getItem("guestId");
-
-  const cartKey =
-
-    `cart_${clientId}`;
-
-  localStorage.setItem(
-
-    cartKey,
-
+  const clientId = getCurrentClientId();
+  safeStorageSet(
+    `cart_${clientId}`,
     JSON.stringify(normalizeCart(cart))
-
   );
 
+  // Informe les autres composants de la boutique du changement de panier.
+  try {
+    window.dispatchEvent(new CustomEvent("cartUpdated", {
+      detail: { cart: normalizeCart(cart), clientId }
+    }));
+  } catch {
+    // Le panier reste sauvegardé même si les événements ne sont pas disponibles.
+  }
 }, [cart]);
 
-const startVoice = ()=>{
+useEffect(() => {
+  const handleStorage = (event) => {
+    if (event.key !== `cart_${getCurrentClientId()}` || !event.newValue) return;
+    setCart(normalizeCart(safeParse(event.newValue, [])));
+  };
+  window.addEventListener("storage", handleStorage);
+  return () => window.removeEventListener("storage", handleStorage);
+}, []);
 
-if (!window.webkitSpeechRecognition) {
+const startVoice = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  return;
+  if (!SpeechRecognition) {
+    window.alert("La reconnaissance vocale n'est pas disponible sur ce navigateur. Vous pouvez continuer par écrit.");
+    return;
+  }
 
-}
+  if (listening || thinking) return;
 
-const recognition =
+  const recognition = new SpeechRecognition();
+  recognition.lang = "fr-FR";
+  recognition.continuous = false;
+  recognition.interimResults = false;
 
-new window.webkitSpeechRecognition();
+  setListening(true);
+  setPulse(true);
 
-recognition.lang =
+  recognition.onresult = async (event) => {
+    const voiceText = normalizeText(
+      event?.results?.[0]?.[0]?.transcript,
+      MAX_MESSAGE_LENGTH
+    );
+    if (voiceText) {
+      setLastCommand(voiceText);
+      await sendMessage(voiceText);
+    }
+  };
 
-"fr-FR";
+  recognition.onerror = () => {
+    setListening(false);
+    setPulse(false);
+  };
 
-recognition.continuous =
+  recognition.onend = () => {
+    setListening(false);
+    setPulse(false);
+  };
 
-false;
-
-recognition.interimResults =
-
-false;
-
-setListening(true);
-
-setPulse(true);
-
-recognition.start();
-
-recognition.onresult =
-
-async(event)=>{
-
-const voiceText =
-
-event.results[0][0]
-
-.transcript;
-
-setLastCommand(
-
-voiceText
-
-);
-
-setListening(false);
-
-setPulse(false);
-
-await sendMessage(
-
-voiceText
-
-);
-
+  try {
+    recognition.start();
+  } catch {
+    setListening(false);
+    setPulse(false);
+  }
 };
 
-recognition.onerror =
+const sendMessage = async (message) => {
+  const cleanMessage = normalizeText(message, MAX_MESSAGE_LENGTH);
+  if (!cleanMessage || requestInProgress.current) return;
+  if (handleRedirectAnswer(cleanMessage)) return;
 
-()=>{
+  requestInProgress.current = true;
+  setThinking(true);
 
-setListening(false);
+  const userMessage = {
+    role: "user",
+    text: cleanMessage
+  };
 
-setPulse(false);
+  try {
+    const res = await api.post(
+      "/api/ai-chat",
+      {
+        message: cleanMessage,
+        history: normalizeHistory(messages)
+      },
+      {
+        timeout: AI_TIMEOUT
+      }
+    );
 
-};
+    const safeReply = normalizeText(res.data?.reply, 5000);
+    if (!safeReply) {
+      throw new Error("Réponse IA invalide");
+    }
 
-};
+    const recommendedProducts = normalizeProductList(
+      res.data?.products || res.data?.recommendations || []
+    );
 
-const sendMessage =
+    setReply(safeReply);
+    setProducts(recommendedProducts);
 
-async(message)=>{
+    const aiMessage = {
+      role: "ai",
+      text: safeReply,
+      products: recommendedProducts
+    };
 
-const cleanMessage = normalizeText(message, MAX_MESSAGE_LENGTH);
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      aiMessage
+    ].slice(-MAX_HISTORY_MESSAGES * 2));
 
-if(!cleanMessage) return;
+    if (res.data?.action) {
+      try {
+        await performAssistantAction(res.data.action);
+      } catch (actionError) {
+        setMessages((prev) => [...prev, { role: "ai", text: "Je n'ai pas pu terminer cette action. Vous pouvez réessayer depuis la boutique." }].slice(-MAX_HISTORY_MESSAGES * 2));
+      }
+    }
 
-if (thinking) return;
-
-setThinking(true);
-
-try{
-
-const res =
-
-await api.post(
-
-"/api/ai-chat",
-
-{
-
-message: cleanMessage,
-
-history: normalizeHistory(messages)
-
-},
-
-{
-
-timeout: AI_TIMEOUT
-
-}
-
-);
-
-const safeReply = normalizeText(res.data?.reply, 5000);
-
-setReply(safeReply);
-
-const recommendedProducts = normalizeProductList(
-
-  res.data?.products || res.data?.recommendations || []
-
-);
-
-setProducts(recommendedProducts);
-
-const aiMessage = {
-
-role:"ai",
-
-text:res.data.reply,
-
-products: recommendedProducts
-
-};
-
-const userMessage = {
-
-role:"user",
-
-text:cleanMessage
-
-};
-
-setMessages(prev=>[
-
-...prev,
-
-userMessage,
-
-aiMessage
-
-]);
-
-const speech =
-
-new SpeechSynthesisUtterance(safeReply);
-
-speech.lang =
-
-"fr-FR";
-
-window
-
-.speechSynthesis
-
-.speak(speech);
-
-}
-
-catch(err){
-
-console.error("Erreur AiMode :", err?.response?.status || "API");
-
-}
-
-setThinking(false);
-
+    if ("speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function") {
+      try {
+        const speech = new window.SpeechSynthesisUtterance(safeReply);
+        speech.lang = "fr-FR";
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(speech);
+      } catch {
+        // La réponse écrite reste disponible si la synthèse vocale échoue.
+      }
+    }
+  } catch (err) {
+    console.error("Erreur AiMode :", err?.response?.status || "API");
+    setMessages((prev) => [
+      ...prev,
+      userMessage,
+      {
+        role: "ai",
+        text: "Désolé, je rencontre momentanément un problème de connexion. Réessaie dans quelques instants."
+      }
+    ].slice(-MAX_HISTORY_MESSAGES * 2));
+  } finally {
+    requestInProgress.current = false;
+    setThinking(false);
+  }
 };
 
 return (
@@ -656,7 +723,7 @@ minHeight:"100vh",
 
 background:
 
-"linear-gradient(180deg,#f8fbff,#ffffff)",
+"linear-gradient(180deg,var(--season-surface-soft),var(--season-surface))",
 
 position:"relative",
 
@@ -666,7 +733,7 @@ overflow:"hidden"
 
 >
 
-{/* HEADER PREMIUM */}
+{/* HEADER PREMIUM — couleurs pilotées par le thème saisonnier */}
 
 <div
 
@@ -730,7 +797,7 @@ flexShrink:0,
 
 boxShadow:
 
-"0 6px 18px rgba(37,99,235,.15)"
+"0 6px 18px var(--season-glow)"
 
 }}
 
@@ -774,7 +841,7 @@ window.innerWidth < 768
 
 fontWeight:"900",
 
-color:"#111827",
+color:"var(--season-text)",
 
 lineHeight:"1"
 
@@ -796,7 +863,7 @@ fontSize:"10px",
 
 fontWeight:"700",
 
-color:"#2563eb",
+color:"var(--season-primary)",
 
 display:"flex",
 
@@ -826,7 +893,7 @@ style={{
 
 background:
 
-"linear-gradient(135deg,#2563eb,#1d4ed8)",
+"linear-gradient(135deg,var(--season-primary),var(--season-secondary))",
 
 padding:
 
@@ -838,7 +905,7 @@ window.innerWidth < 768
 
 borderRadius:"999px",
 
-color:"#fff",
+color:"var(--season-surface)",
 
 fontWeight:"700",
 
@@ -860,7 +927,7 @@ whiteSpace:"nowrap",
 
 boxShadow:
 
-"0 6px 18px rgba(37,99,235,.20)"
+"0 6px 18px var(--season-glow)"
 
 }}
 
@@ -908,7 +975,7 @@ borderRadius:"50%",
 
 background:
 
-"radial-gradient(circle,rgba(37,99,235,.12),transparent 70%)",
+"radial-gradient(circle,var(--season-glow),transparent 70%)",
 
 filter:"blur(50px)",
 
@@ -943,7 +1010,7 @@ window.innerWidth < 768
 >
 
 <div
-
+className="konan-ai-seasonal-sphere"
 onClick={startVoice}
 
 onMouseEnter={() =>
@@ -988,7 +1055,7 @@ alignItems:"center",
 
 background:
 
-"radial-gradient(circle at 30% 30%,#ffffff,#93c5fd,#3b82f6,#2563eb,#1e3a8a)",
+"radial-gradient(circle at 30% 30%,var(--season-surface),var(--season-accent),var(--season-decoration),var(--season-primary),var(--season-secondary))",
 
 boxShadow:
 
@@ -1168,7 +1235,7 @@ window.innerWidth < 768
 
 }
 
-color="#ffffff"
+color="var(--season-surface)"
 
 style={{
 
@@ -1202,7 +1269,7 @@ alignItems:"center",
 
 gap:"6px",
 
-color:"#2563eb",
+color:"var(--season-primary)",
 
 fontWeight:"700",
 
@@ -1336,7 +1403,7 @@ borderRadius:"50%",
 
 background:
 
-"linear-gradient(135deg,#2563eb,#60a5fa)",
+"linear-gradient(135deg,var(--season-primary),var(--season-decoration))",
 
 display:"flex",
 
@@ -1344,13 +1411,13 @@ justifyContent:"center",
 
 alignItems:"center",
 
-color:"#fff",
+color:"var(--season-surface)",
 
 flexShrink:0,
 
 boxShadow:
 
-"0 4px 10px rgba(37,99,235,.20)",
+"0 4px 10px var(--season-glow)",
 
 }}
 
@@ -1372,17 +1439,17 @@ background:
 
 msg.role === "ai"
 
-? "#ffffff"
+? "var(--season-surface)"
 
-: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+: "linear-gradient(135deg,var(--season-primary),var(--season-secondary))",
 
 color:
 
 msg.role === "ai"
 
-? "#111827"
+? "var(--season-text)"
 
-: "#ffffff",
+: "var(--season-surface)",
 
 padding:"12px 14px",
 
@@ -1400,7 +1467,7 @@ msg.role === "ai"
 
 ? "0 3px 12px rgba(0,0,0,.04)"
 
-: "0 6px 15px rgba(37,99,235,.15)",
+: "0 6px 15px var(--season-glow)",
 
 fontSize:
 
@@ -1428,7 +1495,7 @@ border:
 
 msg.role === "ai"
 
-? "1px solid #E5E7EB"
+? "1px solid var(--season-border)"
 
 : "none",
 
@@ -1482,9 +1549,9 @@ color:
 
 msg.role === "ai"
 
-? "#2563eb"
+? "var(--season-primary)"
 
-: "#ffffff",
+: "var(--season-surface)",
 
 }}
 
@@ -1606,7 +1673,7 @@ justifyContent:"center",
 
 alignItems:"center",
 
-color:"#fff",
+color:"var(--season-surface)",
 
 flexShrink:0,
 
@@ -1658,7 +1725,7 @@ fontWeight:"800",
 
 marginBottom:"14px",
 
-color:"#111827",
+color:"var(--season-text)",
 
 }}
 
@@ -1708,9 +1775,9 @@ product.name
 
 style={{
 
-background:"#FFFFFF",
+background:"var(--season-surface)",
 
-border:"1px solid #E5E7EB",
+border:"1px solid var(--season-border)",
 
 padding:"12px",
 
@@ -1728,7 +1795,7 @@ textAlign:"left",
 
 boxShadow:
 
-"0 4px 12px rgba(0,0,0,.04)",
+"0 4px 12px rgba(15,23,42,.04), 0 0 14px var(--season-glow)",
 
 transition:"all .25s ease",
 
@@ -1776,7 +1843,7 @@ fontWeight:"700",
 
 fontSize:"13px",
 
-color:"#111827",
+color:"var(--season-text)",
 
 whiteSpace:"nowrap",
 
@@ -1798,7 +1865,7 @@ style={{
 
 fontSize:"11px",
 
-color:"#2563EB",
+color:"var(--season-primary)",
 
 fontWeight:"700",
 
@@ -1830,6 +1897,26 @@ FCFA
 
 </div>
 
+)}
+
+{/* NOTIFICATION FAVORIS */}
+{favoriteNotice && (
+  <div
+    role="status"
+    style={{
+      maxWidth: "760px",
+      margin: "12px auto",
+      padding: "11px 14px",
+      borderRadius: "12px",
+      background: "var(--season-accent)",
+      color: "var(--season-secondary)",
+      border: "1px solid var(--season-border)",
+      fontSize: "13px",
+      fontWeight: 700
+    }}
+  >
+    {favoriteNotice}
+  </div>
 )}
 
 {/* PRODUITS */}
@@ -1870,7 +1957,7 @@ fontWeight:"900",
 
 marginBottom:"20px",
 
-color:"#111827",
+color:"var(--season-text)",
 
 }}
 
@@ -1922,7 +2009,7 @@ window.location.href =
 
 style={{
 
-background:"#fff",
+background:"var(--season-surface)",
 
 borderRadius:"18px",
 
@@ -1930,11 +2017,11 @@ overflow:"hidden",
 
 cursor:"pointer",
 
-border:"1px solid #EEF2F7",
+border:"1px solid var(--season-border)",
 
 boxShadow:
 
-"0 6px 18px rgba(0,0,0,.05)",
+"0 6px 18px rgba(15,23,42,.05), 0 0 14px var(--season-glow)",
 
 transition:"all .3s ease",
 
@@ -1978,6 +2065,49 @@ objectFit:"cover",
 
 />
 
+<button
+  type="button"
+  aria-label={favoriteIds.includes(String(product._id)) ? "Produit déjà dans les favoris" : "Ajouter aux favoris"}
+  title={favoriteIds.includes(String(product._id)) ? "Déjà dans vos favoris" : "Ajouter aux favoris"}
+  disabled={adding === product._id}
+  onClick={async (event) => {
+    event.stopPropagation();
+    setAdding(product._id);
+    setFavoriteNotice("");
+    try {
+      const result = await addToFavorites(product);
+      setFavoriteNotice(
+        result.serverSynced
+          ? `${product.name} est enregistré dans vos favoris ❤️`
+          : `${product.name} est enregistré sur cet appareil ❤️${safeParse(safeStorageGet("user"), null)?._id ? " Synchronisation du compte indisponible pour le moment." : " Connectez-vous pour synchroniser vos favoris."}`
+      );
+    } catch (error) {
+      setFavoriteNotice(error?.message || "Impossible d'enregistrer ce favori.");
+    } finally {
+      setAdding(null);
+    }
+  }}
+  style={{
+    position: "absolute",
+    top: "10px",
+    left: "10px",
+    width: "38px",
+    height: "38px",
+    border: "none",
+    borderRadius: "50%",
+    background: "var(--season-surface)",
+    color: favoriteIds.includes(String(product._id)) ? "#e11d48" : "#64748b",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 4px 12px rgba(0,0,0,.12)",
+    cursor: adding === product._id ? "wait" : "pointer",
+    zIndex: 2
+  }}
+>
+  <FaHeart size={16} />
+</button>
+
 <div
 
 style={{
@@ -1988,7 +2118,7 @@ top:"10px",
 
 right:"10px",
 
-background:"#FFFFFF",
+background:"var(--season-surface)",
 
 width:"32px",
 
@@ -2014,7 +2144,7 @@ boxShadow:
 
 size={13}
 
-color="#2563EB"
+color="var(--season-primary)"
 
 />
 
@@ -2048,9 +2178,9 @@ padding:"5px 8px",
 
 borderRadius:"20px",
 
-background:"#EFF6FF",
+background:"var(--season-accent)",
 
-color:"#2563EB",
+color:"var(--season-primary)",
 
 fontSize:"10px",
 
@@ -2082,7 +2212,7 @@ window.innerWidth < 768
 
 fontWeight:"800",
 
-color:"#111827",
+color:"var(--season-text)",
 
 marginBottom:"8px",
 
@@ -2118,7 +2248,7 @@ window.innerWidth < 768
 
 fontWeight:"900",
 
-color:"#2563EB",
+color:"var(--season-primary)",
 
 marginBottom:"10px",
 
@@ -2166,7 +2296,7 @@ fontSize:"11px",
 
 fontWeight:"600",
 
-color:"#6B7280",
+color:"var(--season-text)",
 
 }}
 
@@ -2200,6 +2330,21 @@ product.reviews
 
 )}
 
+<div style={{ maxWidth: "760px", margin: "18px auto 110px", padding: "0 14px", position: "relative", zIndex: 5 }}>
+  {pendingRedirect && (
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "10px" }}>
+      <button type="button" onClick={() => { const path = pendingRedirect.path; setPendingRedirect(null); window.location.assign(path); }} style={{ ...suggestionStyle, background: "var(--season-primary)", color: "var(--season-surface)", border: "none" }}>{pendingRedirect.label}</button>
+      <button type="button" onClick={() => setPendingRedirect(null)} style={suggestionStyle}>Continuer mes achats</button>
+    </div>
+  )}
+  <form onSubmit={(event) => { event.preventDefault(); const value = inputText; setInputText(""); sendMessage(value); }} style={{ display: "flex", gap: "8px", alignItems: "center", background: "var(--season-surface)", border: "1px solid var(--season-border)", borderRadius: "18px", padding: "8px", boxShadow: "0 8px 28px var(--season-glow)" }}>
+    <input value={inputText} onChange={(event) => setInputText(event.target.value.slice(0, MAX_MESSAGE_LENGTH))} placeholder="Écrivez à Konan AI : ex. trouve-moi une chaussure Nike…" maxLength={MAX_MESSAGE_LENGTH} aria-label="Votre message à Konan AI" style={{ flex: 1, minWidth: 0, border: "none", outline: "none", padding: "10px 8px", fontSize: "14px", background: "transparent", color: "var(--season-text)" }} />
+    <button type="button" onClick={startVoice} aria-label="Parler à Konan AI" style={{ width: "42px", height: "42px", border: "none", borderRadius: "13px", background: "var(--season-accent)", color: "var(--season-primary)", cursor: "pointer" }}><FaMicrophone /></button>
+    <button type="submit" disabled={thinking || !inputText.trim()} style={{ width: "42px", height: "42px", border: "none", borderRadius: "13px", background: thinking || !inputText.trim() ? "#94a3b8" : "var(--season-primary)", color: "var(--season-surface)", cursor: thinking || !inputText.trim() ? "not-allowed" : "pointer" }}>➤</button>
+  </form>
+  <p style={{ margin: "7px 4px 0", color: "#94a3b8", fontSize: "10px", textAlign: "center" }}>Konan AI peut vous aider à rechercher, comparer, ajouter au panier et gérer vos favoris.</p>
+</div>
+
 {showFooter && (
 
 <div
@@ -2218,13 +2363,13 @@ width:"94%",
 
 maxWidth:"500px",
 
-background:"rgba(255,255,255,.96)",
+background:"var(--season-surface)",
 
 backdropFilter:"blur(20px)",
 
 WebkitBackdropFilter:"blur(20px)",
 
-border:"1px solid rgba(229,231,235,.8)",
+border:"1px solid var(--season-border)",
 
 borderRadius:"20px",
 
@@ -2238,7 +2383,7 @@ alignItems:"center",
 
 boxShadow:
 
-"0 8px 30px rgba(0,0,0,.08)",
+"0 8px 30px rgba(15,23,42,.08), 0 0 22px var(--season-glow)",
 
 zIndex:999,
 
@@ -2284,7 +2429,7 @@ style={{
 
 ...bottomStyle,
 
-color:"#2563EB",
+color:"var(--season-primary)",
 
 }}
 
@@ -2302,7 +2447,7 @@ borderRadius:"12px",
 
 background:
 
-"linear-gradient(135deg,#2563EB,#1D4ED8)",
+"linear-gradient(135deg,var(--season-primary),var(--season-secondary))",
 
 display:"flex",
 
@@ -2310,11 +2455,11 @@ justifyContent:"center",
 
 alignItems:"center",
 
-color:"#FFF",
+color:"var(--season-surface)",
 
 boxShadow:
 
-"0 6px 18px rgba(37,99,235,.20)",
+"0 6px 18px var(--season-glow)",
 
 }}
 
@@ -2388,9 +2533,9 @@ style={bottomStyle}
 
 const suggestionStyle = {
 
-background:"#FFFFFF",
+background:"var(--season-surface)",
 
-border:"1px solid #E5E7EB",
+border:"1px solid var(--season-border)",
 
 padding:"14px",
 
@@ -2404,9 +2549,9 @@ cursor:"pointer",
 
 boxShadow:
 
-"0 4px 12px rgba(0,0,0,.04)",
+"0 4px 12px rgba(15,23,42,.04), 0 0 14px var(--season-glow)",
 
-color:"#111827",
+color:"var(--season-text)",
 
 transition:"all .25s ease",
 
@@ -2426,7 +2571,7 @@ gap:"3px",
 
 textDecoration:"none",
 
-color:"#64748B",
+color:"var(--season-text)",
 
 fontSize:"10px",
 
@@ -2548,7 +2693,7 @@ margin: 0;
 
 padding: 0;
 
-background: #F8FBFF;
+background: var(--season-surface-soft);
 
 font-family:
 
@@ -2568,7 +2713,7 @@ width: 4px;
 
 ::-webkit-scrollbar-thumb {
 
-background: #CBD5E1;
+background: var(--season-decoration);
 
 border-radius: 20px;
 

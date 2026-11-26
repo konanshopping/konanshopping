@@ -17,7 +17,7 @@ export default function InstallPopup() {
 
     const handler = (e) => {
 
-console.log("beforeinstallprompt déclenché");
+      console.log("beforeinstallprompt déclenché");
 
       e.preventDefault();
       setPrompt(e);
@@ -116,7 +116,7 @@ console.log("beforeinstallprompt déclenché");
             margin: "0 auto",
             borderRadius: 20,
             background:
-              "linear-gradient(135deg,#2563eb,#1d4ed8)",
+              "linear-gradient(135deg, var(--season-primary, #2563eb), var(--season-secondary, #3b82f6))",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -160,21 +160,21 @@ console.log("beforeinstallprompt déclenché");
         >
           <div>
             <FaBolt
-              color="#2563eb"
+              color="var(--season-primary, #2563eb)"
             />{" "}
             Navigation plus rapide
           </div>
 
           <div>
             <FaGift
-              color="#2563eb"
+              color="var(--season-primary, #2563eb)"
             />{" "}
             Promotions exclusives
           </div>
 
           <div>
             <FaMobileAlt
-              color="#2563eb"
+              color="var(--season-primary, #2563eb)"
             />{" "}
             Accès depuis l'écran d'accueil
           </div>
@@ -189,7 +189,7 @@ console.log("beforeinstallprompt déclenché");
             border: "none",
             borderRadius: 15,
             background:
-              "linear-gradient(135deg,#2563eb,#1d4ed8)",
+              "linear-gradient(135deg, var(--season-primary, #2563eb), var(--season-secondary, #3b82f6))",
             color: "#fff",
             fontSize: 16,
             fontWeight: 700,

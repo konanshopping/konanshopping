@@ -7522,6 +7522,442 @@ const stopGPS =
 
         }
 
+
+        /* =====================================================
+           RESPONSIVE FINAL — iOS / SAFARI / ANDROID / TABLET
+           Couche visuelle uniquement : aucune logique modifiée.
+        ====================================================== */
+
+        html {
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+          scroll-padding-top: env(safe-area-inset-top, 0px);
+        }
+
+        body {
+          width: 100%;
+          min-width: 0;
+          overscroll-behavior-x: none;
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .driver-page {
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
+          width: 100%;
+          max-width: 100%;
+          padding-left: max(20px, env(safe-area-inset-left, 0px));
+          padding-right: max(20px, env(safe-area-inset-right, 0px));
+          padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+          isolation: isolate;
+        }
+
+        .driver-container,
+        .driver-header,
+        .telegram-card,
+        .stats,
+        .gps-banner,
+        .filters,
+        .section-head,
+        .orders,
+        .order-card,
+        .qr-scanner-card {
+          min-width: 0;
+          max-width: 100%;
+        }
+
+        .driver-page *,
+        .qr-scanner-overlay *,
+        .driver-login-page * {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .driver-page button,
+        .qr-scanner-overlay button,
+        .driver-login-page button,
+        .driver-page a {
+          touch-action: manipulation;
+        }
+
+        .driver-page button,
+        .qr-scanner-overlay button {
+          -webkit-appearance: none;
+          appearance: none;
+        }
+
+        .driver-page img,
+        .qr-scanner-overlay video {
+          max-width: 100%;
+        }
+
+        .order-card,
+        .telegram-card,
+        .stat-card,
+        .destination,
+        .total-box,
+        .eta-card,
+        .product,
+        .professional-notification,
+        .qr-scanner-card {
+          min-width: 0;
+        }
+
+        .client-name,
+        .client-name h3,
+        .destination p,
+        .notification-content,
+        .notification-content span,
+        .telegram-info,
+        .telegram-info span,
+        .product > div,
+        .product strong,
+        .welcome > div {
+          min-width: 0;
+          overflow-wrap: anywhere;
+          word-break: normal;
+        }
+
+        .filters {
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior-x: contain;
+          scroll-snap-type: x proximity;
+        }
+
+        .filter {
+          min-height: 44px;
+          scroll-snap-align: start;
+        }
+
+        .actions button,
+        .map-button,
+        .phone-button,
+        .telegram-button,
+        .refresh-button,
+        .qr-close-button,
+        .qr-cancel-button,
+        .notification-close {
+          min-height: 44px;
+        }
+
+        .qr-scanner-overlay {
+          min-height: 100vh;
+          min-height: 100dvh;
+          padding-top: max(12px, env(safe-area-inset-top, 0px));
+          padding-right: max(12px, env(safe-area-inset-right, 0px));
+          padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+          padding-left: max(12px, env(safe-area-inset-left, 0px));
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        }
+
+        .qr-scanner-card {
+          max-height: calc(100vh - 24px);
+          max-height: calc(100dvh - 24px);
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .qr-camera-wrapper,
+        .qr-reader {
+          min-width: 0;
+          max-width: 100%;
+          touch-action: pan-y;
+        }
+
+        .qr-reader video {
+          width: 100% !important;
+          max-width: 100% !important;
+          height: auto !important;
+          object-fit: cover;
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+        }
+
+        .qr-frame {
+          max-width: calc(100% - 24px);
+          max-height: calc(100% - 24px);
+        }
+
+        .professional-notification {
+          padding-top: max(12px, env(safe-area-inset-top, 0px));
+        }
+
+        .driver-login-page {
+          min-height: 100vh;
+          min-height: 100svh;
+          min-height: 100dvh;
+          padding-top: max(20px, env(safe-area-inset-top, 0px));
+          padding-right: max(16px, env(safe-area-inset-right, 0px));
+          padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+          padding-left: max(16px, env(safe-area-inset-left, 0px));
+        }
+
+        @media (max-width: 900px) {
+          .driver-page {
+            padding-left: max(14px, env(safe-area-inset-left, 0px));
+            padding-right: max(14px, env(safe-area-inset-right, 0px));
+          }
+
+          .orders {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .order-card {
+            width: 100%;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .driver-page {
+            padding-top: 8px;
+            padding-left: max(8px, env(safe-area-inset-left, 0px));
+            padding-right: max(8px, env(safe-area-inset-right, 0px));
+            padding-bottom: max(18px, env(safe-area-inset-bottom, 0px));
+          }
+
+          .driver-container {
+            width: 100%;
+          }
+
+          .header-top,
+          .welcome,
+          .telegram-card,
+          .section-head {
+            min-width: 0;
+          }
+
+          .header-top {
+            flex-wrap: wrap;
+          }
+
+          .brand {
+            flex: 1 1 190px;
+          }
+
+          .online-badge {
+            flex-shrink: 0;
+          }
+
+          .welcome {
+            align-items: center;
+          }
+
+          .stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
+          .stat-card {
+            min-width: 0;
+          }
+
+          .stat-card span {
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+          }
+
+          .section-head {
+            align-items: center;
+          }
+
+          .section-head > div {
+            min-width: 0;
+          }
+
+          .order-header {
+            flex-wrap: wrap;
+          }
+
+          .client-info {
+            flex: 1 1 150px;
+          }
+
+          .client-name h3 {
+            max-width: 100%;
+          }
+
+          .status {
+            max-width: 100%;
+          }
+
+          .action-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .professional-notification {
+            top: max(10px, env(safe-area-inset-top, 0px));
+            right: max(10px, env(safe-area-inset-right, 0px));
+            left: max(10px, env(safe-area-inset-left, 0px));
+            width: auto;
+          }
+
+          .qr-scanner-overlay {
+            align-items: flex-start;
+            padding-top: max(8px, env(safe-area-inset-top, 0px));
+            padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+          }
+
+          .qr-scanner-card {
+            width: 100%;
+            max-width: 470px;
+            max-height: calc(100vh - 16px);
+            max-height: calc(100dvh - 16px);
+            margin: auto;
+          }
+
+          .qr-reader,
+          .qr-reader video {
+            min-height: min(280px, 42dvh);
+          }
+        }
+
+        @media (max-width: 420px) {
+          .driver-page {
+            padding-left: max(6px, env(safe-area-inset-left, 0px));
+            padding-right: max(6px, env(safe-area-inset-right, 0px));
+          }
+
+          .driver-header {
+            padding: 13px;
+          }
+
+          .header-top {
+            align-items: flex-start;
+          }
+
+          .brand {
+            flex-basis: 155px;
+          }
+
+          .online-badge {
+            font-size: 7px;
+            padding: 7px 8px;
+          }
+
+          .stats {
+            gap: 5px;
+          }
+
+          .stat-card {
+            padding: 9px 3px;
+          }
+
+          .stat-card span {
+            font-size: 6.5px;
+          }
+
+          .order-header {
+            gap: 8px;
+          }
+
+          .client-info {
+            flex-basis: 125px;
+          }
+
+          .status {
+            white-space: normal;
+            line-height: 1.2;
+            text-align: center;
+          }
+
+          .eta-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .qr-frame {
+            width: min(220px, calc(100% - 32px));
+            height: min(220px, calc(100vw - 32px));
+          }
+        }
+
+        @media (max-width: 340px) {
+          .driver-page {
+            padding-left: max(4px, env(safe-area-inset-left, 0px));
+            padding-right: max(4px, env(safe-area-inset-right, 0px));
+          }
+
+          .driver-header,
+          .order-card {
+            padding: 10px;
+          }
+
+          .brand {
+            flex-basis: 135px;
+          }
+
+          .brand h1 {
+            font-size: 15px;
+          }
+
+          .online-badge {
+            font-size: 6px;
+            gap: 4px;
+          }
+
+          .stats {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
+          .filter {
+            min-height: 44px;
+            padding-right: 8px;
+            padding-left: 8px;
+          }
+
+          .action-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) {
+          .qr-scanner-overlay {
+            align-items: flex-start;
+          }
+
+          .qr-scanner-card {
+            max-height: calc(100dvh - 16px);
+          }
+
+          .qr-reader,
+          .qr-reader video {
+            min-height: 180px;
+            max-height: 42dvh;
+          }
+        }
+
+        @supports (-webkit-touch-callout: none) {
+          .driver-page {
+            min-height: -webkit-fill-available;
+          }
+
+          .qr-scanner-overlay {
+            min-height: -webkit-fill-available;
+          }
+
+          .qr-scanner-card {
+            -webkit-overflow-scrolling: touch;
+          }
+
+          input,
+          button,
+          select,
+          textarea {
+            font-size: max(16px, 1em);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .driver-page *,
+          .qr-scanner-overlay *,
+          .driver-login-page * {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
       `}</style>
 
     </>

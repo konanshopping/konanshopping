@@ -44,11 +44,11 @@
 
     inset: 0;
 
-    border: 3px solid #ECECF8;
+    border: 3px solid color-mix(in srgb, var(--season-primary, #2563eb) 10%, white);
 
-    border-top: 3px solid #4B2E83;
+    border-top: 3px solid var(--season-primary, #2563eb);
 
-    border-right: 3px solid #7C3AED;
+    border-right: 3px solid var(--season-secondary, #3b82f6);
 
     border-radius: 50%;
 
@@ -86,7 +86,7 @@
 
     box-shadow:
         0 8px 22px
-        rgba(75,46,131,.18);
+        color-mix(in srgb, var(--season-primary, #2563eb) 18%, transparent);
 }
 
 
@@ -125,7 +125,7 @@
         linear-gradient(
             90deg,
             #B8BCC8 20%,
-            #4B2E83 50%,
+            var(--season-primary, #2563eb) 50%,
             #B8BCC8 80%
         );
 
@@ -171,7 +171,7 @@
 
         box-shadow:
             0 0 10px
-            rgba(75,46,131,.15);
+            color-mix(in srgb, var(--season-primary, #2563eb) 15%, transparent);
 
     }
 
@@ -183,7 +183,7 @@
 
         box-shadow:
             0 0 24px
-            rgba(124,58,237,.35);
+            color-mix(in srgb, var(--season-secondary, #3b82f6) 35%, transparent);
 
     }
 
